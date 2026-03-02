@@ -4,6 +4,7 @@ import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
+import 'package:fennac_app/pages/homelanding/data/models/group_invitation_model.dart';
 import 'package:fennac_app/pages/homelanding/presentation/bloc/cubit/home_landing_cubit.dart';
 import 'package:fennac_app/widgets/custom_sized_box.dart';
 import 'package:fennac_app/widgets/custom_text.dart';
@@ -20,6 +21,26 @@ class HomeLandingBanner extends StatelessWidget {
       child: BlocBuilder(
         bloc: _homeLandingCubit,
         builder: (context, state) {
+          final invitations = _homeLandingCubit.invitations;
+          final firstInvitation = invitations.isNotEmpty
+              ? invitations[0]
+              : null;
+          final group = firstInvitation?.group;
+          final inviter = firstInvitation?.inviter;
+
+          // Get member names
+          final memberNames = group?.members != null
+              ? group!.members!
+                    .map((m) => m.firstName ?? '')
+                    .where((name) => name.isNotEmpty)
+                    .join(',\t')
+              : 'Group Members';
+
+          // Get inviter name
+          final inviterName = inviter != null
+              ? '${inviter.firstName ?? ''} ${inviter.lastName ?? ''}'.trim()
+              : 'Group Creator';
+
           return Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -41,10 +62,10 @@ class HomeLandingBanner extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    _buildGroupImageWithAvatars(context),
+                    _buildGroupImageWithAvatars(context, group),
                     const CustomSizedBox(height: 54),
                     AppText(
-                      text: 'Brenda,\t Nancy,\t Jeff,\t Anna',
+                      text: memberNames,
                       style: AppTextStyles.h1(
                         context,
                       ).copyWith(fontSize: 24, fontWeight: FontWeight.w600),
@@ -53,7 +74,9 @@ class HomeLandingBanner extends StatelessWidget {
                     const CustomSizedBox(height: 16),
                     // Group Creation Info
                     AppText(
-                      text: 'Group created by Anna Taylor 2 hours ago',
+                      text: group != null
+                          ? 'Group "${group.title ?? group.name}" created by $inviterName'
+                          : 'Group created by $inviterName',
                       style: AppTextStyles.description(context).copyWith(
                         color: isDarkTheme(context)
                             ? ColorPalette.textSecondary
@@ -72,7 +95,7 @@ class HomeLandingBanner extends StatelessWidget {
     );
   }
 
-  Widget _buildGroupImageWithAvatars(BuildContext context) {
+  Widget _buildGroupImageWithAvatars(BuildContext context, Group? group) {
     return Stack(
       clipBehavior: Clip.none,
       alignment: Alignment.center,
@@ -120,31 +143,46 @@ class HomeLandingBanner extends StatelessWidget {
                       0,
                     ])
                   : const ColorFilter.mode(Colors.transparent, BlendMode.dst),
-              child: Image.asset(
-                Assets.dummy.groupSelfie.path,
-                fit: BoxFit.cover,
-              ),
+              child: _buildGroupImage(context, group),
             ),
           ),
         ),
         // Member Avatars Row at Bottom
         Positioned(
           bottom: -30,
-          right: 0,
-          left: 70,
+          right: (group?.members?.length == 1) ? null : 0,
+          left: (group?.members?.length == 1) ? null : 70,
           child: Row(
-            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: (group?.members?.length == 1)
+                ? MainAxisAlignment.center
+                : MainAxisAlignment.start,
+            mainAxisSize: (group?.members?.length == 1)
+                ? MainAxisSize.max
+                : MainAxisSize.min,
             children: [
-              for (final entry in [
-                Assets.dummy.a1.path,
-                Assets.dummy.b1.path,
-                Assets.dummy.c1.path,
-                Assets.dummy.d1.path,
-              ].indexed)
-                Transform.translate(
-                  offset: Offset(-12.0 * entry.$1, 0),
-                  child: _buildMemberAvatar(entry.$2, context),
-                ),
+              if (group?.members != null && group!.members!.isNotEmpty)
+                for (final entry in group.members!.indexed)
+                  Transform.translate(
+                    offset: (group.members!.length == 1)
+                        ? const Offset(0, 0)
+                        : Offset(-12.0 * entry.$1, 0),
+                    child: _buildMemberAvatar(
+                      entry.$2.image ?? '',
+                      context,
+                      entry.$2,
+                    ),
+                  )
+              else
+                for (final entry in [
+                  Assets.dummy.a1.path,
+                  Assets.dummy.b1.path,
+                  Assets.dummy.c1.path,
+                  Assets.dummy.d1.path,
+                ].indexed)
+                  Transform.translate(
+                    offset: Offset(-12.0 * entry.$1, 0),
+                    child: _buildMemberAvatar(entry.$2, context, null),
+                  ),
             ],
           ),
         ),
@@ -152,7 +190,24 @@ class HomeLandingBanner extends StatelessWidget {
     );
   }
 
-  Widget _buildMemberAvatar(String imagePath, BuildContext context) {
+  Widget _buildGroupImage(BuildContext context, Group? group) {
+    if (group?.photosVideos != null && group!.photosVideos!.isNotEmpty) {
+      return Image.network(
+        group.photosVideos![0],
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return Image.asset(Assets.dummy.groupSelfie.path, fit: BoxFit.cover);
+        },
+      );
+    }
+    return Image.asset(Assets.dummy.groupSelfie.path, fit: BoxFit.cover);
+  }
+
+  Widget _buildMemberAvatar(
+    String imagePath,
+    BuildContext context,
+    Member? member,
+  ) {
     final bool isDeclined =
         _homeLandingCubit.invitationStatus == InvitationStatus.declined;
 
@@ -196,10 +251,25 @@ class HomeLandingBanner extends StatelessWidget {
                   0,
                 ])
               : const ColorFilter.mode(Colors.transparent, BlendMode.dst),
-          child: Image.asset(imagePath, fit: BoxFit.cover),
+          child:
+              member != null && member.image != null && member.image!.isNotEmpty
+              ? Image.network(
+                  member.image!,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return _buildPlaceholderAvatar(imagePath);
+                  },
+                )
+              : _buildPlaceholderAvatar(imagePath),
         ),
       ),
     );
+  }
+
+  Widget _buildPlaceholderAvatar(String imagePath) {
+    return imagePath.isNotEmpty
+        ? Image.asset(imagePath, fit: BoxFit.cover)
+        : Icon(Icons.account_circle, color: ColorPalette.primary, size: 64);
   }
 }
 

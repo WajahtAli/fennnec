@@ -14,6 +14,11 @@ import 'package:fennac_app/pages/auth/domain/usecases/login_usecase.dart';
 import 'package:fennac_app/pages/auth/presentation/bloc/cubit/auth_cubit.dart';
 import 'package:fennac_app/pages/auth/presentation/bloc/cubit/create_account_cubit.dart';
 import 'package:fennac_app/pages/auth/presentation/bloc/cubit/login_cubit.dart';
+import 'package:fennac_app/pages/buy_poke/data/datasource/poke_datasource.dart';
+import 'package:fennac_app/pages/buy_poke/data/repository/poke_repository_impl.dart';
+import 'package:fennac_app/pages/buy_poke/domain/repository/poke_repository.dart';
+import 'package:fennac_app/pages/buy_poke/domain/usecase/fetch_pokes_usecase.dart';
+import 'package:fennac_app/pages/buy_poke/presentation/bloc/cubit/poke_cubit.dart';
 import 'package:fennac_app/pages/call/presentation/bloc/cubit/call_cubit.dart';
 import 'package:fennac_app/pages/chats/presentation/bloc/cubit/chat_landing_cubit.dart';
 import 'package:fennac_app/pages/chats/presentation/bloc/cubit/message_cubit.dart';
@@ -106,6 +111,7 @@ class Di {
     sl.registerLazySingleton<HomeLandingDatasource>(
       () => HomeLandingDatasourceImpl(sl()),
     );
+    sl.registerLazySingleton<PokeDatasource>(() => PokeDatasourceImpl(sl()));
 
     // Repositories
     sl.registerLazySingleton<CreateAccountRepo>(
@@ -130,6 +136,7 @@ class Di {
     sl.registerLazySingleton<HomeLandingRepository>(
       () => HomeLandingRepositoryImpl(sl()),
     );
+    sl.registerLazySingleton<PokeRepository>(() => PokeRepositoryImpl(sl()));
     // sl.registerLazySingleton<ChatRepository>(() => ChatRepositoryImpl(sl()));
 
     // Usecases
@@ -148,6 +155,7 @@ class Di {
     sl.registerLazySingleton<FetchGroupInvitationsUseCase>(
       () => FetchGroupInvitationsUseCase(sl()),
     );
+    sl.registerLazySingleton<FetchPokesUseCase>(() => FetchPokesUseCase(sl()));
 
     // Cubits
     sl.registerLazySingleton<AuthCubit>(() => AuthCubit());
@@ -162,6 +170,7 @@ class Di {
     sl.registerLazySingleton<GroupsCubit>(() => GroupsCubit(sl()));
     sl.registerLazySingleton<LoginCubit>(() => LoginCubit(sl()));
     sl.registerLazySingleton<HomeLandingCubit>(() => HomeLandingCubit(sl()));
+    sl.registerLazySingleton<PokeCubit>(() => PokeCubit(sl()));
     sl.registerLazySingleton<CreateGroupCubit>(() => CreateGroupCubit(sl()));
     sl.registerLazySingleton<FindGroupCubit>(() => FindGroupCubit(sl()));
     sl.registerLazySingleton<MoveAbleBackgroundCubit>(

@@ -97,6 +97,7 @@ class GroupGalleryWidget extends StatelessWidget {
                               imageUrl: images[index],
                               width: double.infinity,
                               fit: BoxFit.cover,
+                              height: 450,
                               radius: 24,
                             )
                           : ClipRRect(
