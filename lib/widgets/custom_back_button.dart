@@ -1,3 +1,5 @@
+import 'package:fennac_app/app/constants/media_query_constants.dart';
+import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class CustomBackButton extends StatelessWidget {
@@ -8,6 +10,8 @@ class CustomBackButton extends StatelessWidget {
   final double? size;
   final Alignment? alignment;
   final EdgeInsetsGeometry? padding;
+  final double? height;
+  final double? width;
 
   const CustomBackButton({
     super.key,
@@ -18,6 +22,8 @@ class CustomBackButton extends StatelessWidget {
     this.size,
     this.alignment,
     this.padding,
+    this.height,
+    this.width,
   });
 
   @override
@@ -25,19 +31,28 @@ class CustomBackButton extends StatelessWidget {
     return Align(
       alignment: alignment ?? Alignment.centerLeft,
       child: Container(
+        height: height ?? 48,
+        width: width ?? 48,
         decoration: BoxDecoration(
-          color: backgroundColor ?? Colors.black26,
+          color:
+              backgroundColor ??
+              (isLightTheme(context)
+                  ? Colors.transparent
+                  : ColorPalette.black.withOpacity(0.75)),
           shape: BoxShape.circle,
         ),
-        child: IconButton(
-          onPressed: onPressed ?? () => Navigator.pop(context),
-          icon: Icon(
+        child: InkWell(
+          borderRadius: BorderRadius.circular(32),
+          onTap: onPressed ?? () => Navigator.pop(context),
+          child: Icon(
             icon ?? Icons.arrow_back,
-            color: iconColor ?? Colors.white,
-            size: size,
+            color:
+                iconColor ??
+                (isLightTheme(context)
+                    ? ColorPalette.black
+                    : ColorPalette.white),
+            size: size ?? 20,
           ),
-          padding: padding ?? EdgeInsets.zero,
-          constraints: const BoxConstraints(),
         ),
       ),
     );

@@ -2,6 +2,18 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSContactsUsageDescription</key>  
+	<string>This app requires access to your contacts to help you easily find and add your friends.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app needs access to your microphone for voice communication and audio recording.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>This app needs access to your camera to capture photos and videos.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Application need access to your photo library to upload images and videos.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Application need permission to save media to your photo library.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Application use your location for checking user address and location.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>ITSAppUsesNonExemptEncryption</key>
@@ -45,11 +57,36 @@
 		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 	</array>
-		<key>NSCameraUsageDescription</key>
-	<string>This app uses the camera to allow users to upload or capture images.</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>This app uses your location to provide location-based features while you are using the app.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+    <string>voip</string>
+    <string>remote-notification</string>
+    <string>processing</string>
+	</array>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>com.fennac.ostryx.refresh</string>
+		<string>com.fennac.ostryx.processing</string>
+	</array>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>This app uses your location to support features that require access even when the app is not active.</string>
+
+	<!-- Google Sign-In URL scheme (reversed client ID) -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.317592885652-fhgvu8tkpcpgo3f3qa9k2e29lle736uf</string>
+			</array>
+		</dict>
+	</array>
+
+	<!-- Allow Google auth to query custom schemes -->
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>google</string>
+		<string>com.googleusercontent.apps.317592885652-fhgvu8tkpcpgo3f3qa9k2e29lle736uf</string>
+	</array>
 </dict>
 </plist>

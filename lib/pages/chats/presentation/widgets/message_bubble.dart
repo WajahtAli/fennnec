@@ -1,0 +1,403 @@
+import 'dart:io';
+
+import 'package:auto_route/auto_route.dart';
+import 'package:fennac_app/app/constants/media_query_constants.dart';
+import 'package:fennac_app/app/theme/app_colors.dart';
+import 'package:fennac_app/app/theme/text_styles.dart';
+import 'package:fennac_app/core/di_container.dart';
+import 'package:fennac_app/generated/assets.gen.dart';
+import 'package:fennac_app/helpers/cached_network_image_helper.dart';
+import 'package:fennac_app/pages/chats/data/models/message_model.dart';
+import 'package:fennac_app/pages/chats/data/models/message_type_enum.dart';
+import 'package:fennac_app/pages/chats/presentation/bloc/cubit/message_cubit.dart';
+import 'package:fennac_app/widgets/prompt_audio_row.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:video_player/video_player.dart';
+
+import '../../../../routes/routes_imports.gr.dart';
+
+class MessageBubble extends StatelessWidget {
+  final MessageModel message;
+  final bool isMineSide;
+  final VoidCallback onLongPress;
+  final GlobalKey messageKey;
+
+  const MessageBubble({
+    super.key,
+    required this.message,
+    required this.isMineSide,
+    required this.onLongPress,
+    required this.messageKey,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    Widget bubble;
+
+    switch (message.type) {
+      case MessageType.audio:
+        bubble = GestureDetector(
+          onLongPress: onLongPress,
+          child: VoiceMessageBubble(message: message, isMineSide: isMineSide),
+        );
+        break;
+
+      case MessageType.image:
+        bubble = GestureDetector(
+          onLongPress: onLongPress,
+          child: ImageMessageBubble(message: message),
+        );
+        break;
+
+      case MessageType.video:
+        bubble = GestureDetector(
+          onLongPress: onLongPress,
+          child: VideoMessageBubble(message: message),
+        );
+        break;
+
+      default:
+        bubble = TextMessageBubble(message: message, isMineSide: isMineSide);
+    }
+
+    return MessageWithReactions(
+      message: message,
+      isMineSide: isMineSide,
+      messageKey: messageKey,
+      child: bubble,
+    );
+  }
+}
+
+class TextMessageBubble extends StatelessWidget {
+  final MessageModel message;
+  final bool isMineSide;
+
+  const TextMessageBubble({
+    super.key,
+    required this.message,
+    required this.isMineSide,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: isMineSide
+          ? CrossAxisAlignment.end
+          : CrossAxisAlignment.start,
+      children: [
+        if (!isMineSide)
+          Text(message.senderName, style: AppTextStyles.body(context)),
+        Container(
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width * 0.75,
+          ),
+          margin: message.reactions.isNotEmpty
+              ? const EdgeInsets.only(bottom: 10)
+              : EdgeInsets.zero,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: isMineSide
+                ? isLightTheme(context)
+                      ? ColorPalette.primary.withValues(alpha: 0.8)
+                      : ColorPalette.primary
+                : (isLightTheme(context)
+                      ? ColorPalette.textGrey
+                      : ColorPalette.secondary.withValues(alpha: 0.5)),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Text(
+            message.content,
+            style: AppTextStyles.body(context).copyWith(
+              color: isMineSide
+                  ? Colors.white
+                  : (isLightTheme(context) ? Colors.black : Colors.white),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class ChatImage extends StatelessWidget {
+  final String path;
+  final double height;
+
+  const ChatImage({super.key, required this.path, required this.height});
+
+  @override
+  Widget build(BuildContext context) {
+    final isNetwork = path.startsWith('http');
+    final isFile = path.startsWith('/');
+
+    if (isNetwork) {
+      return CachedImageHelper(
+        imageUrl: path,
+        fit: BoxFit.cover,
+        height: height,
+      );
+    }
+
+    if (isFile) {
+      return Image.file(File(path), fit: BoxFit.cover, height: height);
+    }
+
+    return Image.asset(path, fit: BoxFit.cover, height: height);
+  }
+}
+
+class ImageMessageBubble extends StatelessWidget {
+  final MessageModel message;
+
+  const ImageMessageBubble({super.key, required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    final images = message.imageUrls;
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: images.length > 1 ? 2 : 1,
+          crossAxisSpacing: 4,
+          mainAxisSpacing: 4,
+        ),
+        itemCount: images.length > 4 ? 4 : images.length,
+        itemBuilder: (_, index) {
+          return Stack(
+            fit: StackFit.expand,
+            children: [
+              GestureDetector(
+                onTap: () {
+                  context.router.navigate(
+                    MediaPreviewRoute(
+                      messages: Di().sl<MessageCubit>().messages,
+                      initialIndex: index,
+                    ),
+                  );
+                },
+                child: ChatImage(path: images[index], height: 120),
+              ),
+              if (index == 3 && images.length > 4)
+                Container(
+                  color: Colors.black.withOpacity(0.6),
+                  child: Center(
+                    child: Text(
+                      '+${images.length - 4}',
+                      style: AppTextStyles.h3(context),
+                    ),
+                  ),
+                ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class VideoMessageBubble extends StatefulWidget {
+  final MessageModel message;
+
+  const VideoMessageBubble({super.key, required this.message});
+
+  @override
+  State<VideoMessageBubble> createState() => _VideoMessageBubbleState();
+}
+
+class _VideoMessageBubbleState extends State<VideoMessageBubble> {
+  late VideoPlayerController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = VideoPlayerController.file(
+      File(widget.message.mediaUrl ?? ''),
+    )..initialize().then((_) => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_controller.value.isInitialized) {
+      return const SizedBox(
+        height: 200,
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    return GestureDetector(
+      onTap: () {
+        context.router.navigate(
+          MediaPreviewRoute(
+            messages: Di().sl<MessageCubit>().messages,
+            initialIndex: 2,
+          ),
+        );
+      },
+      child: SizedBox(
+        height: 400,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: AspectRatio(
+                aspectRatio: _controller.value.aspectRatio,
+                child: VideoPlayer(_controller),
+              ),
+            ),
+            IconButton(
+              style: ButtonStyle(
+                backgroundColor: WidgetStateProperty.all(ColorPalette.primary),
+              ),
+              icon: Icon(
+                _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
+                color: Colors.white,
+                size: 20,
+              ),
+              onPressed: () {
+                setState(() {
+                  _controller.value.isPlaying
+                      ? _controller.pause()
+                      : _controller.play();
+                });
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ReactionRow extends StatelessWidget {
+  final List<dynamic> reactions;
+
+  const ReactionRow({super.key, required this.reactions});
+
+  @override
+  Widget build(BuildContext context) {
+    final Map<String, int> grouped = {};
+
+    for (final r in reactions) {
+      grouped[r.emoji] = (grouped[r.emoji] ?? 0) + 1;
+    }
+
+    return Wrap(
+      spacing: 6,
+      children: grouped.entries.map((e) {
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: ColorPalette.primary,
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Text(
+            '${e.key} ${e.value}',
+            style: AppTextStyles.bodySmall(context),
+          ),
+        );
+      }).toList(),
+    );
+  }
+}
+
+class VoiceMessageBubble extends StatelessWidget {
+  final MessageModel message;
+  final bool isMineSide;
+
+  const VoiceMessageBubble({
+    super.key,
+    required this.message,
+    required this.isMineSide,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(context).size.width * 0.75,
+      ),
+      child: PromptAudioRow(
+        audioPath: message.mediaUrl ?? Assets.dummy.audio.group,
+        duration: message.mediaDuration ?? '00:00',
+        waveformData: message.waveformData,
+        height: 72,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        backgroundColor: isLightTheme(context)
+            ? ColorPalette.primary.withValues(alpha: 0.2)
+            : ColorPalette.primary,
+        playButtonColor: ColorPalette.primary,
+        waveformColor: isLightTheme(context)
+            ? ColorPalette.black
+            : ColorPalette.white,
+        borderRadius: BorderRadius.circular(20),
+      ),
+    );
+  }
+}
+
+class MessageWithReactions extends StatelessWidget {
+  final Widget child;
+  final MessageModel message;
+  final bool isMineSide;
+  final GlobalKey messageKey;
+
+  const MessageWithReactions({
+    super.key,
+    required this.child,
+    required this.message,
+    required this.isMineSide,
+    required this.messageKey,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      key: messageKey,
+      crossAxisAlignment: isMineSide
+          ? CrossAxisAlignment.end
+          : CrossAxisAlignment.start,
+      children: [
+        Stack(
+          children: [
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: isMineSide
+                  ? CrossAxisAlignment.end
+                  : CrossAxisAlignment.start,
+              children: [
+                child,
+                const SizedBox(height: 5),
+                if (isMineSide)
+                  Text(
+                    DateFormat('hh:mm a').format(message.sentAt),
+                    style: AppTextStyles.description(context),
+                  ),
+              ],
+            ),
+            if (message.reactions.isNotEmpty)
+              Positioned(
+                bottom: isMineSide ? 15 : 0,
+                right: isMineSide ? 0 : null,
+                left: isMineSide ? null : 0,
+                child: ReactionRow(reactions: message.reactions),
+              ),
+          ],
+        ),
+      ],
+    );
+  }
+}

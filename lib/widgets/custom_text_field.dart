@@ -1,7 +1,7 @@
+import '../app/constants/media_query_constants.dart';
 import 'package:flutter/material.dart';
 import '../app/theme/app_colors.dart';
 import '../app/theme/text_styles.dart';
-import 'custom_sized_box.dart';
 import 'custom_text.dart';
 
 class CustomLabelTextField extends StatelessWidget {
@@ -17,6 +17,7 @@ class CustomLabelTextField extends StatelessWidget {
   final Widget? suffix;
   final Widget? prefix;
   final TextInputType? keyboardType;
+  final TextInputAction? textInputAction;
   final String? hintText;
   final Color? labelColor;
   final TextStyle? labelStyle;
@@ -34,6 +35,8 @@ class CustomLabelTextField extends StatelessWidget {
   final EdgeInsetsGeometry? contentPadding;
   final int? maxLines;
   final int? minLines;
+  final ScrollController? scrollController;
+  final bool isCentered;
 
   const CustomLabelTextField({
     super.key,
@@ -54,6 +57,7 @@ class CustomLabelTextField extends StatelessWidget {
     this.labelStyle,
     this.textStyle,
     this.hintStyle,
+    this.textInputAction,
     this.fillColor,
     this.borderRadius,
     this.filled,
@@ -66,10 +70,13 @@ class CustomLabelTextField extends StatelessWidget {
     this.contentPadding,
     this.maxLines,
     this.minLines,
+    this.scrollController,
+    this.isCentered = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    final bool isLight = isLightTheme(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -78,12 +85,14 @@ class CustomLabelTextField extends StatelessWidget {
             text: label!,
             style:
                 labelStyle ??
-                AppTextStyles.bodyLarge(context).copyWith(
-                  color: labelColor ?? ColorPalette.primary,
-                  fontWeight: FontWeight.w500,
+                AppTextStyles.inputLabel(context).copyWith(
+                  color:
+                      labelColor ??
+                      (isLight ? Colors.black : ColorPalette.white),
+                  fontWeight: FontWeight.bold,
                 ),
           ),
-        if (label != null) CustomSizedBox(height: 8),
+        // if (label != null) CustomSizedBox(height: 8),
 
         // Check if using default rounded style or underline style
         if (filled == false || border != null || enabledBorder != null)
@@ -93,20 +102,34 @@ class CustomLabelTextField extends StatelessWidget {
             onChanged: onChanged,
             onFieldSubmitted: onSubmit,
             validator: validator,
+            scrollController: scrollController,
             keyboardType: keyboardType,
+            textInputAction: textInputAction ?? TextInputAction.done,
             readOnly: readOnly ?? false,
             obscureText: obscureText ?? false,
             maxLines: obscureText == true ? 1 : maxLines,
             minLines: minLines,
+            textAlign: isCentered ? TextAlign.center : TextAlign.start,
+            textAlignVertical: isCentered
+                ? TextAlignVertical.center
+                : TextAlignVertical.center,
             style:
                 textStyle ??
-                AppTextStyles.bodyLarge(context).copyWith(color: Colors.white),
+                AppTextStyles.bodyLarge(
+                  context,
+                ).copyWith(color: isLight ? ColorPalette.black : null),
             decoration: InputDecoration(
               hintText: hintText,
               hintStyle:
-                  hintStyle ?? TextStyle(color: Colors.white.withOpacity(0.5)),
+                  hintStyle ??
+                  AppTextStyles.inputLabel(context).copyWith(
+                    color: isLight
+                        ? ColorPalette.black.withValues(alpha: 0.6)
+                        : ColorPalette.white.withValues(alpha: 0.9),
+                  ),
               filled: filled ?? false,
-              fillColor: fillColor,
+              fillColor:
+                  fillColor ?? (isLight ? Colors.white : Colors.transparent),
               suffixIcon: suffixIcon,
               prefixIcon: prefixIcon,
               suffix: suffix,
@@ -114,13 +137,19 @@ class CustomLabelTextField extends StatelessWidget {
               border: border,
               enabledBorder:
                   enabledBorder ??
-                  const UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white24),
+                  UnderlineInputBorder(
+                    borderSide: BorderSide(
+                      color: isLight
+                          ? ColorPalette.black.withOpacity(0.2)
+                          : Colors.white24,
+                    ),
                   ),
               focusedBorder:
                   focusedBorder ??
-                  const UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white70),
+                  UnderlineInputBorder(
+                    borderSide: BorderSide(
+                      color: isLight ? ColorPalette.primary : Colors.white70,
+                    ),
                   ),
               errorBorder:
                   errorBorder ??
@@ -153,13 +182,24 @@ class CustomLabelTextField extends StatelessWidget {
               obscureText: obscureText ?? false,
               maxLines: obscureText == true ? 1 : (maxLines ?? 1),
               minLines: minLines,
-              style: textStyle ?? AppTextStyles.bodyLarge(context),
+              style:
+                  textStyle ??
+                  AppTextStyles.bodyLarge(
+                    context,
+                  ).copyWith(color: isLight ? ColorPalette.textPrimary : null),
               decoration: InputDecoration(
                 hintText: hintText,
-                hintStyle: hintStyle,
+                hintStyle:
+                    hintStyle ??
+                    AppTextStyles.inputLabel(context).copyWith(
+                      color: isLight
+                          ? ColorPalette.textSecondary.withOpacity(0.7)
+                          : ColorPalette.textPrimary.withValues(alpha: 0.9),
+                    ),
                 border: InputBorder.none,
                 filled: true,
-                fillColor: fillColor ?? ColorPalette.secondry,
+                fillColor:
+                    fillColor ?? (isLight ? Colors.white : Colors.transparent),
                 suffixIcon: suffixIcon,
                 prefixIcon: prefixIcon,
                 suffix: suffix,

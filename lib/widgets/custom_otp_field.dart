@@ -1,3 +1,4 @@
+import 'package:fennac_app/app/constants/media_query_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pinput/pinput.dart';
@@ -28,31 +29,39 @@ class _CustomOtpFieldState extends State<CustomOtpField> {
   @override
   Widget build(BuildContext context) {
     final defaultPinTheme = PinTheme(
-      width: 48,
+      width: 56,
       height: 56,
       textStyle: AppTextStyles.h2(
         context,
-      ).copyWith(color: ColorPalette.white, fontWeight: FontWeight.bold),
+      ).copyWith(fontWeight: FontWeight.bold),
       decoration: BoxDecoration(
-        border: Border.all(
-          color: widget.color ?? ColorPalette.white.withOpacity(0.2),
-          width: 1,
-        ),
-        borderRadius: BorderRadius.circular(12),
+        color: isLightTheme(context)
+            ? ColorPalette.textGrey
+            : ColorPalette.black.withValues(alpha: .3),
+        border: Border.all(color: widget.color ?? Colors.white70, width: 1),
+        borderRadius: BorderRadius.circular(16),
       ),
     );
 
     final focusedPinTheme = defaultPinTheme.copyDecorationWith(
       border: Border.all(
-        color: widget.color ?? ColorPalette.white.withOpacity(0.2),
+        color: isLightTheme(context)
+            ? ColorPalette.primary
+            : (widget.color ?? Colors.white70),
         width: 1,
       ),
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(16),
     );
 
     final submittedPinTheme = defaultPinTheme.copyWith(
       decoration: defaultPinTheme.decoration?.copyWith(
         color: Colors.transparent,
+        border: Border.all(
+          color: isLightTheme(context)
+              ? ColorPalette.primary
+              : (widget.color ?? Colors.white70),
+          width: 1,
+        ),
       ),
     );
 

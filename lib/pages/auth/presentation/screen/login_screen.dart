@@ -1,7 +1,9 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:fennac_app/app/constants/media_query_constants.dart';
+import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
-import 'package:fennac_app/pages/auth/presentation/bloc/cubit/auth_cubit.dart';
+import 'package:fennac_app/pages/auth/presentation/bloc/cubit/login_cubit.dart';
 import 'package:fennac_app/routes/routes_imports.gr.dart';
 import 'package:fennac_app/widgets/custom_back_button.dart';
 import 'package:fennac_app/widgets/custom_text_field.dart';
@@ -13,6 +15,9 @@ import 'package:fennac_app/widgets/custom_elevated_button.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:lottie/lottie.dart';
+
+import '../bloc/state/login_state.dart';
 
 @RoutePage()
 class LoginScreen extends StatefulWidget {
@@ -24,29 +29,20 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
 
-  final _authCubit = Di().sl<AuthCubit>();
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
+  final _loginCubit = Di().sl<LoginCubit>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1B2E),
       body: MovableBackground(
+        backgroundType: MovableBackgroundType.light,
         child: SafeArea(
           child: SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: BlocBuilder(
-                bloc: _authCubit,
+                bloc: _loginCubit,
                 builder: (context, state) {
                   return Form(
                     key: _formKey,
@@ -57,33 +53,30 @@ class _LoginScreenState extends State<LoginScreen> {
 
                         CustomBackButton(),
 
-                        CustomSizedBox(height: 40),
-
                         SvgPicture.asset(
                           Assets.icons.logoAnimation.path,
                           width: 100,
                           height: 100,
+                          color: ColorPalette.primary,
                         ),
 
-                        CustomSizedBox(height: 40),
+                        CustomSizedBox(height: 30),
 
                         AppText(
                           text: 'Login to your account',
-                          style: AppTextStyles.h1(context).copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: AppTextStyles.h2(
+                            context,
+                          ).copyWith(fontWeight: FontWeight.bold),
                         ),
 
                         CustomSizedBox(height: 40),
 
                         CustomLabelTextField(
                           label: 'Email',
-                          controller: _emailController,
-                          validator: _authCubit.validateEmail,
+                          controller: _loginCubit.email,
+                          validator: _loginCubit.validateEmail,
                           keyboardType: TextInputType.emailAddress,
-                          hintText: 'johndoe@email.com',
-                          labelColor: Colors.white,
+                          hintText: 'example@gmail.com',
                           filled: false,
                         ),
 
@@ -91,27 +84,26 @@ class _LoginScreenState extends State<LoginScreen> {
 
                         CustomLabelTextField(
                           label: 'Password',
-                          controller: _passwordController,
-                          validator: _authCubit.validatePassword,
-                          obscureText: _authCubit.obscurePassword,
-                          hintText: '••••••••••',
-                          labelColor: Colors.white,
+                          controller: _loginCubit.password,
+                          validator: _loginCubit.validatePassword,
+                          obscureText: _loginCubit.obscurePassword,
+                          hintText: 'Enter your password',
                           filled: false,
                           suffixIcon: IconButton(
                             onPressed: () {
-                              _authCubit.isObsecure();
+                              _loginCubit.togglePasswordVisibility();
                             },
                             icon: Icon(
-                              _authCubit.obscurePassword
+                              _loginCubit.obscurePassword
                                   ? Icons.visibility_outlined
                                   : Icons.visibility_off_outlined,
-                              color: Colors.white70,
+                              color: isLightTheme(context)
+                                  ? Colors.black
+                                  : Colors.white70,
                             ),
                           ),
                         ),
-
                         CustomSizedBox(height: 16),
-
                         Align(
                           alignment: Alignment.centerRight,
                           child: TextButton(
@@ -122,26 +114,45 @@ class _LoginScreenState extends State<LoginScreen> {
                             },
                             child: AppText(
                               text: 'Forgot Password?',
-                              style: AppTextStyles.bodyLarge(context).copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w500,
-                              ),
+                              style: AppTextStyles.inputLabel(
+                                context,
+                              ).copyWith(fontWeight: FontWeight.bold),
                             ),
                           ),
                         ),
 
-                        CustomSizedBox(height: 40),
+                        CustomSizedBox(height: 20),
 
-                        CustomElevatedButton(
-                          onTap: () {
-                            if (_formKey.currentState!.validate()) {
-                              AutoRouter.of(context).pop();
-                            }
+                        BlocBuilder<LoginCubit, LoginState>(
+                          bloc: _loginCubit,
+                          builder: (context, state) {
+                            final isLoading = state is LoginLoading;
+
+                            return CustomElevatedButton(
+                              isLoading: isLoading,
+                              icon: isLoading
+                                  ? SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: Lottie.asset(
+                                        Assets.animations.loadingSpinner,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    )
+                                  : null,
+                              onTap: () {
+                                if (_formKey.currentState!.validate()) {
+                                  _loginCubit.login(context: context);
+                                  // AutoRouter.of(
+                                  //   context,
+                                  // ).replaceAll([const DashboardRoute()]);
+                                }
+                              },
+                              text: 'Login',
+                              width: double.infinity,
+                            );
                           },
-                          text: 'Login',
-                          width: double.infinity,
                         ),
-
                         CustomSizedBox(height: 40),
                       ],
                     ),

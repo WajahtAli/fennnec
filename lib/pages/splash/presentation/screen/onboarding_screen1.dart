@@ -1,18 +1,24 @@
-import 'dart:ui';
+import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
-import 'package:fennac_app/app/constants/media_query_constants.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
+import 'package:fennac_app/core/di_container.dart';
+import 'package:fennac_app/generated/assets.gen.dart';
+import 'package:fennac_app/pages/splash/presentation/bloc/cubit/background_cubit.dart';
 import 'package:fennac_app/pages/splash/presentation/widgets/onboarding_widget1.dart';
+import 'package:fennac_app/pages/splash/presentation/widgets/onboarding_widget2.dart';
+import 'package:fennac_app/pages/splash/presentation/widgets/onboarding_widget3.dart';
 import 'package:fennac_app/pages/splash/presentation/widgets/onboarding_widget4.dart';
 import 'package:fennac_app/routes/routes_imports.gr.dart';
+import 'package:fennac_app/widgets/custom_back_button.dart';
 import 'package:fennac_app/widgets/custom_text.dart';
 import 'package:fennac_app/widgets/movable_background.dart';
 import 'package:flutter/material.dart';
-import 'package:fennac_app/generated/assets.gen.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:lottie/lottie.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
+
+import '../../../../app/constants/media_query_constants.dart';
 
 @RoutePage()
 class OnBoardingScreen1 extends StatefulWidget {
@@ -28,15 +34,19 @@ class _OnBoardingScreen1State extends State<OnBoardingScreen1>
   late AnimationController _textController;
   late AnimationController _buttonController;
 
-  late Animation<double> _logoScaleAnimation;
-  late Animation<double> _logoFadeAnimation;
-  late Animation<Offset> _textSlideAnimation;
-  late Animation<double> _textFadeAnimation;
-  late Animation<Offset> _buttonSlideAnimation;
-  late Animation<double> _buttonFadeAnimation;
-
   final PageController _pageController = PageController();
-  int _currentPage = 0;
+  final BackgroundCubit _backgroundCubit = Di().sl<BackgroundCubit>();
+  Timer? _autoAdvanceTimer;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _backgroundCubit.selectIndex(0);
+    if (_pageController.hasClients) {
+      _pageController.jumpToPage(0);
+    }
+    _startAutoAdvance();
+  }
 
   @override
   void initState() {
@@ -63,60 +73,38 @@ class _OnBoardingScreen1State extends State<OnBoardingScreen1>
       duration: const Duration(milliseconds: 600),
       vsync: this,
     );
-
-    // Logo animations
-    _logoScaleAnimation = Tween<double>(begin: 0.5, end: 1.0).animate(
-      CurvedAnimation(parent: _logoController, curve: Curves.easeOutBack),
-    );
-
-    _logoFadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(parent: _logoController, curve: Curves.easeIn));
-
-    // Text animations
-    _textSlideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.5),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _textController, curve: Curves.easeOut));
-
-    _textFadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(parent: _textController, curve: Curves.easeIn));
-
-    // Button animations
-    _buttonSlideAnimation =
-        Tween<Offset>(begin: const Offset(0, 0.5), end: Offset.zero).animate(
-          CurvedAnimation(parent: _buttonController, curve: Curves.easeOut),
-        );
-
-    _buttonFadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(parent: _buttonController, curve: Curves.easeIn));
   }
 
   void _startAnimationSequence() async {
-    // Start logo animation immediately
     await _logoController.forward();
 
-    // Start text animation after logo
     await Future.delayed(const Duration(milliseconds: 100));
     await _textController.forward();
 
-    // Start button animation after text
     await Future.delayed(const Duration(milliseconds: 100));
     await _buttonController.forward();
   }
 
+  void _startAutoAdvance() {
+    _autoAdvanceTimer?.cancel();
+    _autoAdvanceTimer = Timer(const Duration(seconds: 5), () {
+      if (mounted && _pageController.hasClients) {
+        _nextPage();
+        _startAutoAdvance();
+      }
+    });
+  }
+
   void _nextPage() {
-    if (_currentPage < 3) {
+    if (_backgroundCubit.selectedIndex < 3) {
+      _autoAdvanceTimer?.cancel();
       _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
+      _startAutoAdvance();
     } else {
+      _autoAdvanceTimer?.cancel();
       AutoRouter.of(context).replace(const CreateAccountRoute());
     }
   }
@@ -125,12 +113,21 @@ class _OnBoardingScreen1State extends State<OnBoardingScreen1>
     AutoRouter.of(context).replace(const CreateAccountRoute());
   }
 
+  void _handlePageChange(int index) {
+    if (index >= 4) {
+      AutoRouter.of(context).replace(const CreateAccountRoute());
+      return;
+    }
+    _backgroundCubit.selectIndex(index);
+  }
+
   @override
   void dispose() {
     _logoController.dispose();
     _textController.dispose();
     _buttonController.dispose();
     _pageController.dispose();
+    _autoAdvanceTimer?.cancel();
     super.dispose();
   }
 
@@ -138,22 +135,45 @@ class _OnBoardingScreen1State extends State<OnBoardingScreen1>
   Widget build(BuildContext context) {
     return Scaffold(
       body: MovableBackground(
+        backgroundType: MovableBackgroundType.light,
         child: SafeArea(
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8.0,
+                  vertical: 6,
+                ),
+                child: CustomBackButton(
+                  onPressed: () {
+                    if (_pageController.hasClients &&
+                        _backgroundCubit.selectedIndex > 0) {
+                      _pageController.previousPage(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                      );
+                    } else if (_backgroundCubit.selectedIndex == 0) {
+                      AutoRouter.of(context).pop();
+                    } else {
+                      AutoRouter.of(
+                        context,
+                      ).replace(const CreateAccountRoute());
+                    }
+                  },
+                ),
+              ),
               Expanded(
                 child: PageView(
                   controller: _pageController,
-                  onPageChanged: (index) {
-                    setState(() {
-                      _currentPage = index;
-                    });
-                  },
+                  onPageChanged: _handlePageChange,
                   children: [
                     OnBoardingWidget1(),
-                    _buildPage2(),
-                    _buildPage3(),
+                    OnboardingWidget2(),
+                    OnboardingWidget3(),
                     OnBoardingWidget4(),
+                    SizedBox.shrink(),
                   ],
                 ),
               ),
@@ -162,10 +182,7 @@ class _OnBoardingScreen1State extends State<OnBoardingScreen1>
                 animation: _buttonController,
                 builder: (context, child) {
                   return Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 24.w,
-                      vertical: 50.h,
-                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -173,48 +190,71 @@ class _OnBoardingScreen1State extends State<OnBoardingScreen1>
                           onTap: _skipToEnd,
                           child: AppText(
                             text: 'Skip',
-                            style: AppTextStyles.bodyLarge(context).copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w500,
-                            ),
+                            style: AppTextStyles.bodyLarge(
+                              context,
+                            ).copyWith(fontWeight: FontWeight.w500),
                           ),
                         ),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: List.generate(
-                            4,
-                            (index) => Container(
-                              margin: const EdgeInsets.symmetric(horizontal: 8),
-                              width: _currentPage == index ? 24 : 10,
-                              height: _currentPage == index ? 24 : 10,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: _currentPage == index
-                                    ? ColorPalette.primary
-                                    : Colors.white,
-                                border: Border.all(
-                                  color: _currentPage == index
-                                      ? ColorPalette.white
-                                      : Colors.transparent,
-                                  width: 2.2,
+                        BlocBuilder(
+                          bloc: _backgroundCubit,
+                          builder: (context, state) {
+                            return Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: List.generate(
+                                4,
+                                (index) => Container(
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                  ),
+                                  width: _backgroundCubit.selectedIndex == index
+                                      ? 24
+                                      : 10,
+                                  height:
+                                      _backgroundCubit.selectedIndex == index
+                                      ? 24
+                                      : 10,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color:
+                                        _backgroundCubit.selectedIndex == index
+                                        ? ColorPalette.primary
+                                        : isLightTheme(context)
+                                        ? ColorPalette.primary.withValues(
+                                            alpha: 0.2,
+                                          )
+                                        : Colors.white,
+                                    border: Border.all(
+                                      color:
+                                          _backgroundCubit.selectedIndex ==
+                                              index
+                                          ? ColorPalette.white
+                                          : Colors.transparent,
+                                      width: 2.2,
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
-                          ),
+                            );
+                          },
                         ),
                         GestureDetector(
                           onTap: _nextPage,
                           child: Container(
                             width: 56,
                             height: 56,
+                            alignment: Alignment.center,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               color: ColorPalette.primary,
                             ),
-                            child: Icon(
-                              Icons.arrow_forward,
-                              color: ColorPalette.white,
-                              size: 24,
+                            child: SvgPicture.asset(
+                              Assets.icons.arrowRight.path,
+                              width: 24,
+                              height: 24,
+                              colorFilter: const ColorFilter.mode(
+                                Colors.white,
+                                BlendMode.srcIn,
+                              ),
                             ),
                           ),
                         ),
@@ -227,107 +267,6 @@ class _OnBoardingScreen1State extends State<OnBoardingScreen1>
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildPage2() {
-    return Stack(
-      children: [
-        Positioned.fill(
-          child: Align(
-            alignment: Alignment.bottomCenter,
-            child: Lottie.asset(Assets.animations.emojis7s, fit: BoxFit.cover),
-          ),
-        ),
-
-        Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Spacer(flex: 50),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 40),
-              child: Column(
-                children: [
-                  Lottie.asset(
-                    Assets.animations.scrollingMessagesTopOpacity,
-                    fit: BoxFit.contain,
-                  ),
-                  AppText(
-                    text: 'Group Chats that\nStay Alive',
-                    textAlign: TextAlign.center,
-                    style: AppTextStyles.h1(
-                      context,
-                    ).copyWith(color: Colors.white, fontSize: 32),
-                  ),
-                  const SizedBox(height: 24),
-                  AppText(
-                    text:
-                        'Dive into a shared chat room, Have fun with your friends',
-                    textAlign: TextAlign.center,
-                    style: AppTextStyles.bodyLarge(
-                      context,
-                    ).copyWith(color: Colors.white, fontSize: 16),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPage3() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Hero(
-          tag: 'splash_logo',
-          child: AnimatedBuilder(
-            animation: _logoController,
-            builder: (context, child) {
-              return FadeTransition(
-                opacity: _logoFadeAnimation,
-                child: ScaleTransition(
-                  scale: _logoScaleAnimation,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Lottie.asset(
-                        Assets.animations.rotatingGroupAnimationNoShadow,
-                        repeat: true,
-                        fit: BoxFit.fill,
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 40),
-          child: Column(
-            children: [
-              AppText(
-                text: 'Match in Groups',
-                textAlign: TextAlign.center,
-                style: AppTextStyles.h1(
-                  context,
-                ).copyWith(color: Colors.white, fontSize: 32),
-              ),
-              const SizedBox(height: 24),
-              AppText(
-                text: 'Find other groups that match your vibe ',
-                textAlign: TextAlign.center,
-                style: AppTextStyles.bodyLarge(
-                  context,
-                ).copyWith(color: Colors.white, fontSize: 16),
-              ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 }

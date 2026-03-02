@@ -1,0 +1,62 @@
+{
+  "project_info": {
+    "project_number": "317592885652",
+    "project_id": "fennec-d8cab",
+    "storage_bucket": "fennec-d8cab.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:317592885652:android:dd6219be4aa455cf0fd781",
+        "android_client_info": {
+          "package_name": "com.fennac.ostryx"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "317592885652-2eg6eov52fc39r08aacpmc8u971itlvu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.fennac.ostryx",
+            "certificate_hash": "88d601eef8dbc09dd642e24246a871e3d7e8375e"
+          }
+        },
+        {
+          "client_id": "317592885652-rbdpd1hkt52uv7b02lcbj8dp12k181cj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.fennac.ostryx",
+            "certificate_hash": "bdab6fb7839723ea4204eb7cb3ffcffbebe578da"
+          }
+        },
+        {
+          "client_id": "317592885652-v764tpb76ddus1rof26t55upqm7pamgm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCLNrAZMSkhmNR0J5SjeiSdY4Rau1njALY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "317592885652-v764tpb76ddus1rof26t55upqm7pamgm.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "317592885652-fhgvu8tkpcpgo3f3qa9k2e29lle736uf.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.fennac.ostryx"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

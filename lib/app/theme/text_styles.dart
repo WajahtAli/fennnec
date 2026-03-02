@@ -1,3 +1,4 @@
+import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
 import '../constants/media_query_constants.dart';
@@ -5,58 +6,149 @@ import '../constants/media_query_constants.dart';
 class AppTextStyles {
   AppTextStyles._();
 
-  // Base text style with SF Pro font
-  static TextStyle _sfProTextStyle() => const TextStyle(fontFamily: 'SFPro');
+  static TextStyle _sfProTextStyle(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return TextStyle(
+      fontFamily: 'SFPro',
+      color: isDark ? Colors.white : Colors.black,
+    );
+  }
 
-  static TextStyle h1Large(BuildContext context) => _sfProTextStyle().copyWith(
-    fontSize: getWidth(context) > 1000 ? 40 : 28,
-    fontWeight: FontWeight.w500,
-    height: getWidth(context) > 1000 ? 40 / 28 : null,
-  );
+  static TextStyle h1(BuildContext context) =>
+      _sfProTextStyle(context).copyWith(
+        fontSize: 40,
+        fontWeight: FontWeight.w700,
+        height: 1.0,
+        letterSpacing: -0.02 * 40,
+      );
 
-  static TextStyle h1(BuildContext context) => _sfProTextStyle().copyWith(
-    fontSize: getWidth(context) > 1000 ? 32 : 18,
-    fontWeight: FontWeight.w500,
-    height: getWidth(context) > 1000 ? 24 / 28 : null,
-  );
+  static TextStyle h2(BuildContext context) =>
+      _sfProTextStyle(context).copyWith(
+        fontSize: 32,
+        fontWeight: FontWeight.w500,
+        height: 1.0,
+        letterSpacing: -0.02 * 32,
+      );
 
-  static TextStyle h2(BuildContext context) => _sfProTextStyle().copyWith(
-    fontSize: getWidth(context) > 1050 ? 24 : 18,
-    fontWeight: FontWeight.w500,
-    height: getWidth(context) > 1050 ? 24 / 24 : null,
-  );
+  static TextStyle h3(BuildContext context) =>
+      _sfProTextStyle(context).copyWith(
+        fontSize: 24,
+        fontWeight: FontWeight.w500,
+        fontStyle: FontStyle.normal,
+        height: 1.0,
+        letterSpacing: -0.02 * 24,
+      );
+
+  static TextStyle h4(BuildContext context) =>
+      _sfProTextStyle(context).copyWith(
+        fontSize: 20,
+        fontWeight: FontWeight.w600,
+        height: 1.0,
+        letterSpacing: -0.02 * 20,
+      );
+
+  static TextStyle description(BuildContext context) =>
+      _sfProTextStyle(context).copyWith(
+        fontSize: 12,
+        fontWeight: FontWeight.w400,
+        height: 1.0,
+        letterSpacing: 0,
+      );
+
+  static TextStyle chipLabel(BuildContext context) =>
+      _sfProTextStyle(context).copyWith(
+        fontSize: 16,
+        fontWeight: FontWeight.w500,
+        height: 1.25,
+        letterSpacing: 0,
+      );
+
+  static TextStyle label(BuildContext context) =>
+      _sfProTextStyle(context).copyWith(
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+        fontStyle: FontStyle.normal,
+        height: 1.0,
+        letterSpacing: -0.02 * 14,
+      );
+
+  static TextStyle body(BuildContext context) =>
+      _sfProTextStyle(context).copyWith(
+        fontSize: 16,
+        fontWeight: FontWeight.w400,
+        height: 1.5,
+        letterSpacing: 0,
+      );
+
+  static TextStyle button(BuildContext context) =>
+      _sfProTextStyle(context).copyWith(
+        fontSize: 16,
+        fontWeight: FontWeight.w700,
+        height: 1.5,
+        letterSpacing: 0,
+      );
+
+  static TextStyle h1Large(BuildContext context) =>
+      _sfProTextStyle(context).copyWith(
+        fontSize: getWidth(context) > 1000 ? 40 : 28,
+        fontWeight: FontWeight.w500,
+        height: getWidth(context) > 1000 ? 40 / 28 : null,
+      );
 
   static TextStyle bodyLarge(BuildContext context) =>
-      _sfProTextStyle().copyWith(
-        fontSize: getWidth(context) > 600 ? 16 : 12,
-        height: getWidth(context) > 600 ? 17 / 16 : null,
-        fontWeight: FontWeight.w400,
+      _sfProTextStyle(context).copyWith(
+        fontSize: 16,
+        height: 24 / 16,
+        fontWeight: FontWeight.w700,
+        letterSpacing: 0,
       );
 
   static TextStyle bodyRegular(BuildContext context) =>
-      _sfProTextStyle().copyWith(
+      _sfProTextStyle(context).copyWith(
         fontSize: getWidth(context) > 1050 ? 14 : 12,
         height: getWidth(context) > 1050 ? 17 / 14 : null,
         fontWeight: FontWeight.w400,
       );
 
-  static TextStyle h5(BuildContext context) => _sfProTextStyle().copyWith(
-    fontSize: getWidth(context) > 1000 ? 20 : 12,
-    height: getWidth(context) > 1000 ? 17 / 20 : null,
-    fontWeight: FontWeight.w500,
-  );
+  static TextStyle subHeading(BuildContext context) =>
+      _sfProTextStyle(context).copyWith(
+        fontSize: 16,
+        fontWeight: FontWeight.w500,
+        fontStyle: FontStyle.normal,
+        height: 24 / 16,
+        letterSpacing: -0.02 * 16,
+      );
 
-  static TextStyle h6(BuildContext context) => _sfProTextStyle().copyWith(
-    fontSize: getWidth(context) > 1000 ? 18 : 12,
-    height: getWidth(context) > 1000 ? 17 / 18 : null,
-    fontWeight: FontWeight.w500,
-  );
+  static TextStyle h5(BuildContext context) =>
+      _sfProTextStyle(context).copyWith(
+        fontSize: getWidth(context) > 1000 ? 20 : 18,
+        height: getWidth(context) > 1000 ? 17 / 20 : null,
+        fontWeight: FontWeight.w500,
+      );
+
+  static TextStyle h6(BuildContext context) =>
+      _sfProTextStyle(context).copyWith(
+        fontSize: getWidth(context) > 1000 ? 18 : 12,
+        height: getWidth(context) > 1000 ? 17 / 18 : null,
+        fontWeight: FontWeight.w500,
+      );
 
   static TextStyle bodySmall(BuildContext context) =>
-      _sfProTextStyle().copyWith(
-        fontSize: getWidth(context) > 1000 ? 12 : 12,
-        height: getWidth(context) > 1000 ? 17 / 12 : null,
+      _sfProTextStyle(context).copyWith(
+        fontSize: 12,
         fontWeight: FontWeight.w400,
+        fontStyle: FontStyle.normal,
+        height: 1.0,
+        letterSpacing: 0,
+      );
+
+  static TextStyle inputLabel(BuildContext context) =>
+      _sfProTextStyle(context).copyWith(
+        fontSize: 12,
+        fontWeight: FontWeight.w700,
+        fontStyle: FontStyle.normal,
+        height: 16 / 12,
+        letterSpacing: 0,
       );
 
   static Widget checkDirection(BuildContext context, List<Widget> data) =>
@@ -126,16 +218,19 @@ class AppTextStyles {
     );
   }
 
-  static BoxDecoration customBoxDecoration = BoxDecoration(
-    color: Colors.white,
-    borderRadius: BorderRadius.circular(16),
-    boxShadow: [
-      BoxShadow(
-        color: Colors.grey.withOpacity(0.1),
-        blurRadius: 3,
-        spreadRadius: 3,
-        offset: const Offset(0, 3),
-      ),
-    ],
-  );
+  static BoxDecoration customBoxDecoration(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return BoxDecoration(
+      color: isDark ? ColorPaletteDark.cardBlack : ColorPalette.white,
+      borderRadius: BorderRadius.circular(16),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.grey.withValues(alpha: 0.1),
+          blurRadius: 3,
+          spreadRadius: 3,
+          offset: const Offset(0, 3),
+        ),
+      ],
+    );
+  }
 }

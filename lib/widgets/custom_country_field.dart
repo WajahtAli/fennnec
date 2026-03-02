@@ -1,7 +1,10 @@
 import 'dart:convert';
+import 'package:fennac_app/app/constants/media_query_constants.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
+import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
+import 'package:fennac_app/pages/auth/presentation/bloc/cubit/auth_cubit.dart';
 import 'package:fennac_app/widgets/custom_sized_box.dart';
 import 'package:fennac_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
@@ -49,6 +52,7 @@ class PhoneNumberField extends StatefulWidget {
   final void Function(String completePhoneNumber) onChanged;
   final String? Function(String?)? validator;
   final Country? initialCountry;
+  final String? initialValue;
 
   const PhoneNumberField({
     super.key,
@@ -57,6 +61,7 @@ class PhoneNumberField extends StatefulWidget {
     required this.onChanged,
     this.validator,
     this.initialCountry,
+    this.initialValue,
   });
 
   @override
@@ -72,19 +77,82 @@ class _PhoneNumberFieldState extends State<PhoneNumberField> {
   @override
   void initState() {
     super.initState();
-    _future = loadCountries();
-    _phoneController.addListener(_notifyChange);
+    _future = loadCountries().then((countries) {
+      if (widget.initialValue != null && widget.initialValue!.isNotEmpty) {
+        final sortedCountries = List<Country>.from(countries)
+          ..sort(
+            (a, b) =>
+                (b.phoneCode?.length ?? 0).compareTo(a.phoneCode?.length ?? 0),
+          );
 
-    // Set initial country if provided
-    if (widget.initialCountry != null) {
-      _selected = widget.initialCountry;
-    }
+        for (var country in sortedCountries) {
+          if (country.phoneCode != null &&
+              widget.initialValue!.startsWith(country.phoneCode!)) {
+            _selected = country;
+            _phoneController.text = widget.initialValue!.substring(
+              country.phoneCode!.length,
+            );
+            break;
+          }
+        }
+      }
+
+      // If initialValue didn't match or wasn't provided, use initialCountry
+      if (_selected == null && widget.initialCountry != null) {
+        _selected = widget.initialCountry;
+      }
+
+      return countries;
+    });
+    _phoneController.addListener(_notifyChange);
   }
 
-  @override
-  void dispose() {
-    _phoneController.dispose();
-    super.dispose();
+  String formatPhoneNumber({
+    required String input,
+    required String countryIso,
+  }) {
+    final digits = input.replaceAll(RegExp(r'\D'), '');
+    if (digits.isEmpty) return '';
+
+    switch (countryIso) {
+      // 🇺🇸 USA & 🇨🇦 Canada
+      case 'US':
+      case 'CA':
+        if (digits.length <= 3) return digits;
+        if (digits.length <= 6) {
+          return '(${digits.substring(0, 3)}) ${digits.substring(3)}';
+        }
+        return '(${digits.substring(0, 3)}) '
+            '${digits.substring(3, 6)}-'
+            '${digits.substring(6, digits.length.clamp(6, 10))}';
+
+      // 🇮🇳 India (XXXXX XXXXX)
+      case 'IN':
+        if (digits.length <= 5) return digits;
+        return '${digits.substring(0, 5)} '
+            '${digits.substring(5, digits.length.clamp(5, 10))}';
+
+      // 🇵🇰 Pakistan (03XX XXXXXXX)
+      case 'PK':
+        if (digits.length <= 4) return digits;
+        return '${digits.substring(0, 4)} '
+            '${digits.substring(4, digits.length.clamp(4, 11))}';
+
+      // 🇦🇪 UAE & 🇸🇦 KSA (05X XXX XXXX)
+      case 'UAE':
+      case 'SA':
+        if (digits.length <= 3) return digits;
+        if (digits.length <= 6) {
+          return '${digits.substring(0, 3)} ${digits.substring(3)}';
+        }
+        return '${digits.substring(0, 3)} '
+            '${digits.substring(3, 6)} '
+            '${digits.substring(6, digits.length.clamp(6, 10))}';
+
+      // Fallback
+      default:
+        return digits;
+    }
   }
 
   void _notifyChange() {
@@ -139,9 +207,9 @@ class _PhoneNumberFieldState extends State<PhoneNumberField> {
         if (widget.label != null)
           AppText(
             text: widget.label!,
-            style: AppTextStyles.bodyLarge(
+            style: AppTextStyles.inputLabel(
               context,
-            ).copyWith(color: ColorPalette.white, fontWeight: FontWeight.w500),
+            ).copyWith(fontWeight: FontWeight.bold),
           ),
         if (widget.label != null) CustomSizedBox(height: 8),
 
@@ -158,6 +226,7 @@ class _PhoneNumberFieldState extends State<PhoneNumberField> {
                     color: Colors.white70,
                   ),
                 ),
+                isLightMode: isLightTheme(context),
               );
             }
 
@@ -201,15 +270,21 @@ class _PhoneNumberFieldState extends State<PhoneNumberField> {
                             child: TextField(
                               controller: _phoneController,
                               keyboardType: TextInputType.phone,
-                              style: AppTextStyles.bodyLarge(
-                                context,
-                              ).copyWith(color: Colors.white),
+                              style: AppTextStyles.bodyLarge(context),
                               decoration: InputDecoration(
+                                // prefixText: _selected?.phoneCode != null
+                                //     ? '(${_selected!.phoneCode}) '
+                                //     : null,
+                                // prefixStyle: AppTextStyles.bodyLarge(
+                                //   context,
+                                // ).copyWith(color: Colors.white),
                                 hintText:
                                     widget.hintText ?? 'Enter phone number',
-                                hintStyle: AppTextStyles.bodyLarge(context)
+                                hintStyle: AppTextStyles.inputLabel(context)
                                     .copyWith(
-                                      color: Colors.white.withOpacity(0.5),
+                                      color: isLightTheme(context)
+                                          ? ColorPalette.black
+                                          : ColorPalette.textSecondary,
                                     ),
                                 border: InputBorder.none,
                                 isDense: true,
@@ -218,14 +293,28 @@ class _PhoneNumberFieldState extends State<PhoneNumberField> {
                               inputFormatters: [
                                 FilteringTextInputFormatter.digitsOnly,
                               ],
-                              onChanged: (_) {
-                                field.didChange(_phoneController.text);
+                              onChanged: (value) {
+                                // Format the phone number with spaces every 3 digits
+                                final formatted = formatPhoneNumber(
+                                  input: value,
+                                  countryIso: _selected?.iso ?? 'US',
+                                );
+                                if (formatted != value) {
+                                  _phoneController.value = TextEditingValue(
+                                    text: formatted,
+                                    selection: TextSelection.collapsed(
+                                      offset: formatted.length,
+                                    ),
+                                  );
+                                }
+                                field.didChange(formatted);
                               },
                             ),
                           ),
                         ],
                       ),
                       hasError: _errorMessage != null,
+                      isLightMode: isLightTheme(context),
                     ),
 
                     if (_errorMessage != null) ...[
@@ -249,38 +338,46 @@ class _PhoneNumberFieldState extends State<PhoneNumberField> {
 
   Widget _flagBox() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
+        color: ColorPalette.textGrey,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(_selected?.flag ?? '🇺🇸', style: const TextStyle(fontSize: 16)),
-          const SizedBox(width: 4),
-          Text(
-            _selected?.phoneCode != null ? '${_selected!.phoneCode}' : '+1',
-            style: const TextStyle(color: Colors.white, fontSize: 14),
-          ),
-          const SizedBox(width: 4),
-          const Icon(
+          Text(_selected?.flag ?? '🇺🇸', style: AppTextStyles.body(context)),
+          const CustomSizedBox(width: 4),
+          // Text(
+          //   _selected?.phoneCode != null ? '${_selected!.phoneCode}' : '+1',
+          //   style: AppTextStyles.inputLabel(context),
+          // ),
+          // const CustomSizedBox(width: 4),
+          Icon(
             Icons.keyboard_arrow_down,
             size: 18,
-            color: Colors.white70,
+            color: isLightTheme(context) ? Colors.black : Colors.white70,
           ),
         ],
       ),
     );
   }
 
-  Widget _underline({required Widget child, bool hasError = false}) {
+  Widget _underline({
+    required Widget child,
+    bool hasError = false,
+    bool isLightMode = false,
+  }) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12),
       decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(
-            color: hasError ? Colors.red : Colors.white24,
+            color: hasError
+                ? Colors.red
+                : (isLightMode
+                      ? ColorPalette.black.withValues(alpha: 0.2)
+                      : Colors.white24),
             width: hasError ? 1.5 : 1,
           ),
         ),
@@ -300,6 +397,7 @@ class _PhoneNumberFieldState extends State<PhoneNumberField> {
         onCountrySelected: (country) {
           setState(() {
             _selected = country;
+            Di().sl<AuthCubit>().selectedCountry = country;
           });
           _notifyChange();
         },
@@ -377,8 +475,8 @@ class _CountryBottomSheetContentState
   Widget build(BuildContext context) {
     return Container(
       height: MediaQuery.of(context).size.height * 0.75,
-      decoration: const BoxDecoration(
-        color: Color(0xFF1A1A1A),
+      decoration: BoxDecoration(
+        color: isLightTheme(context) ? Colors.white : Color(0xFF1A1A1A),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(24),
           topRight: Radius.circular(24),
@@ -392,7 +490,7 @@ class _CountryBottomSheetContentState
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.3),
+              color: Colors.white.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -403,15 +501,18 @@ class _CountryBottomSheetContentState
               children: [
                 Text(
                   'Select Country',
-                  style: AppTextStyles.h1(context).copyWith(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: AppTextStyles.h1(
+                    context,
+                  ).copyWith(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const Spacer(),
                 IconButton(
-                  icon: const Icon(Icons.close, color: Colors.white70),
+                  icon: Icon(
+                    Icons.close,
+                    color: isLightTheme(context)
+                        ? Colors.black54
+                        : Colors.white70,
+                  ),
                   onPressed: () => Navigator.pop(context),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
@@ -426,20 +527,23 @@ class _CountryBottomSheetContentState
             child: TextField(
               controller: _searchController,
               autofocus: true,
-              style: const TextStyle(color: Colors.white, fontSize: 16),
               decoration: InputDecoration(
                 hintText: 'Search country',
-                hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
+                hintStyle: AppTextStyles.body(context),
                 prefixIcon: Icon(
                   Icons.search,
-                  color: Colors.white.withOpacity(0.5),
+                  color: isLightTheme(context)
+                      ? Colors.black.withValues(alpha: 0.5)
+                      : Colors.white.withValues(alpha: 0.5),
                   size: 20,
                 ),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
                         icon: Icon(
                           Icons.clear,
-                          color: Colors.white.withOpacity(0.5),
+                          color: isLightTheme(context)
+                              ? Colors.black.withValues(alpha: 0.5)
+                              : Colors.white.withValues(alpha: 0.5),
                           size: 20,
                         ),
                         onPressed: () {
@@ -450,7 +554,7 @@ class _CountryBottomSheetContentState
                       )
                     : null,
                 filled: true,
-                fillColor: Colors.white.withOpacity(0.08),
+                fillColor: Colors.white.withValues(alpha: 0.08),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
@@ -469,8 +573,10 @@ class _CountryBottomSheetContentState
             child: ListView.separated(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               itemCount: _filteredCountries.length,
-              separatorBuilder: (_, __) =>
-                  Divider(height: 1, color: Colors.white.withOpacity(0.08)),
+              separatorBuilder: (_, _) => Divider(
+                height: 1,
+                color: Colors.white.withValues(alpha: 0.08),
+              ),
               itemBuilder: (_, index) {
                 final country = _filteredCountries[index];
                 final isSelected = widget.selectedCountry?.iso == country.iso;
@@ -492,9 +598,7 @@ class _CountryBottomSheetContentState
                         Expanded(
                           child: Text(
                             country.name,
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.white,
+                            style: AppTextStyles.body(context).copyWith(
                               fontWeight: isSelected
                                   ? FontWeight.w600
                                   : FontWeight.normal,
@@ -506,16 +610,13 @@ class _CountryBottomSheetContentState
                             padding: const EdgeInsets.only(right: 8),
                             child: Text(
                               '${country.phoneCode}',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.white.withOpacity(0.6),
-                              ),
+                              style: AppTextStyles.inputLabel(context),
                             ),
                           ),
                         if (isSelected)
                           Icon(
                             Icons.check_circle,
-                            color: ColorPalette.primary,
+                            color: ColorPalette.secondary,
                             size: 20,
                           ),
                       ],

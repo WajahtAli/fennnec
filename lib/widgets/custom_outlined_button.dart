@@ -1,3 +1,4 @@
+import 'package:fennac_app/app/constants/media_query_constants.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:flutter/material.dart';
@@ -50,8 +51,12 @@ class CustomOutlinedButton extends StatelessWidget {
                 borderRadius: BorderRadius.circular(borderRadius ?? 30),
               ),
               side: BorderSide(
-                color: borderColor ?? Colors.white70,
-                width: borderWidth ?? 1,
+                color:
+                    borderColor ??
+                    (isLightTheme(context)
+                        ? ColorPalette.secondary
+                        : Colors.white70),
+                width: borderWidth ?? (isLightTheme(context) ? 1 : 2),
               ),
               minimumSize: Size.fromHeight(height ?? 50),
               padding: padding ?? const EdgeInsets.symmetric(horizontal: 24),
@@ -66,7 +71,9 @@ class CustomOutlinedButton extends StatelessWidget {
               style:
                   textStyle ??
                   AppTextStyles.bodyLarge(context).copyWith(
-                    color: textColor ?? ColorPalette.white,
+                    color:
+                        textColor ??
+                        (isLightTheme(context) ? Colors.black : Colors.white),
                     fontSize: fontSize,
                     fontWeight: fontWeight ?? FontWeight.w600,
                   ),

@@ -24,7 +24,7 @@ dependencies:
   flutter_screenutil: ^5.9.3
   google_fonts: ^6.3.3
   hexcolor: ^3.0.1
-  lottie: ^3.3.2
+  lottie: ^3.3.1
 
   image_picker: ^1.2.0
   image_cropper: ^11.0.0
@@ -32,12 +32,40 @@ dependencies:
   camera: ^0.11.2
   permission_handler: ^11.3.1
   geolocator: ^13.0.1
+  audio_waveforms: ^2.0.1
+  path_provider: ^2.1.4
+  just_audio: ^0.10.5
+  fast_contacts: ^5.0.1
 
   freezed_annotation: ^3.0.0
   json_annotation: ^4.9.0
   rename: ^3.1.0
   pinput: ^6.0.1
   fluttertoast: ^9.0.0
+  record: ^6.1.2
+  flutter_card_swiper: ^7.2.0
+  flutter_chat_reactions: ^0.2.7
+  country_flags: ^4.1.1
+  uuid: ^4.5.1
+  agora_rtc_engine: ^6.5.3
+  flutter_callkit_incoming: ^3.0.0
+  flutter_ringtone_player: ^4.0.0+4
+  agora_token_service: ^0.1.2
+  giphy_get: ^3.6.1+1
+  firebase_core: ^4.3.0
+  qr_flutter: ^4.1.0
+  shared_preferences: ^2.5.4
+  intl: ^0.20.2
+  google_sign_in: ^7.2.0
+  firebase_auth: ^6.1.4
+  animated_theme_switcher: ^2.0.10
+  rive: ^0.13.14
+  shimmer: ^3.0.0
+  cached_network_image: ^3.4.1
+  firebase_messaging: ^16.1.1
+  awesome_notifications: ^0.10.1
+  google_maps_flutter: ^2.14.2
+  geocoding: ^4.0.0
 
 dev_dependencies:
   flutter_test:
@@ -58,6 +86,10 @@ flutter:
     - assets/icons/
     - assets/animations/
     - assets/images/background/
+    - assets/dummy/
+    - assets/dummy/audio/
+    - assets/RiveAssets/
+    - assets/json/
 
   fonts:
     - family: SFPro

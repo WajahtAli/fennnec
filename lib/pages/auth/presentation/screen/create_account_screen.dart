@@ -1,9 +1,14 @@
+import 'dart:ui';
+
 import 'package:auto_route/auto_route.dart';
+import 'package:fennac_app/app/constants/media_query_constants.dart';
+import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:fennac_app/pages/auth/presentation/bloc/cubit/auth_cubit.dart';
+import 'package:fennac_app/pages/auth/presentation/bloc/cubit/create_account_cubit.dart';
 import 'package:fennac_app/pages/auth/presentation/bloc/state/auth_state.dart';
-import 'package:fennac_app/routes/routes_imports.gr.dart';
+import 'package:fennac_app/pages/auth/presentation/bloc/state/create_account_state.dart';
 import 'package:fennac_app/widgets/custom_back_button.dart';
 import 'package:fennac_app/widgets/custom_country_field.dart';
 import 'package:fennac_app/widgets/custom_elevated_button.dart';
@@ -18,6 +23,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:lottie/lottie.dart';
 
 @RoutePage()
 class CreateAccountScreen extends StatefulWidget {
@@ -29,6 +35,10 @@ class CreateAccountScreen extends StatefulWidget {
 
 class _CreateAccountScreenState extends State<CreateAccountScreen> {
   final _authCubit = Di().sl<AuthCubit>();
+  final _formKey = GlobalKey<FormState>();
+  final ValueNotifier<bool> _isBlurNotifier = ValueNotifier(false);
+  final ValueNotifier<String?> _errorMessageNotifier = ValueNotifier(null);
+  final CreateAccountCubit _createAccountCubit = Di().sl<CreateAccountCubit>();
 
   @override
   void initState() {
@@ -37,87 +47,102 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
   }
 
   @override
-  void dispose() {
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1B2E),
       body: MovableBackground(
-        child: SafeArea(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: BlocBuilder(
-                bloc: _authCubit,
-                builder: (context, state) {
-                  return Form(
-                    key: _authCubit.formKey,
-                    autovalidateMode: AutovalidateMode.disabled,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        CustomSizedBox(height: 20),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: CustomBackButton(),
-                        ),
-                        CustomSizedBox(height: 20),
-                        SvgPicture.asset(
-                          Assets.icons.logoAnimation.path,
-                          width: 80,
-                          height: 80,
-                        ),
-                        CustomSizedBox(height: 20),
-                        AppText(
-                          text: 'Create Your Account',
-                          style: AppTextStyles.h1(context).copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 24,
-                          ),
-                        ),
-                        CustomSizedBox(height: 12),
-                        AppText(
-                          text:
-                              'Create your Fennec account and start connecting with groups near you.',
-                          style: AppTextStyles.bodyLarge(context).copyWith(
-                            color: Colors.white70,
-                            fontSize: 14,
-                            height: 1.5,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        CustomSizedBox(height: 40),
-
-                        Row(
+        backgroundType: MovableBackgroundType.medium,
+        child: Stack(
+          children: [
+            SafeArea(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: BlocBuilder<AuthCubit, AuthState>(
+                    bloc: _authCubit,
+                    builder: (context, state) {
+                      return Form(
+                        key: _formKey,
+                        autovalidateMode: AutovalidateMode.disabled,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  CustomLabelTextField(
-                                    label: 'First Name',
-                                    controller: _authCubit.firstNameController,
-                                    hintText: 'John',
-                                    labelColor: Colors.white,
-                                    filled: false,
-                                    onChanged: _authCubit.onFirstNameChanged,
+                            Row(
+                              children: [
+                                // Left: back button
+                                const SizedBox(
+                                  width: 48,
+                                  child: CustomBackButton(),
+                                ),
+                                Expanded(
+                                  child: Center(
+                                    child: SvgPicture.asset(
+                                      Assets.icons.logoAnimation.path,
+                                      color: isLightTheme(context)
+                                          ? ColorPalette.primary
+                                          : Colors.white,
+                                      width: 100,
+                                      height: 100,
+                                    ),
                                   ),
-                                  BlocBuilder<AuthCubit, AuthState>(
-                                    bloc: _authCubit,
-                                    builder: (context, state) {
-                                      final error = _authCubit
-                                          .getFirstNameError();
-                                      if (error != null) {
-                                        return Padding(
+                                ),
+                                const SizedBox(width: 48),
+                              ],
+                            ),
+
+                            CustomSizedBox(height: 20),
+                            AppText(
+                              text: 'Create Your Account',
+                              style: AppTextStyles.h2(context).copyWith(
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1.5,
+                              ),
+                            ),
+                            CustomSizedBox(height: 12),
+                            AppText(
+                              text:
+                                  'Create your Fennec account and start connecting with groups near you.',
+                              style: AppTextStyles.subHeading(context).copyWith(
+                                color: isLightTheme(context)
+                                    ? Colors.black
+                                    : ColorPalette.textSecondary,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            CustomSizedBox(height: 40),
+
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      CustomLabelTextField(
+                                        label: 'First Name',
+                                        controller:
+                                            _authCubit.firstNameController,
+                                        hintText: 'Enter your first name',
+
+                                        filled: false,
+                                        onChanged: (value) {
+                                          if (mounted) {
+                                            _authCubit.onFirstNameChanged(
+                                              value,
+                                            );
+                                          }
+                                        },
+                                      ),
+                                      if (_authCubit.getFirstNameError() !=
+                                          null)
+                                        Padding(
                                           padding: const EdgeInsets.only(
                                             top: 8,
                                           ),
                                           child: AppText(
-                                            text: error,
+                                            text:
+                                                _authCubit
+                                                    .getFirstNameError() ??
+                                                "",
                                             style:
                                                 AppTextStyles.bodyRegular(
                                                   context,
@@ -126,39 +151,38 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                                                   fontSize: 12,
                                                 ),
                                           ),
-                                        );
-                                      }
-                                      return const SizedBox.shrink();
-                                    },
+                                        ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  CustomLabelTextField(
-                                    label: 'Last Name',
-                                    controller: _authCubit.lastNameController,
-                                    hintText: 'Doe',
-                                    labelColor: Colors.white,
-                                    filled: false,
-                                    onChanged: _authCubit.onLastNameChanged,
-                                  ),
-                                  BlocBuilder<AuthCubit, AuthState>(
-                                    bloc: _authCubit,
-                                    builder: (context, state) {
-                                      final error = _authCubit
-                                          .getLastNameError();
-                                      if (error != null) {
-                                        return Padding(
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      CustomLabelTextField(
+                                        label: 'Last Name',
+                                        controller:
+                                            _authCubit.lastNameController,
+                                        hintText: 'Enter your last name',
+
+                                        filled: false,
+                                        onChanged: (value) {
+                                          if (mounted) {
+                                            _authCubit.onLastNameChanged(value);
+                                          }
+                                        },
+                                      ),
+                                      if (_authCubit.getLastNameError() != null)
+                                        Padding(
                                           padding: const EdgeInsets.only(
                                             top: 8,
                                           ),
                                           child: AppText(
-                                            text: error,
+                                            text:
+                                                _authCubit.getLastNameError() ??
+                                                "",
                                             style:
                                                 AppTextStyles.bodyRegular(
                                                   context,
@@ -167,304 +191,344 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                                                   fontSize: 12,
                                                 ),
                                           ),
-                                        );
-                                      }
-                                      return const SizedBox.shrink();
-                                    },
+                                        ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        CustomSizedBox(height: 24),
-
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            CustomLabelTextField(
-                              label: 'Email',
-                              controller: _authCubit.emailController,
-                              keyboardType: TextInputType.emailAddress,
-                              hintText: 'jhon@gmail.com',
-                              labelColor: Colors.white,
-                              filled: false,
-                              onChanged: _authCubit.onEmailChanged,
-                            ),
-                            BlocBuilder<AuthCubit, AuthState>(
-                              bloc: _authCubit,
-                              builder: (context, state) {
-                                final error = _authCubit.getEmailError();
-                                if (error != null) {
-                                  return Padding(
-                                    padding: const EdgeInsets.only(top: 8),
-                                    child: AppText(
-                                      text: error,
-                                      style: AppTextStyles.bodyRegular(context)
-                                          .copyWith(
-                                            color: Colors.red,
-                                            fontSize: 12,
-                                          ),
-                                    ),
-                                  );
-                                }
-                                return const SizedBox.shrink();
-                              },
-                            ),
-                          ],
-                        ),
-                        CustomSizedBox(height: 24),
-
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            PhoneNumberField(
-                              label: 'Phone Number',
-                              hintText: 'Enter Your Number',
-                              initialCountry: _authCubit.selectedCountry,
-                              onChanged: (completePhoneNumber) {
-                                _authCubit.phoneController.text =
-                                    completePhoneNumber;
-                                _authCubit.onPhoneChanged(completePhoneNumber);
-                              },
-                            ),
-                            // Show phone validation error
-                            BlocBuilder<AuthCubit, AuthState>(
-                              bloc: _authCubit,
-                              builder: (context, state) {
-                                final phoneError = _authCubit.getPhoneError();
-                                if (phoneError != null) {
-                                  return Padding(
-                                    padding: const EdgeInsets.only(top: 8),
-                                    child: AppText(
-                                      text: phoneError,
-                                      style: AppTextStyles.bodyRegular(context)
-                                          .copyWith(
-                                            color: Colors.red,
-                                            fontSize: 12,
-                                          ),
-                                    ),
-                                  );
-                                }
-                                return const SizedBox.shrink();
-                              },
-                            ),
-                          ],
-                        ),
-                        CustomSizedBox(height: 24),
-
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            CustomLabelTextField(
-                              label: 'Password',
-                              controller: _authCubit.passwordController,
-                              obscureText: _authCubit.obscurePassword,
-                              hintText: '•••••',
-                              labelColor: Colors.white,
-                              filled: false,
-                              suffixIcon: IconButton(
-                                onPressed: () {
-                                  _authCubit.isObsecure();
-                                },
-                                icon: Icon(
-                                  _authCubit.obscurePassword
-                                      ? Icons.visibility_outlined
-                                      : Icons.visibility_off_outlined,
-                                  color: Colors.white,
                                 ),
-                              ),
-                              onChanged: _authCubit.onPasswordChanged,
+                              ],
                             ),
-                            BlocBuilder<AuthCubit, AuthState>(
-                              bloc: _authCubit,
-                              builder: (context, state) {
-                                final error = _authCubit.getPasswordError();
-                                if (error != null) {
-                                  return Padding(
-                                    padding: const EdgeInsets.only(top: 8),
-                                    child: AppText(
-                                      text: error,
-                                      style: AppTextStyles.bodyRegular(context)
-                                          .copyWith(
-                                            color: Colors.red,
-                                            fontSize: 12,
-                                          ),
-                                    ),
-                                  );
-                                }
-                                return const SizedBox.shrink();
-                              },
-                            ),
-                          ],
-                        ),
-                        CustomSizedBox(height: 24),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            CustomLabelTextField(
-                              label: 'Confirm Password',
-                              controller: _authCubit.confirmPasswordController,
-                              obscureText: _authCubit.obscureConfirmPassword,
-                              hintText: '•••••••••••••',
-                              labelColor: Colors.white,
-                              filled: false,
-                              suffixIcon: IconButton(
-                                onPressed: () {
-                                  _authCubit.isObsecureConfirm();
-                                },
-                                icon: Icon(
-                                  _authCubit.obscureConfirmPassword
-                                      ? Icons.visibility_outlined
-                                      : Icons.visibility_off_outlined,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              onChanged: _authCubit.onConfirmPasswordChanged,
-                            ),
-                            BlocBuilder<AuthCubit, AuthState>(
-                              bloc: _authCubit,
-                              builder: (context, state) {
-                                final error = _authCubit
-                                    .getConfirmPasswordError();
-                                if (error != null) {
-                                  return Padding(
-                                    padding: const EdgeInsets.only(top: 8),
-                                    child: AppText(
-                                      text: error,
-                                      style: AppTextStyles.bodyRegular(context)
-                                          .copyWith(
-                                            color: Colors.red,
-                                            fontSize: 12,
-                                          ),
-                                    ),
-                                  );
-                                }
-                                return const SizedBox.shrink();
-                              },
-                            ),
-                          ],
-                        ),
-                        CustomSizedBox(height: 40),
+                            CustomSizedBox(height: 24),
 
-                        // Terms and Privacy
-                        RichText(
-                          textAlign: TextAlign.center,
-                          text: TextSpan(
-                            text: 'By signing up, you agree to our ',
-                            style: AppTextStyles.bodyLarge(
-                              context,
-                            ).copyWith(color: Colors.white70, fontSize: 12),
-                            children: [
-                              TextSpan(
-                                text: 'Terms of Service',
-                                style: const TextStyle(
-                                  decoration: TextDecoration.underline,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                recognizer: TapGestureRecognizer()
-                                  ..onTap = () {
-                                    TermsBottomSheet.show(context);
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                CustomLabelTextField(
+                                  label: 'Email',
+                                  controller: _authCubit.emailController,
+                                  keyboardType: TextInputType.emailAddress,
+                                  hintText: 'example@gmail.com',
+
+                                  filled: false,
+                                  onChanged: (value) {
+                                    if (mounted) {
+                                      _authCubit.onEmailChanged(value);
+                                    }
                                   },
-                              ),
-                              const TextSpan(text: ' and '),
-                              TextSpan(
-                                text: 'Privacy Policy',
-                                style: const TextStyle(
-                                  decoration: TextDecoration.underline,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
                                 ),
-                                recognizer: TapGestureRecognizer()
-                                  ..onTap = () {
-                                    PrivacyBottomSheet.show(context);
+                                if (_authCubit.getEmailError() != null)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 8),
+                                    child: AppText(
+                                      text: _authCubit.getEmailError() ?? "",
+                                      style: AppTextStyles.bodyRegular(context)
+                                          .copyWith(
+                                            color: Colors.red,
+                                            fontSize: 12,
+                                          ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            CustomSizedBox(height: 24),
+
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                PhoneNumberField(
+                                  label: 'Phone Number',
+                                  hintText: 'Enter Your Number',
+                                  initialCountry: _authCubit.selectedCountry,
+                                  onChanged: (completePhoneNumber) {
+                                    if (mounted) {
+                                      _authCubit.phoneController.text =
+                                          completePhoneNumber;
+                                      _authCubit.onPhoneChanged(
+                                        completePhoneNumber,
+                                      );
+                                    }
                                   },
-                              ),
-                            ],
-                          ),
-                        ),
-                        CustomSizedBox(height: 24),
+                                ),
+                                if (_authCubit.getPhoneError() != null)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 8),
+                                    child: AppText(
+                                      text: _authCubit.getPhoneError() ?? "",
+                                      style: AppTextStyles.bodyRegular(context)
+                                          .copyWith(
+                                            color: Colors.red,
+                                            fontSize: 12,
+                                          ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            CustomSizedBox(height: 24),
 
-                        // Sign Up Button
-                        CustomElevatedButton(
-                          onTap: () {
-                            // Validate all fields individually
-                            final firstNameError = _authCubit.validateName(
-                              _authCubit.firstNameController.text,
-                            );
-                            final lastNameError = _authCubit.validateName(
-                              _authCubit.lastNameController.text,
-                            );
-                            final emailError = _authCubit.validateEmail(
-                              _authCubit.emailController.text,
-                            );
-                            final phoneError = _authCubit.validatePhoneNumber(
-                              _authCubit.phoneController.text,
-                            );
-                            final passwordError = _authCubit.validatePassword(
-                              _authCubit.passwordController.text,
-                            );
-                            final confirmPasswordError = _authCubit
-                                .validateConfirmPassword(
-                                  _authCubit.confirmPasswordController.text,
-                                  _authCubit.passwordController.text,
-                                );
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                CustomLabelTextField(
+                                  label: 'Password',
+                                  controller: _authCubit.passwordController,
+                                  obscureText: _authCubit.obscurePassword,
+                                  hintText: 'Enter your password',
 
-                            if (firstNameError == null &&
-                                lastNameError == null &&
-                                emailError == null &&
-                                phoneError == null &&
-                                passwordError == null &&
-                                confirmPasswordError == null) {
-                              AutoRouter.of(
-                                context,
-                              ).replace(const VerifyPhoneNumberRoute());
-                            } else {
-                              // Mark all fields as touched to show validation errors
-                              if (firstNameError != null) {
-                                _authCubit.onFirstNameChanged(
-                                  _authCubit.firstNameController.text,
+                                  filled: false,
+                                  suffixIcon: IconButton(
+                                    onPressed: () {
+                                      if (mounted) {
+                                        _authCubit.togglePasswordVisibility();
+                                      }
+                                    },
+                                    icon: _authCubit.obscurePassword
+                                        ? Assets.icons.eye.svg(
+                                            colorFilter: ColorFilter.mode(
+                                              isLightTheme(context)
+                                                  ? Colors.black
+                                                  : Colors.white,
+                                              BlendMode.srcIn,
+                                            ),
+                                          )
+                                        : Assets.icons.eyeClose.svg(
+                                            colorFilter: ColorFilter.mode(
+                                              isLightTheme(context)
+                                                  ? Colors.black
+                                                  : Colors.white,
+                                              BlendMode.srcIn,
+                                            ),
+                                          ),
+                                  ),
+                                  onChanged: (value) {
+                                    if (mounted) {
+                                      _authCubit.onPasswordChanged(value);
+                                    }
+                                  },
+                                ),
+                                if (_authCubit.getPasswordError() != null)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 8),
+                                    child: AppText(
+                                      text: _authCubit.getPasswordError() ?? "",
+                                      style: AppTextStyles.bodyRegular(context)
+                                          .copyWith(
+                                            color: Colors.red,
+                                            fontSize: 12,
+                                          ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            CustomSizedBox(height: 24),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                CustomLabelTextField(
+                                  label: 'Confirm Password',
+                                  controller:
+                                      _authCubit.confirmPasswordController,
+                                  obscureText:
+                                      _authCubit.obscureConfirmPassword,
+                                  hintText: 'Re-enter your password',
+                                  filled: false,
+                                  suffixIcon: IconButton(
+                                    onPressed: () {
+                                      if (mounted) {
+                                        _authCubit
+                                            .toggleConfirmPasswordVisibility();
+                                      }
+                                    },
+                                    icon: _authCubit.obscureConfirmPassword
+                                        ? Assets.icons.eye.svg(
+                                            colorFilter: ColorFilter.mode(
+                                              isLightTheme(context)
+                                                  ? Colors.black
+                                                  : Colors.white,
+                                              BlendMode.srcIn,
+                                            ),
+                                          )
+                                        : Assets.icons.eyeClose.svg(
+                                            colorFilter: ColorFilter.mode(
+                                              isLightTheme(context)
+                                                  ? Colors.black
+                                                  : Colors.white,
+                                              BlendMode.srcIn,
+                                            ),
+                                          ),
+                                  ),
+                                  onChanged: (value) {
+                                    if (mounted) {
+                                      _authCubit.onConfirmPasswordChanged(
+                                        value,
+                                      );
+                                    }
+                                  },
+                                ),
+                                if (_authCubit.getConfirmPasswordError() !=
+                                    null)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 8),
+                                    child: AppText(
+                                      text:
+                                          _authCubit
+                                              .getConfirmPasswordError() ??
+                                          "",
+                                      style: AppTextStyles.bodyRegular(context)
+                                          .copyWith(
+                                            color: Colors.red,
+                                            fontSize: 12,
+                                          ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            CustomSizedBox(height: 16),
+
+                            // Terms and Privacy
+                            ValueListenableBuilder<String?>(
+                              valueListenable: _errorMessageNotifier,
+                              builder: (context, errorMessage, child) {
+                                return Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: RichText(
+                                    textAlign: TextAlign.left,
+                                    text: TextSpan(
+                                      text: 'By signing up, you agree to our ',
+                                      style: AppTextStyles.description(context)
+                                          .copyWith(
+                                            color: isLightTheme(context)
+                                                ? Colors.black
+                                                : Colors.white70,
+                                          ),
+                                      children: [
+                                        TextSpan(
+                                          text: 'Terms of Service',
+                                          style:
+                                              AppTextStyles.description(
+                                                context,
+                                              ).copyWith(
+                                                fontWeight: FontWeight.bold,
+                                                decoration:
+                                                    TextDecoration.underline,
+                                              ),
+                                          recognizer: TapGestureRecognizer()
+                                            ..onTap = () {
+                                              TermsBottomSheet.show(
+                                                context,
+                                                blurNotifier: _isBlurNotifier,
+                                              );
+                                            },
+                                        ),
+                                        const TextSpan(text: ' and '),
+                                        TextSpan(
+                                          text: 'Privacy Policy',
+                                          style:
+                                              AppTextStyles.description(
+                                                context,
+                                              ).copyWith(
+                                                fontWeight: FontWeight.bold,
+                                                decoration:
+                                                    TextDecoration.underline,
+                                              ),
+                                          recognizer: TapGestureRecognizer()
+                                            ..onTap = () {
+                                              PrivacyBottomSheet.show(
+                                                context,
+                                                blurNotifier: _isBlurNotifier,
+                                              );
+                                            },
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 );
-                              }
-                              if (lastNameError != null) {
-                                _authCubit.onLastNameChanged(
-                                  _authCubit.lastNameController.text,
+                              },
+                            ),
+                            CustomSizedBox(height: 24),
+
+                            // Sign Up Button
+                            BlocBuilder(
+                              bloc: _createAccountCubit,
+                              builder: (context, state) {
+                                return CustomElevatedButton(
+                                  icon: _createAccountCubit.isLoading
+                                      ? SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: Lottie.asset(
+                                            Assets.animations.loadingSpinner,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        )
+                                      : null,
+                                  onTap: () async {
+                                    if (mounted) {
+                                      _authCubit.submit();
+
+                                      if (_authCubit.isFormValid()) {
+                                        await _createAccountCubit.createAccount(
+                                          context: context,
+                                          firstName: _authCubit
+                                              .firstNameController
+                                              .text,
+                                          lastName: _authCubit
+                                              .lastNameController
+                                              .text,
+                                          email:
+                                              _authCubit.emailController.text,
+                                          phone:
+                                              _authCubit.phoneController.text,
+                                          password: _authCubit
+                                              .passwordController
+                                              .text,
+                                          countryCode:
+                                              _authCubit.selectedCountry?.name,
+                                        );
+                                        if (!mounted) {
+                                          return;
+                                        }
+                                        if (state is CreateAccountLoaded) {
+                                          _authCubit.clearCreateAccountFields();
+                                        }
+                                      }
+                                    }
+                                  },
+                                  text: _createAccountCubit.isLoading
+                                      ? ''
+                                      : 'Continue',
+                                  width: double.infinity,
                                 );
-                              }
-                              if (emailError != null) {
-                                _authCubit.onEmailChanged(
-                                  _authCubit.emailController.text,
-                                );
-                              }
-                              if (phoneError != null) {
-                                _authCubit.onPhoneChanged(
-                                  _authCubit.phoneController.text,
-                                );
-                              }
-                              if (passwordError != null) {
-                                _authCubit.onPasswordChanged(
-                                  _authCubit.passwordController.text,
-                                );
-                              }
-                              if (confirmPasswordError != null) {
-                                _authCubit.onConfirmPasswordChanged(
-                                  _authCubit.confirmPasswordController.text,
-                                );
-                              }
-                            }
-                          },
-                          text: 'Sign Up',
-                          width: double.infinity,
+                              },
+                            ),
+                            CustomSizedBox(
+                              height: MediaQuery.paddingOf(context).bottom + 20,
+                            ),
+                          ],
                         ),
-                        CustomSizedBox(height: 40),
-                      ],
-                    ),
-                  );
-                },
+                      );
+                    },
+                  ),
+                ),
               ),
             ),
-          ),
+            ValueListenableBuilder<bool>(
+              valueListenable: _isBlurNotifier,
+              builder: (context, isBlurred, child) {
+                return IgnorePointer(
+                  ignoring: !isBlurred,
+                  child: AnimatedOpacity(
+                    duration: const Duration(milliseconds: 200),
+                    opacity: isBlurred ? 1 : 0.0,
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                      child: Container(
+                        color: Colors.black.withValues(alpha: 0.05),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ],
         ),
       ),
     );

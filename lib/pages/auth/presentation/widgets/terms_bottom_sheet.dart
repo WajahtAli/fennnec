@@ -1,19 +1,28 @@
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
+import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:fennac_app/widgets/custom_sized_box.dart';
 import 'package:fennac_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+
+import '../../../../app/constants/media_query_constants.dart';
 
 class TermsBottomSheet extends StatelessWidget {
-  const TermsBottomSheet({super.key});
+  final ValueNotifier<bool>? blurNotifier;
 
-  static void show(BuildContext context) {
+  const TermsBottomSheet({super.key, this.blurNotifier});
+
+  static void show(BuildContext context, {ValueNotifier<bool>? blurNotifier}) {
+    blurNotifier?.value = true;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => const TermsBottomSheet(),
-    );
+      builder: (context) => TermsBottomSheet(blurNotifier: blurNotifier),
+    ).then((_) {
+      blurNotifier?.value = false;
+    });
   }
 
   @override
@@ -21,37 +30,49 @@ class TermsBottomSheet extends StatelessWidget {
     return Container(
       height: MediaQuery.of(context).size.height * 0.85,
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [ColorPalette.secondry, ColorPalette.black],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        ),
+        gradient: isDarkTheme(context)
+            ? LinearGradient(
+                colors: [ColorPalette.secondary, ColorPalette.black],
+
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              )
+            : null,
+        color: isLightTheme(context) ? Colors.white : null,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
         children: [
           // Header
           Padding(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.only(left: 24, right: 24, top: 24),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 AppText(
                   text: 'Terms of Service',
                   style: AppTextStyles.h1(context).copyWith(
-                    color: Colors.white,
+                    color: isLightTheme(context) ? Colors.black : Colors.white,
                     fontSize: 24,
+                    letterSpacing: 1.5,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 IconButton(
                   onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.close, color: Colors.white),
+                  icon: SvgPicture.asset(
+                    Assets.icons.cancel.path,
+                    width: 24,
+                    height: 24,
+                    colorFilter: ColorFilter.mode(
+                      isLightTheme(context) ? Colors.black : Colors.white,
+                      BlendMode.srcIn,
+                    ),
+                  ),
                 ),
               ],
             ),
           ),
-          const Divider(color: Colors.white10, height: 1),
 
           // Content
           Expanded(
@@ -101,6 +122,75 @@ class TermsBottomSheet extends StatelessWidget {
                     context,
                     'You agree to communicate respectfully and refrain from harassment, hate speech, or inappropriate content.',
                   ),
+                  CustomSizedBox(height: 24),
+                  _buildSectionTitle(context, '4. Premium Features'),
+                  CustomSizedBox(height: 12),
+                  _buildText(
+                    context,
+                    'Some features (such as joining multiple groups or private chats) are available through Fennec Premium. Payments are processed securely through our partners, and all subscriptions automatically renew unless canceled before the renewal date.',
+                  ),
+                  CustomSizedBox(height: 24),
+                  _buildSectionTitle(context, '5. Content Ownership'),
+                  CustomSizedBox(height: 12),
+                  _buildBulletPoint(
+                    context,
+                    'You retain ownership of any content you share (photos, messages, etc.).',
+                  ),
+                  _buildBulletPoint(
+                    context,
+                    'By posting on Fennec, you grant us a non-exclusive, worldwide, royalty-free license to display and distribute that content within the app.',
+                  ),
+                  _buildBulletPoint(
+                    context,
+                    'We may remove content that violates our guidelines or community standards.',
+                  ),
+                  CustomSizedBox(height: 24),
+                  _buildSectionTitle(context, '6. Safety and Reporting'),
+                  CustomSizedBox(height: 12),
+                  _buildBulletPoint(
+                    context,
+                    'Fennec is committed to keeping users safe.',
+                  ),
+                  _buildBulletPoint(
+                    context,
+                    'You can report users or groups that violate our policies through in-app reporting tools.',
+                  ),
+                  _buildBulletPoint(
+                    context,
+                    'We may take action including warnings, suspensions, or permanent bans.',
+                  ),
+                  CustomSizedBox(height: 24),
+                  _buildSectionTitle(context, '7. Disclaimers'),
+                  CustomSizedBox(height: 12),
+                  _buildBulletPoint(
+                    context,
+                    'Fennec is provided "as is" without warranties of any kind.',
+                  ),
+                  _buildBulletPoint(
+                    context,
+                    'We do not guarantee that the app will always function without interruptions or errors, or that all users are who they claim to be.',
+                  ),
+                  CustomSizedBox(height: 24),
+                  _buildSectionTitle(context, '8. Limitation of Liability'),
+                  CustomSizedBox(height: 12),
+                  _buildText(
+                    context,
+                    'Fennec and its affiliates are not responsible for any direct, indirect, or incidental damages arising from your use of the platform.',
+                  ),
+                  CustomSizedBox(height: 24),
+                  _buildSectionTitle(context, '9. Changes to the Terms'),
+                  CustomSizedBox(height: 12),
+                  _buildText(
+                    context,
+                    'We may update these Terms occasionally. Updates will take effect once posted in the app. Continued use of Fennec means you accept the new Terms.',
+                  ),
+                  CustomSizedBox(height: 24),
+                  _buildSectionTitle(context, '10. Contact Us'),
+                  CustomSizedBox(height: 12),
+                  _buildText(
+                    context,
+                    'If you have questions or concerns, contact us at: support@fennec.app',
+                  ),
                   CustomSizedBox(height: 40),
                 ],
               ),
@@ -115,9 +205,7 @@ class TermsBottomSheet extends StatelessWidget {
     return AppText(
       text: text,
       style: AppTextStyles.bodyLarge(context).copyWith(
-        color: Colors.white,
-        fontSize: 18,
-        fontWeight: FontWeight.w600,
+        fontWeight: isLightTheme(context) ? FontWeight.w400 : FontWeight.w600,
       ),
     );
   }
@@ -125,9 +213,9 @@ class TermsBottomSheet extends StatelessWidget {
   Widget _buildText(BuildContext context, String text) {
     return AppText(
       text: text,
-      style: AppTextStyles.bodyLarge(
+      style: AppTextStyles.body(
         context,
-      ).copyWith(color: Colors.white70, fontSize: 14, height: 1.5),
+      ).copyWith(color: isLightTheme(context) ? Colors.black : Colors.white),
     );
   }
 
