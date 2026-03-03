@@ -10,6 +10,7 @@ import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:fennac_app/helpers/gradient_toast.dart';
 import 'package:fennac_app/pages/auth/domain/usecases/login_usecase.dart';
 import 'package:fennac_app/pages/auth/data/model/login_model.dart';
+import 'package:fennac_app/pages/auth/presentation/bloc/cubit/auth_cubit.dart';
 import 'package:fennac_app/pages/auth/presentation/bloc/cubit/create_account_cubit.dart';
 import 'package:fennac_app/pages/auth/presentation/bloc/state/login_state.dart';
 import 'package:fennac_app/pages/dashboard/presentation/bloc/cubit/dashboard_cubit.dart';
@@ -231,7 +232,8 @@ class LoginCubit extends Cubit<LoginState> {
       isLoading = false;
       AutoRouter.of(context).replace(OnBoardingRoute());
       otpController.clear();
-
+      Di().sl<AuthCubit>().newPasswordController.clear();
+      Di().sl<AuthCubit>().confirmNewPasswordController.clear();
       emit(LoginLoaded());
     } catch (e) {
       isLoading = false;

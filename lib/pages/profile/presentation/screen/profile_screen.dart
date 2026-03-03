@@ -15,6 +15,7 @@ import 'package:fennac_app/widgets/custom_sized_box.dart';
 import 'package:fennac_app/widgets/custom_text.dart';
 import 'package:fennac_app/widgets/movable_background.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/di_container.dart';
 import '../../../auth/presentation/bloc/cubit/login_cubit.dart';
@@ -184,100 +185,115 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ).copyWith(fontWeight: FontWeight.w600),
           ),
         ),
-        Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            color: isLightTheme(context)
-                ? ColorPalette.textGrey
-                : ColorPalette.black.withValues(alpha: 0.2),
-
-            border: Border.all(color: ColorPalette.grey, width: 1),
-          ),
-          child: Column(
-            children: [
-              if (Di().sl<LoginCubit>().userData?.user?.authType ==
-                  'email') ...[
-                ProfileListTile(
-                  title: 'Change Password',
-                  onTap: () {
-                    AutoRouter.of(context).push(const ChangePasswordRoute());
-                  },
-                ),
-                ProfileListTile(
-                  title: 'Change Email or Phone',
-                  onTap: () {
-                    AutoRouter.of(context).push(const ChangeEmailPhoneRoute());
-                  },
-                ),
-              ],
-
-              Container(
-                height: 1,
+        BlocBuilder(
+          bloc: Di().sl<LoginCubit>(),
+          builder: (context, state) {
+            return Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
                 color: isLightTheme(context)
-                    ? Colors.transparent
-                    : ColorPalette.grey,
+                    ? ColorPalette.textGrey
+                    : ColorPalette.black.withValues(alpha: 0.2),
+
+                border: Border.all(color: ColorPalette.grey, width: 1),
               ),
-              ProfileListTile(
-                title: 'Notification Settings',
-                onTap: () {
-                  AutoRouter.of(
-                    context,
-                  ).push(const NotificationSettingsRoute());
-                },
-                showDivider: false,
-              ),
-              Container(
-                height: 1,
-                color: isLightTheme(context) ? Colors.grey : ColorPalette.grey,
-              ),
-              ProfileListTile(
-                title: 'App Appearance',
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => const AppearenceScreen(),
+              child: Column(
+                children: [
+                  if (Di().sl<LoginCubit>().userData?.user?.authType ==
+                      'email') ...[
+                    ProfileListTile(
+                      title: 'Change Password',
+                      onTap: () {
+                        AutoRouter.of(
+                          context,
+                        ).push(const ChangePasswordRoute());
+                      },
                     ),
-                  );
-                  // AutoRouter.of(context).push(const AppearenceRoute());
-                },
-                showDivider: false,
+                    ProfileListTile(
+                      title: 'Change Email or Phone',
+                      onTap: () {
+                        AutoRouter.of(
+                          context,
+                        ).push(const ChangeEmailPhoneRoute());
+                      },
+                    ),
+                  ],
+
+                  Container(
+                    height: 1,
+                    color: isLightTheme(context)
+                        ? Colors.transparent
+                        : ColorPalette.grey,
+                  ),
+                  ProfileListTile(
+                    title: 'Notification Settings',
+                    onTap: () {
+                      AutoRouter.of(
+                        context,
+                      ).push(const NotificationSettingsRoute());
+                    },
+                    showDivider: false,
+                  ),
+                  Container(
+                    height: 1,
+                    color: isLightTheme(context)
+                        ? Colors.grey
+                        : ColorPalette.grey,
+                  ),
+                  ProfileListTile(
+                    title: 'App Appearance',
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const AppearenceScreen(),
+                        ),
+                      );
+                      // AutoRouter.of(context).push(const AppearenceRoute());
+                    },
+                    showDivider: false,
+                  ),
+                  Container(
+                    height: 1,
+                    color: isLightTheme(context)
+                        ? ColorPalette.grey
+                        : ColorPalette.grey,
+                  ),
+                  ProfileListTile(
+                    title: 'Privacy & Permissions',
+                    onTap: () {
+                      AutoRouter.of(
+                        context,
+                      ).push(const PrivacyPermissionsRoute());
+                    },
+                    showDivider: true,
+                  ),
+                  ProfileListTile(
+                    title: 'Manage Subscriptions',
+                    onTap: () {
+                      AutoRouter.of(
+                        context,
+                      ).push(const ManageSubscriptionsRoute());
+                    },
+                    showDivider: true,
+                  ),
+                  ProfileListTile(
+                    title: 'Help & Support',
+                    onTap: () {
+                      AutoRouter.of(context).push(const HelpSupportRoute());
+                    },
+                    showDivider: true,
+                  ),
+                  ProfileListTile(
+                    title: 'Logout',
+                    onTap: () {
+                      Di().sl<LoginCubit>().logout(context);
+                    },
+                    showDivider: false,
+                  ),
+                ],
               ),
-              Container(
-                height: 1,
-                color: isLightTheme(context)
-                    ? ColorPalette.grey
-                    : ColorPalette.grey,
-              ),
-              ProfileListTile(
-                title: 'Privacy & Permissions',
-                onTap: () {
-                  AutoRouter.of(context).push(const PrivacyPermissionsRoute());
-                },
-                showDivider: true,
-              ),
-              ProfileListTile(
-                title: 'Manage Subscriptions',
-                onTap: () {
-                  AutoRouter.of(context).push(const ManageSubscriptionsRoute());
-                },
-                showDivider: true,
-              ),
-              ProfileListTile(
-                title: 'Help & Support',
-                onTap: () {
-                  AutoRouter.of(context).push(const HelpSupportRoute());
-                },
-                showDivider: true,
-              ),
-              ProfileListTile(
-                title: 'Logout',
-                onTap: () {
-                  Di().sl<LoginCubit>().logout(context);
-                },
-                showDivider: false,
-              ),
-            ],
-          ),
+            );
+          },
         ),
       ],
     );

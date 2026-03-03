@@ -67,6 +67,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   late SwipeController swipeController;
 
+  Future<void> fetchGroups() async {
+    await _groupsCubit.fetchAllGroups();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -247,324 +251,242 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           child: BlocBuilder(
             bloc: homeCubit,
             builder: (context, state) {
-              return Stack(
-                children: [
-                  Column(
-                    children: [
-                      HomeTopBar(
-                        onSettingsPressed: () {
-                          AutoRouter.of(context).push(const FilterRoute());
-                        },
-                        onBackPressed: () {
-                          // Jump back to the first group and clear end state visuals
-                          resetAnimations();
-                          homeCubit.restartFromBeginning();
-                          VxToast.show(
-                            message: 'Group list reset to start',
-                            icon: Assets.icons.checkGreen.path,
-                          );
-                        },
-                      ),
-                      const CustomSizedBox(height: 20),
+              return RefreshIndicator(
+                color: ColorPalette.primary,
+                backgroundColor: Colors.white,
+                onRefresh: fetchGroups,
+                child: Stack(
+                  children: [
+                    Column(
+                      children: [
+                        HomeTopBar(
+                          onSettingsPressed: () {
+                            AutoRouter.of(context).push(const FilterRoute());
+                          },
+                          onBackPressed: () {
+                            // Jump back to the first group and clear end state visuals
+                            resetAnimations();
+                            homeCubit.restartFromBeginning();
+                            VxToast.show(
+                              message: 'Group list reset to start',
+                              icon: Assets.icons.checkGreen.path,
+                            );
+                          },
+                        ),
+                        const CustomSizedBox(height: 20),
 
-                      Expanded(
-                        child: Stack(
-                          children: [
-                            AnimatedOpacity(
-                              duration: const Duration(seconds: 1),
-                              opacity: homeCubit.isEnd ? 0.0 : 1.0,
-                              child: AnimatedBuilder(
-                                animation: checkAnimController,
-                                builder: (context, child) {
-                                  return Transform.scale(
+                        Expanded(
+                          child: Stack(
+                            children: [
+                              AnimatedOpacity(
+                                duration: const Duration(seconds: 1),
+                                opacity: homeCubit.isEnd ? 0.0 : 1.0,
+                                child: AnimatedBuilder(
+                                  animation: checkAnimController,
+                                  builder: (context, child) {
+                                    return Transform.scale(
+                                      alignment: Alignment.center,
+                                      scale: checkScaleAnimation.value,
+                                      child: Transform.translate(
+                                        offset: crossSlideAnimation.value,
+                                        child: Transform.scale(
+                                          scale: crossSizeAnimation.value,
+                                          child: Opacity(
+                                            opacity: crossFadeAnimation.value,
+                                            child: child,
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: Container(
+                                    height: 40,
+                                    width: 40,
                                     alignment: Alignment.center,
-                                    scale: checkScaleAnimation.value,
-                                    child: Transform.translate(
-                                      offset: crossSlideAnimation.value,
-                                      child: Transform.scale(
-                                        scale: crossSizeAnimation.value,
-                                        child: Opacity(
-                                          opacity: crossFadeAnimation.value,
-                                          child: child,
+                                    decoration: BoxDecoration(
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: ColorPalette.error.withValues(
+                                            alpha: .1,
+                                          ),
+                                          blurRadius: 5,
+                                          offset: const Offset(0, 5),
                                         ),
+                                      ],
+                                      shape: BoxShape.circle,
+                                      color: ColorPalette.error.withValues(
+                                        alpha: .1,
                                       ),
                                     ),
-                                  );
-                                },
-                                child: Container(
-                                  height: 40,
-                                  width: 40,
-                                  alignment: Alignment.center,
-                                  decoration: BoxDecoration(
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: ColorPalette.error.withValues(
-                                          alpha: .1,
-                                        ),
-                                        blurRadius: 5,
-                                        offset: const Offset(0, 5),
+                                    child: SvgPicture.asset(
+                                      Assets.icons.error.path,
+                                      height: 30,
+                                      width: 30,
+                                      colorFilter: ColorFilter.mode(
+                                        ColorPalette.error,
+                                        BlendMode.srcIn,
                                       ),
-                                    ],
-                                    shape: BoxShape.circle,
-                                    color: ColorPalette.error.withValues(
-                                      alpha: .1,
-                                    ),
-                                  ),
-                                  child: SvgPicture.asset(
-                                    Assets.icons.error.path,
-                                    height: 30,
-                                    width: 30,
-                                    colorFilter: ColorFilter.mode(
-                                      ColorPalette.error,
-                                      BlendMode.srcIn,
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
 
-                            // CHECK ANIMATION
-                            AnimatedOpacity(
-                              duration: const Duration(milliseconds: 500),
-                              opacity: homeCubit.isEnd ? 0.0 : 1.0,
-                              child: AnimatedBuilder(
-                                animation: checkAnimController,
-                                builder: (context, child) {
-                                  return Transform.scale(
-                                    scale: checkScaleAnimation.value,
-                                    alignment: Alignment.topLeft,
-                                    child: Transform.translate(
-                                      offset: checkSlideAnimation.value,
-                                      child: Transform.scale(
-                                        scale: checkSizeAnimation.value,
-                                        child: Opacity(
-                                          opacity: checkFadeAnimation.value,
-                                          child: child,
+                              // CHECK ANIMATION
+                              AnimatedOpacity(
+                                duration: const Duration(milliseconds: 500),
+                                opacity: homeCubit.isEnd ? 0.0 : 1.0,
+                                child: AnimatedBuilder(
+                                  animation: checkAnimController,
+                                  builder: (context, child) {
+                                    return Transform.scale(
+                                      scale: checkScaleAnimation.value,
+                                      alignment: Alignment.topLeft,
+                                      child: Transform.translate(
+                                        offset: checkSlideAnimation.value,
+                                        child: Transform.scale(
+                                          scale: checkSizeAnimation.value,
+                                          child: Opacity(
+                                            opacity: checkFadeAnimation.value,
+                                            child: child,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  );
-                                },
-                                child: Container(
-                                  height: 40,
-                                  width: 40,
-                                  alignment: Alignment.center,
-                                  decoration: BoxDecoration(
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: ColorPalette.green.withValues(
-                                          alpha: .1,
-                                        ),
-                                        blurRadius: 5,
-                                        offset: const Offset(0, 5),
-                                      ),
-                                    ],
-                                    shape: BoxShape.circle,
-                                    color: ColorPalette.green.withValues(
-                                      alpha: .1,
-                                    ),
-                                  ),
-                                  child: Image.asset(
-                                    Assets.icons.checkGreen.path,
-                                    height: 30,
-                                    width: 30,
-                                    color: ColorPalette.green,
-                                  ),
-                                ),
-                              ),
-                            ),
-
-                            if (homeCubit.isEnd)
-                              Align(
-                                alignment: Alignment.center,
-                                child: FadeTransition(
-                                  opacity: endFadeAnimation,
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 24,
-                                    ),
-                                    child: EmptyWidget(
-                                      title: 'You’re All Caught Up',
-                                      description:
-                                          'You’ve seen all the groups available in your area for now. New groups join regularly — check back soon.',
-                                      imagePath:
-                                          Assets.icons.alertTriangle.path,
-                                      showButton: true,
-                                      buttonText: 'Adjust Filters',
-                                      onButtonTap: () {
-                                        resetAnimations();
-                                        AutoRouter.of(
-                                          context,
-                                        ).push(const FilterRoute());
-                                      },
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            if (homeCubit.currentGroup == null &&
-                                !homeCubit.isEnd)
-                              BlocBuilder(
-                                bloc: _groupsCubit,
-                                builder: (context, state) {
-                                  if (state is GroupsLoading) {
-                                    return const HomeLandingSkeleton();
-                                  }
-                                  return Align(
+                                    );
+                                  },
+                                  child: Container(
+                                    height: 40,
+                                    width: 40,
                                     alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: ColorPalette.green.withValues(
+                                            alpha: .1,
+                                          ),
+                                          blurRadius: 5,
+                                          offset: const Offset(0, 5),
+                                        ),
+                                      ],
+                                      shape: BoxShape.circle,
+                                      color: ColorPalette.green.withValues(
+                                        alpha: .1,
+                                      ),
+                                    ),
+                                    child: Image.asset(
+                                      Assets.icons.checkGreen.path,
+                                      height: 30,
+                                      width: 30,
+                                      color: ColorPalette.green,
+                                    ),
+                                  ),
+                                ),
+                              ),
+
+                              if (homeCubit.isEnd)
+                                Align(
+                                  alignment: Alignment.center,
+                                  child: FadeTransition(
+                                    opacity: endFadeAnimation,
                                     child: Padding(
                                       padding: const EdgeInsets.symmetric(
                                         horizontal: 24,
                                       ),
                                       child: EmptyWidget(
-                                        title: 'No Groups Available',
+                                        title: 'You’re All Caught Up',
                                         description:
-                                            'We couldn\'t find any groups right now. Try refreshing or check back soon.',
+                                            'You’ve seen all the groups available in your area for now. New groups join regularly — check back soon.',
                                         imagePath:
                                             Assets.icons.alertTriangle.path,
                                         showButton: true,
-                                        buttonText: 'Refresh',
+                                        buttonText: 'Adjust Filters',
                                         onButtonTap: () {
-                                          _groupsCubit.fetchAllGroups();
+                                          resetAnimations();
+                                          AutoRouter.of(
+                                            context,
+                                          ).push(const FilterRoute());
                                         },
                                       ),
                                     ),
+                                  ),
+                                ),
+                              if (homeCubit.currentGroup == null &&
+                                  !homeCubit.isEnd)
+                                BlocBuilder(
+                                  bloc: _groupsCubit,
+                                  builder: (context, state) {
+                                    if (state is GroupsLoading) {
+                                      return const HomeLandingSkeleton();
+                                    }
+                                    return Align(
+                                      alignment: Alignment.center,
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 24,
+                                        ),
+                                        child: EmptyWidget(
+                                          title: 'No Groups Available',
+                                          description:
+                                              'We couldn\'t find any groups right now. Try refreshing or check back soon.',
+                                          imagePath:
+                                              Assets.icons.alertTriangle.path,
+                                          showButton: true,
+                                          buttonText: 'Refresh',
+                                          onButtonTap: () {
+                                            _groupsCubit.fetchAllGroups();
+                                          },
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              BlocBuilder(
+                                bloc: homeCubit,
+                                builder: (context, state) {
+                                  final bool isDragging =
+                                      swipeController.isDragging;
+                                  final double nextYOffset = _nextCardYOffset(
+                                    context,
+                                    homeCubit.xAxisCardValue,
                                   );
-                                },
-                              ),
-                            BlocBuilder(
-                              bloc: homeCubit,
-                              builder: (context, state) {
-                                final bool isDragging =
-                                    swipeController.isDragging;
-                                final double nextYOffset = _nextCardYOffset(
-                                  context,
-                                  homeCubit.xAxisCardValue,
-                                );
 
-                                void handleAnim(SwipeResult result) {
-                                  homeCubit.selectProfileIndex(null);
-                                  // animate next card half → top
-                                  nextCardSettleController
-                                      .forward(from: 0)
-                                      .whenComplete(() {
-                                        homeCubit.onSwipeCompleted(result);
-                                        resetAnimations();
+                                  void handleAnim(SwipeResult result) {
+                                    homeCubit.selectProfileIndex(null);
+                                    // animate next card half → top
+                                    nextCardSettleController
+                                        .forward(from: 0)
+                                        .whenComplete(() {
+                                          homeCubit.onSwipeCompleted(result);
+                                          resetAnimations();
 
-                                        if (homeCubit.isEndOfList) {
-                                          endFadeController.forward();
-                                          homeCubit.markEndReached();
-                                        }
-                                      });
-                                  if (homeCubit.nextGroup != null) {
-                                    // checkAnimController
-                                    // .forward(from: 0)
-                                    // .whenComplete(() {
-                                    homeCubit.updateCardPosition(0);
-                                    checkAnimController.reset();
-                                    checkAnimationController.reset();
-                                    crossAnimationController.reset();
-                                    // });
+                                          if (homeCubit.isEndOfList) {
+                                            endFadeController.forward();
+                                            homeCubit.markEndReached();
+                                          }
+                                        });
+                                    if (homeCubit.nextGroup != null) {
+                                      // checkAnimController
+                                      // .forward(from: 0)
+                                      // .whenComplete(() {
+                                      homeCubit.updateCardPosition(0);
+                                      checkAnimController.reset();
+                                      checkAnimationController.reset();
+                                      crossAnimationController.reset();
+                                      // });
+                                    }
+                                    // animate top card out
+                                    topCardController
+                                        .forward(from: 0)
+                                        .whenComplete(() {});
                                   }
-                                  // animate top card out
-                                  topCardController
-                                      .forward(from: 0)
-                                      .whenComplete(() {});
-                                }
 
-                                return Stack(
-                                  alignment: Alignment.center,
-                                  children: [
-                                    if (homeCubit.nextGroup != null) ...[
-                                      /// 🔹 NEXT CARD
-                                      isDragging
-                                          ? Transform.translate(
-                                              offset: Offset(0, nextYOffset),
-                                              child: HomeCardDesign(
-                                                group: homeCubit.nextGroup,
-                                                onTapLeft: () {
-                                                  // Dislike API call
-                                                  _groupsCubit.likeDislikeGroup(
-                                                    groupId:
-                                                        homeCubit
-                                                            .nextGroup
-                                                            ?.id ??
-                                                        '',
-                                                    type: 'dislike',
-                                                  );
-                                                  swipeController
-                                                      .swipeProgrammatically(
-                                                        toRight: false,
-                                                        screenSize:
-                                                            MediaQuery.of(
-                                                              context,
-                                                            ).size,
-                                                      );
-                                                  homeCubit.sController
-                                                      .animateTo(
-                                                        0,
-                                                        duration: Duration(
-                                                          milliseconds: 300,
-                                                        ),
-                                                        curve: Curves.easeInOut,
-                                                      );
-                                                  final result = swipeController
-                                                      .onDragEnd(
-                                                        MediaQuery.of(
-                                                          context,
-                                                        ).size,
-                                                      );
-                                                  handleAnim(result);
-                                                },
-                                                onTapRight: () {
-                                                  // Like API call
-                                                  _groupsCubit.likeDislikeGroup(
-                                                    groupId:
-                                                        homeCubit
-                                                            .nextGroup
-                                                            ?.id ??
-                                                        '',
-                                                    type: 'like',
-                                                  );
-                                                  homeCubit.sController
-                                                      .animateTo(
-                                                        0,
-                                                        duration: Duration(
-                                                          milliseconds: 300,
-                                                        ),
-                                                        curve: Curves.easeInOut,
-                                                      );
-                                                  swipeController
-                                                      .swipeProgrammatically(
-                                                        toRight: true,
-                                                        screenSize:
-                                                            MediaQuery.of(
-                                                              context,
-                                                            ).size,
-                                                      );
-                                                  final result = swipeController
-                                                      .onDragEnd(
-                                                        MediaQuery.of(
-                                                          context,
-                                                        ).size,
-                                                      );
-                                                  handleAnim(result);
-                                                },
-                                              ),
-                                            )
-                                          : Opacity(
-                                              opacity:
-                                                  nextCardSettleController
-                                                      .isAnimating
-                                                  ? 1
-                                                  : 0,
-                                              child: SlideTransition(
-                                                position:
-                                                    Tween(
-                                                      begin: Offset(0, 0.4),
-                                                      end: Offset.zero,
-                                                    ).animate(
-                                                      nextCardSettleController,
-                                                    ),
+                                  return Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      if (homeCubit.nextGroup != null) ...[
+                                        /// 🔹 NEXT CARD
+                                        isDragging
+                                            ? Transform.translate(
+                                                offset: Offset(0, nextYOffset),
                                                 child: HomeCardDesign(
                                                   group: homeCubit.nextGroup,
                                                   onTapLeft: () {
@@ -578,6 +500,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                               '',
                                                           type: 'dislike',
                                                         );
+                                                    swipeController
+                                                        .swipeProgrammatically(
+                                                          toRight: false,
+                                                          screenSize:
+                                                              MediaQuery.of(
+                                                                context,
+                                                              ).size,
+                                                        );
                                                     homeCubit.sController
                                                         .animateTo(
                                                           0,
@@ -586,14 +516,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                           ),
                                                           curve:
                                                               Curves.easeInOut,
-                                                        );
-                                                    swipeController
-                                                        .swipeProgrammatically(
-                                                          toRight: false,
-                                                          screenSize:
-                                                              MediaQuery.of(
-                                                                context,
-                                                              ).size,
                                                         );
                                                     final result =
                                                         swipeController
@@ -642,217 +564,318 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                     handleAnim(result);
                                                   },
                                                 ),
+                                              )
+                                            : Opacity(
+                                                opacity:
+                                                    nextCardSettleController
+                                                        .isAnimating
+                                                    ? 1
+                                                    : 0,
+                                                child: SlideTransition(
+                                                  position:
+                                                      Tween(
+                                                        begin: Offset(0, 0.4),
+                                                        end: Offset.zero,
+                                                      ).animate(
+                                                        nextCardSettleController,
+                                                      ),
+                                                  child: HomeCardDesign(
+                                                    group: homeCubit.nextGroup,
+                                                    onTapLeft: () {
+                                                      // Dislike API call
+                                                      _groupsCubit
+                                                          .likeDislikeGroup(
+                                                            groupId:
+                                                                homeCubit
+                                                                    .nextGroup
+                                                                    ?.id ??
+                                                                '',
+                                                            type: 'dislike',
+                                                          );
+                                                      homeCubit.sController
+                                                          .animateTo(
+                                                            0,
+                                                            duration: Duration(
+                                                              milliseconds: 300,
+                                                            ),
+                                                            curve: Curves
+                                                                .easeInOut,
+                                                          );
+                                                      swipeController
+                                                          .swipeProgrammatically(
+                                                            toRight: false,
+                                                            screenSize:
+                                                                MediaQuery.of(
+                                                                  context,
+                                                                ).size,
+                                                          );
+                                                      final result =
+                                                          swipeController
+                                                              .onDragEnd(
+                                                                MediaQuery.of(
+                                                                  context,
+                                                                ).size,
+                                                              );
+                                                      handleAnim(result);
+                                                    },
+                                                    onTapRight: () {
+                                                      // Like API call
+                                                      _groupsCubit
+                                                          .likeDislikeGroup(
+                                                            groupId:
+                                                                homeCubit
+                                                                    .nextGroup
+                                                                    ?.id ??
+                                                                '',
+                                                            type: 'like',
+                                                          );
+                                                      homeCubit.sController
+                                                          .animateTo(
+                                                            0,
+                                                            duration: Duration(
+                                                              milliseconds: 300,
+                                                            ),
+                                                            curve: Curves
+                                                                .easeInOut,
+                                                          );
+                                                      swipeController
+                                                          .swipeProgrammatically(
+                                                            toRight: true,
+                                                            screenSize:
+                                                                MediaQuery.of(
+                                                                  context,
+                                                                ).size,
+                                                          );
+                                                      final result =
+                                                          swipeController
+                                                              .onDragEnd(
+                                                                MediaQuery.of(
+                                                                  context,
+                                                                ).size,
+                                                              );
+                                                      handleAnim(result);
+                                                    },
+                                                  ),
+                                                ),
                                               ),
+                                      ],
+                                      if (homeCubit.currentGroup != null)
+                                        /// 🔹 TOP CARD
+                                        SlideTransition(
+                                          position: topCardSlide,
+                                          child: SwipeCard(
+                                            controller: swipeController,
+                                            onSwipe: (result) {
+                                              if (result != SwipeResult.none) {
+                                                handleAnim(result);
+                                              }
+                                            },
+                                            child: HomeCardDesign(
+                                              group: homeCubit.currentGroup,
+                                              onTapLeft: () {
+                                                // Dislike API call
+                                                _groupsCubit.likeDislikeGroup(
+                                                  groupId:
+                                                      homeCubit
+                                                          .currentGroup
+                                                          ?.id ??
+                                                      '',
+                                                  type: 'dislike',
+                                                );
+                                                homeCubit.sController.animateTo(
+                                                  0,
+                                                  duration: Duration(
+                                                    seconds: 1,
+                                                  ),
+                                                  curve: Curves.easeInOut,
+                                                );
+                                                swipeController
+                                                    .swipeProgrammatically(
+                                                      toRight: false,
+                                                      screenSize: MediaQuery.of(
+                                                        context,
+                                                      ).size,
+                                                    );
+                                                final result = swipeController
+                                                    .onDragEnd(
+                                                      MediaQuery.of(
+                                                        context,
+                                                      ).size,
+                                                    );
+                                                handleAnim(result);
+                                              },
+                                              onTapRight: () {
+                                                // Like API call
+                                                _groupsCubit.likeDislikeGroup(
+                                                  groupId:
+                                                      homeCubit
+                                                          .currentGroup
+                                                          ?.id ??
+                                                      '',
+                                                  type: 'like',
+                                                );
+                                                homeCubit.sController.animateTo(
+                                                  0,
+                                                  duration: Duration(
+                                                    seconds: 1,
+                                                  ),
+                                                  curve: Curves.easeInOut,
+                                                );
+                                                swipeController
+                                                    .swipeProgrammatically(
+                                                      toRight: true,
+                                                      screenSize: MediaQuery.of(
+                                                        context,
+                                                      ).size,
+                                                    );
+                                                final result = swipeController
+                                                    .onDragEnd(
+                                                      MediaQuery.of(
+                                                        context,
+                                                      ).size,
+                                                    );
+                                                handleAnim(result);
+                                              },
                                             ),
-                                    ],
-                                    if (homeCubit.currentGroup != null)
-                                      /// 🔹 TOP CARD
-                                      SlideTransition(
-                                        position: topCardSlide,
-                                        child: SwipeCard(
-                                          controller: swipeController,
-                                          onSwipe: (result) {
-                                            if (result != SwipeResult.none) {
-                                              handleAnim(result);
-                                            }
-                                          },
-                                          child: HomeCardDesign(
-                                            group: homeCubit.currentGroup,
-                                            onTapLeft: () {
-                                              // Dislike API call
-                                              _groupsCubit.likeDislikeGroup(
-                                                groupId:
-                                                    homeCubit
-                                                        .currentGroup
-                                                        ?.id ??
-                                                    '',
-                                                type: 'dislike',
-                                              );
-                                              homeCubit.sController.animateTo(
-                                                0,
-                                                duration: Duration(seconds: 1),
-                                                curve: Curves.easeInOut,
-                                              );
-                                              swipeController
-                                                  .swipeProgrammatically(
-                                                    toRight: false,
-                                                    screenSize: MediaQuery.of(
-                                                      context,
-                                                    ).size,
-                                                  );
-                                              final result = swipeController
-                                                  .onDragEnd(
-                                                    MediaQuery.of(context).size,
-                                                  );
-                                              handleAnim(result);
-                                            },
-                                            onTapRight: () {
-                                              // Like API call
-                                              _groupsCubit.likeDislikeGroup(
-                                                groupId:
-                                                    homeCubit
-                                                        .currentGroup
-                                                        ?.id ??
-                                                    '',
-                                                type: 'like',
-                                              );
-                                              homeCubit.sController.animateTo(
-                                                0,
-                                                duration: Duration(seconds: 1),
-                                                curve: Curves.easeInOut,
-                                              );
-                                              swipeController
-                                                  .swipeProgrammatically(
-                                                    toRight: true,
-                                                    screenSize: MediaQuery.of(
-                                                      context,
-                                                    ).size,
-                                                  );
-                                              final result = swipeController
-                                                  .onDragEnd(
-                                                    MediaQuery.of(context).size,
-                                                  );
-                                              handleAnim(result);
-                                            },
                                           ),
                                         ),
-                                      ),
-                                  ],
-                                );
-                              },
-                            ),
+                                    ],
+                                  );
+                                },
+                              ),
 
-                            // BlocBuilder(
-                            //   bloc: homeCubit,
-                            //   builder: (context, state) {
-                            //     if (homeCubit.isEnd) {
-                            //       return const Center(child: Text('No more cards'));
-                            //     }
+                              // BlocBuilder(
+                              //   bloc: homeCubit,
+                              //   builder: (context, state) {
+                              //     if (homeCubit.isEnd) {
+                              //       return const Center(child: Text('No more cards'));
+                              //     }
 
-                            //     return Stack(
-                            //       alignment: Alignment.center,
-                            //       children: [
-                            //         // 🔹 NEXT CARD (under)
-                            //         BlocBuilder(
-                            //           bloc: homeCubit,
-                            //           builder: (context, state) {
-                            //             return SlideTransition(
-                            //               position: nextGroupSlideAnimation,
-                            //               child: SlideTransition(
-                            //                 position: groupSlide,
-                            //                 child: HomeCardDesign(
-                            //                   group: homeCubit.nextGroup,
-                            //                 ),
-                            //               ),
-                            //             );
-                            //           },
-                            //         ),
+                              //     return Stack(
+                              //       alignment: Alignment.center,
+                              //       children: [
+                              //         // 🔹 NEXT CARD (under)
+                              //         BlocBuilder(
+                              //           bloc: homeCubit,
+                              //           builder: (context, state) {
+                              //             return SlideTransition(
+                              //               position: nextGroupSlideAnimation,
+                              //               child: SlideTransition(
+                              //                 position: groupSlide,
+                              //                 child: HomeCardDesign(
+                              //                   group: homeCubit.nextGroup,
+                              //                 ),
+                              //               ),
+                              //             );
+                              //           },
+                              //         ),
 
-                            //         // 🔹 TOP CARD (draggable)
-                            //         SwipeCard(
-                            //           controller: swipeController,
-                            //           onSwipe: (result) {
-                            //             if (result != SwipeResult.none) {
-                            //               homeCubit.onSwipeCompleted(result);
-                            //               // homeCubit.updateCardPosition(0);
-                            //               // homeCubit.selectGroupIndex(
-                            //               //   homeCubit.currentIndex,
-                            //               // );
-                            //               groupAni.forward(from: 0).whenComplete(
-                            //                 () {
-                            //                   resetAnimations();
-                            //                 },
-                            //               );
-                            //               if (homeCubit.isEndOfList) {
-                            //                 // Fade in AllCaughtUp
-                            //                 endFadeController.forward();
-                            //                 // Instantly hide swipe icons
-                            //                 crossAnimationController.reset();
-                            //                 checkAnimationController.reset();
-                            //                 homeCubit.markEndReached();
-                            //               }
-                            //             }
-                            //           },
-                            //           child: HomeCardDesign(
-                            //             group: homeCubit.currentGroup,
-                            //           ),
-                            //         ),
-                            //       ],
-                            //     );
-                            //   },
-                            // ),
+                              //         // 🔹 TOP CARD (draggable)
+                              //         SwipeCard(
+                              //           controller: swipeController,
+                              //           onSwipe: (result) {
+                              //             if (result != SwipeResult.none) {
+                              //               homeCubit.onSwipeCompleted(result);
+                              //               // homeCubit.updateCardPosition(0);
+                              //               // homeCubit.selectGroupIndex(
+                              //               //   homeCubit.currentIndex,
+                              //               // );
+                              //               groupAni.forward(from: 0).whenComplete(
+                              //                 () {
+                              //                   resetAnimations();
+                              //                 },
+                              //               );
+                              //               if (homeCubit.isEndOfList) {
+                              //                 // Fade in AllCaughtUp
+                              //                 endFadeController.forward();
+                              //                 // Instantly hide swipe icons
+                              //                 crossAnimationController.reset();
+                              //                 checkAnimationController.reset();
+                              //                 homeCubit.markEndReached();
+                              //               }
+                              //             }
+                              //           },
+                              //           child: HomeCardDesign(
+                              //             group: homeCubit.currentGroup,
+                              //           ),
+                              //         ),
+                              //       ],
+                              //     );
+                              //   },
+                              // ),
 
-                            // CARD SWIPER
-                            // CardSwiper(
-                            //   cardsCount: DummyConstants.groups.length,
-                            //   numberOfCardsDisplayed: DummyConstants.groups.length,
-                            //   isLoop: false,
-                            //   controller: homeCubit.cardSwiperController,
-                            //   backCardOffset: Offset(0, getHeight(context) * 0.5),
-                            //   padding: const EdgeInsets.symmetric(horizontal: 0),
-                            //   duration: const Duration(seconds: 1),
-                            //   showBackCardOnUndo: true,
-                            //   allowedSwipeDirection:
-                            //       const AllowedSwipeDirection.symmetric(
-                            //         horizontal: true,
-                            //       ),
-                            //   onEnd: () {
-                            //     homeCubit.markEndReached();
-                            //     // Fade in AllCaughtUp
-                            //     endFadeController.forward();
+                              // CARD SWIPER
+                              // CardSwiper(
+                              //   cardsCount: DummyConstants.groups.length,
+                              //   numberOfCardsDisplayed: DummyConstants.groups.length,
+                              //   isLoop: false,
+                              //   controller: homeCubit.cardSwiperController,
+                              //   backCardOffset: Offset(0, getHeight(context) * 0.5),
+                              //   padding: const EdgeInsets.symmetric(horizontal: 0),
+                              //   duration: const Duration(seconds: 1),
+                              //   showBackCardOnUndo: true,
+                              //   allowedSwipeDirection:
+                              //       const AllowedSwipeDirection.symmetric(
+                              //         horizontal: true,
+                              //       ),
+                              //   onEnd: () {
+                              //     homeCubit.markEndReached();
+                              //     // Fade in AllCaughtUp
+                              //     endFadeController.forward();
 
-                            //     // Instantly hide swipe icons
-                            //     crossAnimationController.reset();
-                            //     checkAnimationController.reset();
-                            //   },
-                            //   // Reset animation when swipe ends
-                            //   onSwipe: (previousIndex, currentIndex, direction) {
-                            //     log('Swiped to $currentIndex from $previousIndex');
-                            //     homeCubit.selectGroupIndex(currentIndex);
-                            //     return true;
-                            //   },
-                            //   cardBuilder: (context, index, percentX, percentY) {
-                            //     homeCubit.updateCardPosition(percentX.toDouble());
-                            //     return Stack(
-                            //       children: [
-                            //         ClipRRect(
-                            //           borderRadius: BorderRadius.circular(24),
-                            //           // child: MovableBackground(
-                            //           //   backgroundType: MovableBackgroundType.dark,
-                            //           //   child: SizedBox.expand(),
-                            //           // ),
-                            //         ),
-                            //         HomeCardDesign(
-                            //           group: DummyConstants.groups[index],
-                            //         ),
-                            //       ],
-                            //     );
-                            //   },
-                            // ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  // Blur overlay shown only when bottom sheets are open
-                  ValueListenableBuilder<bool>(
-                    valueListenable: HomeBlurController.isBlurred,
-                    builder: (context, isBlurred, _) {
-                      if (!isBlurred) return const SizedBox.shrink();
-                      return Positioned.fill(
-                        child: IgnorePointer(
-                          ignoring: true,
-                          child: BackdropFilter(
-                            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                            child: Container(
-                              color: Colors.black.withValues(alpha: 0.25),
-                            ),
+                              //     // Instantly hide swipe icons
+                              //     crossAnimationController.reset();
+                              //     checkAnimationController.reset();
+                              //   },
+                              //   // Reset animation when swipe ends
+                              //   onSwipe: (previousIndex, currentIndex, direction) {
+                              //     log('Swiped to $currentIndex from $previousIndex');
+                              //     homeCubit.selectGroupIndex(currentIndex);
+                              //     return true;
+                              //   },
+                              //   cardBuilder: (context, index, percentX, percentY) {
+                              //     homeCubit.updateCardPosition(percentX.toDouble());
+                              //     return Stack(
+                              //       children: [
+                              //         ClipRRect(
+                              //           borderRadius: BorderRadius.circular(24),
+                              //           // child: MovableBackground(
+                              //           //   backgroundType: MovableBackgroundType.dark,
+                              //           //   child: SizedBox.expand(),
+                              //           // ),
+                              //         ),
+                              //         HomeCardDesign(
+                              //           group: DummyConstants.groups[index],
+                              //         ),
+                              //       ],
+                              //     );
+                              //   },
+                              // ),
+                            ],
                           ),
                         ),
-                      );
-                    },
-                  ),
-                ],
+                      ],
+                    ),
+                    // Blur overlay shown only when bottom sheets are open
+                    ValueListenableBuilder<bool>(
+                      valueListenable: HomeBlurController.isBlurred,
+                      builder: (context, isBlurred, _) {
+                        if (!isBlurred) return const SizedBox.shrink();
+                        return Positioned.fill(
+                          child: IgnorePointer(
+                            ignoring: true,
+                            child: BackdropFilter(
+                              filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                              child: Container(
+                                color: Colors.black.withValues(alpha: 0.25),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
               );
             },
           ),

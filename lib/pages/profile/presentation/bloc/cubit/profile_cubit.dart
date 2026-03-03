@@ -1,9 +1,13 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:fennac_app/app/constants/dummy_constants.dart';
+import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:fennac_app/helpers/gradient_toast.dart';
 import 'package:fennac_app/models/dummy/notification_tile_model.dart';
+import 'package:fennac_app/pages/auth/presentation/bloc/cubit/auth_cubit.dart';
 import 'package:fennac_app/pages/profile/presentation/bloc/state/profile_state.dart';
 import 'package:fennac_app/pages/profile/domain/usecase/profile_usecase.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProfileCubit extends Cubit<ProfileState> {
@@ -141,6 +145,7 @@ class ProfileCubit extends Cubit<ProfileState> {
   Future<bool> changePassword({
     required String currentPassword,
     required String newPassword,
+    required BuildContext context,
   }) async {
     if (currentPassword.isEmpty || newPassword.isEmpty) {
       VxToast.show(message: 'Please provide current and new password');
@@ -154,7 +159,10 @@ class ProfileCubit extends Cubit<ProfileState> {
         currentPassword: currentPassword.trim(),
         newPassword: newPassword.trim(),
       );
-
+      Di().sl<AuthCubit>().confirmNewPasswordController.clear();
+      Di().sl<AuthCubit>().newPasswordController.clear();
+      Di().sl<AuthCubit>().currentPasswordController.clear();
+      AutoRouter.of(context).pop();
       VxToast.show(
         message: response['message'] ?? 'Password changed successfully',
         icon: Assets.icons.checkGreen.path,

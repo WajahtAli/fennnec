@@ -268,6 +268,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                                                 newPassword: _authCubit
                                                     .newPasswordController
                                                     .text,
+                                                context: context,
                                               );
                                           if (!mounted || !success) return;
 
@@ -283,14 +284,6 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                                             buttonText: 'Done',
                                           ).then((_) {
                                             _showBackdropFilter.value = false;
-                                            _authCubit
-                                                .confirmNewPasswordController
-                                                .clear();
-                                            _authCubit.newPasswordController
-                                                .clear();
-                                            _authCubit.currentPasswordController
-                                                .clear();
-                                            AutoRouter.of(context).pop();
                                           });
                                         } else {
                                           _authCubit.submitNewPassword();

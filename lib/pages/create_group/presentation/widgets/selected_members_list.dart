@@ -84,14 +84,51 @@ class _MembersWrap extends StatelessWidget {
   Widget build(BuildContext context) {
     // Build list of all members (local + API)
     final allMembers = <Map<String, dynamic>>[];
+    final addedIdentifiers = <String>{};
+
+    // Helper to normalize phone numbers for comparison
+    String normalizePhone(String phone) {
+      return phone.replaceAll(RegExp(r'[^\d+]'), '');
+    }
+
+    // Helper to get unique identifier for a member
+    String? getContactIdentifier(Contact contact) {
+      if (contact.phones.isNotEmpty) {
+        return normalizePhone(contact.phones.first.number);
+      }
+      return null;
+    }
+
+    String? getApiMemberIdentifier(Member member) {
+      if (member.id != null) return 'id:${member.id}';
+      if (member.phone != null && member.phone!.isNotEmpty) {
+        return normalizePhone(member.phone!);
+      }
+      return null;
+    }
+
+    String? getEditMemberIdentifier(CreatedBy member) {
+      if (member.id != null) return 'id:${member.id}';
+      if (member.email != null && member.email!.isNotEmpty) {
+        return 'email:${member.email}';
+      }
+      return null;
+    }
 
     // Add local contact members
     for (int i = 0; i < selectedMembers.length && allMembers.length < 4; i++) {
-      allMembers.add({
-        'type': 'local',
-        'contact': selectedMembers[i],
-        'index': i,
-      });
+      final contact = selectedMembers[i];
+      final identifier = getContactIdentifier(contact);
+
+      if (identifier != null && addedIdentifiers.contains(identifier)) {
+        continue; // Skip duplicate
+      }
+
+      if (identifier != null) {
+        addedIdentifiers.add(identifier);
+      }
+
+      allMembers.add({'type': 'local', 'contact': contact, 'index': i});
     }
 
     if (isEditMode) {
@@ -99,11 +136,15 @@ class _MembersWrap extends StatelessWidget {
         if (allMembers.length >= 4) break;
         if (member.id == null) continue;
 
-        final alreadyAdded = allMembers.any((m) {
-          return m['memberId'] == member.id;
-        });
+        final identifier = getEditMemberIdentifier(member);
 
-        if (alreadyAdded) continue;
+        if (identifier != null && addedIdentifiers.contains(identifier)) {
+          continue; // Skip duplicate
+        }
+
+        if (identifier != null) {
+          addedIdentifiers.add(identifier);
+        }
 
         allMembers.add({
           'type': 'group',
@@ -117,23 +158,24 @@ class _MembersWrap extends StatelessWidget {
     for (final memberId in selectedApiMemberIds) {
       if (allMembers.length >= 4) break;
 
-      // Check if this member is already added (as local contact or API member)
-      final alreadyAdded = allMembers.any((m) {
-        if (m['type'] == 'api' && m['memberId'] == memberId) {
-          return true;
-        }
-        return false;
-      });
-
-      if (alreadyAdded) continue;
-
       final member = fennecMembers.firstWhere(
         (m) => m.id == memberId,
         orElse: () => Member(),
       );
-      if (member.id != null) {
-        allMembers.add({'type': 'api', 'member': member, 'memberId': memberId});
+
+      if (member.id == null) continue;
+
+      final identifier = getApiMemberIdentifier(member);
+
+      if (identifier != null && addedIdentifiers.contains(identifier)) {
+        continue; // Skip duplicate
       }
+
+      if (identifier != null) {
+        addedIdentifiers.add(identifier);
+      }
+
+      allMembers.add({'type': 'api', 'member': member, 'memberId': memberId});
     }
 
     // Generate member slots

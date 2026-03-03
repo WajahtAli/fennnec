@@ -277,14 +277,15 @@ class _FullProfileDialogState extends State<FullProfileDialog> {
                     ),
                     const CustomSizedBox(height: 20),
                   ],
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: GroupGalleryWidget(
-                      onTapRight: () {},
-                      onTapLeft: () {},
-                      isShowReportButton: false,
+                  if (widget.isEditProfile == false)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: GroupGalleryWidget(
+                        onTapRight: () {},
+                        onTapLeft: () {},
+                        isShowReportButton: false,
+                      ),
                     ),
-                  ),
                   const CustomSizedBox(height: 40),
                 ],
               ),

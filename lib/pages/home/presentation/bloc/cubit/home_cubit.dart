@@ -67,7 +67,7 @@ class HomeCubit extends Cubit<HomeState> {
     } else {
       selectedProfile = null;
     }
-    emit(HomeLoaded()); // Emit state to trigger rebuild
+    emit(HomeLoaded());
   }
 
   final List<Group> groups = [];

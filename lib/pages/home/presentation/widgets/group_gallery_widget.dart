@@ -54,9 +54,7 @@ class GroupGalleryWidget extends StatelessWidget {
         if (state is HomeLoading) {
           return const GroupGallerySkeleton();
         }
-        if (_homeCubit.selectedProfile != null ||
-            _homeCubit.selectedProfileType?.name ==
-                SelectedProfile.individual.name) {
+        if (_homeCubit.selectedProfile != null) {
           return _buildIndividualGallery(context);
         }
         return _buildGroupGallery(context);
