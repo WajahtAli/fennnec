@@ -20,6 +20,8 @@ import 'package:fennac_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:fennac_app/core/extensions/string_extension.dart';
+import 'package:fennac_app/reusable_widgets/custom_video_player.dart';
 
 import '../../../../bloc/state/wave_form_state.dart';
 import '../bloc/state/home_state.dart';
@@ -72,166 +74,124 @@ class GroupGalleryWidget extends StatelessWidget {
     final images =
         group.photosVideos?.where((img) => img.isNotEmpty).toList() ?? [];
 
+    final prompts =
+        group.groupPrompts?.where((p) {
+          return p.promptAnswer != null && p.promptAnswer!.isNotEmpty;
+        }).toList() ??
+        [];
+
+    final List<dynamic> interleavedItems = [];
+    int imageIndex = 0;
+    int promptIndex = 0;
+
+    while (imageIndex < images.length || promptIndex < prompts.length) {
+      for (int i = 0; i < 2 && imageIndex < images.length; i++) {
+        interleavedItems.add(images[imageIndex++]);
+      }
+
+      if (promptIndex < prompts.length) {
+        interleavedItems.add(prompts[promptIndex++]);
+      }
+
+      if (imageIndex < images.length) {
+        interleavedItems.add(images[imageIndex++]);
+      }
+
+      if (promptIndex < prompts.length) {
+        interleavedItems.add(prompts[promptIndex++]);
+      }
+    }
+
+    if (interleavedItems.isEmpty && DummyConstants.groupImages.isNotEmpty) {
+      for (final dummy in DummyConstants.groupImages) {
+        interleavedItems.add(dummy);
+      }
+    }
+
     return Column(
       children: [
         ListView.builder(
           physics: const NeverScrollableScrollPhysics(),
           shrinkWrap: true,
           padding: EdgeInsets.zero,
-          itemCount: images.isNotEmpty
-              ? images.length
-              : DummyConstants.groupImages.length,
+          itemCount: interleavedItems.length,
           itemBuilder: (context, index) {
+            final item = interleavedItems[index];
+
             return Padding(
               padding: const EdgeInsets.symmetric(vertical: 12),
               child: Column(
                 children: [
-                  /// IMAGE
-                  Stack(
-                    children: [
-                      images.isNotEmpty && index < images.length
-                          ? CachedImageHelper(
-                              imageUrl: images[index],
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                              height: 450,
-                              radius: 24,
-                            )
-                          : ClipRRect(
-                              borderRadius: BorderRadius.circular(24),
-                              child: Image.asset(
-                                DummyConstants.groupImages[index],
-                                width: double.infinity,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                      if (isShowEditButton == true)
-                        Positioned(
-                          top: 16,
-                          right: 16,
-                          child: InkWell(
-                            onTap: () =>
-                                onEditTap?.call(EditableCardType.image),
-                            child: _editIcon(),
-                          ),
-                        ),
-                    ],
-                  ),
-
-                  if (index == 0) ...[
-                    const SizedBox(height: 12),
+                  if (item is String) ...[
                     Stack(
                       children: [
-                        if (group.groupPrompts != null &&
-                            group.groupPrompts!.any(
-                              (element) => element.type == 'audio',
-                            ))
+                        item.isVideo
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(24),
+                                child: CustomVideoPlayer(
+                                  videoUrl: item,
+                                  autoPlay: false,
+                                  looping: true,
+                                  showControls: true,
+                                  aspectRatio: 1,
+                                  height: 450,
+                                  fit: BoxFit.cover,
+                                ),
+                              )
+                            : (item.startsWith('assets/')
+                                  ? ClipRRect(
+                                      borderRadius: BorderRadius.circular(24),
+                                      child: Image.asset(
+                                        item,
+                                        width: double.infinity,
+                                        height: 450,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    )
+                                  : CachedImageHelper(
+                                      imageUrl: item,
+                                      width: double.infinity,
+                                      fit: BoxFit.cover,
+                                      height: 450,
+                                      radius: 24,
+                                    )),
+                        if (isShowEditButton == true)
+                          Positioned(
+                            top: 16,
+                            right: 16,
+                            child: InkWell(
+                              onTap: () =>
+                                  onEditTap?.call(EditableCardType.image),
+                              child: _editIcon(),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ] else ...[
+                    /// PROMPT
+                    Stack(
+                      children: [
+                        if (item.type == 'audio')
                           _GroupAudioCard(
-                            title:
-                                '${group.groupPrompts!.firstWhere((element) => element.type == 'audio').promptTitle}',
-                            audioPath: group.groupPrompts!
-                                .firstWhere(
-                                  (element) => element.type == 'audio',
-                                )
-                                .promptAnswer,
+                            title: item.promptTitle,
+                            audioPath: item.promptAnswer,
                           )
                         else
-                          _GroupAudioCard(
-                            title: 'If our group had a theme song...',
-                            audioPath: Assets.dummy.audio.group,
+                          _GroupPromptCard(
+                            prompt: item.promptTitle,
+                            answer: item.promptAnswer,
+                            isAudioPrompt: false,
                           ),
                         if (isShowEditButton == true)
                           Positioned(
                             top: 16,
                             right: 16,
                             child: InkWell(
-                              onTap: () =>
-                                  onEditTap?.call(EditableCardType.audio),
-                              child: _editIcon(),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ],
-
-                  // /// GROUP DESCRIPTION
-                  // if (index == 1 &&
-                  //     group.description != null &&
-                  //     group.description!.isNotEmpty) ...[
-                  //   const SizedBox(height: 12),
-                  //   Stack(
-                  //     children: [
-                  //       _GroupPromptCard(
-                  //         prompt: "About our group",
-                  //         answer: group.description,
-                  //       ),
-                  //       if (isShowEditButton == true)
-                  //         Positioned(
-                  //           top: 16,
-                  //           right: 16,
-                  //           child: InkWell(
-                  //             onTap: () =>
-                  //                 onEditTap?.call(EditableCardType.prompt),
-                  //             child: _editIcon(),
-                  //           ),
-                  //         ),
-                  //     ],
-                  //   ),
-                  // ],
-
-                  /// GROUP PROMPTS - TEXT TYPE
-                  if (index == 1 &&
-                      group.groupPrompts != null &&
-                      group.groupPrompts!.any(
-                        (element) => element.type == 'text',
-                      )) ...[
-                    const SizedBox(height: 12),
-                    Stack(
-                      children: [
-                        _GroupPromptCard(
-                          prompt: group.groupPrompts!
-                              .firstWhere((element) => element.type == 'text')
-                              .promptTitle,
-                          answer: group.groupPrompts!
-                              .firstWhere((element) => element.type == 'text')
-                              .promptAnswer,
-                        ),
-                        if (isShowEditButton == true)
-                          Positioned(
-                            top: 16,
-                            right: 16,
-                            child: InkWell(
-                              onTap: () =>
-                                  onEditTap?.call(EditableCardType.prompt),
-                              child: _editIcon(),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ],
-
-                  /// GROUP PROMPTS - ALL TYPES
-                  if (index == 2 &&
-                      group.groupPrompts != null &&
-                      group.groupPrompts!.isNotEmpty &&
-                      group.groupPrompts!.first.promptTitle != null &&
-                      group.groupPrompts!.first.promptTitle!.isNotEmpty) ...[
-                    const SizedBox(height: 12),
-                    Stack(
-                      children: [
-                        _GroupPromptCard(
-                          prompt: group.groupPrompts!.first.promptTitle,
-                          answer: group.groupPrompts!.first.promptAnswer,
-                          isAudioPrompt:
-                              group.groupPrompts!.first.type == 'audio',
-                        ),
-                        if (isShowEditButton == true)
-                          Positioned(
-                            top: 16,
-                            right: 16,
-                            child: InkWell(
-                              onTap: () =>
-                                  onEditTap?.call(EditableCardType.prompt),
+                              onTap: () => onEditTap?.call(
+                                item.type == 'audio'
+                                    ? EditableCardType.audio
+                                    : EditableCardType.prompt,
+                              ),
                               child: _editIcon(),
                             ),
                           ),
@@ -244,14 +204,12 @@ class GroupGalleryWidget extends StatelessWidget {
           },
         ),
 
-        /// ACTION BUTTONS
         if (isShowEditButton == false && isShowReportButton == true)
           _buildBottomActions(context),
       ],
     );
   }
 
-  /// ===================== INDIVIDUAL GALLERY =====================
   Widget _buildIndividualGallery(BuildContext context) {
     final selectedMember = _homeCubit.selectedProfile;
 
@@ -263,12 +221,37 @@ class GroupGalleryWidget extends StatelessWidget {
         selectedMember.bestShorts?.where((img) => img.isNotEmpty).toList() ??
         [];
 
-    // Filter prompts that have answers
     final prompts =
         selectedMember.prompts?.where((p) {
           return p.promptAnswer != null && p.promptAnswer!.isNotEmpty;
         }).toList() ??
         [];
+
+    final List<dynamic> interleavedItems = [];
+    int imageIndex = 0;
+    int promptIndex = 0;
+
+    while (imageIndex < images.length || promptIndex < prompts.length) {
+      for (int i = 0; i < 2 && imageIndex < images.length; i++) {
+        interleavedItems.add(images[imageIndex++]);
+      }
+
+      if (promptIndex < prompts.length) {
+        interleavedItems.add(prompts[promptIndex++]);
+      }
+
+      if (imageIndex < images.length) {
+        interleavedItems.add(images[imageIndex++]);
+      }
+
+      if (promptIndex < prompts.length) {
+        interleavedItems.add(prompts[promptIndex++]);
+      }
+    }
+
+    if (interleavedItems.isEmpty) {
+      return const SizedBox.shrink();
+    }
 
     return Column(
       children: [
@@ -276,131 +259,120 @@ class GroupGalleryWidget extends StatelessWidget {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           padding: EdgeInsets.zero,
-          itemCount: images.isNotEmpty
-              ? images.length
-              : DummyConstants.groupImages.length,
+          itemCount: interleavedItems.length,
           itemBuilder: (context, index) {
-            final promptForIndex = index < prompts.length
-                ? prompts[index]
-                : null;
+            final item = interleavedItems[index];
 
-            return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              child: Column(
-                children: [
-                  /// IMAGE
-                  Stack(
-                    children: [
-                      images.isNotEmpty && index < images.length
-                          ? CachedImageHelper(
-                              imageUrl: images[index],
-                              width: double.infinity,
+            if (item is String) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: Stack(
+                  children: [
+                    item.isVideo
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(24),
+                            child: CustomVideoPlayer(
+                              videoUrl: item,
+                              autoPlay: false,
+                              looping: true,
+                              showControls: true,
+                              aspectRatio: 1,
+                              height: 450,
                               fit: BoxFit.cover,
-                              radius: 24,
-                            )
-                          : SizedBox.shrink(),
-                      // : ClipRRect(
-                      //     borderRadius: BorderRadius.circular(24),
-                      //     child: Image.asset(
-                      //       DummyConstants.groupImages[index],
-                      //       width: double.infinity,
-                      //       fit: BoxFit.cover,
-                      //     ),
-                      //   ),
-
-                      /// EDIT ICON
-                      if (isShowEditButton == true)
-                        Positioned(
-                          top: 16,
-                          right: 16,
-                          child: InkWell(
-                            onTap: () =>
-                                onEditTap?.call(EditableCardType.image),
-                            child: _editIcon(),
+                            ),
+                          )
+                        : CachedImageHelper(
+                            imageUrl: item,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            height: 450,
+                            radius: 24,
                           ),
-                        ),
 
-                      /// POKE ICON (IMAGE)
+                    if (isShowEditButton == true)
                       Positioned(
                         top: 16,
                         right: 16,
-                        child: GestureDetector(
-                          behavior: HitTestBehavior.translucent,
-                          onTap: () async {
-                            await HomeBlurController.showWithBlur(
-                              context: context,
-                              builder: (context) => SendPokeBottomSheet(
-                                pokeType: PokeType.image,
-                                image:
-                                    images.isNotEmpty && index < images.length
-                                    ? images[index]
-                                    : _homeCubit
-                                          .selectedProfile
-                                          ?.bestShorts
-                                          ?.first,
-                                promptTitle: promptForIndex?.promptTitle,
-                                promptAnswer: promptForIndex?.promptAnswer,
-                              ),
-                            );
-                          },
-                          child: _pokeIcon(context),
+                        child: InkWell(
+                          onTap: () => onEditTap?.call(EditableCardType.image),
+                          child: _editIcon(),
                         ),
                       ),
-                    ],
-                  ),
 
-                  /// TEXT / AUDIO PROMPT (INDEX-BASED)
-                  if (promptForIndex != null) ...[
-                    const SizedBox(height: 12),
-                    Stack(
-                      children: [
-                        _GroupPromptCard(
-                          prompt: promptForIndex.promptTitle,
-                          answer: promptForIndex.promptAnswer,
-                          isAudioPrompt: promptForIndex.type == 'audio',
-                        ),
-
-                        /// POKE ICON (PROMPT)
-                        Positioned(
-                          top: 16,
-                          right: 16,
-                          child: GestureDetector(
-                            behavior: HitTestBehavior.translucent,
-                            onTap: () async {
-                              await HomeBlurController.showWithBlur(
-                                context: context,
-                                builder: (context) => SendPokeBottomSheet(
-                                  pokeType: promptForIndex.type == 'audio'
-                                      ? PokeType.audio
-                                      : PokeType.text,
-                                  image:
-                                      images.isNotEmpty && index < images.length
-                                      ? images[index]
-                                      : _homeCubit
-                                            .selectedProfile
-                                            ?.bestShorts
-                                            ?.first,
-                                  promptTitle: promptForIndex.promptTitle,
-                                  promptAnswer: promptForIndex.promptAnswer,
-                                ),
-                              );
-                            },
-                            child: _pokeIcon(context),
-                          ),
-                        ),
-                      ],
+                    Positioned(
+                      top: 16,
+                      right: 16,
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.translucent,
+                        onTap: () async {
+                          await HomeBlurController.showWithBlur(
+                            context: context,
+                            builder: (context) => SendPokeBottomSheet(
+                              pokeType: PokeType.image,
+                              image: item,
+                            ),
+                          );
+                        },
+                        child: _pokeIcon(context),
+                      ),
                     ),
                   ],
-                ],
-              ),
-            );
+                ),
+              );
+            } else {
+              final promptItem = item;
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: Stack(
+                  children: [
+                    _GroupPromptCard(
+                      prompt: promptItem.promptTitle,
+                      answer: promptItem.promptAnswer,
+                      isAudioPrompt: promptItem.type == 'audio',
+                    ),
+
+                    /// EDIT ICON FOR PROMPT
+                    if (isShowEditButton == true)
+                      Positioned(
+                        top: 16,
+                        right: 16,
+                        child: InkWell(
+                          onTap: () => onEditTap?.call(EditableCardType.prompt),
+                          child: _editIcon(),
+                        ),
+                      ),
+
+                    Positioned(
+                      top: 16,
+                      right: 16,
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.translucent,
+                        onTap: () async {
+                          await HomeBlurController.showWithBlur(
+                            context: context,
+                            builder: (context) => SendPokeBottomSheet(
+                              pokeType: promptItem.type == 'audio'
+                                  ? PokeType.audio
+                                  : PokeType.text,
+                              image: images.isNotEmpty ? images.first : null,
+                              promptTitle: promptItem.promptTitle,
+                              promptAnswer: promptItem.promptAnswer,
+                            ),
+                          );
+                        },
+                        child: _pokeIcon(context),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
           },
         ),
       ],
     );
   }
 
-  /// ===================== ACTIONS =====================
   Widget _buildBottomActions(BuildContext context) {
     return Column(
       children: [

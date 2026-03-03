@@ -11,12 +11,15 @@ import 'package:fennac_app/pages/home/presentation/widgets/group_gallery_widget.
 import 'package:fennac_app/pages/home/presentation/widgets/hero_section.dart';
 import 'package:fennac_app/pages/profile/presentation/widgets/profile_avatar.dart';
 import 'package:fennac_app/pages/profile/presentation/widgets/profile_chip.dart';
+import 'package:fennac_app/reusable_widgets/custom_video_player.dart';
 import 'package:fennac_app/utils/validators.dart';
 import 'package:fennac_app/widgets/custom_sized_box.dart';
 import 'package:fennac_app/widgets/prompt_audio_row.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+
+import '../../../edit_profile/presentation/widgets/interleaved_media_section.dart';
 
 class FullProfileDialog extends StatefulWidget {
   final bool isEditProfile;
@@ -171,46 +174,16 @@ class _FullProfileDialogState extends State<FullProfileDialog> {
                         ),
                       ),
                     ),
-                    const CustomSizedBox(height: 14),
-                    ListView.builder(
-                      itemCount: user?.bestShorts?.length ?? 0,
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemBuilder: (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadiusGeometry.circular(16),
-                            child: CachedImageHelper(
-                              imageUrl: user?.bestShorts?[index] ?? '',
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                    const CustomSizedBox(height: 24),
-
-                    // Display user prompts
-                    if (_loginCubit.userData?.prompts?.isNotEmpty ?? false)
+                    if (_loginCubit.userData?.prompts?.isNotEmpty ??
+                        false || (user?.bestShorts?.isNotEmpty ?? false))
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 12),
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: _loginCubit.userData?.prompts?.length ?? 0,
-                          itemBuilder: (context, index) {
-                            final prompt =
-                                _loginCubit.userData?.prompts?[index];
-                            if (prompt == null) return const SizedBox.shrink();
-
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 12),
-                              child: _buildPromptCard(context, prompt),
-                            );
-                          },
+                        child: InterleavedMediaSection(
+                          bestShorts: user?.bestShorts ?? [],
+                          prompts: _loginCubit.userData?.prompts ?? [],
+                          onImageEditTap: () {},
+                          onPromptEditTap: (prompt, isEdit) {},
+                          isNeedEdit: false,
                         ),
                       ),
                   ] else ...[

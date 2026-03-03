@@ -6,9 +6,8 @@ import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/pages/auth/presentation/bloc/cubit/login_cubit.dart';
 import 'package:fennac_app/pages/auth/presentation/bloc/state/login_state.dart';
-import 'package:fennac_app/pages/edit_profile/presentation/widgets/best_shorts_section.dart';
 import 'package:fennac_app/pages/edit_profile/presentation/widgets/edit_profile_avatar.dart';
-import 'package:fennac_app/pages/edit_profile/presentation/widgets/prompts_section.dart';
+import 'package:fennac_app/pages/edit_profile/presentation/widgets/interleaved_media_section.dart';
 import 'package:fennac_app/pages/home/presentation/widgets/group_gallery_widget.dart';
 import 'package:fennac_app/pages/kyc/presentation/bloc/cubit/kyc_prompt_cubit.dart';
 import 'package:fennac_app/pages/profile/presentation/widgets/interest_section_widget.dart';
@@ -86,21 +85,12 @@ class _EditPublicProfileScreenState extends State<EditPublicProfileScreen> {
                       isEditMode: true,
                     ),
                     const CustomSizedBox(height: 24),
-                    BestShortsSection(
+                    InterleavedMediaSection(
                       bestShorts: user?.bestShorts ?? [],
-                      onEditTap: () =>
-                          _handleEditTap(context, EditableCardType.image),
-                    ),
-                    LifestyleSectionWidget(
-                      userName: user?.firstName ?? 'Your',
-                      lifestyles: user?.lifestyleLikes ?? [],
-                      onEditTap: () =>
-                          _handleEditTap(context, EditableCardType.lifestyle),
-                    ),
-                    const CustomSizedBox(height: 24),
-                    PromptsSection(
                       prompts: _loginCubit.userData?.prompts ?? [],
-                      onEditTap: (prompt, isEditMode) {
+                      onImageEditTap: () =>
+                          _handleEditTap(context, EditableCardType.image),
+                      onPromptEditTap: (prompt, isEditMode) {
                         log("isEditMode: $isEditMode");
                         if (isEditMode == false) {
                           Di().sl<KycPromptCubit>().resetAllData();
@@ -126,23 +116,19 @@ class _EditPublicProfileScreenState extends State<EditPublicProfileScreen> {
                             ),
                           );
                         }
-                        // log(prompt.id.toString());
-                        // AudioPromptData audioPromptData = AudioPromptData(
-                        //   id: prompt.id,
-                        //   oldId: prompt.id,
-                        //   promptText: prompt.promptTitle?.toString() ?? '',
-                        //   promptAnswer: prompt.promptAnswer?.toString() ?? '',
-                        //   isCustom: false,
-                        //   waveformData: prompt.waves,
-                        //   duration: "15:00",
-                        // );
-                        // Di().sl<KycPromptCubit>().addPrompt(audioPromptData);
                         _handleEditTap(
                           context,
                           EditableCardType.prompt,
                           isEditMode: isEditMode,
                         );
                       },
+                    ),
+                    const CustomSizedBox(height: 24),
+                    LifestyleSectionWidget(
+                      userName: user?.firstName ?? 'Your',
+                      lifestyles: user?.lifestyleLikes ?? [],
+                      onEditTap: () =>
+                          _handleEditTap(context, EditableCardType.lifestyle),
                     ),
                     const CustomSizedBox(height: 24),
                     InterestSectionWidget(

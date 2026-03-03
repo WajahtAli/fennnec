@@ -33,6 +33,7 @@ class _KycGalleryScreenState extends State<KycGalleryScreen> {
   final _createAccountCubit = Di().sl<CreateAccountCubit>();
   final _imagePickerCubit = Di().sl<ImagePickerCubit>();
   final _loginCubit = Di().sl<LoginCubit>();
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -148,12 +149,16 @@ class _KycGalleryScreenState extends State<KycGalleryScreen> {
   }
 
   Future<void> _handleContinue() async {
+    setState(() => isLoading = true);
     _syncMediaLinksWithMediaList();
     await uploadAllMedia();
+
     if (widget.isEditMode == true) {
       await _createAccountCubit.updateProfile();
+      setState(() => isLoading = false);
       if (mounted) AutoRouter.of(context).pop();
     } else {
+      setState(() => isLoading = false);
       if (mounted) AutoRouter.of(context).push(const KycMatchRoute());
     }
   }
@@ -231,7 +236,7 @@ class _KycGalleryScreenState extends State<KycGalleryScreen> {
         bloc: _createAccountCubit,
         builder: (context, state) => KycGalleryActionButtons(
           isEditMode: widget.isEditMode == true,
-          isLoading: state is CreateAccountLoading,
+          isLoading: isLoading,
           onSkip: () => AutoRouter.of(context).push(const KycMatchRoute()),
           onContinue: _handleContinue,
         ),
