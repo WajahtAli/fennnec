@@ -26,7 +26,7 @@ class AudioPromptData extends Equatable {
   final String? duration;
   final bool? isCustom;
 
-  AudioPromptData({
+  const AudioPromptData({
     this.id,
     this.oldId,
     this.promptText,

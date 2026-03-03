@@ -70,6 +70,8 @@
 	</array>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>This app uses your location to support features that require access even when the app is not active.</string>
+	<key>GMSApiKey</key>
+	<string>AIzaSyB5c3HBdHGkH3zckdX6dK_6gps2AlMVVkU</string>
 
 	<!-- Google Sign-In URL scheme (reversed client ID) -->
 	<key>CFBundleURLTypes</key>

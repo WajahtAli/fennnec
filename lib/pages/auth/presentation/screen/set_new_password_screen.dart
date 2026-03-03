@@ -8,7 +8,6 @@ import 'package:fennac_app/pages/auth/presentation/bloc/cubit/auth_cubit.dart';
 import 'package:fennac_app/pages/auth/presentation/bloc/cubit/login_cubit.dart';
 import 'package:fennac_app/pages/auth/presentation/bloc/state/auth_state.dart';
 import 'package:fennac_app/reusable_widgets/animated_background_container.dart';
-import 'package:fennac_app/routes/routes_imports.gr.dart';
 import 'package:fennac_app/widgets/custom_back_button.dart';
 import 'package:fennac_app/widgets/custom_elevated_button.dart';
 import 'package:fennac_app/widgets/custom_text_field.dart';

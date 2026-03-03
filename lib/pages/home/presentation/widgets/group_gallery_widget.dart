@@ -13,7 +13,6 @@ import 'package:fennac_app/pages/home/presentation/bloc/cubit/home_cubit.dart';
 import 'package:fennac_app/pages/home/presentation/widgets/report_and_block_bottomsheet.dart';
 import 'package:fennac_app/pages/home/presentation/blur_controller.dart';
 import 'package:fennac_app/pages/home/presentation/widgets/send_poke_bottomsheet.dart';
-import 'package:fennac_app/reusable_widgets/empty_widget.dart';
 import 'package:fennac_app/skeletons/group_gallery_skeleton.dart';
 import 'package:fennac_app/widgets/prompt_audio_row.dart';
 import 'package:fennac_app/widgets/custom_sized_box.dart';

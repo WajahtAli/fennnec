@@ -33,7 +33,7 @@ class FilterPill extends StatelessWidget {
             color: isSelected
                 ? ColorPalette.primary
                 : (isLightTheme(context)
-                      ? Colors.transparent
+                      ? ColorPalette.primary
                       : ColorPalette.primary),
             width: 1.5,
           ),

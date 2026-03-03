@@ -65,6 +65,7 @@ class FilterSection extends StatelessWidget {
               color: isLightTheme(context)
                   ? ColorPalette.textGrey
                   : ColorPalette.black.withValues(alpha: 0.2),
+
               borderRadius: BorderRadius.circular(12),
             ),
             child: Column(
@@ -96,13 +97,15 @@ class FilterSection extends StatelessWidget {
                   ],
                 ),
                 CustomSizedBox(height: 16),
-                FilterPill(
-                  label: selectedOption,
-                  isSelected: true,
-                  onTap: () => onTap != null
-                      ? onTap!()
-                      : _showFilterBottomSheet(context),
-                ),
+                // Only show the purple container when something is selected
+                if (selectedOption.isNotEmpty)
+                  FilterPill(
+                    label: selectedOption,
+                    isSelected: true,
+                    onTap: () => onTap != null
+                        ? onTap!()
+                        : _showFilterBottomSheet(context),
+                  ),
               ],
             ),
           ),

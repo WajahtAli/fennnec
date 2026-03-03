@@ -157,6 +157,8 @@ class _FullProfileDialogState extends State<FullProfileDialog> {
                         ),
                       ],
                     ),
+                    const CustomSizedBox(height: 12),
+
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       child: Text(

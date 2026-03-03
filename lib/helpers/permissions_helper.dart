@@ -1,4 +1,3 @@
-import 'package:fennac_app/helpers/gradient_toast.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 /// Requests camera permission from the user.

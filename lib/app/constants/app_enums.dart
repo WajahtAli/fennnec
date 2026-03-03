@@ -17,3 +17,8 @@ enum SubscriptionStatus { subscribed, unsubscribed }
 enum CallType { audio, video }
 
 enum MessageType { text, image, video, audio, file, location, contact }
+
+enum CropType {
+  square, // 1:1
+  portrait, // 9:16
+}

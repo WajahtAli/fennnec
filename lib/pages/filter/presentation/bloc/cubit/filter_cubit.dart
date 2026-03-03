@@ -1,4 +1,3 @@
-import 'package:fennac_app/app/constants/dummy_constants.dart';
 import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/pages/filter/presentation/bloc/state/filter_state.dart';
 import 'package:fennac_app/pages/home/presentation/bloc/cubit/groups_cubit.dart';

@@ -30,3 +30,12 @@ class LoginError extends LoginState {
   @override
   List<Object?> get props => [message];
 }
+
+class PasswordResetSuccessState extends LoginState {
+  final String email;
+
+  PasswordResetSuccessState(this.email);
+
+  @override
+  List<Object?> get props => [email];
+}

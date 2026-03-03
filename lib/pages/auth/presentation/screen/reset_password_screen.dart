@@ -6,6 +6,7 @@ import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:fennac_app/pages/auth/presentation/bloc/cubit/auth_cubit.dart';
 import 'package:fennac_app/pages/auth/presentation/bloc/cubit/login_cubit.dart';
+import 'package:fennac_app/pages/auth/presentation/bloc/state/login_state.dart';
 import 'package:fennac_app/reusable_widgets/animated_background_container.dart';
 import 'package:fennac_app/widgets/custom_back_button.dart';
 import 'package:fennac_app/widgets/custom_country_field.dart';
@@ -106,72 +107,73 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
                             CustomSizedBox(height: 30),
 
-                            BlocBuilder(
+                            BlocListener(
                               bloc: Di().sl<LoginCubit>(),
-                              builder: (context, state) {
-                                return CustomElevatedButton(
-                                  icon: Di().sl<LoginCubit>().isLoading
-                                      ? SizedBox(
-                                          width: 20,
-                                          height: 20,
-                                          child: Lottie.asset(
-                                            Assets.animations.loadingSpinner,
-                                            fit: BoxFit.cover,
-                                          ),
-                                        )
-                                      : null,
-                                  onTap: () async {
-                                    if (_formKey.currentState!.validate()) {
-                                      // Set the email in AuthCubit for later use in OTP and password reset
-                                      _authCubit.emailController.text =
-                                          _emailController.text;
-                                      await Di()
-                                          .sl<LoginCubit>()
-                                          .requestPasswordReset(
-                                            _emailController.text,
-                                          )
-                                          .then((value) async {
-                                            setState(() {
-                                              _isBackgroundBlurred = true;
-                                            });
+                              listener: (context, state) {
+                                if (state is PasswordResetSuccessState) {
+                                  setState(() {
+                                    _isBackgroundBlurred = true;
+                                  });
 
-                                            await CustomBottomSheet.show(
-                                              context: context,
+                                  CustomBottomSheet.show(
+                                    context: context,
+                                    barrierColor: Colors.transparent,
+                                    title: 'Reset code sent!',
+                                    description:
+                                        "We've sent a 6-digit code to you. Continue to reset your password.",
+                                    buttonText: 'Continue',
+                                    onButtonPressed: () {
+                                      // Only clear the local form field, NOT the authCubit email
+                                      // because we need it for OTP and password reset screens
+                                      _emailController.clear();
 
-                                              barrierColor: Colors.transparent,
-                                              title: 'Reset code sent!',
-                                              description:
-                                                  "We've sent a 6-digit code to you. Continue to reset your password.",
-                                              buttonText: 'Continue',
-                                              onButtonPressed: () {
-                                                AutoRouter.of(context).pop();
-
-                                                AutoRouter.of(
-                                                  context,
-                                                ).push(OtpVerificationRoute());
-                                                _isBackgroundBlurred = false;
-                                              },
-                                              icon: AnimatedBackgroundContainer(
-                                                icon: Assets
-                                                    .icons
-                                                    .checkGreen
-                                                    .path,
-                                                isPng: true,
-                                              ),
-                                            );
-
-                                            setState(() {
-                                              _isBackgroundBlurred = false;
-                                            });
-                                          });
-                                    }
-                                  },
-                                  text: Di().sl<LoginCubit>().isLoading
-                                      ? ''
-                                      : 'Send reset code',
-                                  width: double.infinity,
-                                );
+                                      AutoRouter.of(context).pop();
+                                      AutoRouter.of(
+                                        context,
+                                      ).push(const OtpVerificationRoute());
+                                      setState(() {
+                                        _isBackgroundBlurred = false;
+                                      });
+                                    },
+                                    icon: AnimatedBackgroundContainer(
+                                      icon: Assets.icons.checkGreen.path,
+                                      isPng: true,
+                                    ),
+                                  );
+                                }
                               },
+                              child: BlocBuilder(
+                                bloc: Di().sl<LoginCubit>(),
+                                builder: (context, state) {
+                                  return CustomElevatedButton(
+                                    icon: Di().sl<LoginCubit>().isLoading
+                                        ? SizedBox(
+                                            width: 20,
+                                            height: 20,
+                                            child: Lottie.asset(
+                                              Assets.animations.loadingSpinner,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          )
+                                        : null,
+                                    onTap: () async {
+                                      if (_formKey.currentState!.validate()) {
+                                        _authCubit.emailController.text =
+                                            _emailController.text;
+                                        await Di()
+                                            .sl<LoginCubit>()
+                                            .requestPasswordReset(
+                                              _emailController.text,
+                                            );
+                                      }
+                                    },
+                                    text: Di().sl<LoginCubit>().isLoading
+                                        ? ''
+                                        : 'Send reset code',
+                                    width: double.infinity,
+                                  );
+                                },
+                              ),
                             ),
                             CustomSizedBox(height: 30),
                             Container(

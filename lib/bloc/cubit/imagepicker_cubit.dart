@@ -3,8 +3,10 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:fennac_app/app/app.dart';
+import 'package:fennac_app/app/constants/app_enums.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/bloc/state/imagepicker_state.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -34,18 +36,36 @@ class ImagePickerCubit extends Cubit<ImagePickerState> {
   File? selectedImage;
 
   /// Force square cropping for every image selection.
-  Future<String?> _cropToSquare(String sourcePath) async {
+  Future<String?> cropImageWithRatio(
+    String sourcePath,
+    CropType cropType,
+  ) async {
     try {
-      // Check if file exists before attempting to crop
       final sourceFile = File(sourcePath);
       if (!await sourceFile.exists()) {
         debugPrint('Source file does not exist: $sourcePath');
         return null;
       }
 
+      // Decide ratio dynamically
+      CropAspectRatio aspectRatio;
+      CropAspectRatioPreset preset;
+
+      switch (cropType) {
+        case CropType.square:
+          aspectRatio = const CropAspectRatio(ratioX: 1, ratioY: 1);
+          preset = CropAspectRatioPreset.square;
+          break;
+
+        case CropType.portrait:
+          aspectRatio = const CropAspectRatio(ratioX: 9, ratioY: 16);
+          preset = CropAspectRatioPreset.ratio16x9;
+          break;
+      }
+
       final croppedFile = await _imageCropper.cropImage(
         sourcePath: sourcePath,
-        aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
+        aspectRatio: aspectRatio,
         uiSettings: [
           AndroidUiSettings(
             backgroundColor: ColorPalette.secondary,
@@ -55,8 +75,8 @@ class ImagePickerCubit extends Cubit<ImagePickerState> {
             hideBottomControls: true,
             toolbarWidgetColor: Colors.white,
             statusBarLight: true,
-            initAspectRatio: CropAspectRatioPreset.square,
-            aspectRatioPresets: [CropAspectRatioPreset.square],
+            initAspectRatio: preset,
+            aspectRatioPresets: [preset],
           ),
           IOSUiSettings(title: 'Crop Image', aspectRatioLockEnabled: true),
         ],
@@ -65,7 +85,6 @@ class ImagePickerCubit extends Cubit<ImagePickerState> {
       return croppedFile?.path;
     } catch (e) {
       debugPrint('Error while cropping image: $e');
-      // Return null on crop failure - caller will use original image as fallback
       return null;
     }
   }
@@ -110,7 +129,11 @@ class ImagePickerCubit extends Cubit<ImagePickerState> {
       int currentIndex = containerIndex ?? mediaList.length;
 
       for (final file in pickedFiles) {
-        final croppedPath = await _cropToSquare(file.path) ?? file.path;
+        // Show crop type selection dialog
+        final cropType = await _showCropTypeSelectionDialog();
+        final croppedPath = cropType != null
+            ? (await cropImageWithRatio(file.path, cropType) ?? file.path)
+            : file.path;
 
         final newItem = MediaItem(
           path: croppedPath,
@@ -216,12 +239,12 @@ class ImagePickerCubit extends Cubit<ImagePickerState> {
         return;
       }
 
-      // Crop the image
-      final croppedPath = await _cropToSquare(pickedFile.path);
-      if (croppedPath == null) {
-        emit(ImagePickerLoaded(mediaList: mediaList));
-        return;
-      }
+      // Show crop type selection dialog
+      final cropType = await _showCropTypeSelectionDialog();
+      final croppedPath = cropType != null
+          ? (await cropImageWithRatio(pickedFile.path, cropType) ??
+                pickedFile.path)
+          : pickedFile.path;
 
       final newItem = MediaItem(
         path: croppedPath,
@@ -262,6 +285,144 @@ class ImagePickerCubit extends Cubit<ImagePickerState> {
       debugPrint('Camera error: $e');
       emit(ImagePickerLoaded(mediaList: mediaList));
     }
+  }
+
+  /// Show dialog for user to select crop type (square or portrait)
+  Future<CropType?> _showCropTypeSelectionDialog() async {
+    BuildContext? context = navigatorKey.currentContext;
+    if (context == null)
+      return CropType.square; // Default to square if no context
+
+    return showDialog<CropType>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext dialogContext) => Dialog(
+        backgroundColor: Colors.white,
+        elevation: 8,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Title
+              const Text(
+                'Select Crop Format',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Choose how you want to crop your image',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 14, color: Colors.black54),
+              ),
+              const SizedBox(height: 24),
+
+              // Square Option
+              _buildCropOptionTile(
+                context: dialogContext,
+                icon: Icons.crop_square_rounded,
+                title: 'Square',
+                subtitle: '1:1 Aspect Ratio',
+                cropType: CropType.square,
+              ),
+              const SizedBox(height: 12),
+
+              // Portrait Option
+              _buildCropOptionTile(
+                context: dialogContext,
+                icon: Icons.crop_portrait_rounded,
+                title: 'Portrait',
+                subtitle: '9:16 Aspect Ratio',
+                cropType: CropType.portrait,
+              ),
+              const SizedBox(height: 24),
+
+              // Cancel Button
+              SizedBox(
+                width: double.infinity,
+                child: TextButton(
+                  onPressed: () => Navigator.pop(dialogContext),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: const Text(
+                    'Cancel',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Build individual crop option tile
+  Widget _buildCropOptionTile({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required CropType cropType,
+  }) {
+    return GestureDetector(
+      onTap: () => Navigator.pop(context, cropType),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.grey[50],
+          border: Border.all(color: Colors.grey[200]!, width: 1.5),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: ColorPalette.secondary.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, size: 32, color: ColorPalette.secondary),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey[400]),
+          ],
+        ),
+      ),
+    );
   }
 
   /// Show minimal white dialog for camera permission

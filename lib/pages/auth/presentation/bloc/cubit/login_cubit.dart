@@ -176,7 +176,7 @@ class LoginCubit extends Cubit<LoginState> {
       final message = _extractMessage(response) ?? 'Password reset link sent';
       VxToast.show(message: message, icon: Assets.icons.checkGreen.path);
       isLoading = false;
-      emit(LoginLoaded());
+      emit(PasswordResetSuccessState(emailAddress));
     } catch (e) {
       isLoading = false;
       emit(LoginError(e.toString()));
@@ -234,10 +234,9 @@ class LoginCubit extends Cubit<LoginState> {
 
       emit(LoginLoaded());
     } catch (e) {
-      final errorMessage = _extractMessage(e) ?? 'Failed to reset password';
       isLoading = false;
-      emit(LoginError(errorMessage));
-      VxToast.show(message: errorMessage);
+      emit(LoginError(e.toString()));
+      VxToast.show(message: e.toString());
     }
   }
 
