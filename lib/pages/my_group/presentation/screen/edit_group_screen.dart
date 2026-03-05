@@ -448,7 +448,9 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
                   oldId: prompt.id,
                   promptText: promptTitle,
                   promptAnswer: promptAnswer,
-                  isCustom: false,
+                  isCustom: !DummyConstants.predefinedPrompts.contains(
+                    promptTitle,
+                  ),
                   waveformData: prompt.waves,
                   duration: prompt.duration?.toString() ?? "15:00",
                 );
