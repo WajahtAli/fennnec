@@ -18,6 +18,7 @@ import 'package:fennac_app/pages/buy_poke/data/datasource/poke_datasource.dart';
 import 'package:fennac_app/pages/buy_poke/data/repository/poke_repository_impl.dart';
 import 'package:fennac_app/pages/buy_poke/domain/repository/poke_repository.dart';
 import 'package:fennac_app/pages/buy_poke/domain/usecase/fetch_pokes_usecase.dart';
+import 'package:fennac_app/pages/buy_poke/domain/usecase/send_poke_usecase.dart';
 import 'package:fennac_app/pages/buy_poke/presentation/bloc/cubit/poke_cubit.dart';
 import 'package:fennac_app/pages/call/presentation/bloc/cubit/call_cubit.dart';
 import 'package:fennac_app/pages/chats/presentation/bloc/cubit/chat_landing_cubit.dart';
@@ -57,6 +58,21 @@ import 'package:fennac_app/pages/profile/data/datasource/profile_datasource.dart
 import 'package:fennac_app/pages/profile/data/repository/profile_repository_impl.dart';
 import 'package:fennac_app/pages/profile/domain/repository/profile_repository.dart';
 import 'package:fennac_app/pages/profile/domain/usecase/profile_usecase.dart';
+import 'package:fennac_app/pages/profile/data/datasource/contact_support_datasource.dart';
+import 'package:fennac_app/pages/profile/data/repository/contact_support_repository_impl.dart';
+import 'package:fennac_app/pages/profile/domain/repository/contact_support_repository.dart';
+import 'package:fennac_app/pages/profile/domain/usecase/contact_support_usecase.dart';
+import 'package:fennac_app/pages/profile/presentation/bloc/cubit/contact_support_cubit.dart';
+import 'package:fennac_app/pages/profile/data/datasource/faqs_datasource.dart';
+import 'package:fennac_app/pages/profile/data/repository/faqs_repository_impl.dart';
+import 'package:fennac_app/pages/profile/domain/repository/faqs_repository.dart';
+import 'package:fennac_app/pages/profile/domain/usecase/faqs_usecase.dart';
+import 'package:fennac_app/pages/profile/presentation/bloc/cubit/faqs_cubit.dart';
+import 'package:fennac_app/pages/profile/data/datasource/report_problem_datasource.dart';
+import 'package:fennac_app/pages/profile/data/repository/report_problem_repository_impl.dart';
+import 'package:fennac_app/pages/profile/domain/repository/report_problem_repository.dart';
+import 'package:fennac_app/pages/profile/domain/usecase/report_problem_usecase.dart';
+import 'package:fennac_app/pages/profile/presentation/bloc/cubit/report_problem_cubit.dart';
 import 'package:fennac_app/pages/splash/presentation/bloc/cubit/background_cubit.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -108,6 +124,13 @@ class Di {
     sl.registerLazySingleton<ProfileDatasource>(
       () => ProfileDatasourceImpl(sl()),
     );
+    sl.registerLazySingleton<ContactSupportDatasource>(
+      () => ContactSupportDatasourceImpl(sl()),
+    );
+    sl.registerLazySingleton<FaqsDatasource>(() => FaqsDatasourceImpl(sl()));
+    sl.registerLazySingleton<ReportProblemDatasource>(
+      () => ReportProblemDatasourceImpl(sl()),
+    );
     sl.registerLazySingleton<HomeLandingDatasource>(
       () => HomeLandingDatasourceImpl(sl()),
     );
@@ -133,10 +156,18 @@ class Di {
     sl.registerLazySingleton<ProfileRepository>(
       () => ProfileRepositoryImpl(sl()),
     );
+    sl.registerLazySingleton<ContactSupportRepository>(
+      () => ContactSupportRepositoryImpl(sl()),
+    );
+    sl.registerLazySingleton<FaqsRepository>(() => FaqsRepositoryImpl(sl()));
+    sl.registerLazySingleton<ReportProblemRepository>(
+      () => ReportProblemRepositoryImpl(sl()),
+    );
     sl.registerLazySingleton<HomeLandingRepository>(
       () => HomeLandingRepositoryImpl(sl()),
     );
     sl.registerLazySingleton<PokeRepository>(() => PokeRepositoryImpl(sl()));
+
     // sl.registerLazySingleton<ChatRepository>(() => ChatRepositoryImpl(sl()));
 
     // Usecases
@@ -152,10 +183,18 @@ class Di {
     sl.registerLazySingleton<FindGroupUsecase>(() => FindGroupUsecase(sl()));
     sl.registerLazySingleton<MyGroupUsecase>(() => MyGroupUsecase(sl()));
     sl.registerLazySingleton<ProfileUsecase>(() => ProfileUsecase(sl()));
+    sl.registerLazySingleton<ContactSupportUsecase>(
+      () => ContactSupportUsecase(sl()),
+    );
+    sl.registerLazySingleton<FaqsUsecase>(() => FaqsUsecase(sl()));
+    sl.registerLazySingleton<ReportProblemUsecase>(
+      () => ReportProblemUsecase(sl()),
+    );
     sl.registerLazySingleton<FetchGroupInvitationsUseCase>(
       () => FetchGroupInvitationsUseCase(sl()),
     );
     sl.registerLazySingleton<FetchPokesUseCase>(() => FetchPokesUseCase(sl()));
+    sl.registerLazySingleton<SendPokeUseCase>(() => SendPokeUseCase(sl()));
 
     // Cubits
     sl.registerLazySingleton<AuthCubit>(() => AuthCubit());
@@ -166,11 +205,10 @@ class Di {
     sl.registerLazySingleton<KycPromptCubit>(() => KycPromptCubit());
     sl.registerLazySingleton<ImagePickerCubit>(() => ImagePickerCubit());
     sl.registerLazySingleton<DashboardCubit>(() => DashboardCubit());
-    sl.registerLazySingleton<HomeCubit>(() => HomeCubit());
+    sl.registerLazySingleton<HomeCubit>(() => HomeCubit(sl()));
     sl.registerLazySingleton<GroupsCubit>(() => GroupsCubit(sl()));
     sl.registerLazySingleton<LoginCubit>(() => LoginCubit(sl()));
     sl.registerLazySingleton<HomeLandingCubit>(() => HomeLandingCubit(sl()));
-    sl.registerLazySingleton<PokeCubit>(() => PokeCubit(sl()));
     sl.registerLazySingleton<CreateGroupCubit>(() => CreateGroupCubit(sl()));
     sl.registerLazySingleton<FindGroupCubit>(() => FindGroupCubit(sl()));
     sl.registerLazySingleton<MoveAbleBackgroundCubit>(
@@ -182,6 +220,13 @@ class Di {
     sl.registerLazySingleton<MessageCubit>(() => MessageCubit(sl()));
     sl.registerLazySingleton<CallCubit>(() => CallCubit());
     sl.registerLazySingleton<ProfileCubit>(() => ProfileCubit(sl()));
+    sl.registerLazySingleton<ContactSupportCubit>(
+      () => ContactSupportCubit(sl()),
+    );
+    sl.registerLazySingleton<FaqsCubit>(() => FaqsCubit(sl()));
+    sl.registerLazySingleton<ReportProblemCubit>(
+      () => ReportProblemCubit(sl()),
+    );
     sl.registerLazySingleton<CreateAccountCubit>(
       () => CreateAccountCubit(sl()),
     );
@@ -189,5 +234,6 @@ class Di {
     sl.registerLazySingleton<MyGroupCubit>(() => MyGroupCubit(sl()));
     sl.registerLazySingleton<GoogleMapCubit>(() => GoogleMapCubit());
     sl.registerLazySingleton<ContactListCubit>(() => ContactListCubit(sl()));
+    sl.registerLazySingleton<PokeCubit>(() => PokeCubit(sl()));
   }
 }

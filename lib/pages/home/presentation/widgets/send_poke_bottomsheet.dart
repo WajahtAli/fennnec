@@ -64,18 +64,39 @@ class _SendPokeBottomSheetState extends State<SendPokeBottomSheet> {
     final isValid = _formKey.currentState?.validate() ?? false;
     if (!isValid) return;
 
-    Navigator.pop(context);
-    await CustomBottomSheet.show(
-      blurNotifier: _blurNotifier,
-      context: context,
-      title: 'Poke Sent!',
-      description: "Let's see if they poke back.",
-      buttonText: 'Done',
-      icon: AnimatedBackgroundContainer(
-        icon: Assets.icons.checkGreen.path,
-        isPng: true,
-      ),
-    );
+    try {
+      final selectedProfile = _homeCubit.selectedProfile;
+      if (selectedProfile?.id == null) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('No profile selected')));
+        return;
+      }
+
+      // Make API call to send poke
+      await _homeCubit.sendPoke(toUserId: selectedProfile!.id!);
+
+      if (context.mounted) {
+        Navigator.pop(context);
+        await CustomBottomSheet.show(
+          blurNotifier: _blurNotifier,
+          context: context,
+          title: 'Poke Sent!',
+          description: "Let's see if they poke back.",
+          buttonText: 'Done',
+          icon: AnimatedBackgroundContainer(
+            icon: Assets.icons.checkGreen.path,
+            isPng: true,
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to send poke: $e')));
+      }
+    }
   }
 
   @override

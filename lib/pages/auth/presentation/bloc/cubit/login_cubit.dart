@@ -14,6 +14,9 @@ import 'package:fennac_app/pages/auth/presentation/bloc/cubit/auth_cubit.dart';
 import 'package:fennac_app/pages/auth/presentation/bloc/cubit/create_account_cubit.dart';
 import 'package:fennac_app/pages/auth/presentation/bloc/state/login_state.dart';
 import 'package:fennac_app/pages/dashboard/presentation/bloc/cubit/dashboard_cubit.dart';
+import 'package:fennac_app/pages/home/presentation/bloc/cubit/groups_cubit.dart';
+import 'package:fennac_app/pages/homelanding/presentation/bloc/cubit/home_landing_cubit.dart';
+import 'package:fennac_app/pages/my_group/presentation/bloc/cubit/my_group_cubit.dart';
 import 'package:fennac_app/routes/routes_imports.gr.dart';
 import 'package:fennac_app/utils/validators.dart';
 import 'package:flutter/material.dart';
@@ -140,8 +143,13 @@ class LoginCubit extends Cubit<LoginState> {
 
       email.clear();
       password.clear();
-      Di().sl<DashboardCubit>().changePage(0, HomeScreen());
-      AutoRouter.of(context).replaceAll([DashboardRoute()]);
+
+      if (Di().sl<HomeLandingCubit>().invitations.isNotEmpty) {
+        AutoRouter.of(context).replaceAll([DashboardRoute()]);
+      } else {
+        Di().sl<DashboardCubit>().changePage(0, HomeScreen());
+        AutoRouter.of(context).replaceAll([DashboardRoute()]);
+      }
 
       emit(LoginLoaded());
     } catch (e) {
@@ -477,6 +485,8 @@ class LoginCubit extends Cubit<LoginState> {
         message: response['message'] ?? 'Logged out successfully',
         icon: Assets.icons.checkGreen.path,
       );
+      Di().sl<GroupsCubit>().clearGroupData();
+      Di().sl<MyGroupCubit>().clearGroupData();
       emit(LoginLoaded());
 
       if (context.mounted) {
@@ -505,7 +515,12 @@ class LoginCubit extends Cubit<LoginState> {
 
         if (isValid && sessionActive) {
           if (context.mounted) {
-            AutoRouter.of(context).replace(const DashboardRoute());
+            if (Di().sl<HomeLandingCubit>().invitations.isNotEmpty) {
+              AutoRouter.of(context).replaceAll([DashboardRoute()]);
+            } else {
+              Di().sl<DashboardCubit>().changePage(0, HomeScreen());
+              AutoRouter.of(context).replaceAll([DashboardRoute()]);
+            }
           }
         } else {
           if (context.mounted) {

@@ -63,4 +63,11 @@ class MyGroupCubit extends Cubit<MyGroupState> {
       emit(MyGroupError(e.toString()));
     }
   }
+
+  void clearGroupData() {
+    emit(MyGroupLoading());
+    myGroupModel = null;
+    myGroupList = null;
+    emit(MyGroupLoaded());
+  }
 }

@@ -10,7 +10,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class GalleryUploadWidget extends StatelessWidget {
-  const GalleryUploadWidget({super.key});
+  final int? containerIndex;
+
+  const GalleryUploadWidget({super.key, this.containerIndex});
 
   @override
   Widget build(BuildContext context) {
@@ -19,6 +21,31 @@ class GalleryUploadWidget extends StatelessWidget {
     return BlocBuilder<ImagePickerCubit, ImagePickerState>(
       bloc: cubit,
       builder: (context, state) {
+        final hasIndexedMedia =
+            containerIndex != null &&
+            containerIndex! >= 0 &&
+            containerIndex! < cubit.mediaList.length &&
+            cubit.mediaList[containerIndex!].path.isNotEmpty;
+
+        final hasDefaultMedia =
+            cubit.mediaList.isNotEmpty && cubit.mediaList[0].path.isNotEmpty;
+
+        final hasMedia = containerIndex != null
+            ? hasIndexedMedia
+            : hasDefaultMedia;
+
+        final mediaPath = hasMedia
+            ? (containerIndex != null
+                  ? cubit.mediaList[containerIndex!].path
+                  : cubit.mediaList[0].path)
+            : null;
+
+        final mediaId = hasMedia
+            ? (containerIndex != null
+                  ? cubit.mediaList[containerIndex!].id
+                  : cubit.mediaList[0].id)
+            : null;
+
         return GestureDetector(
           onTap: () => _showImageSourceDialog(context, cubit),
           child: Container(
@@ -36,13 +63,11 @@ class GalleryUploadWidget extends StatelessWidget {
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(16),
-              child:
-                  (cubit.mediaList.isNotEmpty &&
-                      cubit.mediaList[0].path.isNotEmpty)
+              child: hasMedia
                   ? Stack(
                       children: [
                         Image.file(
-                          File(cubit.mediaList[0].path),
+                          File(mediaPath!),
                           width: double.infinity,
                           height: 260,
                           fit: BoxFit.cover,
@@ -65,8 +90,13 @@ class GalleryUploadWidget extends StatelessWidget {
                           top: 6,
                           right: 6,
                           child: GestureDetector(
-                            onTap: () =>
-                                cubit.removeMedia(cubit.mediaList[0].id),
+                            onTap: () {
+                              if (containerIndex != null) {
+                                cubit.removeMedia(null, index: containerIndex);
+                              } else {
+                                cubit.removeMedia(mediaId!);
+                              }
+                            },
                             child: Container(
                               alignment: Alignment.center,
                               width: 24,
@@ -157,7 +187,9 @@ class GalleryUploadWidget extends StatelessWidget {
                 ),
                 onTap: () {
                   Navigator.pop(context);
-                  cubit.pickImagesFromGallery(containerIndex: -1);
+                  cubit.pickImagesFromGallery(
+                    containerIndex: containerIndex ?? -1,
+                  );
                 },
               ),
               ListTile(
@@ -173,7 +205,7 @@ class GalleryUploadWidget extends StatelessWidget {
                 ),
                 onTap: () {
                   Navigator.pop(context);
-                  cubit.pickImageFromCamera();
+                  cubit.pickImageFromCamera(containerIndex: containerIndex);
                 },
               ),
               const SizedBox(height: 8),

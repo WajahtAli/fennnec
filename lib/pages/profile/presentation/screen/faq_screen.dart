@@ -1,12 +1,15 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:fennac_app/app/constants/dummy_constants.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
+import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/models/dummy/faq_item_model.dart';
+import 'package:fennac_app/pages/profile/presentation/bloc/cubit/faqs_cubit.dart';
+import 'package:fennac_app/pages/profile/presentation/bloc/state/faqs_state.dart';
 import 'package:fennac_app/reusable_widgets/custom_app_bar.dart';
 import 'package:fennac_app/widgets/custom_search_field.dart';
 import 'package:fennac_app/widgets/movable_background.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../app/constants/media_query_constants.dart';
 
@@ -20,13 +23,13 @@ class FaqScreen extends StatefulWidget {
 
 class _FaqScreenState extends State<FaqScreen> {
   final TextEditingController _searchController = TextEditingController();
-  late List<FaqItem> _filteredItems;
+  final FaqsCubit _faqsCubit = Di().sl<FaqsCubit>();
 
   @override
   void initState() {
     super.initState();
-    _filteredItems = DummyConstants.faqItems;
     _searchController.addListener(_filterFaq);
+    _faqsCubit.fetchFaqs();
   }
 
   @override
@@ -36,23 +39,7 @@ class _FaqScreenState extends State<FaqScreen> {
   }
 
   void _filterFaq() {
-    setState(() {
-      if (_searchController.text.isEmpty) {
-        _filteredItems = DummyConstants.faqItems;
-      } else {
-        _filteredItems = DummyConstants.faqItems
-            .where(
-              (item) =>
-                  item.question.toLowerCase().contains(
-                    _searchController.text.toLowerCase(),
-                  ) ||
-                  item.answer.toLowerCase().contains(
-                    _searchController.text.toLowerCase(),
-                  ),
-            )
-            .toList();
-      }
-    });
+    _faqsCubit.searchFaqs(_searchController.text);
   }
 
   @override
@@ -73,23 +60,41 @@ class _FaqScreenState extends State<FaqScreen> {
 
               const SizedBox(height: 16),
               Expanded(
-                child: _filteredItems.isEmpty
-                    ? Center(
+                child: BlocBuilder<FaqsCubit, FaqsState>(
+                  bloc: _faqsCubit,
+                  builder: (context, state) {
+                    if (state is FaqsLoading) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (state is FaqsError) {
+                      return Center(
                         child: Text(
-                          'No FAQs found',
+                          'Error loading FAQs',
                           style: AppTextStyles.description(context),
                         ),
-                      )
-                    : ListView.builder(
+                      );
+                    } else if (state is FaqsLoaded) {
+                      if (state.faqs.isEmpty) {
+                        return Center(
+                          child: Text(
+                            'No FAQs found',
+                            style: AppTextStyles.description(context),
+                          ),
+                        );
+                      }
+                      return ListView.builder(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 16,
                           vertical: 8,
                         ),
-                        itemCount: _filteredItems.length,
+                        itemCount: state.faqs.length,
                         itemBuilder: (context, index) {
-                          return FaqTile(item: _filteredItems[index]);
+                          return FaqTile(item: state.faqs[index]);
                         },
-                      ),
+                      );
+                    }
+                    return const SizedBox();
+                  },
+                ),
               ),
             ],
           ),

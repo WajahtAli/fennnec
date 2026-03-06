@@ -88,4 +88,11 @@ class GroupsCubit extends Cubit<GroupsState> {
       rethrow;
     }
   }
+
+  void clearGroupData() {
+    emit(GroupsLoading());
+    groupsModel = null;
+    acceptGroupReqResponse = null;
+    emit(GroupsSuccess());
+  }
 }

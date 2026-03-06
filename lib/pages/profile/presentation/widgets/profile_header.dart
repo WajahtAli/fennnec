@@ -137,17 +137,19 @@ class _ProfileHeaderState extends State<ProfileHeader> {
                         runSpacing: 8,
                         alignment: WrapAlignment.center,
                         children: [
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            spacing: 8,
-                            children: List.generate(orientation?.length ?? 0, (
-                              index,
-                            ) {
-                              return ProfileChip(
-                                label: (orientation?[index] ?? '').capitalize(),
-                              );
-                            }),
-                          ),
+                          if (orientation != null)
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              spacing: 8,
+                              children: List.generate(orientation.length, (
+                                index,
+                              ) {
+                                return ProfileChip(
+                                  label: (orientation[index] ?? '')
+                                      .capitalize(),
+                                );
+                              }),
+                            ),
                           if (user.pronouns != null &&
                               user.pronouns!.isNotEmpty)
                             ProfileChip(label: user.pronouns!),

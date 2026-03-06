@@ -82,16 +82,35 @@ class ProfileListTile extends StatelessWidget {
             ],
 
             if (isSwitchGroupTile == true) ...[
-              MemberAvatarWidget(
-                avatarSize: 32,
-                overlap: 24,
-                avatarPaths: [
-                  Assets.dummy.a1.path,
-                  Assets.dummy.a2.path,
-                  Assets.dummy.a3.path,
-                  Assets.dummy.a4.path,
-                  Assets.dummy.a5.path,
-                ],
+              BlocBuilder(
+                bloc: Di().sl<MyGroupCubit>(),
+                builder: (context, state) {
+                  final firstGroup = Di()
+                      .sl<MyGroupCubit>()
+                      .myGroupList
+                      ?.groupList
+                      ?.firstOrNull;
+                  final groupImages = firstGroup?.photosVideos
+                      ?.where((path) => path.trim().isNotEmpty)
+                      .toList();
+
+                  final avatarPaths =
+                      (groupImages != null && groupImages.isNotEmpty)
+                      ? groupImages
+                      : [
+                          Assets.dummy.a1.path,
+                          Assets.dummy.a2.path,
+                          Assets.dummy.a3.path,
+                          Assets.dummy.a4.path,
+                          Assets.dummy.a5.path,
+                        ];
+
+                  return MemberAvatarWidget(
+                    avatarSize: 32,
+                    overlap: 24,
+                    avatarPaths: avatarPaths,
+                  );
+                },
               ),
               const SizedBox(width: 8),
             ],

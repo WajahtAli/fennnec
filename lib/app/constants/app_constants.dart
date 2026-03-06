@@ -30,9 +30,11 @@ class AppConstants {
   static const requestContactChange = 'auth/request-contact-change';
   static const verifyContactChange = 'auth/verify-contact-change';
   static const changePassword = 'auth/change-password';
-  static const acceptGroupRequest = '/accept';
-  static const rejectGroupRequest = '/reject';
+  static const acceptGroupRequest = 'groups/accept-decline';
   static const chatAndCalls = 'groups/accept-decline';
+  static const contactSupport = 'help-support/contact-support';
+  static const fetchFaqs = 'help-support/faqs';
+  static const reportProblem = 'help-support/report-problem';
   static const fetchPokeProducts = 'pokes/products';
 
   //!Agora Constants

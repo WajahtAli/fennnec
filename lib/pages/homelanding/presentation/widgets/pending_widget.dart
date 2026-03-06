@@ -39,7 +39,6 @@ class PendingWidget extends StatelessWidget {
           ),
         ),
         const CustomSizedBox(height: 40),
-
         // Action Buttons
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),

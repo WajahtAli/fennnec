@@ -12,6 +12,8 @@ import 'package:fennac_app/widgets/custom_sized_box.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../bloc/state/home_state.dart';
+
 class HomeCardDesign extends StatefulWidget {
   final Group? group;
   final VoidCallback onTapRight;
@@ -41,8 +43,10 @@ class _HomeCardDesignState extends State<HomeCardDesign> {
     return SingleChildScrollView(
       controller: _homeCubit.sController,
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: BlocConsumer(
-        listener: (context, state) {},
+      child: BlocSelector<HomeCubit, HomeState, Member>(
+        selector: (state) {
+          return _homeCubit.selectedProfile ?? Member();
+        },
         bloc: _homeCubit,
         builder: (context, state) {
           return Column(

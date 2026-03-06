@@ -16,8 +16,3 @@ void main() async {
     );
   }
 }
-
-
-/// send poke request api 
-/// get chats api
-/// get user profile api

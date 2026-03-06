@@ -290,8 +290,9 @@ class ImagePickerCubit extends Cubit<ImagePickerState> {
   /// Show dialog for user to select crop type (square or portrait)
   Future<CropType?> _showCropTypeSelectionDialog() async {
     BuildContext? context = navigatorKey.currentContext;
-    if (context == null)
+    if (context == null) {
       return CropType.square; // Default to square if no context
+    }
 
     return showDialog<CropType>(
       context: context,

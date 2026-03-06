@@ -1,11 +1,16 @@
 import 'dart:ui';
-import 'package:fennac_app/app/constants/dummy_constants.dart';
 import 'package:fennac_app/app/constants/media_query_constants.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
+import 'package:fennac_app/core/di_container.dart';
+import 'package:fennac_app/generated/assets.gen.dart';
+import 'package:fennac_app/pages/my_group/presentation/bloc/cubit/my_group_cubit.dart';
+import 'package:fennac_app/pages/my_group/presentation/bloc/state/my_group_state.dart';
 import 'package:fennac_app/reusable_widgets/member_avatar_widget.dart';
+import 'package:fennac_app/skeletons/group_card_skeleton.dart';
 import 'package:fennac_app/widgets/custom_sized_box.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SwitchGroupsBottomSheet extends StatefulWidget {
   const SwitchGroupsBottomSheet({super.key});
@@ -17,8 +22,18 @@ class SwitchGroupsBottomSheet extends StatefulWidget {
 
 class _SwitchGroupsBottomSheetState extends State<SwitchGroupsBottomSheet> {
   final ValueNotifier<int?> _selectedGroupIndex = ValueNotifier<int?>(0);
+  late final MyGroupCubit _myGroupCubit;
 
-  final List<Map<String, dynamic>> _groups = DummyConstants.switchGroups;
+  @override
+  void initState() {
+    super.initState();
+    _myGroupCubit = Di().sl<MyGroupCubit>();
+    // Fetch groups if not already loaded
+    if (_myGroupCubit.myGroupList == null ||
+        _myGroupCubit.myGroupList?.groupList == null) {
+      _myGroupCubit.fetchGroupById('');
+    }
+  }
 
   @override
   void dispose() {
@@ -49,21 +64,69 @@ class _SwitchGroupsBottomSheetState extends State<SwitchGroupsBottomSheet> {
           Text('Switch Group', style: AppTextStyles.h3(context)),
           const CustomSizedBox(height: 24),
           Flexible(
-            child: ListView.builder(
-              shrinkWrap: true,
-              padding: const EdgeInsets.only(bottom: 32),
-              itemCount: _groups.length,
-              itemBuilder: (context, index) {
-                return ValueListenableBuilder<int?>(
-                  valueListenable: _selectedGroupIndex,
-                  builder: (context, selectedIndex, child) {
-                    final isSelected = selectedIndex == index;
-                    return _SelectableGroupCard(
-                      title: _groups[index]['title'],
-                      avatarPaths: List<String>.from(_groups[index]['avatars']),
-                      isSelected: isSelected,
-                      onTap: () {
-                        _selectedGroupIndex.value = index;
+            child: BlocBuilder<MyGroupCubit, MyGroupState>(
+              bloc: _myGroupCubit,
+              builder: (context, state) {
+                if (state is MyGroupLoading) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 32),
+                    child: Column(
+                      children: [
+                        GroupCardSkeleton(),
+                        const CustomSizedBox(height: 8),
+                        GroupCardSkeleton(),
+                      ],
+                    ),
+                  );
+                }
+
+                final groupList = _myGroupCubit.myGroupList?.groupList;
+
+                if (groupList == null || groupList.isEmpty) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 32),
+                    child: Center(
+                      child: Text(
+                        'No groups available',
+                        style: AppTextStyles.description(context),
+                      ),
+                    ),
+                  );
+                }
+
+                return ListView.builder(
+                  shrinkWrap: true,
+                  padding: const EdgeInsets.only(bottom: 32),
+                  itemCount: groupList.length,
+                  itemBuilder: (context, index) {
+                    final group = groupList[index];
+                    final apiAvatars =
+                        group.photosVideos
+                            ?.where((path) => path.trim().isNotEmpty)
+                            .toList() ??
+                        [];
+                    final avatarPaths = apiAvatars.isNotEmpty
+                        ? apiAvatars
+                        : [
+                            Assets.dummy.a1.path,
+                            Assets.dummy.a2.path,
+                            Assets.dummy.a3.path,
+                          ];
+
+                    return ValueListenableBuilder<int?>(
+                      valueListenable: _selectedGroupIndex,
+                      builder: (context, selectedIndex, child) {
+                        final isSelected = selectedIndex == index;
+                        return _SelectableGroupCard(
+                          title:
+                              group.titleMembers ??
+                              'Brenda, Nancy, Jeff, Anna & You',
+                          avatarPaths: avatarPaths,
+                          isSelected: isSelected,
+                          onTap: () {
+                            _selectedGroupIndex.value = index;
+                          },
+                        );
                       },
                     );
                   },

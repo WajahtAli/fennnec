@@ -21,6 +21,7 @@ import 'package:fennac_app/bloc/cubit/imagepicker_cubit.dart';
 import 'package:fennac_app/bloc/state/imagepicker_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 
 import 'package:fennac_app/generated/assets.gen.dart';
 
@@ -37,6 +38,7 @@ class _FindGroupScreenState extends State<FindGroupScreen> {
   late final ImagePickerCubit _pickerCubit;
   final FindGroupCubit _findGroupCubit = Di().sl<FindGroupCubit>();
   CameraController? _cameraController;
+  final MobileScannerController _controller = MobileScannerController();
   bool _isCameraInitialized = false;
   bool _dialogShown = false;
 
@@ -46,9 +48,7 @@ class _FindGroupScreenState extends State<FindGroupScreen> {
     _pickerCubit = ImagePickerCubit();
     final qrCode = widget.qrCode?.trim();
     if (qrCode != null && qrCode.isNotEmpty) {
-      Future.microtask(
-        () => _findGroupCubit.fetchGroupByQr('GRP-6CA5E005F70367EC-MLBBDHSF'),
-      );
+      Future.microtask(() => _findGroupCubit.fetchGroupByQr(qrCode));
     }
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await _initCamera();
@@ -59,15 +59,12 @@ class _FindGroupScreenState extends State<FindGroupScreen> {
     final status = await Permission.camera.request();
     final allowed = status.isGranted || status.isLimited;
     if (!allowed) {
-      // On iOS limited/denied permissions can block the dialog. Show the landing dialog anyway.
-      _showDialogOnce();
       return;
     }
 
     try {
       final cameras = await availableCameras();
       if (cameras.isEmpty) {
-        _showDialogOnce();
         return;
       }
       final back = cameras.firstWhere(
@@ -86,20 +83,15 @@ class _FindGroupScreenState extends State<FindGroupScreen> {
       setState(() {
         _isCameraInitialized = true;
       });
-
-      _showDialogOnce(delay: const Duration(milliseconds: 700));
     } catch (e) {
       debugPrint('Camera init error: $e');
-      _showDialogOnce();
     }
   }
 
-  void _showDialogOnce({Duration delay = const Duration(milliseconds: 600)}) {
+  void _showDialogOnce() {
     if (_dialogShown || !mounted) return;
     _dialogShown = true;
-    Future.delayed(delay, () {
-      if (mounted) _showLandingDialog();
-    });
+    _showLandingDialog();
   }
 
   void _showLandingDialog() {
@@ -215,6 +207,7 @@ class _FindGroupScreenState extends State<FindGroupScreen> {
   void dispose() {
     _cameraController?.dispose();
     _pickerCubit.close();
+    _dialogShown = false;
     super.dispose();
   }
 
@@ -222,69 +215,96 @@ class _FindGroupScreenState extends State<FindGroupScreen> {
   Widget build(BuildContext context) {
     return BlocProvider<ImagePickerCubit>.value(
       value: _pickerCubit,
-      child: Scaffold(
-        body: MovableBackground(
-          backgroundType: MovableBackgroundType.dark,
+      child: BlocListener<FindGroupCubit, FindGroupState>(
+        bloc: _findGroupCubit,
+        listener: (context, state) {
+          if (state is! FindGroupLoading && state is! FindGroupInitial) {
+            _showDialogOnce();
+          }
+        },
+        child: Scaffold(
+          body: MovableBackground(
+            backgroundType: MovableBackgroundType.dark,
 
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12),
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                CustomAppBar(title: 'Find a Group'),
-                const SizedBox(height: 8),
-                Text(
-                  'Quickly connect with your friends by scanning their\ngroup\'s QR code.',
-                  textAlign: TextAlign.center,
-                  style: AppTextStyles.body(context),
-                ),
-                const SizedBox(height: 18),
-                Flexible(
-                  child: Container(
-                    height: 600,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.black,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
-                      child: Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          if (_isCameraInitialized && _cameraController != null)
-                            CameraPreview(_cameraController!)
-                          else
-                            Container(color: Colors.black),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20.0,
+                vertical: 12,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  CustomAppBar(title: 'Find a Group'),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Quickly connect with your friends by scanning their\ngroup\'s QR code.',
+                    textAlign: TextAlign.center,
+                    style: AppTextStyles.body(context),
+                  ),
+                  const SizedBox(height: 18),
+                  Flexible(
+                    child: Container(
+                      height: 600,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Colors.black,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            if (_isCameraInitialized &&
+                                _cameraController != null)
+                              MobileScanner(
+                                controller: _controller,
+                                onDetect: (capture) {
+                                  final List<Barcode> barcodes =
+                                      capture.barcodes;
+                                  if (barcodes.isNotEmpty) {
+                                    final String? code =
+                                        barcodes.first.rawValue;
+                                    debugPrint(code);
+                                    if (code != null) {
+                                      _findGroupCubit.fetchGroupByQr(code);
+                                    }
+                                  }
+                                },
+                              )
+                            // CameraPreview(_cameraController!)
+                            else
+                              Container(color: Colors.black),
 
-                          BlocBuilder<ImagePickerCubit, ImagePickerState>(
-                            builder: (context, state) {
-                              final media = state.mediaList;
-                              if (media != null && media.isNotEmpty) {
-                                final path = media.last.path;
-                                return Image.file(
-                                  File(path),
-                                  fit: BoxFit.cover,
-                                  width: double.infinity,
-                                  height: double.infinity,
-                                );
-                              }
-                              return const SizedBox.shrink();
-                            },
-                          ),
-                        ],
+                            BlocBuilder<ImagePickerCubit, ImagePickerState>(
+                              builder: (context, state) {
+                                final media = state.mediaList;
+                                if (media != null && media.isNotEmpty) {
+                                  final path = media.last.path;
+                                  return Image.file(
+                                    File(path),
+                                    fit: BoxFit.cover,
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                  );
+                                }
+                                return const SizedBox.shrink();
+                              },
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 18),
-                const Text(
-                  'Looking for QR Code...',
-                  style: TextStyle(color: Colors.white70),
-                ),
-                const SizedBox(height: 22),
-              ],
+                  const SizedBox(height: 18),
+                  const Text(
+                    'Looking for QR Code...',
+                    style: TextStyle(color: Colors.white70),
+                  ),
+                  const SizedBox(height: 22),
+                ],
+              ),
             ),
           ),
         ),

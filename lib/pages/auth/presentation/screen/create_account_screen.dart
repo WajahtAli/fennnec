@@ -329,6 +329,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                                   obscureText:
                                       _authCubit.obscureConfirmPassword,
                                   hintText: 'Re-enter your password',
+
                                   filled: false,
                                   suffixIcon: IconButton(
                                     onPressed: () {

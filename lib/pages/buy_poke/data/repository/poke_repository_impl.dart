@@ -11,4 +11,9 @@ class PokeRepositoryImpl extends PokeRepository {
   Future<PockModel> fetchPokes() async {
     return await _datasource.fetchPokes();
   }
+
+  @override
+  Future<Map<String, dynamic>> sendPoke({required String toUserId}) async {
+    return await _datasource.sendPoke(toUserId: toUserId);
+  }
 }

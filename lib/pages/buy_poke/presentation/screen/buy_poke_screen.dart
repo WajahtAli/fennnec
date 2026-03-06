@@ -9,6 +9,7 @@ import 'package:fennac_app/pages/buy_poke/presentation/bloc/state/poke_state.dar
 import 'package:fennac_app/pages/buy_poke/presentation/widgets/poke_pack_tile.dart';
 import 'package:fennac_app/reusable_widgets/animated_background_container.dart';
 import 'package:fennac_app/reusable_widgets/custom_app_bar.dart';
+import 'package:fennac_app/skeletons/poke_pack_skeleton.dart';
 import 'package:fennac_app/widgets/custom_sized_box.dart';
 import 'package:fennac_app/widgets/custom_text.dart';
 import 'package:fennac_app/widgets/movable_background.dart';
@@ -77,9 +78,8 @@ class _BuyPokeScreenState extends State<BuyPokeScreen> {
                   bloc: _pokeCubit,
                   builder: (context, state) {
                     if (state is PokeLoading) {
-                      return const Center(child: CircularProgressIndicator());
+                      return const PokePackSkeleton(itemCount: 3);
                     }
-
                     if (state is PokeError) {
                       return AppText(
                         text: state.message ?? 'Unable to fetch poke products',
