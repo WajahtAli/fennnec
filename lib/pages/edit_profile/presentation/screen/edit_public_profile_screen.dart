@@ -23,6 +23,7 @@ import 'package:fennac_app/widgets/movable_background.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../app/constants/dummy_constants.dart';
 import '../../../auth/data/model/prompt_model.dart';
 import '../../../create_group/presentation/bloc/cubit/create_group_cubit.dart';
 
@@ -110,7 +111,8 @@ class _EditPublicProfileScreenState extends State<EditPublicProfileScreen> {
                               oldId: i.id,
                               promptText: i.promptTitle?.toString() ?? '',
                               promptAnswer: i.promptAnswer?.toString() ?? '',
-                              isCustom: false,
+                              isCustom: !DummyConstants.predefinedPrompts
+                                  .contains(i.promptTitle),
                               waveformData: i.waves,
                               duration: "15:00",
                             ),
