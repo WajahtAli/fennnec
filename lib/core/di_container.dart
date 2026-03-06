@@ -4,15 +4,20 @@ import 'package:fennac_app/bloc/cubit/wave_form_cubit.dart';
 import 'package:fennac_app/core/network/api_helper.dart';
 import 'package:fennac_app/helpers/shared_pref_helper.dart';
 import 'package:fennac_app/pages/auth/data/datasources/create_account_datasource.dart';
+import 'package:fennac_app/pages/auth/data/datasources/legal_content_datasource.dart';
 import 'package:fennac_app/pages/auth/data/datasources/login_datasource.dart';
 import 'package:fennac_app/pages/auth/data/repositories/create_account_repo_impl.dart';
+import 'package:fennac_app/pages/auth/data/repositories/legal_content_repo_impl.dart';
 import 'package:fennac_app/pages/auth/data/repositories/login_repo_impl.dart';
 import 'package:fennac_app/pages/auth/domain/repositories/create_account_repo.dart';
+import 'package:fennac_app/pages/auth/domain/repositories/legal_content_repo.dart';
 import 'package:fennac_app/pages/auth/domain/repositories/login_repo.dart';
 import 'package:fennac_app/pages/auth/domain/usecases/create_account_usecase.dart';
+import 'package:fennac_app/pages/auth/domain/usecases/legal_content_usecase.dart';
 import 'package:fennac_app/pages/auth/domain/usecases/login_usecase.dart';
 import 'package:fennac_app/pages/auth/presentation/bloc/cubit/auth_cubit.dart';
 import 'package:fennac_app/pages/auth/presentation/bloc/cubit/create_account_cubit.dart';
+import 'package:fennac_app/pages/auth/presentation/bloc/cubit/legal_content_cubit.dart';
 import 'package:fennac_app/pages/auth/presentation/bloc/cubit/login_cubit.dart';
 import 'package:fennac_app/pages/buy_poke/data/datasource/poke_datasource.dart';
 import 'package:fennac_app/pages/buy_poke/data/repository/poke_repository_impl.dart';
@@ -112,6 +117,9 @@ class Di {
       () => GroupsDataSourceImpl(sl()),
     );
     sl.registerLazySingleton<LoginDatasource>(() => LoginDatasourceImpl(sl()));
+    sl.registerLazySingleton<LegalContentDatasource>(
+      () => LegalContentDatasourceImpl(sl()),
+    );
     sl.registerLazySingleton<CreateGroupDatasource>(
       () => CreateGroupDatasourceImpl(sl()),
     );
@@ -141,6 +149,9 @@ class Di {
       () => CreateAccountRepoImpl(sl()),
     );
     sl.registerLazySingleton<LoginRepo>(() => LoginRepoImpl(sl()));
+    sl.registerLazySingleton<LegalContentRepo>(
+      () => LegalContentRepoImpl(sl()),
+    );
     sl.registerLazySingleton<GroupsRepository>(
       () => GroupsRepositoryImpl(sl()),
     );
@@ -176,6 +187,9 @@ class Di {
       () => CreateAccountUsecase(sl()),
     );
     sl.registerLazySingleton<LoginUsecase>(() => LoginUsecase(sl()));
+    sl.registerLazySingleton<LegalContentUsecase>(
+      () => LegalContentUsecase(sl()),
+    );
     sl.registerLazySingleton<GroupsUsecase>(() => GroupsUsecase(sl()));
     sl.registerLazySingleton<CreateGroupUsecase>(
       () => CreateGroupUsecase(sl()),
@@ -208,6 +222,7 @@ class Di {
     sl.registerLazySingleton<HomeCubit>(() => HomeCubit(sl()));
     sl.registerLazySingleton<GroupsCubit>(() => GroupsCubit(sl()));
     sl.registerLazySingleton<LoginCubit>(() => LoginCubit(sl()));
+    sl.registerLazySingleton<LegalContentCubit>(() => LegalContentCubit(sl()));
     sl.registerLazySingleton<HomeLandingCubit>(() => HomeLandingCubit(sl()));
     sl.registerLazySingleton<CreateGroupCubit>(() => CreateGroupCubit(sl()));
     sl.registerLazySingleton<FindGroupCubit>(() => FindGroupCubit(sl()));

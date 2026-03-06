@@ -35,6 +35,7 @@ class AppConstants {
   static const contactSupport = 'help-support/contact-support';
   static const fetchFaqs = 'help-support/faqs';
   static const reportProblem = 'help-support/report-problem';
+  static const legalContents = 'help-support/legal-contents';
   static const fetchPokeProducts = 'pokes/products';
 
   //!Agora Constants
