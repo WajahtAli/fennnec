@@ -10,7 +10,8 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:auto_route/auto_route.dart' as _i50;
-import 'package:collection/collection.dart' as _i54;
+import 'package:collection/collection.dart' as _i55;
+import 'package:fennac_app/app/constants/app_enums.dart' as _i52;
 import 'package:fennac_app/pages/auth/presentation/screen/create_account_screen.dart'
     as _i10;
 import 'package:fennac_app/pages/auth/presentation/screen/login_screen.dart'
@@ -33,7 +34,7 @@ import 'package:fennac_app/pages/call/presentation/screen/group_audio_call_scree
     as _i21;
 import 'package:fennac_app/pages/call/presentation/screen/video_call_screen.dart'
     as _i48;
-import 'package:fennac_app/pages/chats/data/models/message_model.dart' as _i53;
+import 'package:fennac_app/pages/chats/data/models/message_model.dart' as _i54;
 import 'package:fennac_app/pages/chats/presentation/screen/chat_landing_screen.dart'
     as _i8;
 import 'package:fennac_app/pages/chats/presentation/screen/group_chat_screen.dart'
@@ -50,6 +51,8 @@ import 'package:fennac_app/pages/create_group/presentation/screen/create_group_s
     as _i12;
 import 'package:fennac_app/pages/dashboard/presentation/screen/dashboard_screen.dart'
     as _i13;
+import 'package:fennac_app/pages/edit_profile/presentation/screen/edit_public_profile_screen.dart'
+    as _i16;
 import 'package:fennac_app/pages/filter/presentation/screen/distance_screen.dart'
     as _i14;
 import 'package:fennac_app/pages/filter/presentation/screen/filter_screen.dart'
@@ -58,7 +61,7 @@ import 'package:fennac_app/pages/find_group/presentation/screen/find_group_scree
     as _i19;
 import 'package:fennac_app/pages/get_poked/presentation/screen/get_pocked_screen.dart'
     as _i20;
-import 'package:fennac_app/pages/home/data/models/groups_model.dart' as _i52;
+import 'package:fennac_app/pages/home/data/models/groups_model.dart' as _i53;
 import 'package:fennac_app/pages/home/presentation/screen/home_screen.dart'
     as _i26;
 import 'package:fennac_app/pages/homelanding/presentation/screen/home_landing_screen.dart'
@@ -87,8 +90,6 @@ import 'package:fennac_app/pages/profile/presentation/screen/change_password.dar
     as _i7;
 import 'package:fennac_app/pages/profile/presentation/screen/contact_support_screen.dart'
     as _i9;
-import 'package:fennac_app/pages/edit_profile/presentation/screen/edit_public_profile_screen.dart'
-    as _i16;
 import 'package:fennac_app/pages/profile/presentation/screen/faq_screen.dart'
     as _i17;
 import 'package:fennac_app/pages/profile/presentation/screen/help_support_screen.dart'
@@ -508,10 +509,15 @@ class FindGroupRoute extends _i50.PageRouteInfo<FindGroupRouteArgs> {
   FindGroupRoute({
     _i51.Key? key,
     String? qrCode,
+    _i52.FindGroupScreenType? findGroupScreenType,
     List<_i50.PageRouteInfo>? children,
   }) : super(
          FindGroupRoute.name,
-         args: FindGroupRouteArgs(key: key, qrCode: qrCode),
+         args: FindGroupRouteArgs(
+           key: key,
+           qrCode: qrCode,
+           findGroupScreenType: findGroupScreenType,
+         ),
          initialChildren: children,
        );
 
@@ -523,32 +529,41 @@ class FindGroupRoute extends _i50.PageRouteInfo<FindGroupRouteArgs> {
       final args = data.argsAs<FindGroupRouteArgs>(
         orElse: () => const FindGroupRouteArgs(),
       );
-      return _i19.FindGroupScreen(key: args.key, qrCode: args.qrCode);
+      return _i19.FindGroupScreen(
+        key: args.key,
+        qrCode: args.qrCode,
+        findGroupScreenType: args.findGroupScreenType,
+      );
     },
   );
 }
 
 class FindGroupRouteArgs {
-  const FindGroupRouteArgs({this.key, this.qrCode});
+  const FindGroupRouteArgs({this.key, this.qrCode, this.findGroupScreenType});
 
   final _i51.Key? key;
 
   final String? qrCode;
 
+  final _i52.FindGroupScreenType? findGroupScreenType;
+
   @override
   String toString() {
-    return 'FindGroupRouteArgs{key: $key, qrCode: $qrCode}';
+    return 'FindGroupRouteArgs{key: $key, qrCode: $qrCode, findGroupScreenType: $findGroupScreenType}';
   }
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other is! FindGroupRouteArgs) return false;
-    return key == other.key && qrCode == other.qrCode;
+    return key == other.key &&
+        qrCode == other.qrCode &&
+        findGroupScreenType == other.findGroupScreenType;
   }
 
   @override
-  int get hashCode => key.hashCode ^ qrCode.hashCode;
+  int get hashCode =>
+      key.hashCode ^ qrCode.hashCode ^ findGroupScreenType.hashCode;
 }
 
 /// generated route for
@@ -556,7 +571,7 @@ class FindGroupRouteArgs {
 class GetPockedRoute extends _i50.PageRouteInfo<GetPockedRouteArgs> {
   GetPockedRoute({
     _i51.Key? key,
-    required _i52.Group group,
+    required _i53.Group group,
     List<_i50.PageRouteInfo>? children,
   }) : super(
          GetPockedRoute.name,
@@ -580,7 +595,7 @@ class GetPockedRouteArgs {
 
   final _i51.Key? key;
 
-  final _i52.Group group;
+  final _i53.Group group;
 
   @override
   String toString() {
@@ -603,7 +618,7 @@ class GetPockedRouteArgs {
 class GroupAudioCallRoute extends _i50.PageRouteInfo<GroupAudioCallRouteArgs> {
   GroupAudioCallRoute({
     _i51.Key? key,
-    required _i52.Group group,
+    required _i53.Group group,
     bool isVideoCall = false,
     List<_i50.PageRouteInfo>? children,
   }) : super(
@@ -640,7 +655,7 @@ class GroupAudioCallRouteArgs {
 
   final _i51.Key? key;
 
-  final _i52.Group group;
+  final _i53.Group group;
 
   final bool isVideoCall;
 
@@ -1152,7 +1167,7 @@ class ManageSubscriptionsRoute extends _i50.PageRouteInfo<void> {
 class MediaPreviewRoute extends _i50.PageRouteInfo<MediaPreviewRouteArgs> {
   MediaPreviewRoute({
     _i51.Key? key,
-    required List<_i53.MessageModel> messages,
+    required List<_i54.MessageModel> messages,
     required int initialIndex,
     List<_i50.PageRouteInfo>? children,
   }) : super(
@@ -1189,7 +1204,7 @@ class MediaPreviewRouteArgs {
 
   final _i51.Key? key;
 
-  final List<_i53.MessageModel> messages;
+  final List<_i54.MessageModel> messages;
 
   final int initialIndex;
 
@@ -1203,7 +1218,7 @@ class MediaPreviewRouteArgs {
     if (identical(this, other)) return true;
     if (other is! MediaPreviewRouteArgs) return false;
     return key == other.key &&
-        const _i54.ListEquality<_i53.MessageModel>().equals(
+        const _i55.ListEquality<_i54.MessageModel>().equals(
           messages,
           other.messages,
         ) &&
@@ -1213,7 +1228,7 @@ class MediaPreviewRouteArgs {
   @override
   int get hashCode =>
       key.hashCode ^
-      const _i54.ListEquality<_i53.MessageModel>().hash(messages) ^
+      const _i55.ListEquality<_i54.MessageModel>().hash(messages) ^
       initialIndex.hashCode;
 }
 

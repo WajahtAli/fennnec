@@ -22,3 +22,5 @@ enum CropType {
   square, // 1:1
   portrait, // 9:16
 }
+
+enum FindGroupScreenType { qrProfileCode, createGroup }

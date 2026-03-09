@@ -1,6 +1,7 @@
 import 'package:fennac_app/pages/find_group/domain/repository/find_group_repository.dart';
 import 'package:fennac_app/pages/find_group/data/datasource/find_group_datasource.dart';
 import 'package:fennac_app/pages/my_group/data/model/my_group_model.dart';
+import '../model/qr_member_model.dart';
 
 class FindGroupRepositoryImpl extends FindGroupRepository {
   final FindGroupDatasource _datasource;
@@ -15,5 +16,10 @@ class FindGroupRepositoryImpl extends FindGroupRepository {
   @override
   Future<dynamic> joinGroupByQr(String qrCode) async {
     return await _datasource.joinGroupByQr(qrCode);
+  }
+
+  @override
+  Future<QrMemberModel> fetchMemberByQr(String qrCode) async {
+    return await _datasource.fetchMemberByQr(qrCode);
   }
 }

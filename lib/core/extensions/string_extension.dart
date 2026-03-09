@@ -30,6 +30,14 @@ extension StringExtension on String {
       contains(".m4a") ||
       contains(".M4A");
 
+  bool get isVideoUrl => startsWith("http") && (isVideo || isImage || isAudio);
+
+  bool get isVideoFile => isVideo && !isVideoUrl;
+
+  bool get isImageUrl => isImage && startsWith("http");
+
+  bool get isAudioUrl => isAudio && !isVideoUrl;
+
   String capitalize() {
     if (isEmpty) return this;
     return this[0].toUpperCase() + substring(1);

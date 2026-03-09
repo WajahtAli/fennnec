@@ -6,6 +6,7 @@ import 'package:fennac_app/app/constants/media_query_constants.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/core/di_container.dart';
+import 'package:fennac_app/core/extensions/string_extension.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:fennac_app/helpers/cached_network_image_helper.dart';
 import 'package:fennac_app/pages/create_group/presentation/screen/create_group_gallery_screen.dart';
@@ -24,6 +25,7 @@ import 'package:flutter_svg/svg.dart';
 import 'dart:math' as math;
 import 'package:fennac_app/pages/kyc/presentation/bloc/cubit/kyc_prompt_cubit.dart';
 import 'package:fennac_app/widgets/prompt_audio_row.dart';
+import '../../../../reusable_widgets/custom_video_player.dart';
 import '../../../../reusable_widgets/group_card.dart' show GroupCard;
 import '../../../../reusable_widgets/group_settings_widget.dart';
 import '../../data/model/my_group_model.dart';
@@ -261,7 +263,16 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
                       : Colors.grey[300],
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: photosVideos?[index].startsWith('http') ?? false
+                child: photosVideos?[index].isVideo ?? false
+                    ? CustomVideoPlayer(
+                        videoUrl: photosVideos?[index] ?? '',
+                        aspectRatio: 1,
+                        height: 400,
+                        borderRadius: BorderRadius.circular(16),
+                        showControls: true,
+                        sourceType: VideoSourceType.network,
+                      )
+                    : photosVideos?[index].isImageUrl ?? false
                     ? CachedImageHelper(
                         imageUrl: photosVideos?[index] ?? '',
                         fit: BoxFit.cover,

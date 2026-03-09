@@ -12,6 +12,8 @@ import 'package:fennac_app/widgets/movable_background.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../app/constants/app_enums.dart';
+
 @RoutePage()
 class AddMemberScreen extends StatefulWidget {
   const AddMemberScreen({super.key});
@@ -59,11 +61,14 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
                         const Spacer(),
                         Text('Add Member', style: AppTextStyles.h4(context)),
                         const Spacer(),
-
-                        // const SizedBox(width: 48),
                         InkWell(
                           onTap: () {
-                            AutoRouter.of(context).push(FindGroupRoute());
+                            AutoRouter.of(context).push(
+                              FindGroupRoute(
+                                findGroupScreenType:
+                                    FindGroupScreenType.qrProfileCode,
+                              ),
+                            );
                           },
                           child: Icon(
                             Icons.qr_code_2,
