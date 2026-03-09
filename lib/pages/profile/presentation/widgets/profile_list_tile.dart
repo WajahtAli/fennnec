@@ -90,8 +90,8 @@ class ProfileListTile extends StatelessWidget {
                       .myGroupList
                       ?.groupList
                       ?.firstOrNull;
-                  final groupImages = firstGroup?.photosVideos
-                      ?.where((path) => path.trim().isNotEmpty)
+                  final groupImages = firstGroup?.members
+                      ?.map((member) => member.image)
                       .toList();
 
                   final avatarPaths =
@@ -108,7 +108,7 @@ class ProfileListTile extends StatelessWidget {
                   return MemberAvatarWidget(
                     avatarSize: 32,
                     overlap: 24,
-                    avatarPaths: avatarPaths,
+                    avatarPaths: validateStringList(avatarPaths),
                   );
                 },
               ),

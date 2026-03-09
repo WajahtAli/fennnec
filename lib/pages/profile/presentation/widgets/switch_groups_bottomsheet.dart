@@ -8,6 +8,7 @@ import 'package:fennac_app/pages/my_group/presentation/bloc/cubit/my_group_cubit
 import 'package:fennac_app/pages/my_group/presentation/bloc/state/my_group_state.dart';
 import 'package:fennac_app/reusable_widgets/member_avatar_widget.dart';
 import 'package:fennac_app/skeletons/group_card_skeleton.dart';
+import 'package:fennac_app/utils/validators.dart';
 import 'package:fennac_app/widgets/custom_sized_box.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -101,10 +102,10 @@ class _SwitchGroupsBottomSheetState extends State<SwitchGroupsBottomSheet> {
                   itemBuilder: (context, index) {
                     final group = groupList[index];
                     final apiAvatars =
-                        group.photosVideos
-                            ?.where((path) => path.trim().isNotEmpty)
-                            .toList() ??
+                        group.members?.map((member) => member.image).toList() ??
                         [];
+
+                    [];
                     final avatarPaths = apiAvatars.isNotEmpty
                         ? apiAvatars
                         : [
@@ -118,10 +119,8 @@ class _SwitchGroupsBottomSheetState extends State<SwitchGroupsBottomSheet> {
                       builder: (context, selectedIndex, child) {
                         final isSelected = selectedIndex == index;
                         return _SelectableGroupCard(
-                          title:
-                              group.titleMembers ??
-                              'Brenda, Nancy, Jeff, Anna & You',
-                          avatarPaths: avatarPaths,
+                          title: group.titleMembers ?? '',
+                          avatarPaths: validateStringList(avatarPaths),
                           isSelected: isSelected,
                           onTap: () {
                             _selectedGroupIndex.value = index;

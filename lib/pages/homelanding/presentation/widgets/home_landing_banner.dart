@@ -27,7 +27,6 @@ class HomeLandingBanner extends StatelessWidget {
               : null;
           final group = firstInvitation?.group;
           final inviter = firstInvitation?.inviter;
-
           // Get member names
           final memberNames = group?.members != null
               ? group!.members!
@@ -35,12 +34,10 @@ class HomeLandingBanner extends StatelessWidget {
                     .where((name) => name.isNotEmpty)
                     .join(',\t')
               : 'Group Members';
-
           // Get inviter name
           final inviterName = inviter != null
               ? '${inviter.firstName ?? ''} ${inviter.lastName ?? ''}'.trim()
               : 'Group Creator';
-
           return Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [

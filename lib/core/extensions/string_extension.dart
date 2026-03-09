@@ -30,8 +30,6 @@ extension StringExtension on String {
       contains(".m4a") ||
       contains(".M4A");
 
-  bool get isUrl => Uri.tryParse(this) != null;
-
   String capitalize() {
     if (isEmpty) return this;
     return this[0].toUpperCase() + substring(1);

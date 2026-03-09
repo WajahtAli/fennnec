@@ -9,4 +9,8 @@ class FindGroupUsecase {
   Future<MyGroupModel> fetchGroupByQr(String qrCode) async {
     return await _repository.fetchGroupByQr(qrCode);
   }
+
+  Future<dynamic> joinGroupByQr(String qrCode) async {
+    return await _repository.joinGroupByQr(qrCode);
+  }
 }

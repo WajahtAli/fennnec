@@ -68,6 +68,10 @@ bool validateBool(var data) {
   return false;
 }
 
+List<String> validateStringList(List<String?> input) {
+  return input.whereType<String>().toList();
+}
+
 final nameRegex = RegExp(
   r'^[a-zA-Z ]+$|^[\u0600-\u06FF ]+$|^[\u0980-\u09FF ]+$',
 );

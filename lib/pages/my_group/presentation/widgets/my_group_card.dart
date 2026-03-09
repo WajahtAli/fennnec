@@ -6,6 +6,7 @@ import 'package:fennac_app/pages/profile/presentation/widgets/group_option_botto
 import 'package:fennac_app/reusable_widgets/group_card.dart';
 import 'package:fennac_app/routes/routes_imports.gr.dart';
 import 'package:fennac_app/skeletons/group_card_skeleton.dart';
+import 'package:fennac_app/utils/validators.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -91,10 +92,8 @@ class _MyGroupCardState extends State<MyGroupCard> {
           itemBuilder: (context, index) {
             final group = groupList?[index];
             final apiAvatars =
-                group?.photosVideos
-                    ?.where((path) => path.trim().isNotEmpty)
-                    .toList() ??
-                [];
+                group?.members?.map((member) => member.image).toList() ?? [];
+
             final avatarPaths = apiAvatars.isNotEmpty
                 ? apiAvatars
                 : [
@@ -107,7 +106,7 @@ class _MyGroupCardState extends State<MyGroupCard> {
             return GroupCard(
               title: group?.titleMembers ?? '',
               subtitle: group?.bio ?? '',
-              avatarPaths: avatarPaths,
+              avatarPaths: validateStringList(avatarPaths),
               onMenuPressed: widget.isEditMode
                   ? () {
                       AutoRouter.of(

@@ -11,6 +11,7 @@ import 'package:fennac_app/pages/my_group/presentation/bloc/cubit/my_group_cubit
 import 'package:fennac_app/reusable_widgets/animated_background_container.dart';
 import 'package:fennac_app/reusable_widgets/group_card.dart';
 import 'package:fennac_app/routes/routes_imports.gr.dart';
+import 'package:fennac_app/utils/validators.dart';
 import 'package:fennac_app/widgets/custom_bottom_sheet.dart';
 import 'package:fennac_app/widgets/custom_elevated_button.dart';
 import 'package:fennac_app/widgets/custom_sized_box.dart';
@@ -65,11 +66,9 @@ class GroupOptionsBottomSheet extends StatelessWidget {
           Builder(
             builder: (context) {
               final apiAvatars =
-                  groupData.photosVideos
-                      ?.where((path) => path.trim().isNotEmpty)
-                      .toList() ??
+                  groupData.members?.map((member) => member.image).toList() ??
                   [];
-              List<String> avatarPaths = apiAvatars.isNotEmpty
+              List<String?> avatarPaths = apiAvatars.isNotEmpty
                   ? apiAvatars
                   : [];
 
@@ -82,7 +81,7 @@ class GroupOptionsBottomSheet extends StatelessWidget {
                 title:
                     groupData.titleMembers ?? 'Brenda, Nancy, Jeff, Anna & You',
                 subtitle: groupData.bio ?? 'A group for Flutter developers',
-                avatarPaths: avatarPaths,
+                avatarPaths: validateStringList(avatarPaths),
               );
             },
           ),

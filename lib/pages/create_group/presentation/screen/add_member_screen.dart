@@ -1,10 +1,12 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:fennac_app/app/constants/media_query_constants.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/pages/create_group/presentation/bloc/cubit/contact_list_cubit.dart';
 import 'package:fennac_app/pages/create_group/presentation/bloc/state/contact_list_state.dart';
 import 'package:fennac_app/pages/create_group/presentation/widgets/add_member_body.dart';
 import 'package:fennac_app/pages/create_group/presentation/widgets/add_member_search_bar.dart';
+import 'package:fennac_app/routes/routes_imports.gr.dart';
 import 'package:fennac_app/widgets/custom_back_button.dart';
 import 'package:fennac_app/widgets/movable_background.dart';
 import 'package:flutter/material.dart';
@@ -57,7 +59,19 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
                         const Spacer(),
                         Text('Add Member', style: AppTextStyles.h4(context)),
                         const Spacer(),
-                        const SizedBox(width: 48),
+
+                        // const SizedBox(width: 48),
+                        InkWell(
+                          onTap: () {
+                            AutoRouter.of(context).push(FindGroupRoute());
+                          },
+                          child: Icon(
+                            Icons.qr_code_2,
+                            color: isLightTheme(context)
+                                ? Colors.black54
+                                : Colors.white70,
+                          ),
+                        ),
                       ],
                     ),
                   ),

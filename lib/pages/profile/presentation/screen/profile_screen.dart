@@ -165,6 +165,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 isGroupTile: true,
                 showDivider: false,
               ),
+              ProfileListTile(
+                title: 'Create a Group',
+                onTap: () {
+                  AutoRouter.of(context).push(CreateGroupRoute());
+                },
+                showDivider: true,
+              ),
+              ProfileListTile(
+                title: 'Find a Group with QR Code',
+                onTap: () {
+                  AutoRouter.of(context).push(FindGroupRoute());
+                },
+              ),
             ],
           ),
         ),

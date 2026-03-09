@@ -4,11 +4,13 @@ import 'package:auto_route/auto_route.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/core/di_container.dart';
+import 'package:fennac_app/helpers/qr_helper.dart';
 import 'package:fennac_app/pages/auth/presentation/bloc/cubit/login_cubit.dart';
 import 'package:fennac_app/pages/home/presentation/bloc/cubit/home_cubit.dart';
 import 'package:fennac_app/pages/home/presentation/widgets/group_gallery_widget.dart';
 import 'package:fennac_app/routes/routes_imports.gr.dart';
 import 'package:fennac_app/utils/validators.dart';
+import 'package:fennac_app/widgets/custom_elevated_button.dart';
 import 'package:fennac_app/widgets/custom_sized_box.dart';
 import 'package:fennac_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
@@ -66,7 +68,109 @@ class _ProfileHeaderState extends State<ProfileHeader> {
           return Column(
             children: [
               if (widget.showAvatar == true) ...[
-                ProfileAvatar(imageUrl: avatarUrl, size: 128),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    ProfileAvatar(imageUrl: avatarUrl, size: 128),
+                    InkWell(
+                      onTap: () {
+                        showModalBottomSheet(
+                          context: context,
+                          backgroundColor: Colors.transparent,
+                          isScrollControlled: true,
+                          builder: (context) => Container(
+                            height: getHeight(context) * 0.55,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              gradient: isLightTheme(context)
+                                  ? null
+                                  : const LinearGradient(
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                      colors: [
+                                        Color(0xFF16003F),
+                                        Color(0xFF111111),
+                                      ],
+                                    ),
+                              color: isLightTheme(context)
+                                  ? Colors.white
+                                  : null,
+                              borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(32),
+                                topRight: Radius.circular(32),
+                              ),
+                            ),
+                            padding: const EdgeInsets.only(
+                              top: 24,
+                              right: 24,
+                              bottom: 48,
+                              left: 24,
+                            ),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                SizedBox(
+                                  width: 370,
+                                  child: Text(
+                                    'Share this QR Code with your friends',
+                                    style: AppTextStyles.h3(context).copyWith(
+                                      color: isLightTheme(context)
+                                          ? Colors.black
+                                          : Colors.white,
+                                    ),
+                                  ),
+                                ),
+                                const CustomSizedBox(height: 32),
+                                Container(
+                                  width: 272,
+                                  height: 272,
+                                  padding: const EdgeInsets.all(14),
+                                  decoration: BoxDecoration(
+                                    color: ColorPalette.primary,
+                                    borderRadius: BorderRadius.circular(24),
+                                    border: Border.all(
+                                      color: ColorPalette.white,
+                                      width: 4,
+                                    ),
+                                    boxShadow: isDarkTheme(context)
+                                        ? [
+                                            BoxShadow(
+                                              color: ColorPalette.primary,
+                                              blurRadius: 10,
+                                              offset: const Offset(0, 3),
+                                              spreadRadius: 3,
+                                            ),
+                                          ]
+                                        : null,
+                                  ),
+                                  child: QrHelper(
+                                    data:
+                                        _loginCubit.userData?.user?.qrCode ??
+                                        'Group QR Code Data',
+                                  ),
+                                ),
+                                const CustomSizedBox(height: 32),
+
+                                CustomElevatedButton(
+                                  text: 'Done',
+                                  onTap: () {
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                      child: Icon(
+                        Icons.qr_code_2,
+                        size: 32,
+                        color: ColorPalette.grey,
+                      ),
+                    ),
+                  ],
+                ),
                 const CustomSizedBox(height: 16),
               ],
               if (widget.isEditMode == true)

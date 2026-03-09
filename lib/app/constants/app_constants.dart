@@ -30,13 +30,14 @@ class AppConstants {
   static const requestContactChange = 'auth/request-contact-change';
   static const verifyContactChange = 'auth/verify-contact-change';
   static const changePassword = 'auth/change-password';
+  static const notificationSettings = 'notification-settings';
   static const acceptGroupRequest = 'groups/accept-decline';
   static const chatAndCalls = 'groups/accept-decline';
   static const contactSupport = 'help-support/contact-support';
   static const fetchFaqs = 'help-support/faqs';
   static const reportProblem = 'help-support/report-problem';
-  static const legalContents = 'help-support/legal-contents';
   static const fetchPokeProducts = 'pokes/products';
+  static const legalContents = 'help-support/legal-contents';
 
   //!Agora Constants
   static const agoraAppId = "e02d6c955f5947f0a671b1b2dbb67514";

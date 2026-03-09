@@ -14,6 +14,7 @@ import 'package:fennac_app/pages/my_group/presentation/bloc/state/my_group_state
 import 'package:fennac_app/reusable_widgets/custom_app_bar.dart';
 import 'package:fennac_app/routes/routes_imports.gr.dart';
 import 'package:fennac_app/skeletons/edit_group_skeleton.dart';
+import 'package:fennac_app/utils/validators.dart';
 import 'package:fennac_app/widgets/custom_sized_box.dart';
 import 'package:fennac_app/widgets/movable_background.dart';
 import 'package:flutter/material.dart';
@@ -109,6 +110,11 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
                 }
 
                 final groupData = _myGroupCubit.myGroupModel?.data;
+                final avatarPaths =
+                    groupData?.members
+                        ?.map((member) => member.image)
+                        .toList() ??
+                    [];
                 if (groupData == null) {
                   return Center(
                     child: Text(
@@ -131,7 +137,7 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
                     GroupCard(
                       title: groupData.titleMembers ?? '',
                       subtitle: groupData.bio ?? '',
-                      avatarPaths: groupData.photosVideos ?? [],
+                      avatarPaths: validateStringList(avatarPaths),
                       onMenuPressed: () {
                         AutoRouter.of(
                           context,
@@ -142,10 +148,8 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
                     ),
                     _buildPhotosVideosGrid(context),
                     const CustomSizedBox(height: 24),
-
                     _buildPromptsSection(context),
                     const CustomSizedBox(height: 24),
-
                     _buildGroupSettingsSection(context),
                     const CustomSizedBox(height: 32),
                   ],
@@ -448,9 +452,7 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
                   oldId: prompt.id,
                   promptText: promptTitle,
                   promptAnswer: promptAnswer,
-                  isCustom: !DummyConstants.predefinedPrompts.contains(
-                    promptTitle,
-                  ),
+                  isCustom: false,
                   waveformData: prompt.waves,
                   duration: prompt.duration?.toString() ?? "15:00",
                 );

@@ -1,10 +1,5 @@
-// To parse this JSON data, do
-//
-//     final loginModel = loginModelFromJson(jsonString);
-
 import 'dart:convert';
 import 'package:fennac_app/pages/auth/data/model/prompt_model.dart';
-
 import '../../../../utils/validators.dart';
 
 LoginModel loginModelFromJson(String str) =>
@@ -77,9 +72,9 @@ class LoginData {
     prompts: json["prompts"] == null
         ? []
         : List<Prompt>.from(json["prompts"].map((x) => Prompt.fromJson(x))),
-    accessToken: json["accessToken"],
-    refreshToken: json["refreshToken"],
-    deviceFingerprint: json["deviceFingerprint"],
+    accessToken: json["accessToken"]?.toString(),
+    refreshToken: json["refreshToken"]?.toString(),
+    deviceFingerprint: json["deviceFingerprint"]?.toString(),
     deviceInfo: json["deviceInfo"] == null
         ? null
         : DeviceInfo.fromJson(json["deviceInfo"]),
@@ -123,10 +118,10 @@ class DeviceInfo {
   );
 
   factory DeviceInfo.fromJson(Map<String, dynamic> json) => DeviceInfo(
-    userAgent: json["userAgent"],
-    acceptLanguage: json["acceptLanguage"],
-    acceptEncoding: json["acceptEncoding"],
-    ip: json["ip"],
+    userAgent: json["userAgent"]?.toString(),
+    acceptLanguage: json["acceptLanguage"]?.toString(),
+    acceptEncoding: json["acceptEncoding"]?.toString(),
+    ip: json["ip"]?.toString(),
   );
 
   Map<String, dynamic> toJson() => {
@@ -160,6 +155,24 @@ class LoginUser {
   String? shortBio;
   Vibes? vibes;
 
+  /// NEW FIELDS
+  String? countryCode;
+  String? firebaseUserId;
+  String? userImage;
+  String? verifiedAt;
+  String? latitude;
+  String? longitude;
+  String? address;
+  String? zipCode;
+  String? fcmToken;
+  String? qrCode;
+  String? subscriptionActive;
+  String? pokeBalance;
+  String? accountStatus;
+  NotificationSettings? notificationSettings;
+  PrivacyPermissions? privacyPermissions;
+  String? subscriptionExpiresAt;
+
   LoginUser({
     this.authType,
     this.isVerified,
@@ -182,6 +195,22 @@ class LoginUser {
     this.sexualOrientation,
     this.shortBio,
     this.vibes,
+    this.countryCode,
+    this.firebaseUserId,
+    this.userImage,
+    this.verifiedAt,
+    this.latitude,
+    this.longitude,
+    this.address,
+    this.zipCode,
+    this.fcmToken,
+    this.qrCode,
+    this.subscriptionActive,
+    this.pokeBalance,
+    this.accountStatus,
+    this.notificationSettings,
+    this.privacyPermissions,
+    this.subscriptionExpiresAt,
   });
 
   LoginUser copyWith({
@@ -206,6 +235,22 @@ class LoginUser {
     List<String>? sexualOrientation,
     String? shortBio,
     Vibes? vibes,
+    String? countryCode,
+    String? firebaseUserId,
+    String? userImage,
+    String? verifiedAt,
+    String? latitude,
+    String? longitude,
+    String? address,
+    String? zipCode,
+    String? fcmToken,
+    String? qrCode,
+    String? subscriptionActive,
+    String? pokeBalance,
+    String? accountStatus,
+    NotificationSettings? notificationSettings,
+    PrivacyPermissions? privacyPermissions,
+    String? subscriptionExpiresAt,
   }) => LoginUser(
     authType: authType ?? this.authType,
     isVerified: isVerified ?? this.isVerified,
@@ -228,6 +273,22 @@ class LoginUser {
     sexualOrientation: sexualOrientation ?? this.sexualOrientation,
     shortBio: shortBio ?? this.shortBio,
     vibes: vibes ?? this.vibes,
+    countryCode: countryCode ?? this.countryCode,
+    firebaseUserId: firebaseUserId ?? this.firebaseUserId,
+    userImage: userImage ?? this.userImage,
+    verifiedAt: verifiedAt ?? this.verifiedAt,
+    latitude: latitude ?? this.latitude,
+    longitude: longitude ?? this.longitude,
+    address: address ?? this.address,
+    zipCode: zipCode ?? this.zipCode,
+    fcmToken: fcmToken ?? this.fcmToken,
+    qrCode: qrCode ?? this.qrCode,
+    subscriptionActive: subscriptionActive ?? this.subscriptionActive,
+    pokeBalance: pokeBalance ?? this.pokeBalance,
+    accountStatus: accountStatus ?? this.accountStatus,
+    notificationSettings: notificationSettings ?? this.notificationSettings,
+    privacyPermissions: privacyPermissions ?? this.privacyPermissions,
+    subscriptionExpiresAt: subscriptionExpiresAt ?? this.subscriptionExpiresAt,
   );
 
   factory LoginUser.fromJson(Map<String, dynamic> json) => LoginUser(
@@ -248,20 +309,42 @@ class LoginUser {
     v: validateInt(json["__v"]),
     bestShorts: json["bestShorts"] == null
         ? []
-        : List<String>.from(json["bestShorts"]!.map((x) => x)),
+        : List<String>.from(json["bestShorts"].map((x) => x)),
     dob: json["dob"] == null ? null : DateTime.parse(json["dob"]),
     education: validateString(json["education"]),
     gender: validateString(json["gender"]),
     jobTitle: validateString(json["jobTitle"]),
     lifestyleLikes: json["lifestyleLikes"] == null
         ? []
-        : List<String>.from(json["lifestyleLikes"]!.map((x) => x)),
+        : List<String>.from(json["lifestyleLikes"].map((x) => x)),
     pronouns: validateString(json["pronouns"]),
     sexualOrientation: json["sexualOrientation"] == null
         ? []
-        : List<String>.from(json["sexualOrientation"]!.map((x) => x)),
+        : List<String>.from(json["sexualOrientation"].map((x) => x)),
     shortBio: validateString(json["shortBio"]),
     vibes: json["vibes"] == null ? null : Vibes.fromJson(json["vibes"]),
+
+    /// NEW PARSING
+    countryCode: json["countryCode"]?.toString(),
+    firebaseUserId: json["firebaseUserId"]?.toString(),
+    userImage: json["userImage"]?.toString(),
+    verifiedAt: json["verifiedAt"]?.toString(),
+    latitude: json["latitude"]?.toString(),
+    longitude: json["longitude"]?.toString(),
+    address: json["address"]?.toString(),
+    zipCode: json["zipCode"]?.toString(),
+    fcmToken: json["fcmToken"]?.toString(),
+    qrCode: json["qrCode"]?.toString(),
+    subscriptionActive: json["subscriptionActive"]?.toString(),
+    pokeBalance: json["pokeBalance"]?.toString(),
+    accountStatus: json["accountStatus"]?.toString(),
+    notificationSettings: json["notificationSettings"] == null
+        ? null
+        : NotificationSettings.fromJson(json["notificationSettings"]),
+    privacyPermissions: json["privacyPermissions"] == null
+        ? null
+        : PrivacyPermissions.fromJson(json["privacyPermissions"]),
+    subscriptionExpiresAt: json["subscriptionExpiresAt"]?.toString(),
   );
 
   Map<String, dynamic> toJson() => {
@@ -276,22 +359,112 @@ class LoginUser {
     "createdAt": createdAt?.toIso8601String(),
     "updatedAt": updatedAt?.toIso8601String(),
     "__v": v,
-    "bestShorts": bestShorts == null
-        ? []
-        : List<dynamic>.from(bestShorts!.map((x) => x)),
+    "bestShorts": bestShorts,
     "dob": dob?.toIso8601String(),
     "education": education,
     "gender": gender,
     "jobTitle": jobTitle,
-    "lifestyleLikes": lifestyleLikes == null
-        ? []
-        : List<dynamic>.from(lifestyleLikes!.map((x) => x)),
+    "lifestyleLikes": lifestyleLikes,
     "pronouns": pronouns,
-    "sexualOrientation": sexualOrientation == null
-        ? []
-        : List<dynamic>.from(sexualOrientation!.map((x) => x)),
+    "sexualOrientation": sexualOrientation,
     "shortBio": shortBio,
     "vibes": vibes?.toJson(),
+
+    /// NEW
+    "countryCode": countryCode,
+    "firebaseUserId": firebaseUserId,
+    "userImage": userImage,
+    "verifiedAt": verifiedAt,
+    "latitude": latitude,
+    "longitude": longitude,
+    "address": address,
+    "zipCode": zipCode,
+    "fcmToken": fcmToken,
+    "qrCode": qrCode,
+    "subscriptionActive": subscriptionActive,
+    "pokeBalance": pokeBalance,
+    "accountStatus": accountStatus,
+    "notificationSettings": notificationSettings?.toJson(),
+    "privacyPermissions": privacyPermissions?.toJson(),
+    "subscriptionExpiresAt": subscriptionExpiresAt,
+  };
+}
+
+class NotificationSettings {
+  String? groupMatches;
+  String? newLikes;
+  String? newPokes;
+  String? newMessages;
+  String? callsAndMissedCalls;
+  String? messageReactions;
+  String? mentionsAndReplies;
+  String? groupInvitesAndRequests;
+  String? appAnnouncements;
+  String? email;
+
+  NotificationSettings({
+    this.groupMatches,
+    this.newLikes,
+    this.newPokes,
+    this.newMessages,
+    this.callsAndMissedCalls,
+    this.messageReactions,
+    this.mentionsAndReplies,
+    this.groupInvitesAndRequests,
+    this.appAnnouncements,
+    this.email,
+  });
+
+  NotificationSettings copyWith({
+    String? groupMatches,
+    String? newLikes,
+    String? newPokes,
+    String? newMessages,
+    String? callsAndMissedCalls,
+    String? messageReactions,
+    String? mentionsAndReplies,
+    String? groupInvitesAndRequests,
+    String? appAnnouncements,
+    String? email,
+  }) => NotificationSettings(
+    groupMatches: groupMatches ?? this.groupMatches,
+    newLikes: newLikes ?? this.newLikes,
+    newPokes: newPokes ?? this.newPokes,
+    newMessages: newMessages ?? this.newMessages,
+    callsAndMissedCalls: callsAndMissedCalls ?? this.callsAndMissedCalls,
+    messageReactions: messageReactions ?? this.messageReactions,
+    mentionsAndReplies: mentionsAndReplies ?? this.mentionsAndReplies,
+    groupInvitesAndRequests:
+        groupInvitesAndRequests ?? this.groupInvitesAndRequests,
+    appAnnouncements: appAnnouncements ?? this.appAnnouncements,
+    email: email ?? this.email,
+  );
+
+  factory NotificationSettings.fromJson(Map<String, dynamic> json) =>
+      NotificationSettings(
+        groupMatches: json["groupMatches"]?.toString(),
+        newLikes: json["newLikes"]?.toString(),
+        newPokes: json["newPokes"]?.toString(),
+        newMessages: json["newMessages"]?.toString(),
+        callsAndMissedCalls: json["callsAndMissedCalls"]?.toString(),
+        messageReactions: json["messageReactions"]?.toString(),
+        mentionsAndReplies: json["mentionsAndReplies"]?.toString(),
+        groupInvitesAndRequests: json["groupInvitesAndRequests"]?.toString(),
+        appAnnouncements: json["appAnnouncements"]?.toString(),
+        email: json["email"]?.toString(),
+      );
+
+  Map<String, dynamic> toJson() => {
+    "groupMatches": groupMatches,
+    "newLikes": newLikes,
+    "newPokes": newPokes,
+    "newMessages": newMessages,
+    "callsAndMissedCalls": callsAndMissedCalls,
+    "messageReactions": messageReactions,
+    "mentionsAndReplies": mentionsAndReplies,
+    "groupInvitesAndRequests": groupInvitesAndRequests,
+    "appAnnouncements": appAnnouncements,
+    "email": email,
   };
 }
 
@@ -303,7 +476,6 @@ class Vibes {
   List<String>? techAndGaming;
   dynamic readingAndLearning;
   dynamic otherFunInterests;
-
   Vibes({
     this.sportsAndOutdoor,
     this.foodAndDrink,
@@ -313,7 +485,6 @@ class Vibes {
     this.readingAndLearning,
     this.otherFunInterests,
   });
-
   Vibes copyWith({
     List<String>? sportsAndOutdoor,
     List<String>? foodAndDrink,
@@ -331,7 +502,6 @@ class Vibes {
     readingAndLearning: readingAndLearning ?? this.readingAndLearning,
     otherFunInterests: otherFunInterests ?? this.otherFunInterests,
   );
-
   factory Vibes.fromJson(Map<String, dynamic> json) => Vibes(
     sportsAndOutdoor: json["sports and outdoor"] == null
         ? []
@@ -351,7 +521,6 @@ class Vibes {
     readingAndLearning: json["reading and learning"],
     otherFunInterests: json["other fun interests"],
   );
-
   Map<String, dynamic> toJson() => {
     "sports and outdoor": sportsAndOutdoor == null
         ? []
@@ -370,5 +539,48 @@ class Vibes {
         : List<dynamic>.from(techAndGaming!.map((x) => x)),
     "reading and learning": readingAndLearning,
     "other fun interests": otherFunInterests,
+  };
+}
+
+class PrivacyPermissions {
+  String? activityStatusEnabled;
+  String? locationSharingEnabled;
+  String? contactAccessEnabled;
+  String? mediaPermissionsEnabled;
+
+  PrivacyPermissions({
+    this.activityStatusEnabled,
+    this.locationSharingEnabled,
+    this.contactAccessEnabled,
+    this.mediaPermissionsEnabled,
+  });
+
+  PrivacyPermissions copyWith({
+    String? activityStatusEnabled,
+    String? locationSharingEnabled,
+    String? contactAccessEnabled,
+    String? mediaPermissionsEnabled,
+  }) => PrivacyPermissions(
+    activityStatusEnabled: activityStatusEnabled ?? this.activityStatusEnabled,
+    locationSharingEnabled:
+        locationSharingEnabled ?? this.locationSharingEnabled,
+    contactAccessEnabled: contactAccessEnabled ?? this.contactAccessEnabled,
+    mediaPermissionsEnabled:
+        mediaPermissionsEnabled ?? this.mediaPermissionsEnabled,
+  );
+
+  factory PrivacyPermissions.fromJson(Map<String, dynamic> json) =>
+      PrivacyPermissions(
+        activityStatusEnabled: json["activityStatusEnabled"]?.toString(),
+        locationSharingEnabled: json["locationSharingEnabled"]?.toString(),
+        contactAccessEnabled: json["contactAccessEnabled"]?.toString(),
+        mediaPermissionsEnabled: json["mediaPermissionsEnabled"]?.toString(),
+      );
+
+  Map<String, dynamic> toJson() => {
+    "activityStatusEnabled": activityStatusEnabled,
+    "locationSharingEnabled": locationSharingEnabled,
+    "contactAccessEnabled": contactAccessEnabled,
+    "mediaPermissionsEnabled": mediaPermissionsEnabled,
   };
 }

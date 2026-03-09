@@ -11,4 +11,9 @@ class FindGroupRepositoryImpl extends FindGroupRepository {
   Future<MyGroupModel> fetchGroupByQr(String qrCode) async {
     return await _datasource.fetchGroupByQr(qrCode);
   }
+
+  @override
+  Future<dynamic> joinGroupByQr(String qrCode) async {
+    return await _datasource.joinGroupByQr(qrCode);
+  }
 }

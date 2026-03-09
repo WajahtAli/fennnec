@@ -177,19 +177,22 @@ class CreatedBy {
   String? firstName;
   String? lastName;
   String? email;
+  String? image;
 
-  CreatedBy({this.id, this.firstName, this.lastName, this.email});
+  CreatedBy({this.id, this.firstName, this.lastName, this.email, this.image});
 
   CreatedBy copyWith({
     String? id,
     String? firstName,
     String? lastName,
     String? email,
+    String? immage,
   }) => CreatedBy(
     id: id ?? this.id,
     firstName: firstName ?? this.firstName,
     lastName: lastName ?? this.lastName,
     email: email ?? this.email,
+    image: image ?? image,
   );
 
   factory CreatedBy.fromJson(Map<String, dynamic> json) => CreatedBy(
@@ -197,6 +200,7 @@ class CreatedBy {
     firstName: json["firstName"],
     lastName: json["lastName"],
     email: json["email"],
+    image: json["image"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -204,6 +208,7 @@ class CreatedBy {
     "firstName": firstName,
     "lastName": lastName,
     "email": email,
+    "image": image,
   };
 }
 

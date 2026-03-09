@@ -2,7 +2,6 @@ import 'dart:io';
 import 'dart:ui' as ui;
 
 import 'package:auto_route/auto_route.dart';
-import 'package:camera/camera.dart';
 import 'package:fennac_app/app/constants/media_query_constants.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/core/di_container.dart';
@@ -14,9 +13,10 @@ import 'package:fennac_app/reusable_widgets/custom_app_bar.dart';
 import 'package:fennac_app/reusable_widgets/group_card.dart';
 import 'package:fennac_app/routes/routes_imports.gr.dart';
 import 'package:fennac_app/skeletons/group_card_skeleton.dart';
+import 'package:fennac_app/utils/validators.dart';
 import 'package:fennac_app/widgets/custom_elevated_button.dart';
 import 'package:fennac_app/widgets/movable_background.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:lottie/lottie.dart';
 import 'package:fennac_app/bloc/cubit/imagepicker_cubit.dart';
 import 'package:fennac_app/bloc/state/imagepicker_state.dart';
 import 'package:flutter/material.dart';
@@ -34,57 +34,39 @@ class FindGroupScreen extends StatefulWidget {
   State<FindGroupScreen> createState() => _FindGroupScreenState();
 }
 
-class _FindGroupScreenState extends State<FindGroupScreen> {
+class _FindGroupScreenState extends State<FindGroupScreen>
+    with WidgetsBindingObserver {
   late final ImagePickerCubit _pickerCubit;
   final FindGroupCubit _findGroupCubit = Di().sl<FindGroupCubit>();
-  CameraController? _cameraController;
   final MobileScannerController _controller = MobileScannerController();
-  bool _isCameraInitialized = false;
   bool _dialogShown = false;
+  bool _isScanProcessing = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _pickerCubit = ImagePickerCubit();
     final qrCode = widget.qrCode?.trim();
     if (qrCode != null && qrCode.isNotEmpty) {
       Future.microtask(() => _findGroupCubit.fetchGroupByQr(qrCode));
     }
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await _initCamera();
-    });
   }
 
-  Future<void> _initCamera() async {
-    final status = await Permission.camera.request();
-    final allowed = status.isGranted || status.isLimited;
-    if (!allowed) {
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (!mounted) return;
+
+    if (state == AppLifecycleState.resumed) {
+      _controller.start();
       return;
     }
 
-    try {
-      final cameras = await availableCameras();
-      if (cameras.isEmpty) {
-        return;
-      }
-      final back = cameras.firstWhere(
-        (c) => c.lensDirection == CameraLensDirection.back,
-        orElse: () => cameras.first,
-      );
-
-      _cameraController = CameraController(
-        back,
-        ResolutionPreset.high,
-        enableAudio: false,
-      );
-
-      await _cameraController!.initialize();
-      if (!mounted) return;
-      setState(() {
-        _isCameraInitialized = true;
-      });
-    } catch (e) {
-      debugPrint('Camera init error: $e');
+    if (state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.paused ||
+        state == AppLifecycleState.detached ||
+        state == AppLifecycleState.hidden) {
+      _controller.stop();
     }
   }
 
@@ -141,8 +123,8 @@ class _FindGroupScreenState extends State<FindGroupScreen> {
                             }
 
                             final apiAvatars =
-                                _findGroupCubit.myGroupModel?.data?.photosVideos
-                                    ?.where((path) => path.trim().isNotEmpty)
+                                _findGroupCubit.myGroupModel?.data?.members
+                                    ?.map((member) => member.image)
                                     .toList() ??
                                 [];
                             final avatarPaths = apiAvatars.isNotEmpty
@@ -170,25 +152,56 @@ class _FindGroupScreenState extends State<FindGroupScreen> {
                               subtitle:
                                   _findGroupCubit.myGroupModel?.data?.bio ??
                                   'Group details',
-                              avatarPaths: avatarPaths,
+                              avatarPaths: validateStringList(avatarPaths),
                             );
                           },
                         ),
                         const SizedBox(height: 8),
-                        SizedBox(
-                          width: 300,
-                          child: CustomElevatedButton(
-                            text: 'Join Group',
-                            onTap: () {
-                              Di().sl<DashboardCubit>().changePage(
-                                0,
-                                HomeScreen(),
-                              );
-                              AutoRouter.of(
-                                context,
-                              ).push(const DashboardRoute());
-                            },
-                          ),
+                        BlocBuilder(
+                          bloc: _findGroupCubit,
+                          builder: (context, state) {
+                            return SizedBox(
+                              width: 300,
+                              child: CustomElevatedButton(
+                                text: 'Join Group',
+                                isLoading: _findGroupCubit.isJoining,
+                                icon: _findGroupCubit.isJoining
+                                    ? SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: Lottie.asset(
+                                          Assets.animations.loadingSpinner,
+                                        ),
+                                      )
+                                    : null,
+                                onTap: _findGroupCubit.isJoining
+                                    ? () {}
+                                    : () async {
+                                        final qrCode =
+                                            _findGroupCubit.currentQrCode ??
+                                            widget.qrCode;
+                                        if (qrCode == null || qrCode.isEmpty) {
+                                          return;
+                                        }
+                                        final success = await _findGroupCubit
+                                            .joinGroupByQr(qrCode);
+                                        if (success && mounted) {
+                                          Di().sl<DashboardCubit>().changePage(
+                                            0,
+                                            HomeScreen(),
+                                          );
+                                          AutoRouter.of(
+                                            context,
+                                          ).push(const DashboardRoute());
+                                        } else {
+                                          if (mounted) {
+                                            AutoRouter.of(context).pop();
+                                          }
+                                        }
+                                      },
+                              ),
+                            );
+                          },
                         ),
                         const SizedBox(height: 12),
                       ],
@@ -205,7 +218,8 @@ class _FindGroupScreenState extends State<FindGroupScreen> {
 
   @override
   void dispose() {
-    _cameraController?.dispose();
+    WidgetsBinding.instance.removeObserver(this);
+    _controller.dispose();
     _pickerCubit.close();
     _dialogShown = false;
     super.dispose();
@@ -256,26 +270,29 @@ class _FindGroupScreenState extends State<FindGroupScreen> {
                         child: Stack(
                           fit: StackFit.expand,
                           children: [
-                            if (_isCameraInitialized &&
-                                _cameraController != null)
-                              MobileScanner(
-                                controller: _controller,
-                                onDetect: (capture) {
-                                  final List<Barcode> barcodes =
-                                      capture.barcodes;
-                                  if (barcodes.isNotEmpty) {
-                                    final String? code =
-                                        barcodes.first.rawValue;
-                                    debugPrint(code);
-                                    if (code != null) {
-                                      _findGroupCubit.fetchGroupByQr(code);
-                                    }
-                                  }
-                                },
-                              )
-                            // CameraPreview(_cameraController!)
-                            else
-                              Container(color: Colors.black),
+                            MobileScanner(
+                              controller: _controller,
+                              onDetect: (capture) {
+                                if (_isScanProcessing || _dialogShown) {
+                                  return;
+                                }
+
+                                final List<Barcode> barcodes = capture.barcodes;
+                                if (barcodes.isEmpty) {
+                                  return;
+                                }
+
+                                final String? code = barcodes.first.rawValue
+                                    ?.trim();
+                                if (code == null || code.isEmpty) {
+                                  return;
+                                }
+
+                                _isScanProcessing = true;
+                                _controller.stop();
+                                _findGroupCubit.fetchGroupByQr(code);
+                              },
+                            ),
 
                             BlocBuilder<ImagePickerCubit, ImagePickerState>(
                               builder: (context, state) {

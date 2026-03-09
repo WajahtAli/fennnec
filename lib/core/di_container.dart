@@ -58,8 +58,18 @@ import 'package:fennac_app/pages/my_group/domain/repository/my_group_repository.
 import 'package:fennac_app/pages/my_group/domain/usecase/my_group_usecase.dart';
 import 'package:fennac_app/pages/my_group/presentation/bloc/cubit/my_group_cubit.dart';
 import 'package:fennac_app/pages/profile/presentation/bloc/cubit/profile_cubit.dart';
+import 'package:fennac_app/pages/profile/presentation/bloc/cubit/privacy_permission_cubit.dart';
+import 'package:fennac_app/pages/profile/presentation/bloc/cubit/notification_settings_cubit.dart';
 import 'package:fennac_app/pages/profile/presentation/bloc/cubit/settings_cubit.dart';
 import 'package:fennac_app/pages/profile/data/datasource/profile_datasource.dart';
+import 'package:fennac_app/pages/profile/data/datasource/privacy_permission_datasource.dart';
+import 'package:fennac_app/pages/profile/data/datasource/notification_settings_datasource.dart';
+import 'package:fennac_app/pages/profile/data/repository/privacy_permission_repository_impl.dart';
+import 'package:fennac_app/pages/profile/data/repository/notification_settings_repository_impl.dart';
+import 'package:fennac_app/pages/profile/domain/repository/privacy_permission_repository.dart';
+import 'package:fennac_app/pages/profile/domain/repository/notification_settings_repository.dart';
+import 'package:fennac_app/pages/profile/domain/usecase/privacy_permission_usecase.dart';
+import 'package:fennac_app/pages/profile/domain/usecase/notification_settings_usecase.dart';
 import 'package:fennac_app/pages/profile/data/repository/profile_repository_impl.dart';
 import 'package:fennac_app/pages/profile/domain/repository/profile_repository.dart';
 import 'package:fennac_app/pages/profile/domain/usecase/profile_usecase.dart';
@@ -132,6 +142,12 @@ class Di {
     sl.registerLazySingleton<ProfileDatasource>(
       () => ProfileDatasourceImpl(sl()),
     );
+    sl.registerLazySingleton<PrivacyPermissionDatasource>(
+      () => PrivacyPermissionDatasourceImpl(sl()),
+    );
+    sl.registerLazySingleton<NotificationSettingsDatasource>(
+      () => NotificationSettingsDatasourceImpl(sl()),
+    );
     sl.registerLazySingleton<ContactSupportDatasource>(
       () => ContactSupportDatasourceImpl(sl()),
     );
@@ -167,6 +183,12 @@ class Di {
     sl.registerLazySingleton<ProfileRepository>(
       () => ProfileRepositoryImpl(sl()),
     );
+    sl.registerLazySingleton<PrivacyPermissionRepository>(
+      () => PrivacyPermissionRepositoryImpl(sl()),
+    );
+    sl.registerLazySingleton<NotificationSettingsRepository>(
+      () => NotificationSettingsRepositoryImpl(sl()),
+    );
     sl.registerLazySingleton<ContactSupportRepository>(
       () => ContactSupportRepositoryImpl(sl()),
     );
@@ -197,6 +219,12 @@ class Di {
     sl.registerLazySingleton<FindGroupUsecase>(() => FindGroupUsecase(sl()));
     sl.registerLazySingleton<MyGroupUsecase>(() => MyGroupUsecase(sl()));
     sl.registerLazySingleton<ProfileUsecase>(() => ProfileUsecase(sl()));
+    sl.registerLazySingleton<PrivacyPermissionUsecase>(
+      () => PrivacyPermissionUsecase(sl()),
+    );
+    sl.registerLazySingleton<NotificationSettingsUsecase>(
+      () => NotificationSettingsUsecase(sl()),
+    );
     sl.registerLazySingleton<ContactSupportUsecase>(
       () => ContactSupportUsecase(sl()),
     );
@@ -235,6 +263,12 @@ class Di {
     sl.registerLazySingleton<MessageCubit>(() => MessageCubit(sl()));
     sl.registerLazySingleton<CallCubit>(() => CallCubit());
     sl.registerLazySingleton<ProfileCubit>(() => ProfileCubit(sl()));
+    sl.registerLazySingleton<PrivacyPermissionCubit>(
+      () => PrivacyPermissionCubit(sl()),
+    );
+    sl.registerLazySingleton<NotificationSettingsCubit>(
+      () => NotificationSettingsCubit(sl()),
+    );
     sl.registerLazySingleton<ContactSupportCubit>(
       () => ContactSupportCubit(sl()),
     );
