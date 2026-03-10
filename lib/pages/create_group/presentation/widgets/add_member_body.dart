@@ -1,6 +1,7 @@
 import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/pages/create_group/presentation/bloc/cubit/contact_list_cubit.dart';
 import 'package:fennac_app/pages/create_group/presentation/bloc/state/contact_list_state.dart';
+import 'package:fennac_app/pages/create_group/data/model/selected_member.dart';
 import 'package:fennac_app/pages/create_group/presentation/widgets/contacts_list.dart';
 import 'package:fennac_app/pages/create_group/presentation/widgets/permission_denied_view.dart';
 import 'package:fennac_app/pages/create_group/presentation/widgets/permission_permanently_denied_view.dart';
@@ -13,7 +14,7 @@ class AddMemberBody extends StatelessWidget {
   final ContactListState state;
   final ContactListCubit cubit;
   final List<Contact> contacts;
-  final List<Contact> selectedMembers;
+  final List<SelectedMember> selectedMembers;
 
   const AddMemberBody({
     super.key,

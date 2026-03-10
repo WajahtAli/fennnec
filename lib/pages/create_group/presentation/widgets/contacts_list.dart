@@ -6,6 +6,7 @@ import 'package:fennac_app/pages/create_group/presentation/bloc/cubit/contact_li
 import 'package:fennac_app/pages/create_group/presentation/bloc/state/contact_list_state.dart';
 import 'package:fast_contacts/fast_contacts.dart';
 import 'package:flutter/material.dart';
+import 'package:fennac_app/pages/create_group/data/model/selected_member.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ContactsList extends StatelessWidget {
@@ -45,38 +46,14 @@ class ContactsList extends StatelessWidget {
               Divider(color: Colors.white.withValues(alpha: 0.15), height: 1),
           itemBuilder: (context, index) {
             final item = items[index];
-            final contact = item.contact;
             final isInviteOnly = !item.isFennec;
 
-            // Determine if selected
-            bool isSelected = false;
-            if (contact != null) {
-              isSelected = cubit.isMemberSelected(
-                contact,
-                memberId: item.memberId,
-              );
-            } else if (isInviteOnly == false && item.memberId != null) {
-              // API Fennec member without local contact
-              isSelected = cubit.isApiMemberSelected(item.memberId!);
-            }
+            bool isSelected = cubit.isMemberSelected(item.toSelectedMember());
 
             // Create callback for adding
             final addCallback = !isInviteOnly
                 ? () {
-                    if (contact != null) {
-                      cubit.addMember(
-                        contact,
-                        emailOverride: item.email,
-                        memberId: item.memberId,
-                      );
-                    } else if (item.memberId != null) {
-                      // API Fennec member without local contact
-                      cubit.addApiMember(
-                        item.memberId!,
-                        email: item.email,
-                        phone: item.phone,
-                      );
-                    }
+                    cubit.addMember(item.toSelectedMember());
                   }
                 : null;
 
@@ -387,4 +364,17 @@ class MemberListItemData {
     required this.isFennec,
     this.memberId,
   });
+
+  SelectedMember toSelectedMember() {
+    String normalizedPhone = phone.replaceAll(RegExp(r'[^0-9]'), '');
+    return SelectedMember(
+      id: isFennec ? (memberId ?? normalizedPhone) : normalizedPhone,
+      displayName: name,
+      phoneNumber: phone,
+      email: email,
+      isFennecUser: isFennec,
+      contact: contact,
+      fennecId: memberId,
+    );
+  }
 }

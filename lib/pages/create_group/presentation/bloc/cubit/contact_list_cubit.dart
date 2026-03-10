@@ -6,6 +6,7 @@ import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:fennac_app/pages/create_group/data/model/get_members_model.dart';
 import 'package:fennac_app/pages/create_group/domain/usecase/create_group_usecase.dart';
 import 'package:fennac_app/pages/create_group/presentation/bloc/state/contact_list_state.dart';
+import 'package:fennac_app/pages/create_group/data/model/selected_member.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -19,8 +20,7 @@ class ContactListCubit extends Cubit<ContactListState> {
   List<Contact>? searchedContacts;
   bool isSearching = false;
   final searchController = TextEditingController();
-  final List<Contact> selectedMembers = [];
-  final List<String> selectedApiMemberIds = [];
+  final List<SelectedMember> selectedMembers = [];
   GetMembersModel? membersModel;
   List<Member> fennecMembers = [];
   List<NotFennecMember> nonFennecMembers = [];
@@ -97,104 +97,35 @@ class ContactListCubit extends Cubit<ContactListState> {
     emit(ContactListPermissionDenied());
   }
 
-  void addMember(Contact contact, {String? emailOverride, String? memberId}) {
+  void addMember(SelectedMember member) {
     emit(ContactListLoading());
 
-    if (selectedMembers.length + selectedApiMemberIds.length >= 4) {
+    if (selectedMembers.length >= 4) {
       VxToast.show(message: 'You can add up to 4 members in a group.');
       emit(ContactListLoaded());
       return;
     }
 
-    // Check if member is already added locally
-    final alreadyAddedLocally = selectedMembers.any((c) => c.id == contact.id);
-    // Check if member is already added as API member
-    final isAlreadyAddedAsApiMember = selectedApiMemberIds.contains(memberId);
-
-    // If this is a Fennec member (has memberId), ONLY add to selectedApiMemberIds
-    if (memberId != null && memberId.isNotEmpty) {
-      if (!isAlreadyAddedAsApiMember) {
-        selectedApiMemberIds.add(memberId);
-        log(
-          'ContactListCubit: added Fennec member ID $memberId to selectedApiMemberIds',
-        );
-        final email = (emailOverride != null && emailOverride.trim().isNotEmpty)
-            ? emailOverride.trim()
-            : (contact.emails.isNotEmpty ? contact.emails.first.address : null);
-        final phone = contact.phones.isNotEmpty
-            ? contact.phones.first.number.replaceAll(RegExp(r'[^0-9+]'), '')
-            : null;
-        sendGroupInvite(email: email, phone: phone);
-      }
-    } else if (!alreadyAddedLocally) {
-      // If not a Fennec member, add as local contact only
-      selectedMembers.add(contact);
-      log('ContactListCubit: added local member ${contact.displayName}');
-      final email = (emailOverride != null && emailOverride.trim().isNotEmpty)
-          ? emailOverride.trim()
-          : (contact.emails.isNotEmpty ? contact.emails.first.address : null);
-      final phone = contact.phones.isNotEmpty
-          ? contact.phones.first.number.replaceAll(RegExp(r'[^0-9+]'), '')
-          : null;
-      sendGroupInvite(email: email, phone: phone);
+    if (!isMemberSelected(member)) {
+      selectedMembers.add(member);
+      log('ContactListCubit: added member ${member.displayName}');
+      sendGroupInvite(email: member.email, phone: member.phoneNumber);
     }
 
     emit(ContactListLoaded());
   }
 
-  bool isMemberSelected(Contact contact, {String? memberId}) {
-    // Check if member is in selectedMembers (local contacts)
-    if (selectedMembers.any((c) => c.id == contact.id)) {
-      return true;
-    }
-
-    // Check if member is in selectedApiMemberIds (Fennec members)
-    if (memberId != null &&
-        memberId.isNotEmpty &&
-        selectedApiMemberIds.contains(memberId)) {
-      return true;
-    }
-
-    return false;
+  bool isMemberSelected(SelectedMember member) {
+    return selectedMembers.any((m) => m.id == member.id);
   }
 
   void removeMember(int memberIndex) {
     emit(ContactListLoading());
     if (memberIndex >= 0 && memberIndex < selectedMembers.length) {
       final removed = selectedMembers.removeAt(memberIndex);
-      emit(ContactListLoaded());
       log('ContactListCubit: removed member ${removed.displayName}');
     }
-  }
-
-  void addApiMember(String memberId, {String? email, String? phone}) {
-    emit(ContactListLoading());
-
-    if (selectedMembers.length + selectedApiMemberIds.length >= 4) {
-      VxToast.show(message: 'You can add up to 4 members in a group.');
-      emit(ContactListLoaded());
-      return;
-    }
-
-    if (!selectedApiMemberIds.contains(memberId)) {
-      selectedApiMemberIds.add(memberId);
-      log('ContactListCubit: added API member $memberId');
-      sendGroupInvite(email: email, phone: phone);
-    }
-
     emit(ContactListLoaded());
-  }
-
-  void removeApiMember(String memberId) {
-    emit(ContactListLoading());
-    if (selectedApiMemberIds.remove(memberId)) {
-      log('ContactListCubit: removed API member $memberId');
-    }
-    emit(ContactListLoaded());
-  }
-
-  bool isApiMemberSelected(String memberId) {
-    return selectedApiMemberIds.contains(memberId);
   }
 
   Future<void> sendGroupInvite({
@@ -296,7 +227,6 @@ class ContactListCubit extends Cubit<ContactListState> {
   void resetAllData() {
     isSearching = false;
     selectedMembers.clear();
-    selectedApiMemberIds.clear();
     membersModel = null;
     fennecMembers.clear();
     nonFennecMembers.clear();

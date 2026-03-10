@@ -12,6 +12,7 @@ import 'package:fennac_app/pages/find_group/presentation/bloc/cubit/find_group_c
 import 'package:fennac_app/pages/find_group/presentation/bloc/state/find_group_state.dart';
 import 'package:fennac_app/widgets/custom_elevated_button.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
+import 'package:fennac_app/pages/create_group/data/model/selected_member.dart';
 
 import '../../../create_group/presentation/bloc/cubit/contact_list_cubit.dart';
 
@@ -102,8 +103,17 @@ class MemberPreviewDialog extends StatelessWidget {
                             onTap: () {
                               final member = findGroupCubit.qrMemberModel?.data;
                               if (member != null && member.id != null) {
-                                Di().sl<ContactListCubit>().addApiMember(
-                                  member.id!,
+                                final selectedMember = SelectedMember(
+                                  id: member.id!,
+                                  displayName:
+                                      '${member.firstName ?? ''} ${member.lastName ?? ''}'
+                                          .trim(),
+                                  profileImageUrl: member.image,
+                                  isFennecUser: true,
+                                  fennecId: member.id!,
+                                );
+                                Di().sl<ContactListCubit>().addMember(
+                                  selectedMember,
                                 );
                                 AutoRouter.of(context).pop();
                                 AutoRouter.of(context).pop();

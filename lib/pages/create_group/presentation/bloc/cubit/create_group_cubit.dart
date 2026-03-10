@@ -64,7 +64,10 @@ class CreateGroupCubit extends Cubit<CreateGroupState> {
 
     try {
       final contactListCubit = Di().sl<ContactListCubit>();
-      final selectedApiMemberIds = contactListCubit.selectedApiMemberIds;
+      final selectedApiMemberIds = contactListCubit.selectedMembers
+          .where((m) => m.isFennecUser && m.fennecId != null)
+          .map((m) => m.fennecId!)
+          .toList();
 
       log('📊 executeCreateGroup called');
       log('📊 selectedApiMemberIds count: ${selectedApiMemberIds.length}');
@@ -134,7 +137,12 @@ class CreateGroupCubit extends Cubit<CreateGroupState> {
         members.add(currentUserId);
       }
 
-      members.addAll(contactListCubit.selectedApiMemberIds);
+      members.addAll(
+        contactListCubit.selectedMembers
+            .where((m) => m.isFennecUser && m.fennecId != null)
+            .map((m) => m.fennecId!)
+            .toList(),
+      );
 
       List<String> meadiaLinks = [];
       createAccountCubit.mediaLinks.clear();
@@ -265,7 +273,10 @@ class CreateGroupCubit extends Cubit<CreateGroupState> {
           .where((id) => id.isNotEmpty)
           .toList(growable: false);
 
-      final selectedApiMemberIds = contactListCubit.selectedApiMemberIds;
+      final selectedApiMemberIds = contactListCubit.selectedMembers
+          .where((m) => m.isFennecUser && m.fennecId != null)
+          .map((m) => m.fennecId!)
+          .toList();
 
       // Simplified member update logic for now as Contact logic is moved.
       if (selectedApiMemberIds.isNotEmpty &&

@@ -1,3 +1,4 @@
+import 'package:fennac_app/pages/create_group/data/model/selected_member.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:fennac_app/app/constants/dummy_constants.dart';
 import 'package:fennac_app/app/constants/media_query_constants.dart';
@@ -6,14 +7,12 @@ import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:fennac_app/pages/auth/presentation/bloc/cubit/login_cubit.dart';
-import 'package:fennac_app/pages/create_group/data/model/get_members_model.dart';
+import 'package:fennac_app/pages/my_group/data/model/my_group_model.dart';
 import 'package:fennac_app/pages/create_group/presentation/bloc/cubit/contact_list_cubit.dart';
 import 'package:fennac_app/pages/create_group/presentation/bloc/state/contact_list_state.dart';
-import 'package:fennac_app/pages/my_group/data/model/my_group_model.dart';
 import 'package:fennac_app/routes/routes_imports.gr.dart';
 import 'package:fennac_app/widgets/custom_sized_box.dart';
 import 'package:fennac_app/widgets/custom_text.dart';
-import 'package:fast_contacts/fast_contacts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -35,13 +34,9 @@ class SelectedMembersList extends StatelessWidget {
       bloc: contactListCubit,
       builder: (context, state) {
         final selectedMembers = contactListCubit.selectedMembers;
-        final selectedApiMemberIds = contactListCubit.selectedApiMemberIds;
-        final fennecMembers = contactListCubit.fennecMembers;
 
         return _MembersWrap(
           selectedMembers: selectedMembers,
-          selectedApiMemberIds: selectedApiMemberIds,
-          fennecMembers: fennecMembers,
           isEditMode: isEditMode,
           editMembers: editMembers,
           onAddTap: () {
@@ -50,9 +45,6 @@ class SelectedMembersList extends StatelessWidget {
           onRemove: (index) {
             contactListCubit.removeMember(index);
           },
-          onRemoveApiMember: (memberId) {
-            contactListCubit.removeApiMember(memberId);
-          },
         );
       },
     );
@@ -60,52 +52,26 @@ class SelectedMembersList extends StatelessWidget {
 }
 
 class _MembersWrap extends StatelessWidget {
-  final List<Contact> selectedMembers;
-  final List<String> selectedApiMemberIds;
-  final List<Member> fennecMembers;
+  final List<SelectedMember> selectedMembers;
   final bool isEditMode;
   final List<CreatedBy> editMembers;
   final VoidCallback onAddTap;
   final Function(int) onRemove;
-  final Function(String) onRemoveApiMember;
 
   const _MembersWrap({
     required this.selectedMembers,
-    required this.selectedApiMemberIds,
-    required this.fennecMembers,
     required this.isEditMode,
     required this.editMembers,
     required this.onAddTap,
     required this.onRemove,
-    required this.onRemoveApiMember,
   });
 
   @override
   Widget build(BuildContext context) {
     // Build list of all members (local + API)
+    // Build list of all members
     final allMembers = <Map<String, dynamic>>[];
     final addedIdentifiers = <String>{};
-
-    // Helper to normalize phone numbers for comparison
-    String normalizePhone(String phone) {
-      return phone.replaceAll(RegExp(r'[^\d+]'), '');
-    }
-
-    // Helper to get unique identifier for a member
-    String? getContactIdentifier(Contact contact) {
-      if (contact.phones.isNotEmpty) {
-        return normalizePhone(contact.phones.first.number);
-      }
-      return null;
-    }
-
-    String? getApiMemberIdentifier(Member member) {
-      if (member.id != null) return 'id:${member.id}';
-      if (member.phone != null && member.phone!.isNotEmpty) {
-        return normalizePhone(member.phone!);
-      }
-      return null;
-    }
 
     String? getEditMemberIdentifier(CreatedBy member) {
       if (member.id != null) return 'id:${member.id}';
@@ -115,20 +81,17 @@ class _MembersWrap extends StatelessWidget {
       return null;
     }
 
-    // Add local contact members
+    // Add selected members
     for (int i = 0; i < selectedMembers.length && allMembers.length < 4; i++) {
-      final contact = selectedMembers[i];
-      final identifier = getContactIdentifier(contact);
+      final member = selectedMembers[i];
+      final identifier = member.id;
 
-      if (identifier != null && addedIdentifiers.contains(identifier)) {
+      if (addedIdentifiers.contains(identifier)) {
         continue; // Skip duplicate
       }
+      addedIdentifiers.add(identifier);
 
-      if (identifier != null) {
-        addedIdentifiers.add(identifier);
-      }
-
-      allMembers.add({'type': 'local', 'contact': contact, 'index': i});
+      allMembers.add({'type': 'selected', 'member': member, 'index': i});
     }
 
     if (isEditMode) {
@@ -141,55 +104,26 @@ class _MembersWrap extends StatelessWidget {
         if (identifier != null && addedIdentifiers.contains(identifier)) {
           continue; // Skip duplicate
         }
-
         if (identifier != null) {
           addedIdentifiers.add(identifier);
         }
 
-        allMembers.add({
-          'type': 'group',
-          'member': member,
-          'memberId': member.id,
-        });
+        allMembers.add({'type': 'group', 'member': member});
       }
-    }
-
-    // Add API members (skip if already added as local contact)
-    for (final memberId in selectedApiMemberIds) {
-      if (allMembers.length >= 4) break;
-
-      final member = fennecMembers.firstWhere(
-        (m) => m.id == memberId,
-        orElse: () => Member(),
-      );
-
-      if (member.id == null) continue;
-
-      final identifier = getApiMemberIdentifier(member);
-
-      if (identifier != null && addedIdentifiers.contains(identifier)) {
-        continue; // Skip duplicate
-      }
-
-      if (identifier != null) {
-        addedIdentifiers.add(identifier);
-      }
-
-      allMembers.add({'type': 'api', 'member': member, 'memberId': memberId});
     }
 
     // Generate member slots
     final memberSlots = List.generate(4, (index) {
       if (index < allMembers.length) {
         final memberData = allMembers[index];
-        if (memberData['type'] == 'local') {
-          final contact = memberData['contact'] as Contact;
+        if (memberData['type'] == 'selected') {
+          final member = memberData['member'] as SelectedMember;
           return _MemberSlot(
-            contact: contact,
-            label: contact.displayName.isNotEmpty
-                ? contact.displayName
+            selectedMember: member,
+            label: member.displayName.isNotEmpty
+                ? member.displayName
                 : 'Member',
-            subtitle: _primaryMaskedPhone(contact),
+            subtitle: member.phoneNumber,
             roleLabel: 'Invited',
             onRemove: () => onRemove(memberData['index']),
           );
@@ -204,20 +138,6 @@ class _MembersWrap extends StatelessWidget {
             label: displayName.isNotEmpty ? displayName : 'Member',
             subtitle: member.email,
             roleLabel: 'Invited',
-            onRemove: () => onRemoveApiMember(memberData['memberId']),
-          );
-        } else {
-          final member = memberData['member'] as Member;
-          final displayName = [
-            member.firstName,
-            member.lastName,
-          ].whereType<String>().join(' ').trim();
-
-          return _MemberSlot(
-            label: displayName.isNotEmpty ? displayName : 'Member',
-            subtitle: member.phone,
-            roleLabel: 'Invited',
-            onRemove: () => onRemoveApiMember(memberData['memberId']),
           );
         }
       }
@@ -271,7 +191,7 @@ class _MembersWrap extends StatelessWidget {
 }
 
 class _MemberSlot extends StatelessWidget {
-  final Contact? contact;
+  final SelectedMember? selectedMember;
   final bool isAdd;
   final bool isAdmin;
   final String? imagePath;
@@ -282,7 +202,7 @@ class _MemberSlot extends StatelessWidget {
   final VoidCallback? onRemove;
 
   const _MemberSlot({
-    this.contact,
+    this.selectedMember,
     this.isAdd = false,
     this.isAdmin = false,
     this.imagePath,
@@ -296,7 +216,7 @@ class _MemberSlot extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const double size = 80;
-    final String initial = _initialFor(contact);
+    final String initial = _initialFor(selectedMember);
     final bool showRemove = !isAdd && !isAdmin && onRemove != null;
     final isLight = Theme.of(context).brightness == Brightness.light;
     final avatarBgColor = isLight
@@ -317,7 +237,7 @@ class _MemberSlot extends StatelessWidget {
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  gradient: isAdd || contact != null
+                  gradient: isAdd || selectedMember != null
                       ? LinearGradient(
                           colors: [
                             avatarBgColor.withValues(alpha: 0.85),
@@ -449,28 +369,10 @@ class _MemberSlot extends StatelessWidget {
   }
 }
 
-String _initialFor(Contact? contact) {
-  final name = contact?.displayName.trim();
+String _initialFor(SelectedMember? member) {
+  final name = member?.displayName.trim();
   if (name == null || name.isEmpty) {
     return '?';
   }
   return name[0].toUpperCase();
-}
-
-String? _primaryMaskedPhone(Contact contact) {
-  if (contact.phones.isEmpty) {
-    return null;
-  }
-  final raw = contact.phones.first.number.trim();
-  return _maskPhone(raw);
-}
-
-String _maskPhone(String number) {
-  final cleaned = number.replaceAll(RegExp(r'\s+'), '');
-  if (cleaned.length <= 6) {
-    return cleaned;
-  }
-  final prefix = cleaned.substring(0, 4);
-  final suffix = cleaned.substring(cleaned.length - 2);
-  return '$prefix*****$suffix';
 }
