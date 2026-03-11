@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:ui';
 
 import 'package:auto_route/auto_route.dart';
@@ -72,9 +73,13 @@ class _ProfileHeaderState extends State<ProfileHeader> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
+                    Spacer(),
                     ProfileAvatar(imageUrl: avatarUrl, size: 128),
-                    InkWell(
+                    Spacer(),
+                    GestureDetector(
+                      behavior: HitTestBehavior.opaque,
                       onTap: () {
+                        log('QR Code tapped');
                         showModalBottomSheet(
                           context: context,
                           backgroundColor: Colors.transparent,
@@ -151,7 +156,6 @@ class _ProfileHeaderState extends State<ProfileHeader> {
                                   ),
                                 ),
                                 const CustomSizedBox(height: 32),
-
                                 CustomElevatedButton(
                                   text: 'Done',
                                   onTap: () {
@@ -163,10 +167,15 @@ class _ProfileHeaderState extends State<ProfileHeader> {
                           ),
                         );
                       },
-                      child: Icon(
-                        Icons.qr_code_2,
-                        size: 32,
-                        color: ColorPalette.grey,
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 80),
+                        child: Icon(
+                          Icons.qr_code_2,
+                          size: 32,
+                          color: isLightTheme(context)
+                              ? ColorPalette.primary
+                              : Colors.white,
+                        ),
                       ),
                     ),
                   ],

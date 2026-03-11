@@ -10,6 +10,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:fennac_app/pages/auth/presentation/bloc/cubit/legal_content_cubit.dart';
 import 'package:fennac_app/pages/auth/presentation/bloc/state/legal_content_state.dart';
+import 'package:lottie/lottie.dart';
 
 class PrivacyBottomSheet extends StatefulWidget {
   final ValueNotifier<bool>? blurNotifier;
@@ -38,7 +39,10 @@ class _PrivacyBottomSheetState extends State<PrivacyBottomSheet> {
   @override
   void initState() {
     super.initState();
-    _legalContentCubit.fetchLegalContents(termOfService: true);
+    _legalContentCubit.fetchLegalContents(
+      termOfService: false,
+      privacyPolicy: true,
+    );
   }
 
   @override
@@ -100,8 +104,14 @@ class _PrivacyBottomSheetState extends State<PrivacyBottomSheet> {
                     ? (legalContents.first.content ?? '')
                     : '';
 
-                if (state is LegalContentLoading && htmlContent.isEmpty) {
-                  return const Center(child: CircularProgressIndicator());
+                if (state is LegalContentLoading) {
+                  return Center(
+                    child: SizedBox(
+                      width: 34,
+                      height: 34,
+                      child: Lottie.asset(Assets.animations.loadingSpinner),
+                    ),
+                  );
                 }
 
                 if (state is LegalContentError && htmlContent.isEmpty) {

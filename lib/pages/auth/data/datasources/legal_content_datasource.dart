@@ -3,7 +3,10 @@ import 'package:fennac_app/core/network/api_helper.dart';
 import 'package:fennac_app/pages/auth/data/model/legal_content_model.dart';
 
 abstract class LegalContentDatasource {
-  Future<LegalContentModel> fetchLegalContents({required bool termOfService});
+  Future<LegalContentModel> fetchLegalContents({
+    bool? termOfService,
+    bool? privacyPolicy,
+  });
 }
 
 class LegalContentDatasourceImpl extends LegalContentDatasource {
@@ -13,11 +16,15 @@ class LegalContentDatasourceImpl extends LegalContentDatasource {
 
   @override
   Future<LegalContentModel> fetchLegalContents({
-    required bool termOfService,
+    bool? termOfService,
+    bool? privacyPolicy,
   }) async {
     final response = await apiHelper.get(
       AppConstants.legalContents,
-      queryParameters: {'termOfService': termOfService},
+      queryParameters: {
+        if (termOfService != null) 'termOfService': termOfService,
+        if (privacyPolicy != null) 'privacyPolicy': privacyPolicy,
+      },
       requiresAuth: true,
     );
 

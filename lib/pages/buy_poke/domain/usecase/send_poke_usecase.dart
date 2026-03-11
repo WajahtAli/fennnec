@@ -5,7 +5,17 @@ class SendPokeUseCase {
 
   SendPokeUseCase(this._pokeRepository);
 
-  Future<Map<String, dynamic>> call({required String toUserId}) {
-    return _pokeRepository.sendPoke(toUserId: toUserId);
+  Future<Map<String, dynamic>> call({
+    required String toUserId,
+    required String targetType,
+    String? targetId,
+    required String message,
+  }) {
+    return _pokeRepository.sendPoke(
+      toUserId: toUserId,
+      targetType: targetType,
+      targetId: targetId,
+      message: message,
+    );
   }
 }

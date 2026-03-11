@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:fennac_app/helpers/gradient_toast.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../data/model/my_group_model.dart';
@@ -44,6 +45,11 @@ class MyGroupCubit extends Cubit<MyGroupState> {
   void updateMyGroupDataLocal(MyGroupData data) {
     emit(MyGroupLoading());
     myGroupModel = myGroupModel?.copyWith(data: data);
+    log(
+      'Updated local group data: ${data.members?.map((e) {
+        return e.image;
+      }).toList()}',
+    );
     emit(MyGroupLoaded());
   }
 
@@ -59,8 +65,76 @@ class MyGroupCubit extends Cubit<MyGroupState> {
       log('Updated Group: ${result.data?.titleMembers}');
       emit(MyGroupLoaded());
     } catch (e) {
-      log('Error updating group: $e');
-      emit(MyGroupError(e.toString()));
+      emit(MyGroupLoaded());
+      rethrow;
+    }
+  }
+
+  Future<bool> deleteGroupById(String groupId) async {
+    emit(MyGroupLoading());
+    try {
+      final response = await _myGroupUsecase.deleteGroupById(groupId);
+      final String message = response is Map<String, dynamic>
+          ? (response['message']?.toString() ?? 'Group deleted successfully')
+          : 'Group deleted successfully';
+
+      if (myGroupModel?.data?.id == groupId) {
+        myGroupModel = null;
+      }
+
+      if (myGroupList?.groupList != null) {
+        final updatedGroupList = myGroupList!.groupList!
+            .where((group) => group.id != groupId)
+            .toList();
+        myGroupList = MyGroupModel(
+          success: myGroupList?.success,
+          message: myGroupList?.message,
+          groupList: updatedGroupList,
+        );
+      }
+
+      VxToast.show(message: message);
+      emit(MyGroupLoaded());
+      return true;
+    } catch (e) {
+      final String errorMessage = e.toString();
+      VxToast.show(message: errorMessage);
+      emit(MyGroupError(errorMessage));
+      return false;
+    }
+  }
+
+  Future<bool> unMatchGroupById(String groupId) async {
+    emit(MyGroupLoading());
+    try {
+      final response = await _myGroupUsecase.unMatchGroupById(groupId);
+      final String message = response is Map<String, dynamic>
+          ? (response['message']?.toString() ?? 'Group unmatched successfully')
+          : 'Group unmatched successfully';
+
+      if (myGroupModel?.data?.id == groupId) {
+        myGroupModel = null;
+      }
+
+      if (myGroupList?.groupList != null) {
+        final updatedGroupList = myGroupList!.groupList!
+            .where((group) => group.id != groupId)
+            .toList();
+        myGroupList = MyGroupModel(
+          success: myGroupList?.success,
+          message: myGroupList?.message,
+          groupList: updatedGroupList,
+        );
+      }
+
+      VxToast.show(message: message);
+      emit(MyGroupLoaded());
+      return true;
+    } catch (e) {
+      final String errorMessage = e.toString();
+      VxToast.show(message: errorMessage);
+      emit(MyGroupError(errorMessage));
+      return false;
     }
   }
 

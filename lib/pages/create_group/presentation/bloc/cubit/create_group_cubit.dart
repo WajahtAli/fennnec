@@ -6,6 +6,7 @@ import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/pages/auth/presentation/bloc/cubit/create_account_cubit.dart';
 import 'package:fennac_app/pages/auth/presentation/bloc/cubit/login_cubit.dart';
 import 'package:fennac_app/pages/kyc/presentation/bloc/cubit/kyc_prompt_cubit.dart';
+import 'package:fennac_app/pages/my_group/data/model/my_group_model.dart';
 import 'package:fennac_app/pages/my_group/presentation/bloc/cubit/my_group_cubit.dart';
 import 'package:fennac_app/pages/create_group/presentation/bloc/cubit/contact_list_cubit.dart';
 import 'package:fennac_app/routes/routes_imports.gr.dart';
@@ -228,6 +229,18 @@ class CreateGroupCubit extends Cubit<CreateGroupState> {
       final updatedGroupData = groupData?.copyWith(
         titleMembers: groupTitle.isEmpty ? groupData.titleMembers : groupTitle,
         bio: groupBio.isEmpty ? groupData.bio : groupBio,
+        members: contactListCubit.selectedMembers
+            .where((m) => m.isFennecUser && m.fennecId != null)
+            .map(
+              (m) => CreatedBy(
+                id: m.fennecId,
+                email: m.email,
+                firstName: m.displayName.split(' ').first,
+                lastName: m.displayName.split(' ').skip(1).join(' '),
+                image: m.profileImageUrl,
+              ),
+            )
+            .toList(),
         fitsForGroup: fitsForGroup.isEmpty
             ? groupData.fitsForGroup
             : fitsForGroup,
@@ -268,21 +281,23 @@ class CreateGroupCubit extends Cubit<CreateGroupState> {
         updateBody['photosVideos'] = updatedGroupData.photosVideos;
       }
 
-      final originalMembers = (groupData?.members ?? [])
-          .map((member) => member.id ?? '')
-          .where((id) => id.isNotEmpty)
-          .toList(growable: false);
+      // final originalMembers = (groupData?.members ?? [])
+      //     .map((member) => member.id ?? '')
+      //     .where((id) => id.isNotEmpty)
+      //     .toList(growable: false);
 
       final selectedApiMemberIds = contactListCubit.selectedMembers
           .where((m) => m.isFennecUser && m.fennecId != null)
           .map((m) => m.fennecId!)
           .toList();
+      log(' Selected API member IDs for update: $selectedApiMemberIds');
+      // log('📊 Original member IDs: $originalMembers');
 
       // Simplified member update logic for now as Contact logic is moved.
-      if (selectedApiMemberIds.isNotEmpty &&
-          !listEquals(selectedApiMemberIds, originalMembers)) {
-        updateBody['members'] = selectedApiMemberIds;
-      }
+      // if (selectedApiMemberIds.isNotEmpty &&
+      //     !listEquals(selectedApiMemberIds, originalMembers)) {
+      updateBody['members'] = selectedApiMemberIds;
+      // }
 
       // If nothing changed, just show success
       if (updateBody.isEmpty) {
@@ -300,15 +315,9 @@ class CreateGroupCubit extends Cubit<CreateGroupState> {
       VxToast.show(message: 'Group updated successfully');
       emit(CreateGroupLoaded());
     } catch (e) {
-      String errorMsg = 'Failed to update group';
-      if (e is Map<String, dynamic>) {
-        errorMsg = e['message']?.toString() ?? errorMsg;
-      } else {
-        errorMsg = e.toString();
-      }
+      emit(CreateGroupError(e.toString()));
 
-      VxToast.show(message: errorMsg);
-      emit(CreateGroupError(errorMsg));
+      VxToast.show(message: e.toString());
     }
   }
 

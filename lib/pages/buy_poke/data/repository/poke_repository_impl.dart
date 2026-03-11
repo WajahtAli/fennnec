@@ -13,7 +13,17 @@ class PokeRepositoryImpl extends PokeRepository {
   }
 
   @override
-  Future<Map<String, dynamic>> sendPoke({required String toUserId}) async {
-    return await _datasource.sendPoke(toUserId: toUserId);
+  Future<Map<String, dynamic>> sendPoke({
+    required String toUserId,
+    required String targetType,
+    String? targetId,
+    required String message,
+  }) async {
+    return await _datasource.sendPoke(
+      toUserId: toUserId,
+      targetType: targetType,
+      targetId: targetId,
+      message: message,
+    );
   }
 }

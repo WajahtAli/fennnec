@@ -7,6 +7,8 @@ abstract class MyGroupRepository {
     String groupId,
     Map<String, dynamic> body,
   );
+  Future<dynamic> deleteGroupById(String groupId);
+  Future<dynamic> unMatchGroupById(String groupId);
   Future<List<MessageModel>> fetchGroupMessages(
     String groupId, {
     String? receiverGroupId,

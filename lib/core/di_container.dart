@@ -48,6 +48,7 @@ import 'package:fennac_app/pages/homelanding/data/datasource/home_landing_dataso
 import 'package:fennac_app/pages/homelanding/data/repository/home_landing_repository_impl.dart';
 import 'package:fennac_app/pages/homelanding/domain/repository/home_landing_repository.dart';
 import 'package:fennac_app/pages/homelanding/domain/usecase/fetch_group_invitations_usecase.dart';
+import 'package:fennac_app/pages/homelanding/domain/usecase/accept_decline_group_invitation_usecase.dart';
 import 'package:fennac_app/pages/homelanding/presentation/bloc/cubit/home_landing_cubit.dart';
 import 'package:fennac_app/pages/create_group/presentation/bloc/cubit/create_group_cubit.dart';
 import 'package:fennac_app/pages/kyc/presentation/bloc/cubit/kyc_cubit.dart';
@@ -235,6 +236,9 @@ class Di {
     sl.registerLazySingleton<FetchGroupInvitationsUseCase>(
       () => FetchGroupInvitationsUseCase(sl()),
     );
+    sl.registerLazySingleton<AcceptDeclineGroupInvitationUseCase>(
+      () => AcceptDeclineGroupInvitationUseCase(sl()),
+    );
     sl.registerLazySingleton<FetchPokesUseCase>(() => FetchPokesUseCase(sl()));
     sl.registerLazySingleton<SendPokeUseCase>(() => SendPokeUseCase(sl()));
 
@@ -251,7 +255,9 @@ class Di {
     sl.registerLazySingleton<GroupsCubit>(() => GroupsCubit(sl()));
     sl.registerLazySingleton<LoginCubit>(() => LoginCubit(sl()));
     sl.registerLazySingleton<LegalContentCubit>(() => LegalContentCubit(sl()));
-    sl.registerLazySingleton<HomeLandingCubit>(() => HomeLandingCubit(sl()));
+    sl.registerLazySingleton<HomeLandingCubit>(
+      () => HomeLandingCubit(sl(), sl()),
+    );
     sl.registerLazySingleton<CreateGroupCubit>(() => CreateGroupCubit(sl()));
     sl.registerLazySingleton<FindGroupCubit>(() => FindGroupCubit(sl()));
     sl.registerLazySingleton<MoveAbleBackgroundCubit>(

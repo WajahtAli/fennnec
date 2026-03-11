@@ -6,7 +6,6 @@ import 'package:fennac_app/pages/profile/presentation/widgets/group_option_botto
 import 'package:fennac_app/reusable_widgets/group_card.dart';
 import 'package:fennac_app/routes/routes_imports.gr.dart';
 import 'package:fennac_app/skeletons/group_card_skeleton.dart';
-import 'package:fennac_app/utils/validators.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -91,22 +90,30 @@ class _MyGroupCardState extends State<MyGroupCard> {
           physics: const NeverScrollableScrollPhysics(),
           itemBuilder: (context, index) {
             final group = groupList?[index];
-            final apiAvatars =
-                group?.members?.map((member) => member.image).toList() ?? [];
+            final avatarPaths =
+                group?.members?.map((member) => member.image ?? '').toList() ??
+                [
+                  Assets.dummy.a1.path,
+                  Assets.dummy.a2.path,
+                  Assets.dummy.a3.path,
+                  Assets.dummy.a4.path,
+                  Assets.dummy.a5.path,
+                ];
 
-            final avatarPaths = apiAvatars.isNotEmpty
-                ? apiAvatars
-                : [
-                    Assets.dummy.a1.path,
-                    Assets.dummy.a2.path,
-                    Assets.dummy.a3.path,
-                    Assets.dummy.a4.path,
-                    Assets.dummy.a5.path,
-                  ];
+            final memberNames =
+                group?.members
+                    ?.map(
+                      (member) =>
+                          '${member.firstName ?? ''} ${member.lastName ?? ''}'
+                              .trim(),
+                    )
+                    .toList() ??
+                [];
+
             return GroupCard(
               title: group?.titleMembers ?? '',
               subtitle: group?.bio ?? '',
-              avatarPaths: validateStringList(avatarPaths),
+              avatarPaths: avatarPaths,
               onMenuPressed: widget.isEditMode
                   ? () {
                       AutoRouter.of(
@@ -116,6 +123,7 @@ class _MyGroupCardState extends State<MyGroupCard> {
                   : () => _showGroupOptions(group!),
               chipLabel: group?.fitsForGroup,
               isEditMode: widget.isEditMode,
+              memberNames: memberNames,
             );
           },
         );

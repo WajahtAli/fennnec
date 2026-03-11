@@ -97,7 +97,7 @@ class ContactListCubit extends Cubit<ContactListState> {
     emit(ContactListPermissionDenied());
   }
 
-  void addMember(SelectedMember member) {
+  void addMember(SelectedMember member, {bool isApiCallNeeded = true}) {
     emit(ContactListLoading());
 
     if (selectedMembers.length >= 4) {
@@ -109,7 +109,9 @@ class ContactListCubit extends Cubit<ContactListState> {
     if (!isMemberSelected(member)) {
       selectedMembers.add(member);
       log('ContactListCubit: added member ${member.displayName}');
-      sendGroupInvite(email: member.email, phone: member.phoneNumber);
+      if (isApiCallNeeded) {
+        sendGroupInvite(email: member.email, phone: member.phoneNumber);
+      }
     }
 
     emit(ContactListLoaded());

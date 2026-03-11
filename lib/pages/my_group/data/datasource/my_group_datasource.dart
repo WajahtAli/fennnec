@@ -8,6 +8,8 @@ abstract class MyGroupDatasource {
     String groupId,
     Map<String, dynamic> body,
   );
+  Future<dynamic> deleteGroupById(String groupId);
+  Future<dynamic> unMatchGroupById(String groupId);
   Future<List<dynamic>> fetchGroupMessages(
     String groupId, {
     String? receiverGroupId,
@@ -101,6 +103,32 @@ class MyGroupDatasourceImpl extends MyGroupDatasource {
         requiresAuth: true,
       );
       return MyGroupModel.fromJson(response);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<dynamic> deleteGroupById(String groupId) async {
+    try {
+      final response = await apiHelper.delete(
+        '${AppConstants.groupById}$groupId',
+        requiresAuth: true,
+      );
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<dynamic> unMatchGroupById(String groupId) async {
+    try {
+      final response = await apiHelper.post(
+        '${AppConstants.groupById}$groupId/unmatch',
+        requiresAuth: true,
+      );
+      return response;
     } catch (e) {
       rethrow;
     }

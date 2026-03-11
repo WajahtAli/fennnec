@@ -132,7 +132,7 @@ class ApiHelper {
     } catch (e) {
       log('🔥 API ERROR: $e');
       _handleException(e);
-      return null;
+      throw _handleException(e);
     }
   }
 

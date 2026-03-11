@@ -38,6 +38,7 @@ class AppConstants {
   static const reportProblem = 'help-support/report-problem';
   static const fetchPokeProducts = 'pokes/products';
   static const legalContents = 'help-support/legal-contents';
+  static const sendPoke = 'pokes/send';
 
   //!Agora Constants
   static const agoraAppId = "e02d6c955f5947f0a671b1b2dbb67514";

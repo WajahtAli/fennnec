@@ -1,14 +1,19 @@
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
+import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
-import 'package:fennac_app/widgets/custom_sized_box.dart';
+import 'package:fennac_app/pages/auth/presentation/bloc/cubit/legal_content_cubit.dart';
+import 'package:fennac_app/pages/auth/presentation/bloc/state/legal_content_state.dart';
 import 'package:fennac_app/widgets/custom_text.dart';
+import 'package:fennac_app/widgets/html_viewer.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:lottie/lottie.dart';
 
 import '../../../../app/constants/media_query_constants.dart';
 
-class TermsBottomSheet extends StatelessWidget {
+class TermsBottomSheet extends StatefulWidget {
   final ValueNotifier<bool>? blurNotifier;
 
   const TermsBottomSheet({super.key, this.blurNotifier});
@@ -23,6 +28,22 @@ class TermsBottomSheet extends StatelessWidget {
     ).then((_) {
       blurNotifier?.value = false;
     });
+  }
+
+  @override
+  State<TermsBottomSheet> createState() => _TermsBottomSheetState();
+}
+
+class _TermsBottomSheetState extends State<TermsBottomSheet> {
+  final LegalContentCubit _legalContentCubit = Di().sl<LegalContentCubit>();
+
+  @override
+  void initState() {
+    super.initState();
+    _legalContentCubit.fetchLegalContents(
+      termOfService: true,
+      privacyPolicy: false,
+    );
   }
 
   @override
@@ -74,126 +95,46 @@ class TermsBottomSheet extends StatelessWidget {
             ),
           ),
 
-          // Content
           Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildText(
-                    context,
-                    'Welcome to Fennec, a group-based social and dating platform that helps people connect and interact in a fun, safe, and authentic way. By using our app, you agree to these Terms of Service ("Terms"). Please read them carefully.',
-                  ),
-                  CustomSizedBox(height: 24),
-                  _buildSectionTitle(context, '1. Acceptance of Terms'),
-                  CustomSizedBox(height: 12),
-                  _buildText(
-                    context,
-                    'By accessing or using Fennec, you confirm that you are at least 18 years old and agree to be bound by these Terms and our Privacy Policy. If you do not agree, please do not use the app.',
-                  ),
-                  CustomSizedBox(height: 24),
-                  _buildSectionTitle(context, '2. Account Registration'),
-                  CustomSizedBox(height: 12),
-                  _buildBulletPoint(
-                    context,
-                    'You must provide accurate and up-to-date information when creating your account.',
-                  ),
-                  _buildBulletPoint(
-                    context,
-                    'You are responsible for maintaining the confidentiality of your login details.',
-                  ),
-                  _buildBulletPoint(
-                    context,
-                    'Fennec reserves the right to suspend or terminate any account that violates these Terms.',
-                  ),
-                  CustomSizedBox(height: 24),
-                  _buildSectionTitle(context, '3. Group Use & Conduct'),
-                  CustomSizedBox(height: 12),
-                  _buildBulletPoint(
-                    context,
-                    'Users may create or join groups to connect with others.',
-                  ),
-                  _buildBulletPoint(
-                    context,
-                    'Group Heads can manage members, approve or remove participants, and report misconduct.',
-                  ),
-                  _buildBulletPoint(
-                    context,
-                    'You agree to communicate respectfully and refrain from harassment, hate speech, or inappropriate content.',
-                  ),
-                  CustomSizedBox(height: 24),
-                  _buildSectionTitle(context, '4. Premium Features'),
-                  CustomSizedBox(height: 12),
-                  _buildText(
-                    context,
-                    'Some features (such as joining multiple groups or private chats) are available through Fennec Premium. Payments are processed securely through our partners, and all subscriptions automatically renew unless canceled before the renewal date.',
-                  ),
-                  CustomSizedBox(height: 24),
-                  _buildSectionTitle(context, '5. Content Ownership'),
-                  CustomSizedBox(height: 12),
-                  _buildBulletPoint(
-                    context,
-                    'You retain ownership of any content you share (photos, messages, etc.).',
-                  ),
-                  _buildBulletPoint(
-                    context,
-                    'By posting on Fennec, you grant us a non-exclusive, worldwide, royalty-free license to display and distribute that content within the app.',
-                  ),
-                  _buildBulletPoint(
-                    context,
-                    'We may remove content that violates our guidelines or community standards.',
-                  ),
-                  CustomSizedBox(height: 24),
-                  _buildSectionTitle(context, '6. Safety and Reporting'),
-                  CustomSizedBox(height: 12),
-                  _buildBulletPoint(
-                    context,
-                    'Fennec is committed to keeping users safe.',
-                  ),
-                  _buildBulletPoint(
-                    context,
-                    'You can report users or groups that violate our policies through in-app reporting tools.',
-                  ),
-                  _buildBulletPoint(
-                    context,
-                    'We may take action including warnings, suspensions, or permanent bans.',
-                  ),
-                  CustomSizedBox(height: 24),
-                  _buildSectionTitle(context, '7. Disclaimers'),
-                  CustomSizedBox(height: 12),
-                  _buildBulletPoint(
-                    context,
-                    'Fennec is provided "as is" without warranties of any kind.',
-                  ),
-                  _buildBulletPoint(
-                    context,
-                    'We do not guarantee that the app will always function without interruptions or errors, or that all users are who they claim to be.',
-                  ),
-                  CustomSizedBox(height: 24),
-                  _buildSectionTitle(context, '8. Limitation of Liability'),
-                  CustomSizedBox(height: 12),
-                  _buildText(
-                    context,
-                    'Fennec and its affiliates are not responsible for any direct, indirect, or incidental damages arising from your use of the platform.',
-                  ),
-                  CustomSizedBox(height: 24),
-                  _buildSectionTitle(context, '9. Changes to the Terms'),
-                  CustomSizedBox(height: 12),
-                  _buildText(
-                    context,
-                    'We may update these Terms occasionally. Updates will take effect once posted in the app. Continued use of Fennec means you accept the new Terms.',
-                  ),
-                  CustomSizedBox(height: 24),
-                  _buildSectionTitle(context, '10. Contact Us'),
-                  CustomSizedBox(height: 12),
-                  _buildText(
-                    context,
-                    'If you have questions or concerns, contact us at: support@fennec.app',
-                  ),
-                  CustomSizedBox(height: 40),
-                ],
-              ),
+            child: BlocBuilder<LegalContentCubit, LegalContentState>(
+              bloc: _legalContentCubit,
+              builder: (context, state) {
+                final legalContents =
+                    _legalContentCubit.legalContentModel?.data?.legalContent ??
+                    [];
+
+                final htmlContent = legalContents.isNotEmpty
+                    ? (legalContents.first.content ?? '')
+                    : '';
+
+                if (state is LegalContentLoading) {
+                  return Center(
+                    child: SizedBox(
+                      width: 34,
+                      height: 34,
+                      child: Lottie.asset(Assets.animations.loadingSpinner),
+                    ),
+                  );
+                }
+
+                if (state is LegalContentError && htmlContent.isEmpty) {
+                  return Center(child: _buildText(context, state.message));
+                }
+
+                if (htmlContent.isEmpty) {
+                  return Center(
+                    child: _buildText(
+                      context,
+                      'No terms of service content available.',
+                    ),
+                  );
+                }
+
+                return SingleChildScrollView(
+                  padding: const EdgeInsets.all(24),
+                  child: HtmlViewer(htmlContent: htmlContent),
+                );
+              },
             ),
           ),
         ],

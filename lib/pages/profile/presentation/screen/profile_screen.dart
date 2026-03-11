@@ -10,6 +10,7 @@ import 'package:fennac_app/pages/profile/presentation/widgets/switch_groups_bott
 
 import 'package:fennac_app/pages/profile/presentation/widgets/profile_list_tile.dart';
 import 'package:fennac_app/routes/routes_imports.gr.dart';
+import 'package:fennac_app/utils/validators.dart';
 
 import 'package:fennac_app/widgets/custom_sized_box.dart';
 import 'package:fennac_app/widgets/custom_text.dart';
@@ -59,10 +60,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       children: [
                         ProfileHeader(),
                         const CustomSizedBox(height: 20),
-                        PokeBalanceTile(
-                          pokeCount: 3,
-                          onBuyMore: () {
-                            AutoRouter.of(context).push(const BuyPokeRoute());
+                        BlocBuilder(
+                          bloc: Di().sl<LoginCubit>(),
+                          builder: (context, state) {
+                            return PokeBalanceTile(
+                              pokeCount: validateInt(
+                                Di()
+                                        .sl<LoginCubit>()
+                                        .userData
+                                        ?.user
+                                        ?.pokeBalance ??
+                                    0,
+                              ),
+                              onBuyMore: () {
+                                AutoRouter.of(
+                                  context,
+                                ).push(const BuyPokeRoute());
+                              },
+                            );
                           },
                         ),
                         const CustomSizedBox(height: 24),

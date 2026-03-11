@@ -7,10 +7,12 @@ class LegalContentUsecase {
   LegalContentUsecase(this._legalContentRepo);
 
   Future<LegalContentModel> fetchLegalContents({
-    required bool termOfService,
+    bool? termOfService,
+    bool? privacyPolicy,
   }) async {
     return await _legalContentRepo.fetchLegalContents(
       termOfService: termOfService,
+      privacyPolicy: privacyPolicy,
     );
   }
 }

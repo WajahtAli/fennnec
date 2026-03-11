@@ -1,13 +1,12 @@
 import 'package:fennac_app/pages/create_group/data/model/selected_member.dart';
 import 'package:auto_route/auto_route.dart';
-import 'package:fennac_app/app/constants/dummy_constants.dart';
 import 'package:fennac_app/app/constants/media_query_constants.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
-import 'package:fennac_app/pages/auth/presentation/bloc/cubit/login_cubit.dart';
 import 'package:fennac_app/pages/my_group/data/model/my_group_model.dart';
+import 'package:fennac_app/pages/my_group/presentation/bloc/cubit/my_group_cubit.dart';
 import 'package:fennac_app/pages/create_group/presentation/bloc/cubit/contact_list_cubit.dart';
 import 'package:fennac_app/pages/create_group/presentation/bloc/state/contact_list_state.dart';
 import 'package:fennac_app/routes/routes_imports.gr.dart';
@@ -16,7 +15,7 @@ import 'package:fennac_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class SelectedMembersList extends StatelessWidget {
+class SelectedMembersList extends StatefulWidget {
   final ContactListCubit contactListCubit;
   final bool isEditMode;
   final List<CreatedBy> editMembers;
@@ -29,21 +28,53 @@ class SelectedMembersList extends StatelessWidget {
   });
 
   @override
+  State<SelectedMembersList> createState() => _SelectedMembersListState();
+}
+
+class _SelectedMembersListState extends State<SelectedMembersList> {
+  @override
+  void initState() {
+    super.initState();
+    // Add edit members to cubit's selectedMembers if in edit mode
+    if (widget.isEditMode) {
+      widget.contactListCubit.selectedMembers.clear();
+      for (final member in widget.editMembers) {
+        if (member.id != null) {
+          final displayName = [
+            member.firstName,
+            member.lastName,
+          ].whereType<String>().join(' ').trim();
+
+          widget.contactListCubit.addMember(
+            SelectedMember(
+              id: member.id ?? '',
+              displayName: displayName.isNotEmpty ? displayName : 'Member',
+              email: member.email ?? '',
+              fennecId: member.id ?? "",
+              isFennecUser: true,
+              profileImageUrl: member.image,
+            ),
+            isApiCallNeeded: false, // Avoid API call for pre-filling
+          );
+        }
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return BlocBuilder<ContactListCubit, ContactListState>(
-      bloc: contactListCubit,
+      bloc: widget.contactListCubit,
       builder: (context, state) {
-        final selectedMembers = contactListCubit.selectedMembers;
+        final selectedMembers = widget.contactListCubit.selectedMembers;
 
         return _MembersWrap(
           selectedMembers: selectedMembers,
-          isEditMode: isEditMode,
-          editMembers: editMembers,
           onAddTap: () {
             AutoRouter.of(context).push(const AddMemberRoute());
           },
           onRemove: (index) {
-            contactListCubit.removeMember(index);
+            widget.contactListCubit.removeMember(index);
           },
         );
       },
@@ -53,108 +84,62 @@ class SelectedMembersList extends StatelessWidget {
 
 class _MembersWrap extends StatelessWidget {
   final List<SelectedMember> selectedMembers;
-  final bool isEditMode;
-  final List<CreatedBy> editMembers;
   final VoidCallback onAddTap;
   final Function(int) onRemove;
 
   const _MembersWrap({
     required this.selectedMembers,
-    required this.isEditMode,
-    required this.editMembers,
     required this.onAddTap,
     required this.onRemove,
   });
 
-  @override
-  Widget build(BuildContext context) {
-    // Build list of all members (local + API)
-    // Build list of all members
-    final allMembers = <Map<String, dynamic>>[];
-    final addedIdentifiers = <String>{};
-
-    String? getEditMemberIdentifier(CreatedBy member) {
-      if (member.id != null) return 'id:${member.id}';
-      if (member.email != null && member.email!.isNotEmpty) {
-        return 'email:${member.email}';
-      }
-      return null;
-    }
-
-    // Add selected members
-    for (int i = 0; i < selectedMembers.length && allMembers.length < 4; i++) {
-      final member = selectedMembers[i];
-      final identifier = member.id;
-
-      if (addedIdentifiers.contains(identifier)) {
-        continue; // Skip duplicate
-      }
-      addedIdentifiers.add(identifier);
-
-      allMembers.add({'type': 'selected', 'member': member, 'index': i});
-    }
-
-    if (isEditMode) {
-      for (final member in editMembers) {
-        if (allMembers.length >= 4) break;
-        if (member.id == null) continue;
-
-        final identifier = getEditMemberIdentifier(member);
-
-        if (identifier != null && addedIdentifiers.contains(identifier)) {
-          continue; // Skip duplicate
-        }
-        if (identifier != null) {
-          addedIdentifiers.add(identifier);
-        }
-
-        allMembers.add({'type': 'group', 'member': member});
-      }
-    }
-
-    // Generate member slots
-    final memberSlots = List.generate(4, (index) {
-      if (index < allMembers.length) {
-        final memberData = allMembers[index];
-        if (memberData['type'] == 'selected') {
-          final member = memberData['member'] as SelectedMember;
-          return _MemberSlot(
-            selectedMember: member,
-            label: member.displayName.isNotEmpty
-                ? member.displayName
-                : 'Member',
-            subtitle: member.phoneNumber,
-            roleLabel: 'Invited',
-            onRemove: () => onRemove(memberData['index']),
-          );
-        } else if (memberData['type'] == 'group') {
-          final member = memberData['member'] as CreatedBy;
-          final displayName = [
-            member.firstName,
-            member.lastName,
-          ].whereType<String>().join(' ').trim();
-
-          return _MemberSlot(
-            label: displayName.isNotEmpty ? displayName : 'Member',
-            subtitle: member.email,
-            roleLabel: 'Invited',
-          );
-        }
+  /// Generates the UI slots for members from the unified list
+  List<Widget> _generateMemberSlots() {
+    return List.generate(4, (index) {
+      if (index < selectedMembers.length) {
+        final member = selectedMembers[index];
+        return _MemberSlot(
+          selectedMember: member,
+          label: member.displayName.isNotEmpty ? member.displayName : 'Member',
+          subtitle: member.phoneNumber,
+          roleLabel: 'Invited',
+          onRemove: () => onRemove(index),
+        );
       }
       return _MemberSlot(isAdd: true, label: 'Add Member', onAdd: onAddTap);
     });
+  }
 
-    final loginCubit = Di().sl<LoginCubit>();
-    final currentUserImage =
-        loginCubit.userData?.user?.bestShorts?.isNotEmpty == true
-        ? loginCubit.userData!.user!.bestShorts!.first
-        : DummyConstants.avatarPaths[0];
+  @override
+  Widget build(BuildContext context) {
+    final memberSlots = _generateMemberSlots();
+    final myGroupCubit = Di().sl<MyGroupCubit>();
+    final createdBy =
+        myGroupCubit.myGroupModel?.data?.createdBy ??
+        ((myGroupCubit.myGroupList?.groupList?.isNotEmpty ?? false)
+            ? myGroupCubit.myGroupList!.groupList!.first.createdBy
+            : null);
+    final createdByName = [
+      createdBy?.firstName?.trim(),
+      createdBy?.lastName?.trim(),
+    ].whereType<String>().where((name) => name.isNotEmpty).join(' ').trim();
+    final createdByMember = SelectedMember(
+      id: createdBy?.id ?? 'group-admin',
+      displayName: createdByName.isNotEmpty ? createdByName : 'Admin',
+      profileImageUrl: createdBy?.image,
+      email: createdBy?.email,
+      isFennecUser: true,
+      fennecId: createdBy?.id,
+    );
 
     final allSlots = [
       _MemberSlot(
         isAdmin: true,
-        imagePath: currentUserImage,
-        label: 'You',
+        selectedMember: createdByMember,
+        imagePath: createdBy?.image?.isNotEmpty == true
+            ? createdBy!.image
+            : null,
+        label: createdByMember.displayName,
         roleLabel: 'Admin',
       ),
       ...memberSlots,

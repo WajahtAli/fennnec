@@ -2,7 +2,6 @@ import 'dart:developer';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:fennac_app/app/constants/app_constants.dart';
-import 'package:fennac_app/app/constants/app_enums.dart';
 import 'package:fennac_app/app/constants/media_query_constants.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
@@ -504,6 +503,7 @@ class LoginCubit extends Cubit<LoginState> {
     emit(LoginLoading());
     try {
       final response = await _loginUsecase.checkToken();
+      var shouldOpenDashboard = false;
 
       if (response is Map<String, dynamic>) {
         final data = response['data'] as Map<String, dynamic>? ?? {};
@@ -515,19 +515,7 @@ class LoginCubit extends Cubit<LoginState> {
         );
 
         if (isValid && sessionActive) {
-          if (context.mounted) {
-            if (Di().sl<HomeLandingCubit>().invitations.isEmpty &&
-                (Di().sl<MyGroupCubit>().myGroupList?.groupList?.isEmpty ??
-                    false)) {
-              Di().sl<HomeLandingCubit>().invitationStatus =
-                  InvitationStatus.declined;
-              AutoRouter.of(context).replaceAll([DashboardRoute()]);
-            } else {
-              Di().sl<DashboardCubit>().changePage(0, HomeScreen());
-              AutoRouter.of(context).replaceAll([DashboardRoute()]);
-            }
-            // AutoRouter.of(context).replaceAll([DashboardRoute()]);
-          }
+          shouldOpenDashboard = true;
         } else {
           if (context.mounted) {
             _showSessionExpiredDialog(context);
@@ -535,7 +523,11 @@ class LoginCubit extends Cubit<LoginState> {
         }
       } else {
         refreshAuthToken(refreshToken: userData?.refreshToken ?? '');
-        AutoRouter.of(context).replace(const DashboardRoute());
+        shouldOpenDashboard = true;
+      }
+
+      if (shouldOpenDashboard && context.mounted) {
+        AutoRouter.of(context).replaceAll([const DashboardRoute()]);
       }
 
       emit(LoginLoaded());

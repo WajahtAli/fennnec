@@ -310,6 +310,7 @@ class GroupGalleryWidget extends StatelessWidget {
                             builder: (context) => SendPokeBottomSheet(
                               pokeType: PokeType.image,
                               image: item,
+                              targetId: images.indexOf(item).toString(),
                             ),
                           );
                         },
@@ -354,6 +355,7 @@ class GroupGalleryWidget extends StatelessWidget {
                               pokeType: promptItem.type == 'audio'
                                   ? PokeType.audio
                                   : PokeType.text,
+                              targetId: promptItem.id,
                               image: images.isNotEmpty ? images.first : null,
                               promptTitle: promptItem.promptTitle,
                               promptAnswer: promptItem.promptAnswer,
@@ -369,6 +371,25 @@ class GroupGalleryWidget extends StatelessWidget {
             }
           },
         ),
+        const CustomSizedBox(height: 40),
+        InkWell(
+          onTap: () {
+            final groupId = _homeCubit.currentGroup?.id;
+            if (groupId == null || groupId.isEmpty) {
+              VxToast.show(message: 'Unable to report this group right now.');
+              return;
+            }
+            HomeBlurController.showWithBlur(
+              context: context,
+              builder: (_) => ReportAndBlockBottomSheet(groupId: groupId),
+            );
+          },
+          child: AppText(
+            text: 'Report and block',
+            style: AppTextStyles.bodyLarge(context),
+          ),
+        ),
+        const CustomSizedBox(height: 80),
       ],
     );
   }

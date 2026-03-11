@@ -16,4 +16,12 @@ class MyGroupUsecase {
   ) async {
     return await _repository.updateGroupById(groupId, body);
   }
+
+  Future<dynamic> deleteGroupById(String groupId) async {
+    return await _repository.deleteGroupById(groupId);
+  }
+
+  Future<dynamic> unMatchGroupById(String groupId) async {
+    return await _repository.unMatchGroupById(groupId);
+  }
 }

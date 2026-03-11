@@ -39,6 +39,7 @@ class ReportProblemCubit extends Cubit<ReportProblemState> {
           response['message'] ?? 'Report submitted successfully';
 
       isSubmitting = false;
+      attachments.clear();
       if (isClosed) return false;
       emit(ReportProblemSuccess(successMessage));
       return true;

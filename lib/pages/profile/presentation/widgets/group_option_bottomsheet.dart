@@ -65,12 +65,11 @@ class GroupOptionsBottomSheet extends StatelessWidget {
           ),
           Builder(
             builder: (context) {
-              final apiAvatars =
-                  groupData.members?.map((member) => member.image).toList() ??
+              final avatarPaths =
+                  groupData.members
+                      ?.map((member) => member.image ?? '')
+                      .toList() ??
                   [];
-              List<String?> avatarPaths = apiAvatars.isNotEmpty
-                  ? apiAvatars
-                  : [];
 
               return GroupCard(
                 isShowInfoIcon: false,
@@ -78,10 +77,15 @@ class GroupOptionsBottomSheet extends StatelessWidget {
                 backgroundColor: isDarkTheme(context)
                     ? ColorPalette.primary.withValues(alpha: 0.25)
                     : null,
+                memberNames:
+                    groupData.members
+                        ?.map((member) => validateString(member.firstName))
+                        .toList() ??
+                    [],
                 title:
                     groupData.titleMembers ?? 'Brenda, Nancy, Jeff, Anna & You',
                 subtitle: groupData.bio ?? 'A group for Flutter developers',
-                avatarPaths: validateStringList(avatarPaths),
+                avatarPaths: avatarPaths,
               );
             },
           ),
@@ -205,8 +209,69 @@ class GroupOptionsBottomSheet extends StatelessWidget {
                     "Once you leave this group, you won’t be able to access its messages, media, and matches with this group.",
                 description1: 'This action cannot be undone.',
                 buttonText: ' Leave Group',
-                onButtonPressed: () {
-                  Navigator.pop(context);
+                onButtonPressed: () async {
+                  final bool isUnmatched = await Di()
+                      .sl<MyGroupCubit>()
+                      .unMatchGroupById(groupData.id ?? '');
+                  if (!context.mounted || !isUnmatched) {
+                    return;
+                  }
+
+                  CustomBottomSheet.show(
+                    context: context,
+                    icon: AnimatedBackgroundContainer(
+                      icon: Assets.icons.checkGreen.path,
+                      isPng: true,
+                    ),
+                    title: 'Group Deleted',
+                    description: 'Your group has been successfully removed.',
+                    descriptionStyle: AppTextStyles.h4(context),
+                    description1:
+                        "You can always create a new group or join an existing one whenever you’re ready to connect again.",
+                    description1Style: AppTextStyles.subHeading(context)
+                        .copyWith(
+                          color: ColorPalette.textSecondary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                    buttonText: 'Explore Groups',
+                    onButtonPressed: () {
+                      AutoRouter.of(context).push(DashboardRoute());
+                      Di().sl<DashboardCubit>().changeIndex(0);
+                    },
+                  );
+                },
+                isHorizontalButton: true,
+
+                secondaryButtonText: 'Cancel',
+              );
+            },
+          ),
+
+          _buildOption(
+            context,
+            title: 'Delete This Group',
+            textColor: const Color(0xFFFF3B30),
+            onTap: () {
+              CustomBottomSheet.show(
+                context: context,
+                isSecondaryButtonFirst: true,
+
+                icon: AnimatedBackgroundContainer(
+                  icon: Assets.icons.alertTriangle.path,
+                ),
+                title: 'Delete This Group?',
+                description:
+                    "Once you Delete this group, you won’t be able to access its messages, media, and matches with this group.",
+                description1: 'This action cannot be undone.',
+                buttonText: ' Delete Group',
+                onButtonPressed: () async {
+                  final bool isDeleted = await Di()
+                      .sl<MyGroupCubit>()
+                      .deleteGroupById(groupData.id ?? '');
+                  if (!context.mounted || !isDeleted) {
+                    return;
+                  }
+
                   CustomBottomSheet.show(
                     context: context,
                     icon: AnimatedBackgroundContainer(

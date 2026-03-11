@@ -1,3 +1,5 @@
+import 'package:auto_route/auto_route.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fennac_app/app/constants/app_enums.dart';
 import 'package:fennac_app/app/constants/media_query_constants.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
@@ -6,10 +8,14 @@ import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:fennac_app/pages/homelanding/data/models/group_invitation_model.dart';
 import 'package:fennac_app/pages/homelanding/presentation/bloc/cubit/home_landing_cubit.dart';
+import 'package:fennac_app/pages/homelanding/presentation/bloc/state/home_landing_state.dart';
+import 'package:fennac_app/routes/routes_imports.gr.dart';
+import 'package:fennac_app/skeletons/home_landing_banner_skeleton.dart';
 import 'package:fennac_app/widgets/custom_sized_box.dart';
 import 'package:fennac_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class HomeLandingBanner extends StatelessWidget {
   const HomeLandingBanner({super.key});
@@ -21,6 +27,9 @@ class HomeLandingBanner extends StatelessWidget {
       child: BlocBuilder(
         bloc: _homeLandingCubit,
         builder: (context, state) {
+          if (state is HomeLandingLoading) {
+            AutoRouter.of(context).push(DashboardRoute());
+          }
           final invitations = _homeLandingCubit.invitations;
           final firstInvitation = invitations.isNotEmpty
               ? invitations[0]
@@ -100,7 +109,6 @@ class HomeLandingBanner extends StatelessWidget {
         Container(
           width: 392,
           height: getWidth(context) > 370 ? 250 : 200,
-
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(24),
             boxShadow: [
@@ -147,40 +155,53 @@ class HomeLandingBanner extends StatelessWidget {
         // Member Avatars Row at Bottom
         Positioned(
           bottom: -30,
-          right: (group?.members?.length == 1) ? null : 0,
-          left: (group?.members?.length == 1) ? null : 70,
-          child: Row(
-            mainAxisAlignment: (group?.members?.length == 1)
-                ? MainAxisAlignment.center
-                : MainAxisAlignment.start,
-            mainAxisSize: (group?.members?.length == 1)
-                ? MainAxisSize.max
-                : MainAxisSize.min,
-            children: [
-              if (group?.members != null && group!.members!.isNotEmpty)
-                for (final entry in group.members!.indexed)
-                  Transform.translate(
-                    offset: (group.members!.length == 1)
-                        ? const Offset(0, 0)
-                        : Offset(-12.0 * entry.$1, 0),
-                    child: _buildMemberAvatar(
-                      entry.$2.image ?? '',
-                      context,
-                      entry.$2,
-                    ),
-                  )
-              else
-                for (final entry in [
-                  Assets.dummy.a1.path,
-                  Assets.dummy.b1.path,
-                  Assets.dummy.c1.path,
-                  Assets.dummy.d1.path,
-                ].indexed)
-                  Transform.translate(
-                    offset: Offset(-12.0 * entry.$1, 0),
-                    child: _buildMemberAvatar(entry.$2, context, null),
+          left: 0,
+          right: 0,
+          child: Builder(
+            builder: (context) {
+              final members = group?.members;
+              final bool hasMembers = members != null && members.isNotEmpty;
+              final int count = hasMembers ? members.length : 4;
+              final double itemWidth = getWidth(context) > 370 ? 64 : 54;
+              final double overlap = 12.0;
+              final double totalWidth =
+                  itemWidth + (count - 1) * (itemWidth - overlap);
+              final double startOffset = -totalWidth / 2;
+
+              return Align(
+                alignment: (count == 1) ? Alignment.center : Alignment.center,
+                child: SizedBox(
+                  width: totalWidth,
+                  height: itemWidth,
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      if (hasMembers)
+                        for (final entry in members.indexed)
+                          Positioned(
+                            left: entry.$1 * (itemWidth - overlap),
+                            child: _buildMemberAvatar(
+                              entry.$2.image ?? '',
+                              context,
+                              entry.$2,
+                            ),
+                          )
+                      else
+                        for (final entry in [
+                          Assets.dummy.a1.path,
+                          Assets.dummy.b1.path,
+                          Assets.dummy.c1.path,
+                          Assets.dummy.d1.path,
+                        ].indexed)
+                          Positioned(
+                            left: entry.$1 * (itemWidth - overlap),
+                            child: _buildMemberAvatar(entry.$2, context, null),
+                          ),
+                    ],
                   ),
-            ],
+                ),
+              );
+            },
           ),
         ),
       ],
@@ -189,11 +210,12 @@ class HomeLandingBanner extends StatelessWidget {
 
   Widget _buildGroupImage(BuildContext context, Group? group) {
     if (group?.photosVideos != null && group!.photosVideos!.isNotEmpty) {
-      return Image.network(
-        group.photosVideos![0],
+      return CachedNetworkImage(
+        imageUrl: group.photosVideos?.first ?? '',
         fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
-          return Image.asset(Assets.dummy.groupSelfie.path, fit: BoxFit.cover);
+
+        errorWidget: (context, url, error) {
+          return _buildPlaceholderAvatar(Assets.icons.logoAnimation.path);
         },
       );
     }
@@ -208,56 +230,67 @@ class HomeLandingBanner extends StatelessWidget {
     final bool isDeclined =
         _homeLandingCubit.invitationStatus == InvitationStatus.declined;
 
-    return Container(
-      width: getWidth(context) > 370 ? 64 : 54,
-      height: getWidth(context) > 370 ? 64 : 54,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(color: Colors.black, width: 2),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+    final double size = getWidth(context) > 370 ? 64 : 54;
+
+    return SizedBox(
+      width: size,
+      height: size,
+      child: Center(
+        child: Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.black, width: 2),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.2),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: ClipOval(
-        child: ColorFiltered(
-          colorFilter: isDeclined
-              ? const ColorFilter.matrix(<double>[
-                  0.2126,
-                  0.7152,
-                  0.0722,
-                  0,
-                  0,
-                  0.2126,
-                  0.7152,
-                  0.0722,
-                  0,
-                  0,
-                  0.2126,
-                  0.7152,
-                  0.0722,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  1,
-                  0,
-                ])
-              : const ColorFilter.mode(Colors.transparent, BlendMode.dst),
-          child:
-              member != null && member.image != null && member.image!.isNotEmpty
-              ? Image.network(
-                  member.image!,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return _buildPlaceholderAvatar(imagePath);
-                  },
-                )
-              : _buildPlaceholderAvatar(imagePath),
+          child: ClipOval(
+            child: ColorFiltered(
+              colorFilter: isDeclined
+                  ? const ColorFilter.matrix(<double>[
+                      0.2126,
+                      0.7152,
+                      0.0722,
+                      0,
+                      0,
+                      0.2126,
+                      0.7152,
+                      0.0722,
+                      0,
+                      0,
+                      0.2126,
+                      0.7152,
+                      0.0722,
+                      0,
+                      0,
+                      0,
+                      0,
+                      0,
+                      1,
+                      0,
+                    ])
+                  : const ColorFilter.mode(Colors.transparent, BlendMode.dst),
+              child:
+                  member != null &&
+                      member.image != null &&
+                      member.image!.isNotEmpty
+                  ? Image.network(
+                      member.image!,
+                      fit: BoxFit.cover,
+                      alignment: Alignment.center, // ← anchors from center
+                      errorBuilder: (context, error, stackTrace) {
+                        return _buildPlaceholderAvatar(imagePath);
+                      },
+                    )
+                  : _buildPlaceholderAvatar(imagePath),
+            ),
+          ),
         ),
       ),
     );
@@ -265,7 +298,11 @@ class HomeLandingBanner extends StatelessWidget {
 
   Widget _buildPlaceholderAvatar(String imagePath) {
     return imagePath.isNotEmpty
-        ? Image.asset(imagePath, fit: BoxFit.cover)
+        ? SizedBox(
+            height: 60,
+            width: 60,
+            child: SvgPicture.asset(imagePath, color: ColorPalette.primary),
+          )
         : Icon(Icons.account_circle, color: ColorPalette.primary, size: 64);
   }
 }

@@ -9,7 +9,6 @@ import 'package:fennac_app/pages/profile/presentation/widgets/group_option_botto
 import 'package:fennac_app/reusable_widgets/custom_app_bar.dart';
 import 'package:fennac_app/reusable_widgets/group_card.dart';
 import 'package:fennac_app/skeletons/group_card_skeleton.dart';
-import 'package:fennac_app/utils/validators.dart';
 import 'package:fennac_app/widgets/custom_sized_box.dart';
 import 'package:fennac_app/widgets/custom_text.dart';
 import 'package:fennac_app/widgets/movable_background.dart';
@@ -100,12 +99,11 @@ class _YourGroupsScreenState extends State<YourGroupsScreen> {
                         shrinkWrap: true,
                         itemBuilder: (context, index) {
                           final group = groupList?[index];
-                          final avatarPaths = validateStringList(
-                            group?.members
-                                    ?.map((member) => member.image)
-                                    .toList() ??
-                                [],
-                          );
+                          final avatarPaths =
+                              group?.members
+                                  ?.map((member) => member.image ?? '')
+                                  .toList() ??
+                              [];
                           final avatarInitials =
                               group?.members?.map((member) {
                                 final firstName =
@@ -129,14 +127,14 @@ class _YourGroupsScreenState extends State<YourGroupsScreen> {
                               '$createdByFirstName $createdByLastName'.trim();
 
                           return GroupCard(
-                            title: group?.titleMembers ?? 'Flutter Devs',
-                            subtitle:
-                                group?.bio ?? 'A group for Flutter developers',
+                            title: group?.titleMembers ?? '',
+                            subtitle: group?.bio ?? '',
                             avatarPaths: avatarPaths,
                             createdByName: createdByName.isNotEmpty
                                 ? createdByName
                                 : null,
                             createdAt: group?.createdAt,
+                            memberNames: avatarInitials,
                             onMenuPressed: () =>
                                 _showGroupOptions(group ?? MyGroupData()),
                           );

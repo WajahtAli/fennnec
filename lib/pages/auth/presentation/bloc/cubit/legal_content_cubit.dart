@@ -10,12 +10,16 @@ class LegalContentCubit extends Cubit<LegalContentState> {
 
   LegalContentModel? legalContentModel;
 
-  Future<void> fetchLegalContents({required bool termOfService}) async {
+  Future<void> fetchLegalContents({
+    bool? termOfService,
+    bool? privacyPolicy,
+  }) async {
     emit(LegalContentLoading());
 
     try {
       final response = await _legalContentUsecase.fetchLegalContents(
         termOfService: termOfService,
+        privacyPolicy: privacyPolicy,
       );
 
       legalContentModel = response;

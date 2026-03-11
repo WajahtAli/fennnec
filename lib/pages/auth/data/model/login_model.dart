@@ -166,7 +166,7 @@ class LoginUser {
   String? zipCode;
   String? fcmToken;
   String? qrCode;
-  String? subscriptionActive;
+  bool? subscriptionActive;
   String? pokeBalance;
   String? accountStatus;
   NotificationSettings? notificationSettings;
@@ -245,7 +245,7 @@ class LoginUser {
     String? zipCode,
     String? fcmToken,
     String? qrCode,
-    String? subscriptionActive,
+    bool? subscriptionActive,
     String? pokeBalance,
     String? accountStatus,
     NotificationSettings? notificationSettings,
@@ -335,7 +335,7 @@ class LoginUser {
     zipCode: json["zipCode"]?.toString(),
     fcmToken: json["fcmToken"]?.toString(),
     qrCode: json["qrCode"]?.toString(),
-    subscriptionActive: json["subscriptionActive"]?.toString(),
+    subscriptionActive: json["subscriptionActive"],
     pokeBalance: json["pokeBalance"]?.toString(),
     accountStatus: json["accountStatus"]?.toString(),
     notificationSettings: json["notificationSettings"] == null

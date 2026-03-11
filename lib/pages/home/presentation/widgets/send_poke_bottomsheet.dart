@@ -6,6 +6,7 @@ import 'package:fennac_app/app/theme/app_emojis.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
+import 'package:fennac_app/helpers/gradient_toast.dart';
 import 'package:fennac_app/pages/home/presentation/bloc/cubit/home_cubit.dart';
 import 'package:fennac_app/widgets/prompt_audio_row.dart';
 import 'package:fennac_app/reusable_widgets/animated_background_container.dart';
@@ -21,6 +22,7 @@ import 'package:flutter_svg/svg.dart';
 class SendPokeBottomSheet extends StatefulWidget {
   final String? image;
   final PokeType pokeType;
+  final String? targetId;
   final String? promptTitle;
   final String? promptAnswer;
   final String? audioPath;
@@ -31,6 +33,7 @@ class SendPokeBottomSheet extends StatefulWidget {
     super.key,
     this.image,
     required this.pokeType,
+    this.targetId,
     this.promptTitle,
     this.promptAnswer,
     this.audioPath,
@@ -66,15 +69,28 @@ class _SendPokeBottomSheetState extends State<SendPokeBottomSheet> {
 
     try {
       final selectedProfile = _homeCubit.selectedProfile;
-      if (selectedProfile?.id == null) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('No profile selected')));
+      final toUserId = selectedProfile?.id;
+      if (toUserId == null) {
+        VxToast.show(message: 'No profile selected');
         return;
       }
 
-      // Make API call to send poke
-      await _homeCubit.sendPoke(toUserId: selectedProfile!.id!);
+      final targetType = _resolveTargetType();
+      final targetId = _resolveTargetId(selectedProfile);
+
+      if ((targetType == 'photo' || targetType == 'prompt') &&
+          (targetId == null || targetId.isEmpty)) {
+        VxToast.show(message: 'Could not determine the selected poke target');
+
+        return;
+      }
+
+      await _homeCubit.sendPoke(
+        toUserId: toUserId,
+        targetType: targetType,
+        targetId: targetId,
+        message: _messageController.text.trim(),
+      );
 
       if (context.mounted) {
         Navigator.pop(context);
@@ -92,10 +108,52 @@ class _SendPokeBottomSheetState extends State<SendPokeBottomSheet> {
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Failed to send poke: $e')));
+        VxToast.show(message: 'Failed to send poke: $e');
       }
+    }
+  }
+
+  String _resolveTargetType() {
+    switch (widget.pokeType) {
+      case PokeType.floating:
+        return 'profile';
+      case PokeType.image:
+        return 'photo';
+      case PokeType.text:
+      case PokeType.audio:
+        return 'prompt';
+    }
+  }
+
+  String? _resolveTargetId(dynamic profile) {
+    if (widget.targetId != null && widget.targetId!.isNotEmpty) {
+      return widget.targetId;
+    }
+
+    switch (widget.pokeType) {
+      case PokeType.image:
+        final image = widget.image;
+        if (image == null || image.isEmpty) {
+          return null;
+        }
+        final index = profile?.bestShorts?.indexOf(image) ?? -1;
+        return index >= 0 ? index.toString() : null;
+      case PokeType.text:
+      case PokeType.audio:
+        final prompts = profile?.prompts;
+        if (prompts == null || prompts.isEmpty) {
+          return null;
+        }
+
+        for (final prompt in prompts) {
+          if (prompt.promptTitle == widget.promptTitle &&
+              prompt.promptAnswer == widget.promptAnswer) {
+            return prompt.id;
+          }
+        }
+        return null;
+      case PokeType.floating:
+        return null;
     }
   }
 

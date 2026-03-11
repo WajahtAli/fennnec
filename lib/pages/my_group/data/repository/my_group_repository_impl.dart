@@ -22,6 +22,16 @@ class MyGroupRepositoryImpl extends MyGroupRepository {
   }
 
   @override
+  Future<dynamic> deleteGroupById(String groupId) async {
+    return await _datasource.deleteGroupById(groupId);
+  }
+
+  @override
+  Future<dynamic> unMatchGroupById(String groupId) async {
+    return await _datasource.unMatchGroupById(groupId);
+  }
+
+  @override
   Future<List<MessageModel>> fetchGroupMessages(
     String groupId, {
     String? receiverGroupId,

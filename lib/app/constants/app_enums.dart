@@ -6,7 +6,7 @@ enum PaymentMethodType { onlinePay, applePay, walletPay, tabby, notSelected }
 
 enum SwipeResult { left, right, none }
 
-enum InvitationStatus { pending, accepted, declined }
+enum InvitationStatus { pending, accepted, declined, landing }
 
 enum SelectionType { single, multiple }
 

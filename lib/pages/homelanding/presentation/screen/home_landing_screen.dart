@@ -7,6 +7,7 @@ import 'package:fennac_app/pages/homelanding/presentation/bloc/state/home_landin
 import 'package:fennac_app/pages/homelanding/presentation/widgets/decline_widget.dart';
 import 'package:fennac_app/pages/homelanding/presentation/widgets/home_landing_banner.dart';
 import 'package:fennac_app/pages/homelanding/presentation/widgets/join_widget.dart';
+import 'package:fennac_app/pages/homelanding/presentation/widgets/landing_widget.dart';
 import 'package:fennac_app/pages/homelanding/presentation/widgets/pending_widget.dart';
 import 'package:fennac_app/widgets/custom_sized_box.dart';
 import 'package:fennac_app/widgets/movable_background.dart';
@@ -25,12 +26,6 @@ class _HomeLandingScreenState extends State<HomeLandingScreen> {
   final HomeLandingCubit _homeLandingCubit = Di().sl<HomeLandingCubit>();
 
   @override
-  void initState() {
-    super.initState();
-    _homeLandingCubit.fetchGroupInvitations();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ColorPalette.secondary,
@@ -46,6 +41,9 @@ class _HomeLandingScreenState extends State<HomeLandingScreen> {
                 if (_homeLandingCubit.invitationStatus ==
                     InvitationStatus.declined) ...[
                   DeclineWidget(),
+                ] else if (_homeLandingCubit.invitationStatus ==
+                    InvitationStatus.landing) ...[
+                  LandingWidget(),
                 ] else if (_homeLandingCubit.invitationStatus ==
                     InvitationStatus.accepted) ...[
                   JoinWidget(),

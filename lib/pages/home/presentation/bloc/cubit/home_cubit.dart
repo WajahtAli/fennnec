@@ -184,10 +184,20 @@ class HomeCubit extends Cubit<HomeState> {
   }
 
   // ========== SEND POKE METHOD ==========
-  Future<void> sendPoke({required String toUserId}) async {
+  Future<void> sendPoke({
+    required String toUserId,
+    required String targetType,
+    String? targetId,
+    required String message,
+  }) async {
     emit(HomeLoading());
     try {
-      final response = await _sendPokeUseCase(toUserId: toUserId);
+      final response = await _sendPokeUseCase(
+        toUserId: toUserId,
+        targetType: targetType,
+        targetId: targetId,
+        message: message,
+      );
       log('Poke sent successfully: $response');
       emit(HomeLoaded());
     } catch (e) {

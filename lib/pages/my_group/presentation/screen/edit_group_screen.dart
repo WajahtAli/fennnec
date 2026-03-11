@@ -114,7 +114,12 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
                 final groupData = _myGroupCubit.myGroupModel?.data;
                 final avatarPaths =
                     groupData?.members
-                        ?.map((member) => member.image)
+                        ?.map((member) => member.image ?? '')
+                        .toList() ??
+                    [];
+                final avatarInitials =
+                    groupData?.members
+                        ?.map((member) => validateString(member.firstName))
                         .toList() ??
                     [];
                 if (groupData == null) {
@@ -139,13 +144,15 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
                     GroupCard(
                       title: groupData.titleMembers ?? '',
                       subtitle: groupData.bio ?? '',
-                      avatarPaths: validateStringList(avatarPaths),
+                      avatarPaths: avatarPaths,
+
                       onMenuPressed: () {
                         AutoRouter.of(
                           context,
                         ).push(CreateGroupRoute(isEditMode: true));
                       },
                       chipLabel: groupData.fitsForGroup,
+                      memberNames: avatarInitials,
                       isEditMode: true,
                     ),
                     _buildPhotosVideosGrid(context),

@@ -9,10 +9,12 @@ class LegalContentRepoImpl extends LegalContentRepo {
 
   @override
   Future<LegalContentModel> fetchLegalContents({
-    required bool termOfService,
+    bool? termOfService,
+    bool? privacyPolicy,
   }) async {
     return await _legalContentDatasource.fetchLegalContents(
       termOfService: termOfService,
+      privacyPolicy: privacyPolicy,
     );
   }
 }

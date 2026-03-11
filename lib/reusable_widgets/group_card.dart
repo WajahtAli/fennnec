@@ -18,6 +18,7 @@ class GroupCard extends StatelessWidget {
   final String? chipLabel;
   final double? height;
   final List<String> avatarPaths;
+  final List<String> memberNames;
   final VoidCallback? onMenuPressed;
 
   final Color? backgroundColor;
@@ -33,6 +34,7 @@ class GroupCard extends StatelessWidget {
     this.chipLabel,
     this.height,
     this.avatarPaths = const [],
+    this.memberNames = const [],
     this.onMenuPressed,
     this.backgroundColor,
     this.isShowInfoIcon = true,
@@ -135,7 +137,10 @@ class GroupCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        MemberAvatarWidget(avatarPaths: avatarPaths),
+                        MemberAvatarWidget(
+                          avatarPaths: avatarPaths,
+                          memberNames: memberNames,
+                        ),
                         const SizedBox(height: 16),
                         Text(
                           title,

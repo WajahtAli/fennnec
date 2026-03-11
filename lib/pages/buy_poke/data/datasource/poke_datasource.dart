@@ -4,7 +4,12 @@ import 'package:fennac_app/pages/buy_poke/data/model/poke_model.dart';
 
 abstract class PokeDatasource {
   Future<PockModel> fetchPokes();
-  Future<Map<String, dynamic>> sendPoke({required String toUserId});
+  Future<Map<String, dynamic>> sendPoke({
+    required String toUserId,
+    required String targetType,
+    String? targetId,
+    required String message,
+  });
 }
 
 class PokeDatasourceImpl extends PokeDatasource {
@@ -22,10 +27,25 @@ class PokeDatasourceImpl extends PokeDatasource {
   }
 
   @override
-  Future<Map<String, dynamic>> sendPoke({required String toUserId}) async {
+  Future<Map<String, dynamic>> sendPoke({
+    required String toUserId,
+    required String targetType,
+    String? targetId,
+    required String message,
+  }) async {
+    final body = <String, dynamic>{
+      'toUserId': toUserId,
+      'targetType': targetType,
+      'message': message,
+    };
+
+    if (targetId != null && targetId.isNotEmpty) {
+      body['targetId'] = targetId;
+    }
+
     final response = await apiHelper.post(
-      'pokes/send',
-      body: {'toUserId': toUserId},
+      AppConstants.sendPoke,
+      body: body,
       requiresAuth: true,
     );
     return response;

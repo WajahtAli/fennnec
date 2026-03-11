@@ -1,9 +1,9 @@
+import 'dart:developer';
 import 'dart:ui';
 import 'package:fennac_app/app/constants/media_query_constants.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/core/di_container.dart';
-import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:fennac_app/pages/my_group/presentation/bloc/cubit/my_group_cubit.dart';
 import 'package:fennac_app/pages/my_group/presentation/bloc/state/my_group_state.dart';
 import 'package:fennac_app/reusable_widgets/member_avatar_widget.dart';
@@ -101,18 +101,17 @@ class _SwitchGroupsBottomSheetState extends State<SwitchGroupsBottomSheet> {
                   itemCount: groupList.length,
                   itemBuilder: (context, index) {
                     final group = groupList[index];
-                    final apiAvatars =
-                        group.members?.map((member) => member.image).toList() ??
+                    // Keep empty string for null images to maintain index alignment with memberNames
+                    final avatarPaths =
+                        group.members
+                            ?.map((member) => member.image ?? '')
+                            .toList() ??
                         [];
-
-                    [];
-                    final avatarPaths = apiAvatars.isNotEmpty
-                        ? apiAvatars
-                        : [
-                            Assets.dummy.a1.path,
-                            Assets.dummy.a2.path,
-                            Assets.dummy.a3.path,
-                          ];
+                    final memberNames =
+                        group.members
+                            ?.map((member) => validateString(member.firstName))
+                            .toList() ??
+                        [];
 
                     return ValueListenableBuilder<int?>(
                       valueListenable: _selectedGroupIndex,
@@ -120,7 +119,8 @@ class _SwitchGroupsBottomSheetState extends State<SwitchGroupsBottomSheet> {
                         final isSelected = selectedIndex == index;
                         return _SelectableGroupCard(
                           title: group.titleMembers ?? '',
-                          avatarPaths: validateStringList(avatarPaths),
+                          avatarPaths: avatarPaths,
+                          memberNames: memberNames,
                           isSelected: isSelected,
                           onTap: () {
                             _selectedGroupIndex.value = index;
@@ -142,12 +142,14 @@ class _SwitchGroupsBottomSheetState extends State<SwitchGroupsBottomSheet> {
 class _SelectableGroupCard extends StatelessWidget {
   final String title;
   final List<String> avatarPaths;
+  final List<String> memberNames;
   final bool isSelected;
   final VoidCallback onTap;
 
   const _SelectableGroupCard({
     required this.title,
     required this.avatarPaths,
+    this.memberNames = const [],
     required this.isSelected,
     required this.onTap,
   });
@@ -157,6 +159,8 @@ class _SelectableGroupCard extends StatelessWidget {
     final cardWidth = getWidth(context) - 32;
     final maxWidth = 392.0;
     final actualWidth = cardWidth > maxWidth ? maxWidth : cardWidth;
+
+    log('members: ${memberNames.map((e) => e).toList()}');
 
     return GestureDetector(
       onTap: onTap,
@@ -188,6 +192,7 @@ class _SelectableGroupCard extends StatelessWidget {
                   MemberAvatarWidget(
                     avatarPaths: avatarPaths,
                     borderColor: isSelected ? Colors.white : null,
+                    memberNames: memberNames,
                   ),
                   const CustomSizedBox(height: 16),
                   Text(
