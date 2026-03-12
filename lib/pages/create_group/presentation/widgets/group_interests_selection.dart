@@ -10,8 +10,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class GroupInterestsSelection extends StatelessWidget {
   final CreateGroupCubit cubit;
+  final bool isEditable;
 
-  const GroupInterestsSelection({super.key, required this.cubit});
+  const GroupInterestsSelection({
+    super.key,
+    required this.cubit,
+    this.isEditable = true,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -29,47 +34,50 @@ class GroupInterestsSelection extends StatelessWidget {
           bloc: cubit,
           builder: (context, state) {
             final selectedInterests = cubit.selectedInterests;
-            return Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                InterestChip(
-                  emoji: AppEmojis.mountain,
-                  label: 'Travel & Adventure',
-                  isSelected: selectedInterests.contains('travel'),
-                  onTap: () => cubit.toggleInterest('travel'),
-                ),
-                InterestChip(
-                  emoji: AppEmojis.musicalNote,
-                  label: 'Music & Arts',
-                  isSelected: selectedInterests.contains('music'),
-                  onTap: () => cubit.toggleInterest('music'),
-                ),
-                InterestChip(
-                  emoji: AppEmojis.hamburger,
-                  label: 'Food & Drink',
-                  isSelected: selectedInterests.contains('food'),
-                  onTap: () => cubit.toggleInterest('food'),
-                ),
-                InterestChip(
-                  emoji: AppEmojis.yoga,
-                  label: 'Wellness & Lifestyle',
-                  isSelected: selectedInterests.contains('wellness'),
-                  onTap: () => cubit.toggleInterest('wellness'),
-                ),
-                InterestChip(
-                  emoji: AppEmojis.football,
-                  label: 'Sports & Outdoors',
-                  isSelected: selectedInterests.contains('sports'),
-                  onTap: () => cubit.toggleInterest('sports'),
-                ),
-                InterestChip(
-                  emoji: AppEmojis.partyPopper,
-                  label: 'Events & Parties',
-                  isSelected: selectedInterests.contains('events'),
-                  onTap: () => cubit.toggleInterest('events'),
-                ),
-              ],
+            return IgnorePointer(
+              ignoring: !isEditable,
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  InterestChip(
+                    emoji: AppEmojis.mountain,
+                    label: 'Travel & Adventure',
+                    isSelected: selectedInterests.contains('travel'),
+                    onTap: () => cubit.toggleInterest('travel'),
+                  ),
+                  InterestChip(
+                    emoji: AppEmojis.musicalNote,
+                    label: 'Music & Arts',
+                    isSelected: selectedInterests.contains('music'),
+                    onTap: () => cubit.toggleInterest('music'),
+                  ),
+                  InterestChip(
+                    emoji: AppEmojis.hamburger,
+                    label: 'Food & Drink',
+                    isSelected: selectedInterests.contains('food'),
+                    onTap: () => cubit.toggleInterest('food'),
+                  ),
+                  InterestChip(
+                    emoji: AppEmojis.yoga,
+                    label: 'Wellness & Lifestyle',
+                    isSelected: selectedInterests.contains('wellness'),
+                    onTap: () => cubit.toggleInterest('wellness'),
+                  ),
+                  InterestChip(
+                    emoji: AppEmojis.football,
+                    label: 'Sports & Outdoors',
+                    isSelected: selectedInterests.contains('sports'),
+                    onTap: () => cubit.toggleInterest('sports'),
+                  ),
+                  InterestChip(
+                    emoji: AppEmojis.partyPopper,
+                    label: 'Events & Parties',
+                    isSelected: selectedInterests.contains('events'),
+                    onTap: () => cubit.toggleInterest('events'),
+                  ),
+                ],
+              ),
             );
           },
         ),

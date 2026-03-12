@@ -9,11 +9,13 @@ import 'package:flutter/material.dart';
 class GroupTitleField extends StatelessWidget {
   final CreateGroupCubit cubit;
   final TextEditingController controller;
+  final bool readOnly;
 
   const GroupTitleField({
     super.key,
     required this.cubit,
     required this.controller,
+    this.readOnly = false,
   });
 
   @override
@@ -30,6 +32,7 @@ class GroupTitleField extends StatelessWidget {
         ),
         CustomLabelTextField(
           controller: controller,
+          readOnly: readOnly,
           hintText: 'Enter group title',
           hintStyle: AppTextStyles.body(context).copyWith(
             color: isLight
@@ -38,6 +41,7 @@ class GroupTitleField extends StatelessWidget {
           ),
           filled: false,
           onChanged: (value) {
+            if (readOnly) return;
             cubit.updateGroupTitle(value);
           },
         ),

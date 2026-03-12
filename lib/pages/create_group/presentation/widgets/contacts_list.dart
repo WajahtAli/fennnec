@@ -31,11 +31,11 @@ class ContactsList extends StatelessWidget {
         }
 
         if (items.isEmpty) {
+          final emptyMessage = contacts.isEmpty && !cubit.isSearching
+              ? 'No contacts found on this device'
+              : 'No contacts found';
           return Center(
-            child: Text(
-              'No contacts found',
-              style: AppTextStyles.body(context),
-            ),
+            child: Text(emptyMessage, style: AppTextStyles.body(context)),
           );
         }
 

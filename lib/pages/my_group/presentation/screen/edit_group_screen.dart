@@ -8,8 +8,10 @@ import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/core/extensions/string_extension.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
+import 'package:fennac_app/helpers/gradient_toast.dart';
 import 'package:fennac_app/helpers/cached_network_image_helper.dart';
 import 'package:fennac_app/pages/create_group/presentation/screen/create_group_gallery_screen.dart';
+import 'package:fennac_app/pages/auth/presentation/bloc/cubit/login_cubit.dart';
 import 'package:fennac_app/pages/my_group/presentation/bloc/cubit/my_group_cubit.dart';
 import 'package:fennac_app/pages/my_group/presentation/bloc/state/my_group_state.dart';
 import 'package:fennac_app/reusable_widgets/custom_app_bar.dart';
@@ -44,6 +46,34 @@ class EditGroupScreen extends StatefulWidget {
 
 class _EditGroupScreenState extends State<EditGroupScreen> {
   final MyGroupCubit _myGroupCubit = Di().sl<MyGroupCubit>();
+
+  bool _isCurrentUserAdmin() {
+    final currentUserId = Di().sl<LoginCubit>().userData?.user?.id;
+    final createdById = _myGroupCubit.myGroupModel?.data?.createdBy?.id;
+    if (currentUserId == null || currentUserId.isEmpty) return false;
+    if (createdById == null || createdById.isEmpty) return false;
+    return currentUserId == createdById;
+  }
+
+  bool _canUpdatePhotosVideos() {
+    if (_isCurrentUserAdmin()) return true;
+    return _myGroupCubit
+            .myGroupModel
+            ?.data
+            ?.groupSettings
+            ?.anyoneCanUpdatePhotosVideos ==
+        true;
+  }
+
+  bool _canUpdatePrompts() {
+    if (_isCurrentUserAdmin()) return true;
+    return _myGroupCubit
+            .myGroupModel
+            ?.data
+            ?.groupSettings
+            ?.anyoneCanUpdatePrompts ==
+        true;
+  }
 
   late TextEditingController _titleController;
   late TextEditingController _bioController;
@@ -582,6 +612,27 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
   }) {
     log('Edit tapped for type: $editType');
 
+    if ((editType == EditableGroupCardType.title ||
+            editType == EditableGroupCardType.bio ||
+            editType == EditableGroupCardType.category ||
+            editType == EditableGroupCardType.settings) &&
+        !_isCurrentUserAdmin()) {
+      VxToast.show(message: 'Only group admin can edit this section.');
+      return;
+    }
+
+    if (editType == EditableGroupCardType.image && !_canUpdatePhotosVideos()) {
+      VxToast.show(
+        message: 'You do not have permission to update photos/videos.',
+      );
+      return;
+    }
+
+    if (editType == EditableGroupCardType.prompt && !_canUpdatePrompts()) {
+      VxToast.show(message: 'You do not have permission to update prompts.');
+      return;
+    }
+
     switch (editType) {
       case EditableGroupCardType.image:
         AutoRouter.of(context).push(CreateGroupGalleryRoute(isEditMode: true));
@@ -769,27 +820,5 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
 
     _myGroupCubit.updateGroupById(widget.groupId, body);
     log('Group updated with data: $body');
-  }
-
-  void _updateGroupSettings(
-    bool anyoneCanInvite,
-    bool anyoneCanUpdatePhotos,
-    bool anyoneCanUpdatePrompts,
-  ) {
-    final body = {
-      'title': _titleController.text,
-      'bio': _bioController.text,
-      'fitsForGroup': _categoryController.text,
-      'groupSettings': {
-        'anyoneCanInviteMembers': anyoneCanInvite,
-        'anyoneCanUpdatePhotosVideos': anyoneCanUpdatePhotos,
-        'anyoneCanUpdatePrompts': anyoneCanUpdatePrompts,
-      },
-      'photosVideos': _myGroupCubit.myGroupModel?.data?.photosVideos ?? [],
-      'members': _myGroupCubit.myGroupModel?.data?.members?.toList() ?? [],
-    };
-
-    _myGroupCubit.updateGroupById(widget.groupId, body);
-    log('Group settings updated: $body');
   }
 }

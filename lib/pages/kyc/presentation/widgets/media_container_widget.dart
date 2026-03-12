@@ -8,6 +8,7 @@ import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:fennac_app/helpers/cached_network_image_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:lottie/lottie.dart';
 import 'package:video_player/video_player.dart';
 
 class MediaContainerWidget extends StatefulWidget {
@@ -298,13 +299,10 @@ class _MediaContainerWidgetState extends State<MediaContainerWidget> {
       color: ColorPalette.secondary.withValues(alpha: 0.3),
       child: Center(
         child: isLoading
-            ? const SizedBox(
+            ? SizedBox(
                 width: 24,
                 height: 24,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Colors.white,
-                ),
+                child: Lottie.asset(Assets.animations.loadingSpinner),
               )
             : Icon(
                 Icons.video_camera_back,
@@ -335,11 +333,11 @@ class _MediaContainerWidgetState extends State<MediaContainerWidget> {
         errorWidget: _buildErrorWidget(),
         placeholder: Container(
           color: ColorPalette.secondary.withValues(alpha: 0.3),
-          child: const Center(
+          child: Center(
             child: SizedBox(
               width: 24,
               height: 24,
-              child: CircularProgressIndicator(strokeWidth: 2),
+              child: Lottie.asset(Assets.animations.loadingSpinner),
             ),
           ),
         ),

@@ -44,6 +44,19 @@ class GroupsRepositoryImpl extends GroupsRepository {
   }
 
   @override
+  Future<Map<String, dynamic>> reportUser({
+    required String userId,
+    required String reason,
+    String? customReason,
+  }) async {
+    return await _groupsDataSource.reportUser(
+      userId: userId,
+      reason: reason,
+      customReason: customReason,
+    );
+  }
+
+  @override
   Future<Map<String, dynamic>> acceptGroupReq({
     required String groupId,
     required String type,

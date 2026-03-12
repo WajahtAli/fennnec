@@ -192,61 +192,62 @@ class GroupOptionsBottomSheet extends StatelessWidget {
               );
             },
           ),
-          _buildOption(
-            context,
-            title: 'Leave This Group',
-            textColor: const Color(0xFFFF3B30),
-            onTap: () {
-              CustomBottomSheet.show(
-                context: context,
-                isSecondaryButtonFirst: true,
 
-                icon: AnimatedBackgroundContainer(
-                  icon: Assets.icons.alertTriangle.path,
-                ),
-                title: 'Leave This Group?',
-                description:
-                    "Once you leave this group, you won’t be able to access its messages, media, and matches with this group.",
-                description1: 'This action cannot be undone.',
-                buttonText: ' Leave Group',
-                onButtonPressed: () async {
-                  final bool isUnmatched = await Di()
-                      .sl<MyGroupCubit>()
-                      .unMatchGroupById(groupData.id ?? '');
-                  if (!context.mounted || !isUnmatched) {
-                    return;
-                  }
+          //todo only for group to group unMatch
+          // _buildOption(
+          //   context,
+          //   title: 'Leave This Group',
+          //   textColor: const Color(0xFFFF3B30),
+          //   onTap: () {
+          //     CustomBottomSheet.show(
+          //       context: context,
+          //       isSecondaryButtonFirst: true,
 
-                  CustomBottomSheet.show(
-                    context: context,
-                    icon: AnimatedBackgroundContainer(
-                      icon: Assets.icons.checkGreen.path,
-                      isPng: true,
-                    ),
-                    title: 'Group Deleted',
-                    description: 'Your group has been successfully removed.',
-                    descriptionStyle: AppTextStyles.h4(context),
-                    description1:
-                        "You can always create a new group or join an existing one whenever you’re ready to connect again.",
-                    description1Style: AppTextStyles.subHeading(context)
-                        .copyWith(
-                          color: ColorPalette.textSecondary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                    buttonText: 'Explore Groups',
-                    onButtonPressed: () {
-                      AutoRouter.of(context).push(DashboardRoute());
-                      Di().sl<DashboardCubit>().changeIndex(0);
-                    },
-                  );
-                },
-                isHorizontalButton: true,
+          //       icon: AnimatedBackgroundContainer(
+          //         icon: Assets.icons.alertTriangle.path,
+          //       ),
+          //       title: 'Leave This Group?',
+          //       description:
+          //           "Once you leave this group, you won’t be able to access its messages, media, and matches with this group.",
+          //       description1: 'This action cannot be undone.',
+          //       buttonText: ' Leave Group',
+          //       onButtonPressed: () async {
+          //         final bool isUnmatched = await Di()
+          //             .sl<MyGroupCubit>()
+          //             .unMatchGroupById(groupData.id ?? '');
+          //         if (!context.mounted || !isUnmatched) {
+          //           return;
+          //         }
 
-                secondaryButtonText: 'Cancel',
-              );
-            },
-          ),
+          //         CustomBottomSheet.show(
+          //           context: context,
+          //           icon: AnimatedBackgroundContainer(
+          //             icon: Assets.icons.checkGreen.path,
+          //             isPng: true,
+          //           ),
+          //           title: 'Group Deleted',
+          //           description: 'Your group has been successfully removed.',
+          //           descriptionStyle: AppTextStyles.h4(context),
+          //           description1:
+          //               "You can always create a new group or join an existing one whenever you’re ready to connect again.",
+          //           description1Style: AppTextStyles.subHeading(context)
+          //               .copyWith(
+          //                 color: ColorPalette.textSecondary,
+          //                 fontWeight: FontWeight.w600,
+          //               ),
+          //           buttonText: 'Explore Groups',
+          //           onButtonPressed: () {
+          //             AutoRouter.of(context).push(DashboardRoute());
+          //             Di().sl<DashboardCubit>().changeIndex(0);
+          //           },
+          //         );
+          //       },
+          //       isHorizontalButton: true,
 
+          //       secondaryButtonText: 'Cancel',
+          //     );
+          //   },
+          // ),
           _buildOption(
             context,
             title: 'Delete This Group',

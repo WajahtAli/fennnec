@@ -32,7 +32,16 @@ class ContactListCubit extends Cubit<ContactListState> {
       final status = await Permission.contacts.status;
 
       if (status.isGranted) {
-        contacts = await FastContacts.getAllContacts();
+        if (FastContacts.getAllContactsInProgress) {
+          return;
+        }
+        contacts = await FastContacts.getAllContacts(
+          fields: const [
+            ContactField.displayName,
+            ContactField.phoneNumbers,
+            ContactField.emailAddresses,
+          ],
+        );
         await getAllMembers(
           contacts: contacts!
               .map(
@@ -50,7 +59,16 @@ class ContactListCubit extends Cubit<ContactListState> {
         final result = await Permission.contacts.request();
 
         if (result.isGranted) {
-          contacts = await FastContacts.getAllContacts();
+          if (FastContacts.getAllContactsInProgress) {
+            return;
+          }
+          contacts = await FastContacts.getAllContacts(
+            fields: const [
+              ContactField.displayName,
+              ContactField.phoneNumbers,
+              ContactField.emailAddresses,
+            ],
+          );
           await getAllMembers(
             contacts: contacts!
                 .map(
@@ -78,11 +96,20 @@ class ContactListCubit extends Cubit<ContactListState> {
     }
   }
 
-  Future<void> checkPermissionAndLoad() async {
+  Future<void> checkPermissionAndLoad({bool forceReload = false}) async {
     try {
       final status = await Permission.contacts.status;
+
       if (status.isGranted) {
+        if (!forceReload && contacts != null && contacts!.isNotEmpty) {
+          emit(ContactListLoaded());
+          return;
+        }
         await requestAccessAndLoadContacts();
+      } else if (status.isPermanentlyDenied || status.isRestricted) {
+        emit(ContactListPermissionPermanentlyDenied());
+      } else {
+        emit(ContactListInitial());
       }
     } catch (e) {
       log('Check permission failed', error: e);

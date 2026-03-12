@@ -1,5 +1,8 @@
 import 'dart:developer';
 
+import 'package:fennac_app/core/di_container.dart';
+import 'package:fennac_app/helpers/gradient_toast.dart';
+import 'package:fennac_app/pages/auth/presentation/bloc/cubit/login_cubit.dart';
 import 'package:fennac_app/pages/buy_poke/domain/usecase/send_poke_usecase.dart';
 import 'package:fennac_app/pages/home/data/models/groups_model.dart';
 import 'package:fennac_app/pages/home/presentation/bloc/state/home_state.dart';
@@ -114,6 +117,21 @@ class HomeCubit extends Cubit<HomeState> {
     emit(HomeLoaded());
   }
 
+  void removeProfileById(String userId) {
+    emit(HomeLoading());
+    if (selectedGroupIndex < groups.length) {
+      final members = groups[selectedGroupIndex].members;
+      members?.removeWhere((member) => member.id == userId);
+    }
+
+    if (selectedProfile?.id == userId) {
+      selectedProfile = null;
+      selectedProfileIndex = null;
+    }
+
+    emit(HomeLoaded());
+  }
+
   void removeGroupAt(int index) {
     emit(HomeLoading());
     if (index >= 0 && index < groups.length) {
@@ -183,6 +201,21 @@ class HomeCubit extends Cubit<HomeState> {
     }
   }
 
+  // Validate swipe availability for non-subscribed members.
+  bool checkAvailableSwipes() {
+    if (Di().sl<LoginCubit>().userData?.user?.subscriptionActive == true) {
+      return true;
+    }
+
+    if (currentIndex >= 5) {
+      cardSwiperController.moveTo(4);
+      VxToast.show(message: 'Subscribe to swipe through more profiles');
+      return false;
+    }
+
+    return true;
+  }
+
   // ========== SEND POKE METHOD ==========
   Future<void> sendPoke({
     required String toUserId,
@@ -199,6 +232,7 @@ class HomeCubit extends Cubit<HomeState> {
         message: message,
       );
       log('Poke sent successfully: $response');
+      VxToast.show(message: response['message'] ?? 'Poke sent successfully');
       emit(HomeLoaded());
     } catch (e) {
       log('Error sending poke: $e');

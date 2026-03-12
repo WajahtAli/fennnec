@@ -72,6 +72,28 @@ class GroupsCubit extends Cubit<GroupsState> {
     }
   }
 
+  Future<Map<String, dynamic>> reportUser({
+    required String userId,
+    required String reason,
+    String? customReason,
+  }) async {
+    try {
+      emit(GroupsLoading());
+      final response = await _groupsUsecase.reportUser(
+        userId: userId,
+        reason: reason,
+        customReason: customReason,
+      );
+      log('Report submitted for userId: $userId');
+      emit(GroupsSuccess());
+      return response;
+    } catch (e) {
+      log(e.toString());
+      emit(GroupsError(e.toString()));
+      rethrow;
+    }
+  }
+
   Future<void> acceptGroupReq({
     required String groupId,
     required String type,

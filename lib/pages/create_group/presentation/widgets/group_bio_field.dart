@@ -10,12 +10,14 @@ class GroupBioField extends StatelessWidget {
   final CreateGroupCubit cubit;
   final TextEditingController controller;
   final ScrollController scrollController;
+  final bool readOnly;
 
   const GroupBioField({
     super.key,
     required this.cubit,
     required this.controller,
     required this.scrollController,
+    this.readOnly = false,
   });
 
   @override
@@ -33,6 +35,7 @@ class GroupBioField extends StatelessWidget {
         CustomLabelTextField(
           controller: controller,
           scrollController: scrollController,
+          readOnly: readOnly,
           keyboardType: TextInputType.multiline,
           hintText: 'Type here...',
           hintStyle: AppTextStyles.body(context).copyWith(
@@ -43,6 +46,7 @@ class GroupBioField extends StatelessWidget {
           filled: false,
           maxLines: 4,
           onChanged: (value) {
+            if (readOnly) return;
             cubit.updateGroupBio(value);
           },
         ),

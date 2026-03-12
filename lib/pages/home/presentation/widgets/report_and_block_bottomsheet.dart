@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:auto_route/auto_route.dart';
+import 'package:fennac_app/app/constants/app_enums.dart';
 import 'package:fennac_app/app/constants/media_query_constants.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
@@ -23,7 +24,15 @@ import 'package:lottie/lottie.dart';
 
 class ReportAndBlockBottomSheet extends StatefulWidget {
   final String groupId;
-  const ReportAndBlockBottomSheet({super.key, required this.groupId});
+  final String? userId;
+  final ReportTargetType reportTargetType;
+
+  const ReportAndBlockBottomSheet({
+    super.key,
+    required this.groupId,
+    this.userId,
+    this.reportTargetType = ReportTargetType.group,
+  });
 
   @override
   State<ReportAndBlockBottomSheet> createState() =>
@@ -270,18 +279,42 @@ class _ReportAndBlockBottomSheetState extends State<ReportAndBlockBottomSheet> {
                                 }
 
                                 try {
-                                  await _groupsCubit.reportGroup(
-                                    groupId: widget.groupId,
-                                    reason: _selectedReason!,
-                                    customReason: _selectedReason == 'Other'
-                                        ? _reasonController.text
-                                        : null,
-                                  );
-                                  _blurNotifier.value = true;
+                                  final customReason =
+                                      _selectedReason == 'Other'
+                                      ? _reasonController.text
+                                      : null;
 
-                                  Di().sl<HomeCubit>().removeGroupById(
-                                    widget.groupId,
-                                  );
+                                  if (widget.reportTargetType ==
+                                      ReportTargetType.user) {
+                                    final userId = widget.userId;
+                                    if (userId == null || userId.isEmpty) {
+                                      throw Exception(
+                                        'Unable to report this user right now.',
+                                      );
+                                    }
+
+                                    await _groupsCubit.reportUser(
+                                      userId: userId,
+                                      reason: _selectedReason!,
+                                      customReason: customReason,
+                                    );
+
+                                    Di().sl<HomeCubit>().removeProfileById(
+                                      userId,
+                                    );
+                                  } else {
+                                    await _groupsCubit.reportGroup(
+                                      groupId: widget.groupId,
+                                      reason: _selectedReason!,
+                                      customReason: customReason,
+                                    );
+
+                                    Di().sl<HomeCubit>().removeGroupById(
+                                      widget.groupId,
+                                    );
+                                  }
+
+                                  _blurNotifier.value = true;
                                 } catch (e) {
                                   _blurNotifier.value = false;
                                   if (!mounted) return;

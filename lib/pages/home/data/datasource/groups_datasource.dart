@@ -20,6 +20,12 @@ abstract class GroupsDataSource {
     String? customReason,
   });
 
+  Future<Map<String, dynamic>> reportUser({
+    required String userId,
+    required String reason,
+    String? customReason,
+  });
+
   Future<Map<String, dynamic>> acceptGroupReq({
     required String groupId,
     required String type,
@@ -77,6 +83,27 @@ class GroupsDataSourceImpl extends GroupsDataSource {
       }
       final response = await apiHelper.post(
         'groups/$groupId/report',
+        body: body,
+      );
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>> reportUser({
+    required String userId,
+    required String reason,
+    String? customReason,
+  }) async {
+    try {
+      final body = <String, dynamic>{'reason': reason};
+      if (customReason != null && customReason.trim().isNotEmpty) {
+        body['customReason'] = customReason.trim();
+      }
+      final response = await apiHelper.post(
+        'groups/user/$userId/report',
         body: body,
       );
       return response;

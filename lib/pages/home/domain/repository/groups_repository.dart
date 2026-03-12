@@ -18,6 +18,12 @@ abstract class GroupsRepository {
     String? customReason,
   });
 
+  Future<Map<String, dynamic>> reportUser({
+    required String userId,
+    required String reason,
+    String? customReason,
+  });
+
   Future<Map<String, dynamic>> acceptGroupReq({
     required String groupId,
     required String type,

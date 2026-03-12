@@ -51,13 +51,13 @@ class _CreateGroupContentState extends State<CreateGroupContent> {
       cubit.updateGroupTitle(title);
       cubit.updateGroupCategory(category);
       cubit.updateCanInviteMembers(
-        groupData.groupSettings?.anyoneCanInviteMembers ?? true,
+        groupData.groupSettings?.anyoneCanInviteMembers ?? false,
       );
       cubit.updateCanUpdatePhotosVideos(
-        groupData.groupSettings?.anyoneCanUpdatePhotosVideos ?? true,
+        groupData.groupSettings?.anyoneCanUpdatePhotosVideos ?? false,
       );
       cubit.updateCanUpdatePrompts(
-        groupData.groupSettings?.anyoneCanUpdatePrompts ?? true,
+        groupData.groupSettings?.anyoneCanUpdatePrompts ?? false,
       );
 
       if (category.isNotEmpty) {
@@ -100,6 +100,11 @@ class _CreateGroupContentState extends State<CreateGroupContent> {
 
   @override
   Widget build(BuildContext context) {
+    final canEditCoreDetails =
+        !widget.isEditMode || cubit.canCurrentUserEditCoreDetails();
+    final canEditMembers =
+        !widget.isEditMode || cubit.canCurrentUserInviteMembers();
+
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 0),
       child: Column(
@@ -122,6 +127,7 @@ class _CreateGroupContentState extends State<CreateGroupContent> {
                   SelectedMembersList(
                     contactListCubit: contactListCubit,
                     isEditMode: widget.isEditMode,
+                    canEditMembers: canEditMembers,
                     editMembers:
                         _myGroupCubit.myGroupModel?.data?.members ?? [],
                   ),
@@ -129,15 +135,20 @@ class _CreateGroupContentState extends State<CreateGroupContent> {
                   GroupTitleField(
                     cubit: cubit,
                     controller: _groupTitleController,
+                    readOnly: !canEditCoreDetails,
                   ),
                   const CustomSizedBox(height: 24),
                   GroupBioField(
                     cubit: cubit,
                     controller: _bioController,
                     scrollController: _scrollController,
+                    readOnly: !canEditCoreDetails,
                   ),
                   const CustomSizedBox(height: 24),
-                  GroupInterestsSelection(cubit: cubit),
+                  GroupInterestsSelection(
+                    cubit: cubit,
+                    isEditable: canEditCoreDetails,
+                  ),
                   const CustomSizedBox(height: 24),
                   GroupBasicSettings(cubit: cubit),
                 ],

@@ -19,12 +19,14 @@ class SelectedMembersList extends StatefulWidget {
   final ContactListCubit contactListCubit;
   final bool isEditMode;
   final List<CreatedBy> editMembers;
+  final bool canEditMembers;
 
   const SelectedMembersList({
     super.key,
     required this.contactListCubit,
     required this.isEditMode,
     required this.editMembers,
+    this.canEditMembers = true,
   });
 
   @override
@@ -70,12 +72,16 @@ class _SelectedMembersListState extends State<SelectedMembersList> {
 
         return _MembersWrap(
           selectedMembers: selectedMembers,
-          onAddTap: () {
-            AutoRouter.of(context).push(const AddMemberRoute());
-          },
-          onRemove: (index) {
-            widget.contactListCubit.removeMember(index);
-          },
+          onAddTap: widget.canEditMembers
+              ? () {
+                  AutoRouter.of(context).push(const AddMemberRoute());
+                }
+              : null,
+          onRemove: widget.canEditMembers
+              ? (index) {
+                  widget.contactListCubit.removeMember(index);
+                }
+              : null,
         );
       },
     );
@@ -84,8 +90,8 @@ class _SelectedMembersListState extends State<SelectedMembersList> {
 
 class _MembersWrap extends StatelessWidget {
   final List<SelectedMember> selectedMembers;
-  final VoidCallback onAddTap;
-  final Function(int) onRemove;
+  final VoidCallback? onAddTap;
+  final Function(int)? onRemove;
 
   const _MembersWrap({
     required this.selectedMembers,
@@ -103,7 +109,7 @@ class _MembersWrap extends StatelessWidget {
           label: member.displayName.isNotEmpty ? member.displayName : 'Member',
           subtitle: member.phoneNumber,
           roleLabel: 'Invited',
-          onRemove: () => onRemove(index),
+          onRemove: onRemove != null ? () => onRemove!(index) : null,
         );
       }
       return _MemberSlot(isAdd: true, label: 'Add Member', onAdd: onAddTap);
@@ -129,6 +135,7 @@ class _MembersWrap extends StatelessWidget {
       profileImageUrl: createdBy?.image,
       email: createdBy?.email,
       isFennecUser: true,
+
       fennecId: createdBy?.id,
     );
 

@@ -10,7 +10,6 @@ import 'package:fennac_app/pages/homelanding/data/models/group_invitation_model.
 import 'package:fennac_app/pages/homelanding/presentation/bloc/cubit/home_landing_cubit.dart';
 import 'package:fennac_app/pages/homelanding/presentation/bloc/state/home_landing_state.dart';
 import 'package:fennac_app/routes/routes_imports.gr.dart';
-import 'package:fennac_app/skeletons/home_landing_banner_skeleton.dart';
 import 'package:fennac_app/widgets/custom_sized_box.dart';
 import 'package:fennac_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';

@@ -24,18 +24,33 @@ class AddMemberScreen extends StatefulWidget {
   State<AddMemberScreen> createState() => _AddMemberScreenState();
 }
 
-class _AddMemberScreenState extends State<AddMemberScreen> {
+class _AddMemberScreenState extends State<AddMemberScreen>
+    with WidgetsBindingObserver {
   final contactListCubit = Di().sl<ContactListCubit>();
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     final hasContacts =
         contactListCubit.contacts != null &&
         contactListCubit.contacts!.isNotEmpty;
     if (!hasContacts) {
       contactListCubit.checkPermissionAndLoad();
     }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      contactListCubit.checkPermissionAndLoad(forceReload: true);
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   @override

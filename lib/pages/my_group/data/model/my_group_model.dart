@@ -178,30 +178,50 @@ class CreatedBy {
   String? lastName;
   String? email;
   String? image;
+  List<String>? bestShorts;
 
-  CreatedBy({this.id, this.firstName, this.lastName, this.email, this.image});
+  CreatedBy({
+    this.id,
+    this.firstName,
+    this.lastName,
+    this.email,
+    this.image,
+    this.bestShorts,
+  });
 
   CreatedBy copyWith({
     String? id,
     String? firstName,
     String? lastName,
     String? email,
-    String? immage,
+    String? image,
+    List<String>? bestShorts,
   }) => CreatedBy(
     id: id ?? this.id,
     firstName: firstName ?? this.firstName,
     lastName: lastName ?? this.lastName,
     email: email ?? this.email,
-    image: image ?? image,
+    image: image ?? this.image,
+    bestShorts: bestShorts ?? this.bestShorts,
   );
 
-  factory CreatedBy.fromJson(Map<String, dynamic> json) => CreatedBy(
-    id: json["_id"],
-    firstName: json["firstName"],
-    lastName: json["lastName"],
-    email: json["email"],
-    image: json["image"],
-  );
+  factory CreatedBy.fromJson(Map<String, dynamic> json) {
+    final shorts = json["bestShorts"] == null
+        ? <String>[]
+        : List<String>.from(json["bestShorts"].map((x) => x.toString()));
+
+    final image =
+        (json["image"] as String?) ?? (shorts.isNotEmpty ? shorts.first : null);
+
+    return CreatedBy(
+      id: json["_id"],
+      firstName: json["firstName"],
+      lastName: json["lastName"],
+      email: json["email"],
+      image: image,
+      bestShorts: shorts,
+    );
+  }
 
   Map<String, dynamic> toJson() => {
     "_id": id,
@@ -209,6 +229,9 @@ class CreatedBy {
     "lastName": lastName,
     "email": email,
     "image": image,
+    "bestShorts": bestShorts == null
+        ? []
+        : List<dynamic>.from(bestShorts!.map((x) => x)),
   };
 }
 

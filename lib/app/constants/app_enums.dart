@@ -24,3 +24,5 @@ enum CropType {
 }
 
 enum FindGroupScreenType { qrProfileCode, createGroup }
+
+enum ReportTargetType { group, user }

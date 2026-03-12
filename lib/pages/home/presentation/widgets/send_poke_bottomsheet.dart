@@ -8,6 +8,7 @@ import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:fennac_app/helpers/gradient_toast.dart';
 import 'package:fennac_app/pages/home/presentation/bloc/cubit/home_cubit.dart';
+import 'package:fennac_app/pages/home/presentation/bloc/state/home_state.dart';
 import 'package:fennac_app/widgets/prompt_audio_row.dart';
 import 'package:fennac_app/reusable_widgets/animated_background_container.dart';
 import 'package:fennac_app/widgets/custom_bottom_sheet.dart';
@@ -18,6 +19,7 @@ import 'package:fennac_app/widgets/custom_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:lottie/lottie.dart';
 
 class SendPokeBottomSheet extends StatefulWidget {
   final String? image;
@@ -50,6 +52,7 @@ class _SendPokeBottomSheetState extends State<SendPokeBottomSheet> {
   final _homeCubit = Di().sl<HomeCubit>();
   final _formKey = GlobalKey<FormState>();
   final ValueNotifier<bool> _blurNotifier = ValueNotifier(false);
+  String? _errorMessage;
 
   @override
   void initState() {
@@ -66,6 +69,8 @@ class _SendPokeBottomSheetState extends State<SendPokeBottomSheet> {
   Future<void> _sendPoke() async {
     final isValid = _formKey.currentState?.validate() ?? false;
     if (!isValid) return;
+
+    setState(() => _errorMessage = null);
 
     try {
       final selectedProfile = _homeCubit.selectedProfile;
@@ -107,8 +112,10 @@ class _SendPokeBottomSheetState extends State<SendPokeBottomSheet> {
         );
       }
     } catch (e) {
-      if (context.mounted) {
-        VxToast.show(message: 'Failed to send poke: $e');
+      if (mounted) {
+        setState(() {
+          _errorMessage = e.toString();
+        });
       }
     }
   }
@@ -258,7 +265,33 @@ class _SendPokeBottomSheetState extends State<SendPokeBottomSheet> {
                     ),
                   ),
                   const CustomSizedBox(height: 24),
-                  CustomElevatedButton(onTap: _sendPoke, text: 'Send Poke'),
+                  if (_errorMessage != null)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: Text(
+                        _errorMessage!,
+                        style: const TextStyle(color: Colors.red, fontSize: 13),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  BlocBuilder(
+                    bloc: _homeCubit,
+                    builder: (context, state) {
+                      return CustomElevatedButton(
+                        icon: state is HomeLoading
+                            ? SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: Lottie.asset(
+                                  Assets.animations.loadingSpinner,
+                                ),
+                              )
+                            : SizedBox.shrink(),
+                        onTap: _sendPoke,
+                        text: state is HomeLoading ? '' : 'Send Poke',
+                      );
+                    },
+                  ),
                 ],
               ),
             ),

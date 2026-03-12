@@ -13,6 +13,7 @@ import 'package:fennac_app/pages/find_group/presentation/bloc/state/find_group_s
 import 'package:fennac_app/widgets/custom_elevated_button.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:fennac_app/pages/create_group/data/model/selected_member.dart';
+import 'package:lottie/lottie.dart';
 
 import '../../../create_group/presentation/bloc/cubit/contact_list_cubit.dart';
 
@@ -63,8 +64,10 @@ class MemberPreviewDialog extends StatelessWidget {
                         bloc: findGroupCubit,
                         builder: (context, state) {
                           if (state is FindGroupLoading) {
-                            return const Center(
-                              child: CircularProgressIndicator(),
+                            return Center(
+                              child: Lottie.asset(
+                                Assets.animations.loadingSpinner,
+                              ),
                             );
                           }
 

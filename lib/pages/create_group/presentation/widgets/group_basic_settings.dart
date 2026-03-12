@@ -11,6 +11,8 @@ class GroupBasicSettings extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final canManageSettings = cubit.canCurrentUserEditGroupSettings();
+
     return BlocBuilder<CreateGroupCubit, CreateGroupState>(
       bloc: cubit,
       builder: (context, state) {
@@ -20,6 +22,9 @@ class GroupBasicSettings extends StatelessWidget {
               label: 'Anyone can invite members',
               value: cubit.canInviteMembers,
               onChanged: (value) {
+                if (!canManageSettings) {
+                  return;
+                }
                 cubit.updateCanInviteMembers(value);
               },
             ),
@@ -27,6 +32,9 @@ class GroupBasicSettings extends StatelessWidget {
               label: 'Anyone can update photos/videos',
               value: cubit.canUpdatePhotosVideos,
               onChanged: (value) {
+                if (!canManageSettings) {
+                  return;
+                }
                 cubit.updateCanUpdatePhotosVideos(value);
               },
             ),
@@ -34,6 +42,9 @@ class GroupBasicSettings extends StatelessWidget {
               label: 'Anyone can update prompts',
               value: cubit.canUpdatePrompts,
               onChanged: (value) {
+                if (!canManageSettings) {
+                  return;
+                }
                 cubit.updateCanUpdatePrompts(value);
               },
             ),

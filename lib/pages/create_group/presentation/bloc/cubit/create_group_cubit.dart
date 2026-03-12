@@ -36,6 +36,57 @@ class CreateGroupCubit extends Cubit<CreateGroupState> {
   bool canUpdatePrompts = true;
   String? createdGroupId;
 
+  CreatedBy? _resolveGroupAdmin() {
+    final myGroupCubit = Di().sl<MyGroupCubit>();
+    return myGroupCubit.myGroupModel?.data?.createdBy ??
+        ((myGroupCubit.myGroupList?.groupList?.isNotEmpty ?? false)
+            ? myGroupCubit.myGroupList!.groupList!.first.createdBy
+            : null);
+  }
+
+  GroupSettings? _resolveGroupSettings() {
+    final myGroupCubit = Di().sl<MyGroupCubit>();
+    return myGroupCubit.myGroupModel?.data?.groupSettings ??
+        ((myGroupCubit.myGroupList?.groupList?.isNotEmpty ?? false)
+            ? myGroupCubit.myGroupList!.groupList!.first.groupSettings
+            : null);
+  }
+
+  bool isCurrentUserGroupAdmin() {
+    final currentUserId = Di().sl<LoginCubit>().userData?.user?.id;
+    final adminId = _resolveGroupAdmin()?.id;
+    if (currentUserId == null || currentUserId.isEmpty) return false;
+    if (adminId == null || adminId.isEmpty) return false;
+    return currentUserId == adminId;
+  }
+
+  bool canCurrentUserInviteMembers() {
+    if (isCurrentUserGroupAdmin()) return true;
+    return _resolveGroupSettings()?.anyoneCanInviteMembers ?? false;
+  }
+
+  bool canCurrentUserUpdatePhotosVideos() {
+    if (isCurrentUserGroupAdmin()) return true;
+    return _resolveGroupSettings()?.anyoneCanUpdatePhotosVideos ?? false;
+  }
+
+  bool canCurrentUserUpdatePrompts() {
+    if (isCurrentUserGroupAdmin()) return true;
+    return _resolveGroupSettings()?.anyoneCanUpdatePrompts ?? false;
+  }
+
+  bool canCurrentUserEditGroupSettings() {
+    return isCurrentUserGroupAdmin();
+  }
+
+  bool canCurrentUserEditCoreDetails() {
+    return isCurrentUserGroupAdmin();
+  }
+
+  bool canCurrentUserUpdateAnythingOnDetailsScreen() {
+    return canCurrentUserEditCoreDetails() || canCurrentUserInviteMembers();
+  }
+
   Future<void> openSettings() async {
     await openAppSettings();
   }
@@ -211,6 +262,16 @@ class CreateGroupCubit extends Cubit<CreateGroupState> {
       final ImagePickerCubit imagePickerCubit = Di().sl<ImagePickerCubit>();
 
       final groupData = myGroupCubit.myGroupModel?.data;
+      final canEditCoreDetails = canCurrentUserEditCoreDetails();
+      final canEditMembers = canCurrentUserInviteMembers();
+      final canEditSettings = canCurrentUserEditGroupSettings();
+      final canEditPhotosVideos = canCurrentUserUpdatePhotosVideos();
+
+      if (!canEditCoreDetails && !canEditMembers && !canEditPhotosVideos) {
+        VxToast.show(message: 'You do not have permission to edit this group.');
+        emit(CreateGroupLoaded());
+        return;
+      }
 
       final baseSettings = groupData?.groupSettings;
       final updatedSettings =
@@ -252,19 +313,22 @@ class CreateGroupCubit extends Cubit<CreateGroupState> {
 
       final Map<String, dynamic> updateBody = {};
 
-      if (updatedGroupData?.titleMembers != groupData?.titleMembers) {
+      if (canEditCoreDetails &&
+          updatedGroupData?.titleMembers != groupData?.titleMembers) {
         updateBody['title'] = updatedGroupData?.titleMembers;
       }
 
-      if (updatedGroupData?.bio != groupData?.bio) {
+      if (canEditCoreDetails && updatedGroupData?.bio != groupData?.bio) {
         updateBody['bio'] = updatedGroupData?.bio;
       }
 
-      if (updatedGroupData?.fitsForGroup != groupData?.fitsForGroup) {
+      if (canEditCoreDetails &&
+          updatedGroupData?.fitsForGroup != groupData?.fitsForGroup) {
         updateBody['fitsForGroup'] = updatedGroupData?.fitsForGroup;
       }
 
-      if (updatedSettings != null &&
+      if (canEditSettings &&
+          updatedSettings != null &&
           updatedSettings.toJson() != baseSettings?.toJson()) {
         updateBody['groupSettings'] = {
           'anyoneCanInviteMembers': updatedSettings.anyoneCanInviteMembers,
@@ -275,10 +339,15 @@ class CreateGroupCubit extends Cubit<CreateGroupState> {
       }
 
       final originalPhotosVideos = groupData?.photosVideos ?? const <String>[];
+      var attemptedPhotosVideoUpdateWithoutPermission = false;
 
       if (updatedGroupData?.photosVideos != null &&
           !listEquals(updatedGroupData!.photosVideos!, originalPhotosVideos)) {
-        updateBody['photosVideos'] = updatedGroupData.photosVideos;
+        if (canEditPhotosVideos) {
+          updateBody['photosVideos'] = updatedGroupData.photosVideos;
+        } else {
+          attemptedPhotosVideoUpdateWithoutPermission = true;
+        }
       }
 
       // final originalMembers = (groupData?.members ?? [])
@@ -296,12 +365,20 @@ class CreateGroupCubit extends Cubit<CreateGroupState> {
       // Simplified member update logic for now as Contact logic is moved.
       // if (selectedApiMemberIds.isNotEmpty &&
       //     !listEquals(selectedApiMemberIds, originalMembers)) {
-      updateBody['members'] = selectedApiMemberIds;
+      if (canEditMembers) {
+        updateBody['members'] = selectedApiMemberIds;
+      }
       // }
 
       // If nothing changed, just show success
       if (updateBody.isEmpty) {
-        VxToast.show(message: 'No changes to update');
+        if (attemptedPhotosVideoUpdateWithoutPermission) {
+          VxToast.show(
+            message: 'You do not have permission to update photos/videos.',
+          );
+        } else {
+          VxToast.show(message: 'No changes to update');
+        }
         emit(CreateGroupLoaded());
         return;
       }

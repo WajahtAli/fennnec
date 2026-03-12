@@ -1,8 +1,10 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
+import 'package:fennac_app/bloc/cubit/imagepicker_cubit.dart';
 import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
+import 'package:fennac_app/helpers/gradient_toast.dart';
 import 'package:fennac_app/pages/create_group/presentation/bloc/cubit/create_group_cubit.dart';
 import 'package:fennac_app/pages/create_group/presentation/bloc/state/create_group_state.dart';
 import 'package:fennac_app/pages/create_group/presentation/widgets/create_group_content.dart';
@@ -27,6 +29,17 @@ class CreateGroupScreen extends StatefulWidget {
 
 class _CreateGroupScreenState extends State<CreateGroupScreen> {
   final createGroupContentKey = GlobalKey<State>();
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (!widget.isEditMode) {
+      final createGroupCubit = Di().sl<CreateGroupCubit>();
+      createGroupCubit.resetAllData();
+      Di().sl<ImagePickerCubit>().clearAllMedia();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,6 +92,14 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                     : null,
                 onTap: () {
                   if (widget.isEditMode == true) {
+                    if (!createGroupCubit
+                        .canCurrentUserUpdateAnythingOnDetailsScreen()) {
+                      VxToast.show(
+                        message:
+                            'You do not have permission to update this group.',
+                      );
+                      return;
+                    }
                     createGroupCubit.updateGroupWithChangedFields(
                       groupId:
                           Di().sl<MyGroupCubit>().myGroupModel?.data?.id ?? '',

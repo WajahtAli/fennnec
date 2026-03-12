@@ -9,6 +9,7 @@ import 'package:fennac_app/reusable_widgets/custom_video_player.dart';
 import 'package:fennac_app/widgets/prompt_audio_row.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:lottie/lottie.dart';
 
 class InterleavedMediaSection extends StatelessWidget {
   final List<String> bestShorts;
@@ -150,7 +151,7 @@ class _ImageItem extends StatelessWidget {
                         return Container(
                           height: 400,
                           alignment: Alignment.center,
-                          child: const CircularProgressIndicator(),
+                          child: Lottie.asset(Assets.animations.loadingSpinner),
                         );
                       },
                       errorBuilder: (context, error, stackTrace) {

@@ -374,14 +374,19 @@ class GroupGalleryWidget extends StatelessWidget {
         const CustomSizedBox(height: 40),
         InkWell(
           onTap: () {
-            final groupId = _homeCubit.currentGroup?.id;
-            if (groupId == null || groupId.isEmpty) {
-              VxToast.show(message: 'Unable to report this group right now.');
+            final userId = selectedMember.id;
+            final groupId = _homeCubit.currentGroup?.id ?? '';
+            if (userId == null || userId.isEmpty) {
+              VxToast.show(message: 'Unable to report this user right now.');
               return;
             }
             HomeBlurController.showWithBlur(
               context: context,
-              builder: (_) => ReportAndBlockBottomSheet(groupId: groupId),
+              builder: (_) => ReportAndBlockBottomSheet(
+                groupId: groupId,
+                userId: userId,
+                reportTargetType: ReportTargetType.user,
+              ),
             );
           },
           child: AppText(
@@ -404,13 +409,19 @@ class GroupGalleryWidget extends StatelessWidget {
             _actionButton(
               icon: Assets.icons.error.path,
               color: ColorPalette.error,
-              onTap: onTapLeft,
+              onTap: () {
+                if (!_homeCubit.checkAvailableSwipes()) return;
+                onTapLeft();
+              },
             ),
             const CustomSizedBox(width: 32),
             _actionButton(
               icon: Assets.icons.checkGreen.path,
               color: ColorPalette.green,
-              onTap: onTapRight,
+              onTap: () {
+                if (!_homeCubit.checkAvailableSwipes()) return;
+                onTapRight();
+              },
               isPng: true,
             ),
           ],

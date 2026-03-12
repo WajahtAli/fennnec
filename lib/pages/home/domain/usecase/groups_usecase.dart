@@ -36,6 +36,18 @@ class GroupsUsecase {
     );
   }
 
+  Future<Map<String, dynamic>> reportUser({
+    required String userId,
+    required String reason,
+    String? customReason,
+  }) {
+    return _groupsRepository.reportUser(
+      userId: userId,
+      reason: reason,
+      customReason: customReason,
+    );
+  }
+
   Future<Map<String, dynamic>> acceptGroupReq({
     required String groupId,
     required String type,

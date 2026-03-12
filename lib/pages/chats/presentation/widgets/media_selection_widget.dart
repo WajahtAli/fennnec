@@ -1,8 +1,10 @@
 import 'dart:io';
 
 import 'package:fennac_app/core/di_container.dart';
+import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lottie/lottie.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../../../app/theme/app_colors.dart';
@@ -256,7 +258,7 @@ class _VideoThumbnailState extends State<_VideoThumbnail> {
         ? VideoPlayer(_controller)
         : Container(
             color: Colors.black12,
-            child: const Center(child: CircularProgressIndicator()),
+            child: Lottie.asset(Assets.animations.loadingSpinner),
           );
   }
 }

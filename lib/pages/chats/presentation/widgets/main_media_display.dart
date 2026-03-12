@@ -2,7 +2,9 @@ import 'dart:io';
 
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/core/extensions/string_extension.dart';
+import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:video_player/video_player.dart';
 
 class MainMediaDisplay extends StatefulWidget {
@@ -54,7 +56,7 @@ class _MainMediaDisplayState extends State<MainMediaDisplay> {
     final controller = _videoPlayerController;
 
     if (controller == null || !controller.value.isInitialized) {
-      return const Center(child: CircularProgressIndicator());
+      return Center(child: Lottie.asset(Assets.animations.loadingSpinner));
     }
 
     return Stack(
