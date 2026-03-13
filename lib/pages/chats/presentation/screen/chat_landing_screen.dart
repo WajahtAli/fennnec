@@ -30,6 +30,12 @@ class _ChatLandingScreenState extends State<ChatLandingScreen> {
   final ChatLandingCubit _chatLandingCubit = Di().sl<ChatLandingCubit>();
 
   @override
+  void initState() {
+    super.initState();
+    _chatLandingCubit.fetchChatAndCalls();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ColorPalette.secondary,
@@ -129,41 +135,46 @@ class _ChatLandingScreenState extends State<ChatLandingScreen> {
             ),
           ),
 
-          ...DummyConstants.callHistory.map((call) {
-            if (call['isGroup']) {
-              return InkWell(
-                borderRadius: BorderRadius.circular(12),
-                onTap: () {
-                  if (!mounted) return;
-                  VxToast.show(message: 'Call feature coming soon!');
-                },
-                child: CallHistoryItem(
-                  names: List<String>.from(call['names']),
-                  callType: call['callType'],
-                  duration: call['duration'],
-                  timeAgo: call['timeAgo'],
-                  avatars: List<String>.from(call['avatars']),
-                  isGroup: true,
-                ),
-              );
-            } else {
-              return InkWell(
-                borderRadius: BorderRadius.circular(12),
-                onTap: () {
-                  if (!mounted) return;
-                  VxToast.show(message: 'Call feature coming soon!');
-                },
-                child: CallHistoryItem(
-                  name: call['name'],
-                  callType: call['callType'],
-                  duration: call['duration'],
-                  timeAgo: call['timeAgo'],
-                  avatar: call['avatar'],
-                  isGroup: false,
-                ),
-              );
-            }
-          }),
+          BlocBuilder<ChatLandingCubit, ChatLandingState>(
+            bloc: _chatLandingCubit,
+            builder: (context, state) {
+              if (state is ChatLandingLoading) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (state is ChatLandingLoaded) {
+                final calls = state.response.data.calls;
+                if (calls.isEmpty) {
+                  return const Padding(
+                    padding: EdgeInsets.all(24.0),
+                    child: Center(child: Text('No call history found', style: TextStyle(color: Colors.white))),
+                  );
+                }
+                return ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  padding: EdgeInsets.zero,
+                  itemCount: calls.length,
+                  itemBuilder: (context, index) {
+                    final call = calls[index];
+                    return InkWell(
+                      borderRadius: BorderRadius.circular(12),
+                      onTap: () {
+                        if (!mounted) return;
+                        VxToast.show(message: 'Call feature coming soon!');
+                      },
+                      child: CallHistoryItem(
+                        callModel: call,
+                        timeAgo: '', // Placeholder
+                        isGroup: call.members != null && call.members!.length > 1,
+                      ),
+                    );
+                  },
+                );
+              } else if (state is ChatLandingError) {
+                return Center(child: Text('Error: ${state.message}'));
+              }
+              return const SizedBox();
+            },
+          ),
           CustomSizedBox(height: MediaQuery.paddingOf(context).bottom + 30),
         ],
       ),

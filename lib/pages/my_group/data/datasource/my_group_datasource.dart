@@ -176,7 +176,7 @@ class MyGroupDatasourceImpl extends MyGroupDatasource {
       };
 
       final response = await apiHelper.get(
-        'users/$userId/chat/messages',
+        '${AppConstants.directChat}$userId/chat/messages',
         queryParameters: queryParameters,
         requiresAuth: true,
       );
@@ -232,7 +232,7 @@ class MyGroupDatasourceImpl extends MyGroupDatasource {
       };
 
       final response = await apiHelper.post(
-        '${AppConstants.baseUrl}users/$userId/chat/messages',
+        '${AppConstants.directChat}$userId/chat/messages',
         body: body,
         requiresAuth: true,
       );
@@ -278,7 +278,7 @@ class MyGroupDatasourceImpl extends MyGroupDatasource {
   }) async {
     try {
       final String url =
-          '${AppConstants.baseUrl}users/$userId/chat/messages/$messageId/reactions';
+          '${AppConstants.directChat}$userId/chat/messages/$messageId/reactions';
       final response = isRemove
           ? await apiHelper.delete(
               url,
@@ -313,7 +313,7 @@ class MyGroupDatasourceImpl extends MyGroupDatasource {
   Future<dynamic> deleteDirectMessage(String userId, String messageId) async {
     try {
       final response = await apiHelper.delete(
-        '${AppConstants.baseUrl}users/$userId/chat/messages/$messageId',
+        '${AppConstants.directChat}$userId/chat/messages/$messageId',
         requiresAuth: true,
       );
       return response;
@@ -345,7 +345,7 @@ class MyGroupDatasourceImpl extends MyGroupDatasource {
   ) async {
     try {
       final response = await apiHelper.post(
-        '${AppConstants.baseUrl}users/$userId/chat/messages/$messageId/read',
+        '${AppConstants.directChat}$userId/chat/messages/$messageId/read',
         requiresAuth: true,
       );
       return response;
