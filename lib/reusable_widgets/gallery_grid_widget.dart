@@ -24,6 +24,10 @@ class GalleryGridWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Key mediaKey(int index, MediaItem? media) {
+      return ValueKey(media?.id ?? 'empty_media_slot_$index');
+    }
+
     return LayoutBuilder(
       builder: (context, constraints) {
         final maxWidth = constraints.maxWidth;
@@ -61,6 +65,7 @@ class GalleryGridWidget extends StatelessWidget {
                 width: double.infinity,
                 height: adjustedHeaderHeight,
                 child: MediaContainerWidget(
+                  key: mediaKey(-1, headerMedia),
                   media: headerMedia,
                   isDeleteNeeded: false,
                   index: -1,
@@ -82,6 +87,10 @@ class GalleryGridWidget extends StatelessWidget {
                   height: adjustedLargeSize,
                   width: adjustedLargeSize,
                   child: MediaContainerWidget(
+                    key: mediaKey(
+                      offset,
+                      mediaList.isNotEmpty ? mediaList[0] : null,
+                    ),
                     media: mediaList.isNotEmpty ? mediaList[0] : null,
                     index: offset,
                     width: adjustedLargeSize,
@@ -106,6 +115,10 @@ class GalleryGridWidget extends StatelessWidget {
                         width: double.infinity,
                         height: adjustedSmallSize,
                         child: MediaContainerWidget(
+                          key: mediaKey(
+                            offset + 1,
+                            mediaList.length > 1 ? mediaList[1] : null,
+                          ),
                           media: mediaList.length > 1 ? mediaList[1] : null,
                           index: offset + 1,
                           width: adjustedSmallSize,
@@ -131,6 +144,10 @@ class GalleryGridWidget extends StatelessWidget {
                         width: double.infinity,
                         height: adjustedSmallSize,
                         child: MediaContainerWidget(
+                          key: mediaKey(
+                            offset + 2,
+                            mediaList.length > 2 ? mediaList[2] : null,
+                          ),
                           media: mediaList.length > 2 ? mediaList[2] : null,
                           index: offset + 2,
                           width: adjustedSmallSize,
@@ -165,6 +182,10 @@ class GalleryGridWidget extends StatelessWidget {
                   child: SizedBox(
                     height: adjustedSmallSize,
                     child: MediaContainerWidget(
+                      key: mediaKey(
+                        offset + 3,
+                        mediaList.length > 3 ? mediaList[3] : null,
+                      ),
                       media: mediaList.length > 3 ? mediaList[3] : null,
                       index: offset + 3,
                       width: bottomItemWidth,
@@ -188,6 +209,10 @@ class GalleryGridWidget extends StatelessWidget {
                   child: SizedBox(
                     height: adjustedSmallSize,
                     child: MediaContainerWidget(
+                      key: mediaKey(
+                        offset + 4,
+                        mediaList.length > 4 ? mediaList[4] : null,
+                      ),
                       media: mediaList.length > 4 ? mediaList[4] : null,
                       index: offset + 4,
                       width: bottomItemWidth,
@@ -211,6 +236,10 @@ class GalleryGridWidget extends StatelessWidget {
                   child: SizedBox(
                     height: adjustedSmallSize,
                     child: MediaContainerWidget(
+                      key: mediaKey(
+                        offset + 5,
+                        mediaList.length > 5 ? mediaList[5] : null,
+                      ),
                       media: mediaList.length > 5 ? mediaList[5] : null,
                       index: offset + 5,
                       width: bottomItemWidth,
