@@ -50,6 +50,7 @@ class GalleryGridWidget extends StatelessWidget {
         final adjustedSmallSize = smallSize * actualScale;
         final adjustedGap = gap * actualScale;
         final adjustedHeaderHeight = headerHeight * actualScale;
+        final bottomItemWidth = (maxWidth - (adjustedGap * 2)) / 3;
 
         final offset = hasHeader ? 0 : 0;
 
@@ -61,6 +62,7 @@ class GalleryGridWidget extends StatelessWidget {
                 height: adjustedHeaderHeight,
                 child: MediaContainerWidget(
                   media: headerMedia,
+                  isDeleteNeeded: false,
                   index: -1,
                   width: double.infinity,
                   height: adjustedHeaderHeight,
@@ -165,7 +167,7 @@ class GalleryGridWidget extends StatelessWidget {
                     child: MediaContainerWidget(
                       media: mediaList.length > 3 ? mediaList[3] : null,
                       index: offset + 3,
-                      width: double.infinity,
+                      width: bottomItemWidth,
                       height: adjustedSmallSize,
                       isEditMode: isEditMode,
                       isSelected: selectedIndex == offset + 3,
@@ -188,7 +190,7 @@ class GalleryGridWidget extends StatelessWidget {
                     child: MediaContainerWidget(
                       media: mediaList.length > 4 ? mediaList[4] : null,
                       index: offset + 4,
-                      width: double.infinity,
+                      width: bottomItemWidth,
                       height: adjustedSmallSize,
                       isEditMode: isEditMode,
                       isSelected: selectedIndex == offset + 4,
@@ -211,7 +213,7 @@ class GalleryGridWidget extends StatelessWidget {
                     child: MediaContainerWidget(
                       media: mediaList.length > 5 ? mediaList[5] : null,
                       index: offset + 5,
-                      width: double.infinity,
+                      width: bottomItemWidth,
                       height: adjustedSmallSize,
                       isEditMode: isEditMode,
                       isSelected: selectedIndex == offset + 5,

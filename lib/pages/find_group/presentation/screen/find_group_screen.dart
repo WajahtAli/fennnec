@@ -25,8 +25,7 @@ class FindGroupScreen extends StatefulWidget {
   State<FindGroupScreen> createState() => _FindGroupScreenState();
 }
 
-class _FindGroupScreenState extends State<FindGroupScreen>
-    with WidgetsBindingObserver {
+class _FindGroupScreenState extends State<FindGroupScreen> {
   late final ImagePickerCubit _pickerCubit;
   final FindGroupCubit _findGroupCubit = Di().sl<FindGroupCubit>();
   final MobileScannerController _controller = MobileScannerController();
@@ -39,7 +38,6 @@ class _FindGroupScreenState extends State<FindGroupScreen>
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance.addObserver(this);
     _pickerCubit = ImagePickerCubit();
 
     final qrCode = widget.qrCode?.trim();
@@ -50,30 +48,12 @@ class _FindGroupScreenState extends State<FindGroupScreen>
       Future.microtask(() async {
         await _controller.stop();
         _isScanLocked = true;
-
         if (isUserQr) {
           _findGroupCubit.fetchMemberByQr(qrCode);
         } else {
           _findGroupCubit.fetchGroupByQr(qrCode);
         }
       });
-    }
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (!mounted) return;
-
-    if (state == AppLifecycleState.resumed) {
-      _controller.start();
-      return;
-    }
-
-    if (state == AppLifecycleState.inactive ||
-        state == AppLifecycleState.paused ||
-        state == AppLifecycleState.detached ||
-        state == AppLifecycleState.hidden) {
-      _controller.stop();
     }
   }
 
@@ -105,7 +85,8 @@ class _FindGroupScreenState extends State<FindGroupScreen>
         }
       },
     ).then((_) {
-      /// Reset scanner when dialog closes
+      if (!mounted) return;
+
       _dialogShown = false;
       _isScanLocked = false;
       _controller.start();
@@ -136,7 +117,7 @@ class _FindGroupScreenState extends State<FindGroupScreen>
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
+    _controller.stop();
     _controller.dispose();
     _pickerCubit.close();
     super.dispose();

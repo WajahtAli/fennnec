@@ -3,7 +3,6 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:fennac_app/app/app.dart';
-import 'package:fennac_app/app/constants/app_enums.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/bloc/state/imagepicker_state.dart';
 
@@ -35,11 +34,28 @@ class ImagePickerCubit extends Cubit<ImagePickerState> {
   List<MediaItem> mediaList = [];
   File? selectedImage;
 
-  /// Force square cropping for every image selection.
-  Future<String?> cropImageWithRatio(
-    String sourcePath,
-    CropType cropType,
-  ) async {
+  List<MediaItem> _snapshotMediaList([List<MediaItem>? source]) {
+    return List<MediaItem>.unmodifiable(
+      List<MediaItem>.from(source ?? mediaList),
+    );
+  }
+
+  void _emitLoading() {
+    emit(ImagePickerLoading(mediaList: _snapshotMediaList()));
+  }
+
+  void _emitLoaded([List<MediaItem>? source]) {
+    final snapshot = _snapshotMediaList(source);
+    mediaList = List<MediaItem>.from(snapshot);
+    emit(ImagePickerLoaded(mediaList: snapshot));
+  }
+
+  void _emitError(String message) {
+    emit(ImagePickerError(message, mediaList: _snapshotMediaList()));
+  }
+
+  /// Crop image with selectable aspect ratios.
+  Future<String?> cropImage(String sourcePath) async {
     try {
       final sourceFile = File(sourcePath);
       if (!await sourceFile.exists()) {
@@ -47,38 +63,32 @@ class ImagePickerCubit extends Cubit<ImagePickerState> {
         return null;
       }
 
-      // Decide ratio dynamically
-      CropAspectRatio aspectRatio;
-      CropAspectRatioPreset preset;
-
-      switch (cropType) {
-        case CropType.square:
-          aspectRatio = const CropAspectRatio(ratioX: 1, ratioY: 1);
-          preset = CropAspectRatioPreset.square;
-          break;
-
-        case CropType.portrait:
-          aspectRatio = const CropAspectRatio(ratioX: 9, ratioY: 16);
-          preset = CropAspectRatioPreset.ratio16x9;
-          break;
-      }
-
       final croppedFile = await _imageCropper.cropImage(
         sourcePath: sourcePath,
-        aspectRatio: aspectRatio,
         uiSettings: [
           AndroidUiSettings(
             backgroundColor: ColorPalette.secondary,
             toolbarColor: ColorPalette.secondary,
             toolbarTitle: 'Crop Image',
-            lockAspectRatio: true,
-            hideBottomControls: true,
+            lockAspectRatio: false,
+            hideBottomControls: false,
             toolbarWidgetColor: Colors.white,
             statusBarLight: true,
-            initAspectRatio: preset,
-            aspectRatioPresets: [preset],
+            initAspectRatio: CropAspectRatioPreset.square,
+            aspectRatioPresets: [
+              CropAspectRatioPreset.square,
+              CropAspectRatioPreset.ratio16x9,
+            ],
           ),
-          IOSUiSettings(title: 'Crop Image', aspectRatioLockEnabled: true),
+          IOSUiSettings(
+            title: 'Crop Image',
+            aspectRatioLockEnabled: false,
+            resetAspectRatioEnabled: true,
+            aspectRatioPresets: [
+              CropAspectRatioPreset.square,
+              CropAspectRatioPreset.ratio16x9,
+            ],
+          ),
         ],
       );
 
@@ -98,11 +108,11 @@ class ImagePickerCubit extends Cubit<ImagePickerState> {
     );
 
     if (containerIndex == null && remainingSlots <= 0) {
-      emit(ImagePickerError('Maximum $maxMediaItems images allowed'));
+      _emitError('Maximum $maxMediaItems images allowed');
       return;
     }
 
-    emit(ImagePickerLoading());
+    _emitLoading();
 
     try {
       List<XFile> pickedFiles = [];
@@ -122,18 +132,14 @@ class ImagePickerCubit extends Cubit<ImagePickerState> {
       }
 
       if (pickedFiles.isEmpty) {
-        emit(ImagePickerLoaded(mediaList: mediaList));
+        _emitLoaded();
         return;
       }
 
       int currentIndex = containerIndex ?? mediaList.length;
 
       for (final file in pickedFiles) {
-        // Show crop type selection dialog
-        final cropType = await _showCropTypeSelectionDialog();
-        final croppedPath = cropType != null
-            ? (await cropImageWithRatio(file.path, cropType) ?? file.path)
-            : file.path;
+        final croppedPath = await cropImage(file.path) ?? file.path;
 
         final newItem = MediaItem(
           path: croppedPath,
@@ -163,24 +169,24 @@ class ImagePickerCubit extends Cubit<ImagePickerState> {
 
       // optional warning
       if (containerIndex == null && pickedFiles.length > remainingSlots) {
-        emit(ImagePickerError('Only $remainingSlots images allowed'));
+        _emitError('Only $remainingSlots images allowed');
       }
 
-      emit(ImagePickerLoaded(mediaList: mediaList));
+      _emitLoaded();
     } catch (e) {
       debugPrint('Error picking images: $e');
-      emit(ImagePickerError('Error picking images'));
+      _emitError('Error picking images');
     }
   }
 
   /// Pick video from gallery and add to specific index
   Future<void> pickVideoFromGallery({int? containerIndex}) async {
     if (mediaList.length >= maxMediaItems) {
-      emit(ImagePickerError('Maximum $maxMediaItems media items allowed'));
+      _emitError('Maximum $maxMediaItems media items allowed');
       return;
     }
 
-    emit(ImagePickerLoading());
+    _emitLoading();
     try {
       final XFile? pickedFile = await _imagePicker.pickVideo(
         source: ImageSource.gallery,
@@ -206,12 +212,12 @@ class ImagePickerCubit extends Cubit<ImagePickerState> {
         } else {
           mediaList.add(newItem);
         }
-        emit(ImagePickerLoaded(mediaList: mediaList));
+        _emitLoaded();
       } else {
-        emit(ImagePickerLoaded(mediaList: mediaList));
+        _emitLoaded();
       }
     } catch (e) {
-      emit(ImagePickerError('Error picking video: $e'));
+      _emitError('Error picking video: $e');
       debugPrint('Error picking video from gallery: $e');
     }
   }
@@ -219,11 +225,11 @@ class ImagePickerCubit extends Cubit<ImagePickerState> {
   /// Pick image from camera and add to specific index
   Future<void> pickImageFromCamera({int? containerIndex}) async {
     if (mediaList.length >= maxMediaItems) {
-      emit(ImagePickerError('Maximum $maxMediaItems media items allowed'));
+      _emitError('Maximum $maxMediaItems media items allowed');
       return;
     }
 
-    emit(ImagePickerLoading());
+    _emitLoading();
 
     try {
       // Just try to open camera - let image_picker request permission
@@ -235,16 +241,11 @@ class ImagePickerCubit extends Cubit<ImagePickerState> {
       );
 
       if (pickedFile == null) {
-        emit(ImagePickerLoaded(mediaList: mediaList));
+        _emitLoaded();
         return;
       }
 
-      // Show crop type selection dialog
-      final cropType = await _showCropTypeSelectionDialog();
-      final croppedPath = cropType != null
-          ? (await cropImageWithRatio(pickedFile.path, cropType) ??
-                pickedFile.path)
-          : pickedFile.path;
+      final croppedPath = await cropImage(pickedFile.path) ?? pickedFile.path;
 
       final newItem = MediaItem(
         path: croppedPath,
@@ -265,12 +266,12 @@ class ImagePickerCubit extends Cubit<ImagePickerState> {
         mediaList.add(newItem);
       }
 
-      emit(ImagePickerLoaded(mediaList: mediaList));
+      _emitLoaded();
     } on PlatformException catch (e) {
       debugPrint('Camera error: ${e.code} - ${e.message}');
 
-      // Emit state FIRST
-      emit(ImagePickerLoaded(mediaList: mediaList));
+      // Emit state first so the existing grid stays visible on failures.
+      _emitLoaded();
 
       // Handle permission denied - show dialog first
       if (e.code == 'camera_access_denied') {
@@ -283,147 +284,8 @@ class ImagePickerCubit extends Cubit<ImagePickerState> {
       }
     } catch (e) {
       debugPrint('Camera error: $e');
-      emit(ImagePickerLoaded(mediaList: mediaList));
+      _emitLoaded();
     }
-  }
-
-  /// Show dialog for user to select crop type (square or portrait)
-  Future<CropType?> _showCropTypeSelectionDialog() async {
-    BuildContext? context = navigatorKey.currentContext;
-    if (context == null) {
-      return CropType.square; // Default to square if no context
-    }
-
-    return showDialog<CropType>(
-      context: context,
-      barrierDismissible: true,
-      builder: (BuildContext dialogContext) => Dialog(
-        backgroundColor: Colors.white,
-        elevation: 8,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Title
-              const Text(
-                'Select Crop Format',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.black87,
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Choose how you want to crop your image',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 14, color: Colors.black54),
-              ),
-              const SizedBox(height: 24),
-
-              // Square Option
-              _buildCropOptionTile(
-                context: dialogContext,
-                icon: Icons.crop_square_rounded,
-                title: 'Square',
-                subtitle: '1:1 Aspect Ratio',
-                cropType: CropType.square,
-              ),
-              const SizedBox(height: 12),
-
-              // Portrait Option
-              _buildCropOptionTile(
-                context: dialogContext,
-                icon: Icons.crop_portrait_rounded,
-                title: 'Portrait',
-                subtitle: '9:16 Aspect Ratio',
-                cropType: CropType.portrait,
-              ),
-              const SizedBox(height: 24),
-
-              // Cancel Button
-              SizedBox(
-                width: double.infinity,
-                child: TextButton(
-                  onPressed: () => Navigator.pop(dialogContext),
-                  style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: const Text(
-                    'Cancel',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// Build individual crop option tile
-  Widget _buildCropOptionTile({
-    required BuildContext context,
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required CropType cropType,
-  }) {
-    return GestureDetector(
-      onTap: () => Navigator.pop(context, cropType),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.grey[50],
-          border: Border.all(color: Colors.grey[200]!, width: 1.5),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: ColorPalette.secondary.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(icon, size: 32, color: ColorPalette.secondary),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                  ),
-                ],
-              ),
-            ),
-            Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey[400]),
-          ],
-        ),
-      ),
-    );
   }
 
   /// Show minimal white dialog for camera permission
@@ -485,7 +347,7 @@ class ImagePickerCubit extends Cubit<ImagePickerState> {
   }
 
   Future<void> pickImageFromGallery() async {
-    emit(ImagePickerLoading());
+    _emitLoading();
     try {
       final List<XFile> pickedFiles = await _imagePicker.pickMultiImage(
         limit: 4,
@@ -501,16 +363,16 @@ class ImagePickerCubit extends Cubit<ImagePickerState> {
         mediaItems.add(newItem);
       }
 
-      emit(ImagePickerLoaded(mediaList: mediaItems));
+      _emitLoaded(mediaItems);
     } catch (e) {
-      emit(ImagePickerError('Error picking image from gallery: $e'));
+      _emitError('Error picking image from gallery: $e');
       debugPrint('Error picking image from gallery: $e');
     }
   }
 
   /// Remove media item by ID or by index
   void removeMedia(String? id, {int? index}) {
-    emit(ImagePickerLoading());
+    _emitLoading();
     if (id == 'header_image' || index == -1) {
       selectedImage = null;
     } else if (id != null) {
@@ -518,38 +380,41 @@ class ImagePickerCubit extends Cubit<ImagePickerState> {
     } else if (index != null && index >= 0 && index < mediaList.length) {
       mediaList.removeAt(index);
     }
-    emit(ImagePickerLoaded(mediaList: mediaList));
+    _emitLoaded();
   }
 
   /// Reorder media items by dragging
   void reorderMedia(int oldIndex, int newIndex) {
-    if (oldIndex < 0 ||
-        oldIndex >= mediaList.length ||
-        newIndex < 0 ||
-        newIndex >= mediaList.length) {
+    if (oldIndex < 0 || oldIndex >= mediaList.length) {
       return;
     }
 
-    if (oldIndex < newIndex) {
-      newIndex -= 1;
+    // Cap newIndex to the bounds of the current list
+    if (newIndex >= mediaList.length) {
+      newIndex = mediaList.length - 1;
+    }
+    if (newIndex < 0) {
+      newIndex = 0;
     }
 
-    final item = mediaList.removeAt(oldIndex);
-    mediaList.insert(newIndex, item);
-    emit(ImagePickerLoaded(mediaList: mediaList));
+    if (oldIndex == newIndex) return;
+
+    final updatedMediaList = List<MediaItem>.from(mediaList);
+    final item = updatedMediaList.removeAt(oldIndex);
+    updatedMediaList.insert(newIndex, item);
+    _emitLoaded(updatedMediaList);
   }
 
   /// Clear all media
   void clearAllMedia() {
     mediaList.clear();
-    emit(ImagePickerLoaded(mediaList: mediaList));
+    _emitLoaded();
   }
 
   /// Update media list and emit state (useful for external updates)
   void updateMediaList(List<MediaItem> newMediaList) {
-    emit(ImagePickerLoading());
-    mediaList = newMediaList;
-    emit(ImagePickerLoaded(mediaList: mediaList));
+    _emitLoading();
+    _emitLoaded(newMediaList);
   }
 
   /// Get current count of media
@@ -568,11 +433,11 @@ class ImagePickerCubit extends Cubit<ImagePickerState> {
   /// Pick GIF from Giphy
   Future<void> pickGifFromGiphy(BuildContext context) async {
     if (mediaList.length >= maxMediaItems) {
-      emit(ImagePickerError('Maximum $maxMediaItems media items allowed'));
+      _emitError('Maximum $maxMediaItems media items allowed');
       return;
     }
 
-    emit(ImagePickerLoading());
+    _emitLoading();
     try {
       final GiphyGif? gif = await GiphyGet.getGif(
         context: context,
@@ -593,12 +458,12 @@ class ImagePickerCubit extends Cubit<ImagePickerState> {
         );
 
         mediaList.add(newItem);
-        emit(ImagePickerLoaded(mediaList: mediaList));
+        _emitLoaded();
       } else {
-        emit(ImagePickerLoaded(mediaList: mediaList));
+        _emitLoaded();
       }
     } catch (e) {
-      emit(ImagePickerError('Error picking GIF: $e'));
+      _emitError('Error picking GIF: $e');
       debugPrint('Error picking GIF from Giphy: $e');
     }
   }

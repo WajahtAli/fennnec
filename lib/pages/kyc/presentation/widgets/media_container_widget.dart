@@ -20,6 +20,7 @@ class MediaContainerWidget extends StatefulWidget {
   final VoidCallback? onTapExisting;
   final bool isEditMode;
   final bool isSelected;
+  final bool isDeleteNeeded;
 
   const MediaContainerWidget({
     super.key,
@@ -31,6 +32,7 @@ class MediaContainerWidget extends StatefulWidget {
     this.onTapExisting,
     this.isEditMode = false,
     this.isSelected = false,
+    this.isDeleteNeeded = true,
   });
 
   @override
@@ -94,37 +96,34 @@ class _MediaContainerWidgetState extends State<MediaContainerWidget> {
       return _buildUploadPlaceholder();
     }
 
-    return LongPressDraggable<int>(
-      data: widget.index,
-      feedback: Material(
-        elevation: 8,
-        borderRadius: BorderRadius.circular(16),
-        child: _buildMediaPreview(cubit),
-      ),
-      childWhenDragging: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: isLightTheme(context)
-                ? Colors.black.withValues(alpha: 0.2)
-                : Colors.white.withValues(alpha: 0.2),
-            width: 1,
+    return DragTarget<int>(
+      onWillAcceptWithDetails: (details) => details.data != widget.index,
+      onAcceptWithDetails: (details) {
+        cubit.reorderMedia(details.data, widget.index);
+      },
+      builder: (context, candidateData, rejectedData) {
+        final isActiveDropTarget = candidateData.isNotEmpty;
+
+        return LongPressDraggable<int>(
+          data: widget.index,
+          maxSimultaneousDrags: 1,
+          rootOverlay: true,
+          feedback: Material(
+            elevation: 8,
+            borderRadius: BorderRadius.circular(16),
+            child: _buildMediaPreview(),
           ),
-          color: Colors.black.withValues(alpha: 0.3),
-        ),
-      ),
-      child: DragTarget<int>(
-        onAcceptWithDetails: (details) {
-          cubit.reorderMedia(details.data, widget.index);
-        },
-        builder: (context, candidateData, rejectedData) {
-          return GestureDetector(
+          childWhenDragging: _buildDraggingPlaceholder(),
+          child: GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: widget.isEditMode ? widget.onTapExisting : null,
-            child: _buildMediaWithDelete(cubit),
-          );
-        },
-      ),
+            child: _buildMediaWithDelete(
+              cubit,
+              isActiveDropTarget: isActiveDropTarget,
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -150,9 +149,12 @@ class _MediaContainerWidgetState extends State<MediaContainerWidget> {
           child: SvgPicture.asset(
             Assets.icons.camera.path,
             fit: BoxFit.scaleDown,
-            color: isLightTheme(context)
-                ? ColorPalette.black
-                : Colors.white.withValues(alpha: 0.6),
+            colorFilter: ColorFilter.mode(
+              isLightTheme(context)
+                  ? ColorPalette.black
+                  : Colors.white.withValues(alpha: 0.6),
+              BlendMode.srcIn,
+            ),
             width: 32,
             height: 32,
           ),
@@ -161,7 +163,7 @@ class _MediaContainerWidgetState extends State<MediaContainerWidget> {
     );
   }
 
-  Widget _buildMediaPreview(ImagePickerCubit cubit) {
+  Widget _buildMediaPreview() {
     return Container(
       width: widget.width,
       height: widget.height,
@@ -175,11 +177,32 @@ class _MediaContainerWidgetState extends State<MediaContainerWidget> {
     );
   }
 
-  Widget _buildMediaWithDelete(ImagePickerCubit cubit) {
-    final borderColor = widget.isEditMode && widget.isSelected
-        ? Colors.white
-        : Colors.white.withValues(alpha: 0.2);
-    final borderWidth = widget.isEditMode && widget.isSelected ? 3.0 : 1.0;
+  Widget _buildDraggingPlaceholder() {
+    return Container(
+      height: widget.height,
+      width: widget.width,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isLightTheme(context)
+              ? Colors.black.withValues(alpha: 0.2)
+              : Colors.white.withValues(alpha: 0.2),
+          width: 1,
+        ),
+        color: Colors.black.withValues(alpha: 0.3),
+      ),
+    );
+  }
+
+  Widget _buildMediaWithDelete(
+    ImagePickerCubit cubit, {
+    bool isActiveDropTarget = false,
+  }) {
+    final isSelected = widget.isEditMode && widget.isSelected;
+    final borderColor = isActiveDropTarget
+        ? ColorPalette.primary
+        : (isSelected ? Colors.white : Colors.white.withValues(alpha: 0.2));
+    final borderWidth = isActiveDropTarget ? 3.0 : (isSelected ? 3.0 : 1.0);
 
     return Container(
       height: widget.height,
@@ -198,27 +221,28 @@ class _MediaContainerWidgetState extends State<MediaContainerWidget> {
                 : _buildVideoThumbnail(),
           ),
           // Delete button
-          Positioned(
-            top: 8,
-            right: 8,
-            child: GestureDetector(
-              onTap: () =>
-                  cubit.removeMedia(widget.media!.id, index: widget.index),
-              child: Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  color: Colors.red.withValues(alpha: 0.8),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.delete_outline,
-                  color: Colors.white,
-                  size: 16,
+          if (widget.isDeleteNeeded)
+            Positioned(
+              top: 8,
+              right: 8,
+              child: GestureDetector(
+                onTap: () =>
+                    cubit.removeMedia(widget.media!.id, index: widget.index),
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: Colors.red.withValues(alpha: 0.8),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.delete_outline,
+                    color: Colors.white,
+                    size: 16,
+                  ),
                 ),
               ),
             ),
-          ),
           // Video badge
           if (widget.media!.type == MediaType.video)
             Positioned(
