@@ -32,7 +32,7 @@ class GroupCardSkeleton extends StatelessWidget {
       children: [
         Container(
           // width: actualWidth,
-          height: isShowInfoIcon ? height ?? 166 : null,
+          height: isShowInfoIcon ? height ?? 130 : null,
           margin: EdgeInsets.symmetric(
             horizontal: !isShowInfoIcon ? 16 : 0,
             vertical: 8,

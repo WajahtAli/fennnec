@@ -25,7 +25,7 @@ class ManageSubscriptionsScreen extends StatelessWidget {
         child: SafeArea(
           child: Column(
             children: [
-              CustomAppBar(title: 'Manage Subscription'),
+              CustomAppBar(title: 'Manage Subscription', allowSpace: true),
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(20),
@@ -188,8 +188,12 @@ class ManageSubscriptionsScreen extends StatelessWidget {
               onPressed: () {
                 VxToast.show(message: 'Coming Soon!');
               },
-              borderColor: ColorPalette.secondary,
-              textColor: ColorPalette.secondary,
+              borderColor: isLightTheme(context)
+                  ? ColorPalette.secondary
+                  : ColorPalette.textPrimary,
+              textColor: isLightTheme(context)
+                  ? ColorPalette.secondary
+                  : ColorPalette.textPrimary,
               borderRadius: 52,
             ),
           ],

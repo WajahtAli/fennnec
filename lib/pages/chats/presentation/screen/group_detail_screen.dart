@@ -12,6 +12,7 @@ import 'package:fennac_app/pages/chats/presentation/bloc/state/chat_landing_stat
 import 'package:fennac_app/pages/chats/presentation/widgets/chat_tab_selector.dart';
 import 'package:fennac_app/pages/chats/presentation/widgets/group_detail_members_avatar.dart';
 import 'package:fennac_app/pages/dashboard/presentation/bloc/cubit/dashboard_cubit.dart';
+import 'package:fennac_app/pages/my_group/presentation/bloc/cubit/my_group_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fennac_app/reusable_widgets/animated_background_container.dart';
 import 'package:fennac_app/reusable_widgets/custom_app_bar.dart';
@@ -358,7 +359,9 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
               description:
                   'We’ve closed your chat and removed this group from your matches. You can still find new connections.',
               buttonText: 'Explore Groups',
-              onButtonPressed: () {
+              dismissible: false,
+              onButtonPressed: () async {
+                await Di().sl<MyGroupCubit>().fetchGroupById('');
                 AutoRouter.of(context).push(DashboardRoute());
                 Di().sl<DashboardCubit>().changeIndex(0);
               },

@@ -5,6 +5,7 @@ import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:fennac_app/widgets/custom_elevated_button.dart';
 import 'package:fennac_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
+import 'package:fennac_app/widgets/app_inkwell.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../app/constants/media_query_constants.dart';
@@ -99,7 +100,7 @@ class _DropdownFieldWidgetState extends State<DropdownFieldWidget>
         const SizedBox(height: 8),
         ScaleTransition(
           scale: _bounceAnimation,
-          child: InkWell(
+          child: AppInkWell(
             onTap: () => _handleTap(context),
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 12),
@@ -230,7 +231,7 @@ class _DropdownFieldWidgetState extends State<DropdownFieldWidget>
                         final option = widget.options[index];
                         final isSelected = selected.contains(option);
 
-                        return InkWell(
+                        return AppInkWell(
                           onTap: () {
                             setModalState(() {
                               if (isSelected) {
@@ -401,7 +402,7 @@ class _DropdownFieldWidgetState extends State<DropdownFieldWidget>
                         final option = widget.options[index];
                         final isSelected = selected == option;
 
-                        return InkWell(
+                        return AppInkWell(
                           onTap: () {
                             setModalState(() {
                               selected = option;

@@ -9,6 +9,7 @@ import 'package:fennac_app/widgets/custom_outlined_button.dart';
 import 'package:fennac_app/widgets/custom_sized_box.dart';
 import 'package:fennac_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
+import 'package:fennac_app/widgets/app_inkwell.dart';
 
 import '../../../../app/constants/media_query_constants.dart';
 import '../../../../core/di_container.dart';
@@ -153,7 +154,7 @@ class PokeNotificationCard extends StatelessWidget {
                       ),
                     ),
                     const Spacer(),
-                    InkWell(
+                    AppInkWell(
                       onTap: () {
                         showModalBottomSheet(
                           context: context,
@@ -210,7 +211,7 @@ class PokeNotificationCard extends StatelessWidget {
                 ],
               ),
               const CustomSizedBox(height: 16),
-              InkWell(
+              AppInkWell(
                 onTap: () {
                   final groupId = Di().sl<HomeCubit>().currentGroup?.id;
                   if (groupId == null || groupId.isEmpty) {

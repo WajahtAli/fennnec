@@ -18,6 +18,7 @@ import 'package:fennac_app/widgets/prompt_audio_row.dart';
 import 'package:fennac_app/widgets/custom_sized_box.dart';
 import 'package:fennac_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
+import 'package:fennac_app/widgets/app_inkwell.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:fennac_app/core/extensions/string_extension.dart';
@@ -159,7 +160,7 @@ class GroupGalleryWidget extends StatelessWidget {
                           Positioned(
                             top: 16,
                             right: 16,
-                            child: InkWell(
+                            child: AppInkWell(
                               onTap: () =>
                                   onEditTap?.call(EditableCardType.image),
                               child: _editIcon(),
@@ -186,7 +187,7 @@ class GroupGalleryWidget extends StatelessWidget {
                           Positioned(
                             top: 16,
                             right: 16,
-                            child: InkWell(
+                            child: AppInkWell(
                               onTap: () => onEditTap?.call(
                                 item.type == 'audio'
                                     ? EditableCardType.audio
@@ -293,7 +294,7 @@ class GroupGalleryWidget extends StatelessWidget {
                       Positioned(
                         top: 16,
                         right: 16,
-                        child: InkWell(
+                        child: AppInkWell(
                           onTap: () => onEditTap?.call(EditableCardType.image),
                           child: _editIcon(),
                         ),
@@ -337,7 +338,7 @@ class GroupGalleryWidget extends StatelessWidget {
                       Positioned(
                         top: 16,
                         right: 16,
-                        child: InkWell(
+                        child: AppInkWell(
                           onTap: () => onEditTap?.call(EditableCardType.prompt),
                           child: _editIcon(),
                         ),
@@ -372,7 +373,7 @@ class GroupGalleryWidget extends StatelessWidget {
           },
         ),
         const CustomSizedBox(height: 40),
-        InkWell(
+        AppInkWell(
           onTap: () {
             final userId = selectedMember.id;
             final groupId = _homeCubit.currentGroup?.id ?? '';
@@ -427,7 +428,7 @@ class GroupGalleryWidget extends StatelessWidget {
           ],
         ),
         const CustomSizedBox(height: 80),
-        InkWell(
+        AppInkWell(
           onTap: () {
             final groupId = _homeCubit.currentGroup?.id;
             if (groupId == null || groupId.isEmpty) {

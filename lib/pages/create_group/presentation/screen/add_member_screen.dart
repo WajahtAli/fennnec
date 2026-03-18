@@ -12,6 +12,7 @@ import 'package:fennac_app/widgets/custom_back_button.dart';
 import 'package:fennac_app/widgets/custom_sized_box.dart';
 import 'package:fennac_app/widgets/movable_background.dart';
 import 'package:flutter/material.dart';
+import 'package:fennac_app/widgets/app_inkwell.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../app/constants/app_enums.dart';
@@ -32,11 +33,14 @@ class _AddMemberScreenState extends State<AddMemberScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+
     final hasContacts =
         contactListCubit.contacts != null &&
         contactListCubit.contacts!.isNotEmpty;
     if (!hasContacts) {
       contactListCubit.checkPermissionAndLoad();
+    } else {
+      contactListCubit.requestAccessAndLoadContacts();
     }
   }
 
@@ -78,7 +82,7 @@ class _AddMemberScreenState extends State<AddMemberScreen>
                         const Spacer(),
                         Text('Add Member', style: AppTextStyles.h4(context)),
                         const Spacer(),
-                        InkWell(
+                        AppInkWell(
                           onTap: () {
                             AutoRouter.of(context).push(
                               FindGroupRoute(

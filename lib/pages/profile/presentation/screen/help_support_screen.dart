@@ -8,6 +8,7 @@ import 'package:fennac_app/routes/routes_imports.gr.dart';
 import 'package:fennac_app/widgets/custom_sized_box.dart';
 import 'package:fennac_app/widgets/movable_background.dart';
 import 'package:flutter/material.dart';
+import 'package:fennac_app/widgets/app_inkwell.dart';
 import 'dart:ui';
 
 import '../../../../app/constants/media_query_constants.dart';
@@ -113,7 +114,7 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
   }
 
   Widget _buildHelpTile(BuildContext context, HelpItem item) {
-    return InkWell(
+    return AppInkWell(
       onTap: () {
         final title = item.title.toLowerCase();
         if (title == 'terms of service') {

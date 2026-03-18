@@ -1,4 +1,3 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:fennac_app/app/constants/app_enums.dart';
 import 'package:fennac_app/app/constants/media_query_constants.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
@@ -6,14 +5,16 @@ import 'package:fennac_app/app/theme/app_emojis.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
+import 'package:fennac_app/helpers/gradient_toast.dart';
+import 'package:fennac_app/pages/buy_poke/presentation/bloc/cubit/poke_cubit.dart';
 import 'package:fennac_app/pages/chats/presentation/bloc/cubit/chat_landing_cubit.dart';
 import 'package:fennac_app/pages/chats/presentation/bloc/state/chat_landing_state.dart';
-import 'package:fennac_app/routes/routes_imports.gr.dart';
 import 'package:fennac_app/widgets/custom_elevated_button.dart';
 import 'package:fennac_app/widgets/custom_sized_box.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:lottie/lottie.dart';
 
 class PremiumCard extends StatelessWidget {
   final bool? isGradientTitle;
@@ -173,17 +174,32 @@ class PremiumCard extends StatelessWidget {
                       ],
                     ),
                     const CustomSizedBox(height: 20),
-                    CustomElevatedButton(
-                      text: 'Upgrade to Premium',
-                      onTap: () {
-                        if (isGradientTitle == true) {
-                          // VxToast.show(message: 'Coming Soon!');
-                          AutoRouter.of(context).push(const MyGroupRoute());
-                        } else {
-                          Di().sl<ChatLandingCubit>().updateSubscriptionStatus(
-                            SubscriptionStatus.subscribed,
-                          );
-                        }
+                    Builder(
+                      builder: (context) {
+                        final pokeCubit = Di().sl<PokeCubit>();
+                        return CustomElevatedButton(
+                          text: 'Upgrade to Premium',
+                          icon: pokeCubit.isSubscriptionPurchasing
+                              ? SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: Lottie.asset(
+                                    Assets.animations.loadingSpinner,
+                                  ),
+                                )
+                              : SizedBox.shrink(),
+                          isLoading: pokeCubit.isSubscriptionPurchasing,
+                          onTap: () {
+                            if (isGradientTitle == true) {
+                              //todo - implement premium subscription flow
+                              // VxToast.show(message: 'Coming Soon!');
+                              // AutoRouter.of(context).push(const MyGroupRoute());
+                              pokeCubit.purchaseSubscription('monthly');
+                            } else {
+                              pokeCubit.purchaseSubscription('monthly');
+                            }
+                          },
+                        );
                       },
                     ),
                   ],

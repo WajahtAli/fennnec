@@ -601,7 +601,7 @@ $PaginationModelCopyWith<$Res> get pagination {
 /// @nodoc
 mixin _$ChatModel {
 
- String get type; String get id; String get name; String get image; String get lastMessage; DateTime get lastMessageAt; int get unreadCount; Map<String, dynamic> get meta; List<MemberModel>? get members;
+ String get type; String get id; String get name; String get image; String get lastMessage; DateTime? get lastMessageAt; int get unreadCount; Map<String, dynamic> get meta; List<MemberModel>? get members;
 /// Create a copy of ChatModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -634,7 +634,7 @@ abstract mixin class $ChatModelCopyWith<$Res>  {
   factory $ChatModelCopyWith(ChatModel value, $Res Function(ChatModel) _then) = _$ChatModelCopyWithImpl;
 @useResult
 $Res call({
- String type, String id, String name, String image, String lastMessage, DateTime lastMessageAt, int unreadCount, Map<String, dynamic> meta, List<MemberModel>? members
+ String type, String id, String name, String image, String lastMessage, DateTime? lastMessageAt, int unreadCount, Map<String, dynamic> meta, List<MemberModel>? members
 });
 
 
@@ -651,15 +651,15 @@ class _$ChatModelCopyWithImpl<$Res>
 
 /// Create a copy of ChatModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? type = null,Object? id = null,Object? name = null,Object? image = null,Object? lastMessage = null,Object? lastMessageAt = null,Object? unreadCount = null,Object? meta = null,Object? members = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? type = null,Object? id = null,Object? name = null,Object? image = null,Object? lastMessage = null,Object? lastMessageAt = freezed,Object? unreadCount = null,Object? meta = null,Object? members = freezed,}) {
   return _then(_self.copyWith(
 type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
 as String,id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,image: null == image ? _self.image : image // ignore: cast_nullable_to_non_nullable
 as String,lastMessage: null == lastMessage ? _self.lastMessage : lastMessage // ignore: cast_nullable_to_non_nullable
-as String,lastMessageAt: null == lastMessageAt ? _self.lastMessageAt : lastMessageAt // ignore: cast_nullable_to_non_nullable
-as DateTime,unreadCount: null == unreadCount ? _self.unreadCount : unreadCount // ignore: cast_nullable_to_non_nullable
+as String,lastMessageAt: freezed == lastMessageAt ? _self.lastMessageAt : lastMessageAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,unreadCount: null == unreadCount ? _self.unreadCount : unreadCount // ignore: cast_nullable_to_non_nullable
 as int,meta: null == meta ? _self.meta : meta // ignore: cast_nullable_to_non_nullable
 as Map<String, dynamic>,members: freezed == members ? _self.members : members // ignore: cast_nullable_to_non_nullable
 as List<MemberModel>?,
@@ -747,7 +747,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String type,  String id,  String name,  String image,  String lastMessage,  DateTime lastMessageAt,  int unreadCount,  Map<String, dynamic> meta,  List<MemberModel>? members)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String type,  String id,  String name,  String image,  String lastMessage,  DateTime? lastMessageAt,  int unreadCount,  Map<String, dynamic> meta,  List<MemberModel>? members)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ChatModel() when $default != null:
 return $default(_that.type,_that.id,_that.name,_that.image,_that.lastMessage,_that.lastMessageAt,_that.unreadCount,_that.meta,_that.members);case _:
@@ -768,7 +768,7 @@ return $default(_that.type,_that.id,_that.name,_that.image,_that.lastMessage,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String type,  String id,  String name,  String image,  String lastMessage,  DateTime lastMessageAt,  int unreadCount,  Map<String, dynamic> meta,  List<MemberModel>? members)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String type,  String id,  String name,  String image,  String lastMessage,  DateTime? lastMessageAt,  int unreadCount,  Map<String, dynamic> meta,  List<MemberModel>? members)  $default,) {final _that = this;
 switch (_that) {
 case _ChatModel():
 return $default(_that.type,_that.id,_that.name,_that.image,_that.lastMessage,_that.lastMessageAt,_that.unreadCount,_that.meta,_that.members);case _:
@@ -788,7 +788,7 @@ return $default(_that.type,_that.id,_that.name,_that.image,_that.lastMessage,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String type,  String id,  String name,  String image,  String lastMessage,  DateTime lastMessageAt,  int unreadCount,  Map<String, dynamic> meta,  List<MemberModel>? members)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String type,  String id,  String name,  String image,  String lastMessage,  DateTime? lastMessageAt,  int unreadCount,  Map<String, dynamic> meta,  List<MemberModel>? members)?  $default,) {final _that = this;
 switch (_that) {
 case _ChatModel() when $default != null:
 return $default(_that.type,_that.id,_that.name,_that.image,_that.lastMessage,_that.lastMessageAt,_that.unreadCount,_that.meta,_that.members);case _:
@@ -803,15 +803,15 @@ return $default(_that.type,_that.id,_that.name,_that.image,_that.lastMessage,_th
 @JsonSerializable()
 
 class _ChatModel implements ChatModel {
-  const _ChatModel({required this.type, required this.id, required this.name, required this.image, required this.lastMessage, required this.lastMessageAt, required this.unreadCount, required final  Map<String, dynamic> meta, final  List<MemberModel>? members}): _meta = meta,_members = members;
+  const _ChatModel({required this.type, required this.id, required this.name, this.image = '', this.lastMessage = '', this.lastMessageAt, required this.unreadCount, required final  Map<String, dynamic> meta, final  List<MemberModel>? members}): _meta = meta,_members = members;
   factory _ChatModel.fromJson(Map<String, dynamic> json) => _$ChatModelFromJson(json);
 
 @override final  String type;
 @override final  String id;
 @override final  String name;
-@override final  String image;
-@override final  String lastMessage;
-@override final  DateTime lastMessageAt;
+@override@JsonKey() final  String image;
+@override@JsonKey() final  String lastMessage;
+@override final  DateTime? lastMessageAt;
 @override final  int unreadCount;
  final  Map<String, dynamic> _meta;
 @override Map<String, dynamic> get meta {
@@ -863,7 +863,7 @@ abstract mixin class _$ChatModelCopyWith<$Res> implements $ChatModelCopyWith<$Re
   factory _$ChatModelCopyWith(_ChatModel value, $Res Function(_ChatModel) _then) = __$ChatModelCopyWithImpl;
 @override @useResult
 $Res call({
- String type, String id, String name, String image, String lastMessage, DateTime lastMessageAt, int unreadCount, Map<String, dynamic> meta, List<MemberModel>? members
+ String type, String id, String name, String image, String lastMessage, DateTime? lastMessageAt, int unreadCount, Map<String, dynamic> meta, List<MemberModel>? members
 });
 
 
@@ -880,15 +880,15 @@ class __$ChatModelCopyWithImpl<$Res>
 
 /// Create a copy of ChatModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? type = null,Object? id = null,Object? name = null,Object? image = null,Object? lastMessage = null,Object? lastMessageAt = null,Object? unreadCount = null,Object? meta = null,Object? members = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? type = null,Object? id = null,Object? name = null,Object? image = null,Object? lastMessage = null,Object? lastMessageAt = freezed,Object? unreadCount = null,Object? meta = null,Object? members = freezed,}) {
   return _then(_ChatModel(
 type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
 as String,id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,image: null == image ? _self.image : image // ignore: cast_nullable_to_non_nullable
 as String,lastMessage: null == lastMessage ? _self.lastMessage : lastMessage // ignore: cast_nullable_to_non_nullable
-as String,lastMessageAt: null == lastMessageAt ? _self.lastMessageAt : lastMessageAt // ignore: cast_nullable_to_non_nullable
-as DateTime,unreadCount: null == unreadCount ? _self.unreadCount : unreadCount // ignore: cast_nullable_to_non_nullable
+as String,lastMessageAt: freezed == lastMessageAt ? _self.lastMessageAt : lastMessageAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,unreadCount: null == unreadCount ? _self.unreadCount : unreadCount // ignore: cast_nullable_to_non_nullable
 as int,meta: null == meta ? _self._meta : meta // ignore: cast_nullable_to_non_nullable
 as Map<String, dynamic>,members: freezed == members ? _self._members : members // ignore: cast_nullable_to_non_nullable
 as List<MemberModel>?,
@@ -2345,7 +2345,7 @@ $PokedTargetDetailCopyWith<$Res> get pokedTargetDetail {
 /// @nodoc
 mixin _$PokeModel {
 
-@JsonKey(name: '_id') String get id; String get fromUserId; String get toUserId; String get targetType; String get targetId; String get message; String get status; DateTime get createdAt; DateTime get updatedAt;
+ String get id; String get fromUserId; String get toUserId; String get targetType; String get targetId; String get message; String get status; DateTime get createdAt; DateTime get updatedAt;
 /// Create a copy of PokeModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -2378,7 +2378,7 @@ abstract mixin class $PokeModelCopyWith<$Res>  {
   factory $PokeModelCopyWith(PokeModel value, $Res Function(PokeModel) _then) = _$PokeModelCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(name: '_id') String id, String fromUserId, String toUserId, String targetType, String targetId, String message, String status, DateTime createdAt, DateTime updatedAt
+ String id, String fromUserId, String toUserId, String targetType, String targetId, String message, String status, DateTime createdAt, DateTime updatedAt
 });
 
 
@@ -2491,7 +2491,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: '_id')  String id,  String fromUserId,  String toUserId,  String targetType,  String targetId,  String message,  String status,  DateTime createdAt,  DateTime updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String fromUserId,  String toUserId,  String targetType,  String targetId,  String message,  String status,  DateTime createdAt,  DateTime updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PokeModel() when $default != null:
 return $default(_that.id,_that.fromUserId,_that.toUserId,_that.targetType,_that.targetId,_that.message,_that.status,_that.createdAt,_that.updatedAt);case _:
@@ -2512,7 +2512,7 @@ return $default(_that.id,_that.fromUserId,_that.toUserId,_that.targetType,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: '_id')  String id,  String fromUserId,  String toUserId,  String targetType,  String targetId,  String message,  String status,  DateTime createdAt,  DateTime updatedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String fromUserId,  String toUserId,  String targetType,  String targetId,  String message,  String status,  DateTime createdAt,  DateTime updatedAt)  $default,) {final _that = this;
 switch (_that) {
 case _PokeModel():
 return $default(_that.id,_that.fromUserId,_that.toUserId,_that.targetType,_that.targetId,_that.message,_that.status,_that.createdAt,_that.updatedAt);case _:
@@ -2532,7 +2532,7 @@ return $default(_that.id,_that.fromUserId,_that.toUserId,_that.targetType,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: '_id')  String id,  String fromUserId,  String toUserId,  String targetType,  String targetId,  String message,  String status,  DateTime createdAt,  DateTime updatedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String fromUserId,  String toUserId,  String targetType,  String targetId,  String message,  String status,  DateTime createdAt,  DateTime updatedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _PokeModel() when $default != null:
 return $default(_that.id,_that.fromUserId,_that.toUserId,_that.targetType,_that.targetId,_that.message,_that.status,_that.createdAt,_that.updatedAt);case _:
@@ -2547,10 +2547,10 @@ return $default(_that.id,_that.fromUserId,_that.toUserId,_that.targetType,_that.
 @JsonSerializable()
 
 class _PokeModel implements PokeModel {
-  const _PokeModel({@JsonKey(name: '_id') required this.id, required this.fromUserId, required this.toUserId, required this.targetType, required this.targetId, required this.message, required this.status, required this.createdAt, required this.updatedAt});
+  const _PokeModel({required this.id, required this.fromUserId, required this.toUserId, required this.targetType, required this.targetId, required this.message, required this.status, required this.createdAt, required this.updatedAt});
   factory _PokeModel.fromJson(Map<String, dynamic> json) => _$PokeModelFromJson(json);
 
-@override@JsonKey(name: '_id') final  String id;
+@override final  String id;
 @override final  String fromUserId;
 @override final  String toUserId;
 @override final  String targetType;
@@ -2593,7 +2593,7 @@ abstract mixin class _$PokeModelCopyWith<$Res> implements $PokeModelCopyWith<$Re
   factory _$PokeModelCopyWith(_PokeModel value, $Res Function(_PokeModel) _then) = __$PokeModelCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: '_id') String id, String fromUserId, String toUserId, String targetType, String targetId, String message, String status, DateTime createdAt, DateTime updatedAt
+ String id, String fromUserId, String toUserId, String targetType, String targetId, String message, String status, DateTime createdAt, DateTime updatedAt
 });
 
 
@@ -2632,7 +2632,7 @@ as DateTime,
 /// @nodoc
 mixin _$PokerFromUser {
 
-@JsonKey(name: '_id') String get id; String get firstName; String get lastName; List<String> get bestShorts;
+ String get id; String get firstName; String get lastName; List<String> get bestShorts;
 /// Create a copy of PokerFromUser
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -2665,7 +2665,7 @@ abstract mixin class $PokerFromUserCopyWith<$Res>  {
   factory $PokerFromUserCopyWith(PokerFromUser value, $Res Function(PokerFromUser) _then) = _$PokerFromUserCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(name: '_id') String id, String firstName, String lastName, List<String> bestShorts
+ String id, String firstName, String lastName, List<String> bestShorts
 });
 
 
@@ -2773,7 +2773,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: '_id')  String id,  String firstName,  String lastName,  List<String> bestShorts)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String firstName,  String lastName,  List<String> bestShorts)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PokerFromUser() when $default != null:
 return $default(_that.id,_that.firstName,_that.lastName,_that.bestShorts);case _:
@@ -2794,7 +2794,7 @@ return $default(_that.id,_that.firstName,_that.lastName,_that.bestShorts);case _
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: '_id')  String id,  String firstName,  String lastName,  List<String> bestShorts)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String firstName,  String lastName,  List<String> bestShorts)  $default,) {final _that = this;
 switch (_that) {
 case _PokerFromUser():
 return $default(_that.id,_that.firstName,_that.lastName,_that.bestShorts);case _:
@@ -2814,7 +2814,7 @@ return $default(_that.id,_that.firstName,_that.lastName,_that.bestShorts);case _
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: '_id')  String id,  String firstName,  String lastName,  List<String> bestShorts)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String firstName,  String lastName,  List<String> bestShorts)?  $default,) {final _that = this;
 switch (_that) {
 case _PokerFromUser() when $default != null:
 return $default(_that.id,_that.firstName,_that.lastName,_that.bestShorts);case _:
@@ -2829,10 +2829,10 @@ return $default(_that.id,_that.firstName,_that.lastName,_that.bestShorts);case _
 @JsonSerializable()
 
 class _PokerFromUser implements PokerFromUser {
-  const _PokerFromUser({@JsonKey(name: '_id') required this.id, required this.firstName, required this.lastName, required final  List<String> bestShorts}): _bestShorts = bestShorts;
+  const _PokerFromUser({required this.id, required this.firstName, required this.lastName, required final  List<String> bestShorts}): _bestShorts = bestShorts;
   factory _PokerFromUser.fromJson(Map<String, dynamic> json) => _$PokerFromUserFromJson(json);
 
-@override@JsonKey(name: '_id') final  String id;
+@override final  String id;
 @override final  String firstName;
 @override final  String lastName;
  final  List<String> _bestShorts;
@@ -2876,7 +2876,7 @@ abstract mixin class _$PokerFromUserCopyWith<$Res> implements $PokerFromUserCopy
   factory _$PokerFromUserCopyWith(_PokerFromUser value, $Res Function(_PokerFromUser) _then) = __$PokerFromUserCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: '_id') String id, String firstName, String lastName, List<String> bestShorts
+ String id, String firstName, String lastName, List<String> bestShorts
 });
 
 

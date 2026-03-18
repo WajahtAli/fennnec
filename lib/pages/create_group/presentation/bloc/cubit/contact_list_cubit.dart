@@ -127,7 +127,7 @@ class ContactListCubit extends Cubit<ContactListState> {
   void addMember(SelectedMember member, {bool isApiCallNeeded = true}) {
     emit(ContactListLoading());
 
-    if (selectedMembers.length >= 4) {
+    if (selectedMembers.length >= 5) {
       VxToast.show(message: 'You can add up to 4 members in a group.');
       emit(ContactListLoaded());
       return;
@@ -224,8 +224,7 @@ class ContactListCubit extends Cubit<ContactListState> {
   Future<GetMembersModel?> getAllMembers({
     required List<String> contacts,
   }) async {
-    // Only emit loading if not already loading (optional optimization, but good for UI flicker)
-    // emit(ContactListLoading());
+    emit(ContactListLoading());
 
     try {
       final response = await _createGroupUsecase.getAllMembers(
@@ -236,7 +235,7 @@ class ContactListCubit extends Cubit<ContactListState> {
       fennecMembers = response.data?.members ?? [];
       nonFennecMembers = response.data?.notFennecMembers ?? [];
 
-      // emit(ContactListLoaded());
+      emit(ContactListLoaded());
       return response;
     } catch (e) {
       String errorMsg = 'Failed to get members';

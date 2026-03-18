@@ -6,6 +6,7 @@ import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/pages/kyc/presentation/bloc/cubit/kyc_cubit.dart';
 import 'package:fennac_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
+import 'package:fennac_app/widgets/app_inkwell.dart';
 
 class GenderSelectionWidget extends StatefulWidget {
   final String? selectedGender;
@@ -53,7 +54,7 @@ class _GenderSelectionWidgetState extends State<GenderSelectionWidget> {
         final gender = genderOptions[index];
         final isSelected = _selectedGender == gender;
 
-        return InkWell(
+        return AppInkWell(
           borderRadius: BorderRadius.circular(16),
           onTap: () {
             setState(() {

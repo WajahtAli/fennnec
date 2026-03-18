@@ -8,6 +8,7 @@ import 'package:fennac_app/pages/kyc/presentation/bloc/state/kyc_state.dart';
 import 'package:fennac_app/widgets/custom_sized_box.dart';
 import 'package:fennac_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
+import 'package:fennac_app/widgets/app_inkwell.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class InterestSelectionWidget extends StatelessWidget {
@@ -49,7 +50,7 @@ class InterestSelectionWidget extends StatelessWidget {
                         .where((item) => cubit.selectedInterests.contains(item))
                         .length;
                     final isMaxReached = selectedInCategory >= 3 && !isSelected;
-                    return InkWell(
+                    return AppInkWell(
                       borderRadius: BorderRadius.circular(20),
                       onTap: isMaxReached
                           ? null

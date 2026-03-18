@@ -68,13 +68,7 @@ class _MediaContainerWidgetState extends State<MediaContainerWidget> {
   void _initVideoControllerIfNeeded() {
     if (widget.media?.type != MediaType.video) return;
 
-    final mediaPath = widget.media!.path;
-    final isNetworkVideo =
-        mediaPath.startsWith('http://') || mediaPath.startsWith('https://');
-
-    _videoController = isNetworkVideo
-        ? VideoPlayerController.networkUrl(Uri.parse(mediaPath))
-        : VideoPlayerController.file(File(mediaPath));
+    _videoController = VideoPlayerController.file(File(widget.media!.path));
     _videoInitFuture = _videoController!
         .initialize()
         .then(
@@ -246,24 +240,6 @@ class _MediaContainerWidgetState extends State<MediaContainerWidget> {
                     color: Colors.white,
                     size: 16,
                   ),
-                ),
-              ),
-            ),
-          // Edit button (images only)
-          if (widget.media!.type == MediaType.image)
-            Positioned(
-              bottom: 8,
-              right: 8,
-              child: GestureDetector(
-                onTap: () => cubit.editMediaAtIndex(widget.index),
-                child: Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.6),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.edit, color: Colors.white, size: 16),
                 ),
               ),
             ),

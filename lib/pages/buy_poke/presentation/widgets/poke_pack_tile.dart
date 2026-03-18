@@ -5,6 +5,7 @@ import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:fennac_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:lottie/lottie.dart';
 
 class PokePackTile extends StatelessWidget {
   final String title;
@@ -12,6 +13,7 @@ class PokePackTile extends StatelessWidget {
   final int pokes;
   final String price;
   final VoidCallback? onTap;
+  final bool isPurchasing;
 
   const PokePackTile({
     super.key,
@@ -20,6 +22,7 @@ class PokePackTile extends StatelessWidget {
     required this.pokes,
     required this.price,
     this.onTap,
+    this.isPurchasing = false,
   });
 
   @override
@@ -73,17 +76,23 @@ class PokePackTile extends StatelessWidget {
                   ).copyWith(fontWeight: FontWeight.w700),
                 ),
                 const SizedBox(width: 16),
-                SvgPicture.asset(
-                  Assets.icons.arrowRight.path,
-                  width: 16,
-                  height: 16,
-                  colorFilter: ColorFilter.mode(
-                    isLightTheme(context)
-                        ? ColorPalette.black
-                        : ColorPalette.white,
-                    BlendMode.srcIn,
-                  ),
-                ),
+                isPurchasing
+                    ? SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: Lottie.asset(Assets.animations.loadingSpinner),
+                      )
+                    : SvgPicture.asset(
+                        Assets.icons.arrowRight.path,
+                        width: 16,
+                        height: 16,
+                        colorFilter: ColorFilter.mode(
+                          isLightTheme(context)
+                              ? ColorPalette.black
+                              : ColorPalette.white,
+                          BlendMode.srcIn,
+                        ),
+                      ),
               ],
             ),
           ],

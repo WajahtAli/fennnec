@@ -10,9 +10,27 @@ abstract class PokeDatasource {
     String? targetId,
     required String message,
   });
+
+  Future<Map<String, dynamic>> purchasePokes({required String productId});
+  Future<Map<String, dynamic>> purchaseSubscription({
+    required String productId,
+  });
 }
 
 class PokeDatasourceImpl extends PokeDatasource {
+  @override
+  Future<Map<String, dynamic>> purchaseSubscription({
+    required String productId,
+  }) async {
+    final body = <String, dynamic>{'productId': productId};
+    final response = await apiHelper.post(
+      'subscription/purchase',
+      body: body,
+      requiresAuth: true,
+    );
+    return response;
+  }
+
   final ApiHelper apiHelper;
 
   PokeDatasourceImpl(this.apiHelper);
@@ -45,6 +63,19 @@ class PokeDatasourceImpl extends PokeDatasource {
 
     final response = await apiHelper.post(
       AppConstants.sendPoke,
+      body: body,
+      requiresAuth: true,
+    );
+    return response;
+  }
+
+  @override
+  Future<Map<String, dynamic>> purchasePokes({
+    required String productId,
+  }) async {
+    final body = <String, dynamic>{'productId': productId};
+    final response = await apiHelper.post(
+      'pokes/purchase',
       body: body,
       requiresAuth: true,
     );

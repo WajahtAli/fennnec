@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:auto_route/auto_route.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
+import 'package:fennac_app/pages/auth/presentation/bloc/cubit/login_cubit.dart';
 import 'package:fennac_app/pages/chats/presentation/widgets/premium_card.dart';
 import 'package:fennac_app/pages/my_group/data/model/my_group_model.dart';
 import 'package:fennac_app/pages/my_group/presentation/bloc/cubit/my_group_cubit.dart';
@@ -68,7 +69,14 @@ class _YourGroupsScreenState extends State<YourGroupsScreen> {
               children: [
                 CustomAppBar(title: 'Your Groups'),
                 CustomSizedBox(height: 16),
-                PremiumCard(isGradientTitle: true),
+                if (Di()
+                        .sl<LoginCubit>()
+                        .userData
+                        ?.user
+                        ?.accountStatus
+                        ?.toLowerCase() ==
+                    'active'.toLowerCase())
+                  PremiumCard(isGradientTitle: true),
                 CustomSizedBox(height: 10),
                 Align(
                   alignment: Alignment.centerLeft,

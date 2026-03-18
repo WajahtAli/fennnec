@@ -23,6 +23,7 @@ import 'package:fennac_app/widgets/custom_sized_box.dart';
 import 'package:fennac_app/widgets/custom_text.dart';
 import 'package:fennac_app/widgets/movable_background.dart';
 import 'package:flutter/material.dart';
+import 'package:fennac_app/widgets/app_inkwell.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lottie/lottie.dart';
@@ -356,7 +357,7 @@ class _VerifyPhoneNumberScreenState extends State<VerifyPhoneNumberScreen> {
                                     final isLoading =
                                         state is CreateAccountLoading &&
                                         _createAccountCubit.isLoading;
-                                    return InkWell(
+                                    return AppInkWell(
                                       onTap: () {
                                         final email = _authCubit
                                             .emailController

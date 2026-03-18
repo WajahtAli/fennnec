@@ -48,13 +48,26 @@ class Data {
     this.v,
   });
 
+  static String? _extractId(dynamic value) {
+    if (value is String) return value;
+    if (value is Map<String, dynamic>) {
+      final id = value['_id'] ?? value['id'];
+      return id?.toString();
+    }
+    return null;
+  }
+
   factory Data.fromJson(Map<String, dynamic> json) => Data(
     members: json["members"] == null
         ? []
-        : List<String>.from(json["members"]!.map((x) => x)),
-    createdBy: json["createdBy"],
+        : List<String>.from(
+            (json["members"] as List)
+                .map((x) => _extractId(x))
+                .whereType<String>(),
+          ),
+    createdBy: _extractId(json["createdBy"]),
     qrCode: json["qrCode"],
-    titleMembers: json["title_members"],
+    titleMembers: json["title_members"] ?? json["title"] ?? json["name"],
     bio: json["bio"],
     fitsForGroup: json["fitsForGroup"],
     groupSettings: json["groupSettings"] == null

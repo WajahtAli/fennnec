@@ -1,8 +1,6 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fennac_app/app/constants/media_query_constants.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
-import 'package:fennac_app/pages/chats/data/models/chat_and_calls_response.dart';
 import 'package:fennac_app/widgets/custom_sized_box.dart';
 import 'package:flutter/material.dart';
 
@@ -23,10 +21,6 @@ class CallHistoryItem extends StatelessWidget {
   final bool showBorder;
   final Color? backgroundColor;
 
-  // New optional models
-  final ChatModel? chatModel;
-  final CallModel? callModel;
-
   const CallHistoryItem({
     super.key,
     this.name,
@@ -42,34 +36,11 @@ class CallHistoryItem extends StatelessWidget {
     this.isPoked = false,
     this.showBorder = true,
     this.backgroundColor,
-    this.chatModel,
-    this.callModel,
   });
 
   @override
   Widget build(BuildContext context) {
-    // Determine data source
-    final bool isGroupVal = chatModel?.type == 'group' || isGroup;
-    final String nameVal =
-        chatModel?.name ??
-        (isGroup
-            ? (names?.join(', ') ?? '')
-            : (name ?? ''));
-
-    final String lastMessageVal =
-        chatModel?.lastMessage ?? lastMessage ?? '';
-    final String timeVal = chatModel != null ? '' : timeAgo; // Placeholder for time
-    final String? singleAvatar =
-        chatModel?.members?.isNotEmpty == true
-            ? chatModel?.members?.first.image
-            : avatar;
-
-    final List<String> groupAvatars =
-        chatModel?.members?.map((e) => e.image ?? '').toList() ??
-        avatars ??
-        [];
-
-    final isCallItem = callType != null && duration != null || callModel != null;
+    final isCallItem = callType != null && duration != null;
 
     return Container(
       padding:
@@ -94,10 +65,10 @@ class CallHistoryItem extends StatelessWidget {
       child: Row(
         children: [
           // Avatar or avatars stack
-          if (isGroupVal && groupAvatars.isNotEmpty)
-            _buildGroupAvatars(groupAvatars)
+          if (isGroup && avatars != null)
+            _buildGroupAvatars()
           else
-            _buildSingleAvatar(context, singleAvatar),
+            _buildSingleAvatar(context),
           const SizedBox(width: 12),
           // Content
           Expanded(
@@ -105,7 +76,7 @@ class CallHistoryItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  nameVal,
+                  isGroup ? names!.join(', ') : name!,
                   style: AppTextStyles.body(context),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -115,11 +86,7 @@ class CallHistoryItem extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      isCallItem
-                          ? (callModel != null
-                              ? '${callModel!.callTypeLabel ?? ''} • ${callModel!.duration ?? ''}'
-                              : '$callType • $duration')
-                          : lastMessageVal,
+                      _buildSecondaryText(isCallItem),
                       style: AppTextStyles.description(context).copyWith(
                         color: isLightTheme(context)
                             ? ColorPalette.black.withValues(alpha: 0.8)
@@ -129,7 +96,7 @@ class CallHistoryItem extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
-                      callModel?.timeAgo ?? timeVal,
+                      timeAgo,
                       style: AppTextStyles.bodySmall(context).copyWith(
                         color: isLightTheme(context)
                             ? ColorPalette.black.withValues(alpha: 0.8)
@@ -147,10 +114,19 @@ class CallHistoryItem extends StatelessWidget {
     );
   }
 
-  Widget _buildSingleAvatar(BuildContext context, String? avatarPath) {
+  String _buildSecondaryText(bool isCallItem) {
+    if (isCallItem) {
+      return '$callType • $duration';
+    } else {
+      return lastMessage ?? '';
+    }
+  }
+
+  Widget _buildSingleAvatar(BuildContext context) {
     return Stack(
       alignment: Alignment.center,
       children: [
+        // SizedBox(height: 52, width: 52),
         Container(
           width: 48,
           height: 48,
@@ -160,21 +136,10 @@ class CallHistoryItem extends StatelessWidget {
               color: ColorPalette.primary.withValues(alpha: 0.3),
               width: 2,
             ),
-          ),
-          child: ClipOval(
-            child:
-                avatarPath != null &&
-                        (avatarPath.startsWith('http') ||
-                            avatarPath.contains('assets/'))
-                    ? (avatarPath.startsWith('http')
-                        ? CachedNetworkImage(
-                          imageUrl: avatarPath,
-                          fit: BoxFit.cover,
-                          placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
-                          errorWidget: (context, url, error) => const Icon(Icons.person),
-                        )
-                        : Image.asset(avatarPath, fit: BoxFit.cover))
-                    : const Icon(Icons.person),
+            image: DecorationImage(
+              image: AssetImage(avatar!),
+              fit: BoxFit.cover,
+            ),
           ),
         ),
         if (isPoked)
@@ -200,49 +165,40 @@ class CallHistoryItem extends StatelessWidget {
     );
   }
 
-  Widget _buildGroupAvatars(List<String> avatarPaths) {
+  Widget _buildGroupAvatars() {
     return SizedBox(
       width: 48,
       height: 48,
       child: Stack(
         children: [
           // Top-left
-          if (avatarPaths.isNotEmpty)
-            Positioned(left: 0, top: 0, child: _buildAvatar(avatarPaths[0])),
+          if (avatars!.isNotEmpty)
+            Positioned(left: 0, top: 0, child: _buildAvatar(avatars![0])),
           // Top-right
-          if (avatarPaths.length > 1)
-            Positioned(left: 24, top: 0, child: _buildAvatar(avatarPaths[1])),
+          if (avatars!.length > 1)
+            Positioned(left: 24, top: 0, child: _buildAvatar(avatars![1])),
           // Bottom-left
-          if (avatarPaths.length > 3)
-            Positioned(left: 0, top: 24, child: _buildAvatar(avatarPaths[3])),
+          if (avatars!.length > 3)
+            Positioned(left: 0, top: 24, child: _buildAvatar(avatars![3])),
           // Bottom-right
-          if (avatarPaths.length > 4)
-            Positioned(left: 24, top: 24, child: _buildAvatar(avatarPaths[4])),
+          if (avatars!.length > 4)
+            Positioned(left: 24, top: 24, child: _buildAvatar(avatars![4])),
           // Center on top
-          if (avatarPaths.length > 2)
-            Positioned(left: 12, top: 12, child: _buildAvatar(avatarPaths[2])),
+          if (avatars!.length > 2)
+            Positioned(left: 12, top: 12, child: _buildAvatar(avatars![2])),
         ],
       ),
     );
   }
 
-  Widget _buildAvatar(String avatarPath) {
+  Widget _buildAvatar(String assetPath) {
     return Container(
       width: 24,
       height: 24,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(color: ColorPalette.secondary, width: 1),
-      ),
-      child: ClipOval(
-        child:
-            avatarPath.startsWith('http')
-                ? CachedNetworkImage(
-                  imageUrl: avatarPath,
-                  fit: BoxFit.cover,
-                  errorWidget: (context, url, error) => const Icon(Icons.person, size: 12),
-                )
-                : Image.asset(avatarPath, fit: BoxFit.cover),
+        image: DecorationImage(image: AssetImage(assetPath), fit: BoxFit.cover),
       ),
     );
   }

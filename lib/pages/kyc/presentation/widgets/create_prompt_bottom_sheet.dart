@@ -145,7 +145,8 @@ class _CreatePromptBottomSheetState extends State<CreatePromptBottomSheet> {
             );
 
         log("test ${widget.isEditMode} :: ${widget.isEditingPrompt}");
-        if (audioPromptData?.promptAnswer?.isAudio ?? false) {
+        if ((audioPromptData?.promptAnswer?.isAudio ?? false) &&
+            (audioPromptData?.promptAnswer?.isUrl == false)) {
           String url = await _createAccountCubit.uploadMedia(
             filePath: audioPromptData?.promptAnswer ?? "",
           );

@@ -150,7 +150,7 @@ class _CreateGroupContentState extends State<CreateGroupContent> {
                     isEditable: canEditCoreDetails,
                   ),
                   const CustomSizedBox(height: 24),
-                  GroupBasicSettings(cubit: cubit),
+                  GroupBasicSettings(isEditMode: widget.isEditMode),
                 ],
               );
             },

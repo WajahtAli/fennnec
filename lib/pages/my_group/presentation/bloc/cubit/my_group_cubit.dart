@@ -7,6 +7,21 @@ import '../../../domain/usecase/my_group_usecase.dart';
 import '../state/my_group_state.dart';
 
 class MyGroupCubit extends Cubit<MyGroupState> {
+  Future<void> setActiveGroup(String groupId) async {
+    emit(MyGroupLoading());
+    try {
+      final response = await _myGroupUsecase.setActiveGroup(groupId);
+      final String message = response is Map<String, dynamic>
+          ? (response['message']?.toString() ?? 'Group activated successfully')
+          : 'Group activated successfully';
+      VxToast.show(message: message);
+      emit(MyGroupLoaded());
+    } catch (e) {
+      VxToast.show(message: 'Failed to activate group: \\${e.toString()}');
+      emit(MyGroupError(e.toString()));
+    }
+  }
+
   final MyGroupUsecase _myGroupUsecase;
   MyGroupCubit(this._myGroupUsecase) : super(MyGroupInitial());
 

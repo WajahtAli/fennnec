@@ -8,6 +8,7 @@ import 'package:fennac_app/pages/auth/presentation/bloc/cubit/auth_cubit.dart';
 import 'package:fennac_app/widgets/custom_sized_box.dart';
 import 'package:fennac_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
+import 'package:fennac_app/widgets/app_inkwell.dart';
 import 'package:flutter/services.dart'
     show rootBundle, FilteringTextInputFormatter;
 
@@ -260,7 +261,7 @@ class _PhoneNumberFieldState extends State<PhoneNumberField> {
                     _underline(
                       child: Row(
                         children: [
-                          InkWell(
+                          AppInkWell(
                             onTap: () =>
                                 _showCountryBottomSheet(context, snap.data!),
                             child: _flagBox(),
@@ -581,7 +582,7 @@ class _CountryBottomSheetContentState
                 final country = _filteredCountries[index];
                 final isSelected = widget.selectedCountry?.iso == country.iso;
 
-                return InkWell(
+                return AppInkWell(
                   onTap: () {
                     widget.onCountrySelected(country);
                     Navigator.pop(context);

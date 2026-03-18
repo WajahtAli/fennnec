@@ -1,4 +1,6 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:fennac_app/app/constants/app_enums.dart';
+import 'package:fennac_app/app/constants/media_query_constants.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/bloc/cubit/imagepicker_cubit.dart';
@@ -14,6 +16,7 @@ import 'package:fennac_app/routes/routes_imports.gr.dart';
 import 'package:fennac_app/widgets/custom_elevated_button.dart';
 import 'package:fennac_app/widgets/movable_background.dart';
 import 'package:flutter/material.dart';
+import 'package:fennac_app/widgets/app_inkwell.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lottie/lottie.dart';
 
@@ -62,7 +65,25 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                   titleStyle: AppTextStyles.h4(
                     context,
                   ).copyWith(letterSpacing: 0.2, fontWeight: FontWeight.bold),
+                  action: AppInkWell(
+                    onTap: () {
+                      AutoRouter.of(context).push(
+                        FindGroupRoute(
+                          findGroupScreenType:
+                              FindGroupScreenType.qrProfileCode,
+                          isFromCreateGroup: true,
+                        ),
+                      );
+                    },
+                    child: Icon(
+                      Icons.qr_code_2,
+                      color: isLightTheme(context)
+                          ? ColorPalette.primary
+                          : Colors.white,
+                    ),
+                  ),
                 ),
+
                 CreateGroupContent(isEditMode: widget.isEditMode),
               ],
             ),

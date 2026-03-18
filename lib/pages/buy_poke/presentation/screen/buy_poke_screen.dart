@@ -4,6 +4,7 @@ import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/app_emojis.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/core/di_container.dart';
+import 'package:fennac_app/pages/auth/presentation/bloc/cubit/login_cubit.dart';
 import 'package:fennac_app/pages/buy_poke/presentation/bloc/cubit/poke_cubit.dart';
 import 'package:fennac_app/pages/buy_poke/presentation/bloc/state/poke_state.dart';
 import 'package:fennac_app/pages/buy_poke/presentation/widgets/poke_pack_tile.dart';
@@ -77,7 +78,8 @@ class _BuyPokeScreenState extends State<BuyPokeScreen> {
                 BlocBuilder<PokeCubit, PokeState>(
                   bloc: _pokeCubit,
                   builder: (context, state) {
-                    if (state is PokeLoading) {
+                    if (state is PokeLoading &&
+                        _pokeCubit.isPurchasing == false) {
                       return const PokePackSkeleton(itemCount: 3);
                     }
                     if (state is PokeError) {
@@ -118,7 +120,14 @@ class _BuyPokeScreenState extends State<BuyPokeScreen> {
                           subtitle: 'Tap to purchase',
                           price:
                               '\$${(product.priceUsd ?? 0).toStringAsFixed(2)}',
-                          onTap: () {},
+                          onTap: () {
+                            Di().sl<PokeCubit>().purchasePokes(
+                              product.id ?? '',
+                            );
+                          },
+                          isPurchasing:
+                              _pokeCubit.isPurchasing &&
+                              _pokeCubit.purchasingProductId == product.id,
                         );
                       },
                     );

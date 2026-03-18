@@ -4,6 +4,11 @@ import 'package:fennac_app/pages/chats/data/models/message_model.dart';
 import '../model/my_group_model.dart';
 
 class MyGroupRepositoryImpl extends MyGroupRepository {
+  @override
+  Future<dynamic> setActiveGroup(String groupId) async {
+    return await _datasource.setActiveGroup(groupId);
+  }
+
   final MyGroupDatasource _datasource;
 
   MyGroupRepositoryImpl(this._datasource);

@@ -20,6 +20,7 @@ import 'package:fennac_app/widgets/custom_sized_box.dart';
 import 'package:fennac_app/widgets/custom_text.dart';
 import 'package:fennac_app/widgets/movable_background.dart';
 import 'package:flutter/material.dart';
+import 'package:fennac_app/widgets/app_inkwell.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lottie/lottie.dart';
@@ -225,7 +226,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                                   text: 'Didn\'t get the code?',
                                   style: AppTextStyles.bodyLarge(context),
                                 ),
-                                InkWell(
+                                AppInkWell(
                                   borderRadius: BorderRadius.circular(32),
                                   onTap: _authCubit.canResendOtp
                                       ? () async {

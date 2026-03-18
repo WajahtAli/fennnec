@@ -1,6 +1,7 @@
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
+import 'package:fennac_app/widgets/app_inkwell.dart';
 import 'package:lottie/lottie.dart';
 
 import '../../../../generated/assets.gen.dart';
@@ -50,7 +51,7 @@ class ContinueButton extends StatelessWidget {
       ),
       child: Material(
         color: Colors.transparent,
-        child: InkWell(
+        child: AppInkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(52),
           splashColor: Colors.white.withValues(alpha: 0.2),

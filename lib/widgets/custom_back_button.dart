@@ -1,6 +1,7 @@
 import 'package:fennac_app/app/constants/media_query_constants.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:fennac_app/widgets/app_inkwell.dart';
 
 class CustomBackButton extends StatelessWidget {
   final VoidCallback? onPressed;
@@ -41,7 +42,7 @@ class CustomBackButton extends StatelessWidget {
                   : ColorPalette.black.withOpacity(0.75)),
           shape: BoxShape.circle,
         ),
-        child: InkWell(
+        child: AppInkWell(
           borderRadius: BorderRadius.circular(32),
           onTap: onPressed ?? () => Navigator.pop(context),
           child: Icon(

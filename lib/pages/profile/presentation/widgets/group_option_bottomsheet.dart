@@ -4,7 +4,6 @@ import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
-import 'package:fennac_app/helpers/qr_helper.dart';
 import 'package:fennac_app/pages/my_group/data/model/my_group_model.dart';
 import 'package:fennac_app/pages/dashboard/presentation/bloc/cubit/dashboard_cubit.dart';
 import 'package:fennac_app/pages/my_group/presentation/bloc/cubit/my_group_cubit.dart';
@@ -13,10 +12,12 @@ import 'package:fennac_app/reusable_widgets/group_card.dart';
 import 'package:fennac_app/routes/routes_imports.gr.dart';
 import 'package:fennac_app/utils/validators.dart';
 import 'package:fennac_app/widgets/custom_bottom_sheet.dart';
-import 'package:fennac_app/widgets/custom_elevated_button.dart';
-import 'package:fennac_app/widgets/custom_sized_box.dart';
+import 'package:fennac_app/widgets/share_qr_bottomsheet.dart';
 import 'package:fennac_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
+
+import 'package:fennac_app/widgets/app_inkwell.dart';
+import 'package:fennac_app/helpers/shared_pref_helper.dart';
 
 class GroupOptionsBottomSheet extends StatelessWidget {
   final bool isEdit;
@@ -30,6 +31,10 @@ class GroupOptionsBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final sharedPreferencesHelper = Di().sl<SharedPreferencesHelper>();
+    final currentUserId = sharedPreferencesHelper.getUserId();
+    final groupAdminId = groupData.createdBy?.id;
+
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -96,6 +101,32 @@ class GroupOptionsBottomSheet extends StatelessWidget {
             title: 'Edit Group',
             textColor: Colors.white,
             onTap: () {
+              final isAdmin =
+                  currentUserId != null &&
+                  groupAdminId != null &&
+                  currentUserId == groupAdminId;
+              final groupSettings = groupData.groupSettings;
+              final canEdit =
+                  isAdmin ||
+                  (groupSettings?.anyoneCanInviteMembers == true ||
+                      groupSettings?.anyoneCanUpdatePhotosVideos == true ||
+                      groupSettings?.anyoneCanUpdatePrompts == true);
+              if (!canEdit) {
+                CustomBottomSheet.show(
+                  context: context,
+                  icon: AnimatedBackgroundContainer(
+                    icon: Assets.icons.alertTriangle.path,
+                  ),
+                  title: 'Edit Not Allowed',
+                  description:
+                      "Only the group admin or members with edit permissions can edit this group.",
+                  buttonText: 'OK',
+                  onButtonPressed: () {
+                    Navigator.pop(context);
+                  },
+                );
+                return;
+              }
               Di().sl<MyGroupCubit>().updateMyGroupDataLocal(groupData);
               Navigator.pop(context);
               AutoRouter.of(
@@ -110,198 +141,124 @@ class GroupOptionsBottomSheet extends StatelessWidget {
             title: 'View QR Code',
             textColor: Colors.white,
             onTap: () {
-              showModalBottomSheet(
+              ShareQrBottomSheet.show(
                 context: context,
-                backgroundColor: Colors.transparent,
-                isScrollControlled: true,
-                builder: (context) => Container(
-                  height: getHeight(context) * 0.55,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    gradient: isLightTheme(context)
-                        ? null
-                        : const LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [Color(0xFF16003F), Color(0xFF111111)],
-                          ),
-                    color: isLightTheme(context) ? Colors.white : null,
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(32),
-                      topRight: Radius.circular(32),
-                    ),
-                  ),
-                  padding: const EdgeInsets.only(
-                    top: 24,
-                    right: 24,
-                    bottom: 48,
-                    left: 24,
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SizedBox(
-                        width: 370,
-                        child: Text(
-                          'Share this QR Code with your friends',
-                          style: AppTextStyles.h3(context).copyWith(
-                            color: isLightTheme(context)
-                                ? Colors.black
-                                : Colors.white,
-                          ),
-                        ),
-                      ),
-                      const CustomSizedBox(height: 32),
-                      Container(
-                        width: 272,
-                        height: 272,
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          color: ColorPalette.primary,
-                          borderRadius: BorderRadius.circular(24),
-                          border: Border.all(
-                            color: ColorPalette.white,
-                            width: 4,
-                          ),
-                          boxShadow: isDarkTheme(context)
-                              ? [
-                                  BoxShadow(
-                                    color: ColorPalette.primary,
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 3),
-                                    spreadRadius: 3,
-                                  ),
-                                ]
-                              : null,
-                        ),
-                        child: QrHelper(
-                          data: groupData.qrCode ?? 'Group QR Code Data',
-                        ),
-                      ),
-                      const CustomSizedBox(height: 32),
-
-                      CustomElevatedButton(
-                        text: 'Done',
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
-                      ),
-                    ],
-                  ),
-                ),
+                qrData: groupData.qrCode ?? 'Group QR Code Data',
               );
             },
           ),
 
-          //todo only for group to group unMatch
-          // _buildOption(
-          //   context,
-          //   title: 'Leave This Group',
-          //   textColor: const Color(0xFFFF3B30),
-          //   onTap: () {
-          //     CustomBottomSheet.show(
-          //       context: context,
-          //       isSecondaryButtonFirst: true,
+          if (currentUserId != null &&
+              groupAdminId != null &&
+              currentUserId == groupAdminId)
+            // Show Delete Group for admin
+            _buildOption(
+              context,
+              title: 'Delete This Group',
+              textColor: const Color(0xFFFF3B30),
+              onTap: () {
+                CustomBottomSheet.show(
+                  context: context,
+                  isSecondaryButtonFirst: true,
+                  icon: AnimatedBackgroundContainer(
+                    icon: Assets.icons.alertTriangle.path,
+                  ),
+                  title: 'Delete This Group?',
+                  description:
+                      "Once you Delete this group, you won’t be able to access its messages, media, and matches with this group.",
+                  description1: 'This action cannot be undone.',
+                  buttonText: ' Delete Group',
+                  onButtonPressed: () async {
+                    final bool isDeleted = await Di()
+                        .sl<MyGroupCubit>()
+                        .deleteGroupById(groupData.id ?? '');
+                    if (!context.mounted || !isDeleted) {
+                      return;
+                    }
 
-          //       icon: AnimatedBackgroundContainer(
-          //         icon: Assets.icons.alertTriangle.path,
-          //       ),
-          //       title: 'Leave This Group?',
-          //       description:
-          //           "Once you leave this group, you won’t be able to access its messages, media, and matches with this group.",
-          //       description1: 'This action cannot be undone.',
-          //       buttonText: ' Leave Group',
-          //       onButtonPressed: () async {
-          //         final bool isUnmatched = await Di()
-          //             .sl<MyGroupCubit>()
-          //             .unMatchGroupById(groupData.id ?? '');
-          //         if (!context.mounted || !isUnmatched) {
-          //           return;
-          //         }
+                    CustomBottomSheet.show(
+                      context: context,
+                      icon: AnimatedBackgroundContainer(
+                        icon: Assets.icons.checkGreen.path,
+                        isPng: true,
+                      ),
+                      dismissible: false,
+                      title: 'Group Deleted',
+                      description: 'Your group has been successfully removed.',
+                      descriptionStyle: AppTextStyles.h4(context),
+                      description1:
+                          "You can always create a new group or join an existing one whenever you’re ready to connect again.",
+                      description1Style: AppTextStyles.subHeading(context)
+                          .copyWith(
+                            color: ColorPalette.textSecondary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                      buttonText: 'Explore Groups',
+                      onButtonPressed: () {
+                        AutoRouter.of(context).push(DashboardRoute());
+                        Di().sl<DashboardCubit>().changeIndex(0);
+                      },
+                    );
+                  },
+                  isHorizontalButton: true,
+                  secondaryButtonText: 'Cancel',
+                );
+              },
+            )
+          else
+            // Show Leave Group for non-admin
+            _buildOption(
+              context,
+              title: 'Leave This Group',
+              textColor: const Color(0xFFFF3B30),
+              onTap: () {
+                CustomBottomSheet.show(
+                  context: context,
+                  isSecondaryButtonFirst: true,
+                  icon: AnimatedBackgroundContainer(
+                    icon: Assets.icons.alertTriangle.path,
+                  ),
+                  title: 'Leave This Group?',
+                  description:
+                      "Once you leave this group, you won’t be able to access its messages, media, and matches with this group.",
+                  description1: 'This action cannot be undone.',
+                  buttonText: ' Leave Group',
+                  onButtonPressed: () async {
+                    final bool isUnmatched = await Di()
+                        .sl<MyGroupCubit>()
+                        .unMatchGroupById(groupData.id ?? '');
+                    if (!context.mounted || !isUnmatched) {
+                      return;
+                    }
 
-          //         CustomBottomSheet.show(
-          //           context: context,
-          //           icon: AnimatedBackgroundContainer(
-          //             icon: Assets.icons.checkGreen.path,
-          //             isPng: true,
-          //           ),
-          //           title: 'Group Deleted',
-          //           description: 'Your group has been successfully removed.',
-          //           descriptionStyle: AppTextStyles.h4(context),
-          //           description1:
-          //               "You can always create a new group or join an existing one whenever you’re ready to connect again.",
-          //           description1Style: AppTextStyles.subHeading(context)
-          //               .copyWith(
-          //                 color: ColorPalette.textSecondary,
-          //                 fontWeight: FontWeight.w600,
-          //               ),
-          //           buttonText: 'Explore Groups',
-          //           onButtonPressed: () {
-          //             AutoRouter.of(context).push(DashboardRoute());
-          //             Di().sl<DashboardCubit>().changeIndex(0);
-          //           },
-          //         );
-          //       },
-          //       isHorizontalButton: true,
-
-          //       secondaryButtonText: 'Cancel',
-          //     );
-          //   },
-          // ),
-          _buildOption(
-            context,
-            title: 'Delete This Group',
-            textColor: const Color(0xFFFF3B30),
-            onTap: () {
-              CustomBottomSheet.show(
-                context: context,
-                isSecondaryButtonFirst: true,
-
-                icon: AnimatedBackgroundContainer(
-                  icon: Assets.icons.alertTriangle.path,
-                ),
-                title: 'Delete This Group?',
-                description:
-                    "Once you Delete this group, you won’t be able to access its messages, media, and matches with this group.",
-                description1: 'This action cannot be undone.',
-                buttonText: ' Delete Group',
-                onButtonPressed: () async {
-                  final bool isDeleted = await Di()
-                      .sl<MyGroupCubit>()
-                      .deleteGroupById(groupData.id ?? '');
-                  if (!context.mounted || !isDeleted) {
-                    return;
-                  }
-
-                  CustomBottomSheet.show(
-                    context: context,
-                    icon: AnimatedBackgroundContainer(
-                      icon: Assets.icons.checkGreen.path,
-                      isPng: true,
-                    ),
-                    title: 'Group Deleted',
-                    description: 'Your group has been successfully removed.',
-                    descriptionStyle: AppTextStyles.h4(context),
-                    description1:
-                        "You can always create a new group or join an existing one whenever you’re ready to connect again.",
-                    description1Style: AppTextStyles.subHeading(context)
-                        .copyWith(
-                          color: ColorPalette.textSecondary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                    buttonText: 'Explore Groups',
-                    onButtonPressed: () {
-                      AutoRouter.of(context).push(DashboardRoute());
-                      Di().sl<DashboardCubit>().changeIndex(0);
-                    },
-                  );
-                },
-                isHorizontalButton: true,
-
-                secondaryButtonText: 'Cancel',
-              );
-            },
-          ),
+                    CustomBottomSheet.show(
+                      context: context,
+                      icon: AnimatedBackgroundContainer(
+                        icon: Assets.icons.checkGreen.path,
+                        isPng: true,
+                      ),
+                      title: 'Group Deleted',
+                      description: 'Your group has been successfully removed.',
+                      descriptionStyle: AppTextStyles.h4(context),
+                      description1:
+                          "You can always create a new group or join an existing one whenever you’re ready to connect again.",
+                      description1Style: AppTextStyles.subHeading(context)
+                          .copyWith(
+                            color: ColorPalette.textSecondary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                      buttonText: 'Explore Groups',
+                      onButtonPressed: () {
+                        AutoRouter.of(context).push(DashboardRoute());
+                        Di().sl<DashboardCubit>().changeIndex(0);
+                      },
+                    );
+                  },
+                  isHorizontalButton: true,
+                  secondaryButtonText: 'Cancel',
+                );
+              },
+            ),
         ],
       ),
     );
@@ -313,7 +270,7 @@ class GroupOptionsBottomSheet extends StatelessWidget {
     required Color textColor,
     required VoidCallback onTap,
   }) {
-    return InkWell(
+    return AppInkWell(
       onTap: onTap,
       child: Column(
         mainAxisSize: MainAxisSize.min,

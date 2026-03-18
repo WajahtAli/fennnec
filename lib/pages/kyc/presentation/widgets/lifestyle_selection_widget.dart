@@ -7,6 +7,7 @@ import 'package:fennac_app/pages/kyc/presentation/bloc/cubit/kyc_cubit.dart';
 import 'package:fennac_app/pages/kyc/presentation/bloc/state/kyc_state.dart';
 import 'package:fennac_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
+import 'package:fennac_app/widgets/app_inkwell.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class LifestyleSelectionWidget extends StatelessWidget {
@@ -25,7 +26,7 @@ class LifestyleSelectionWidget extends StatelessWidget {
           children: DummyConstants.lifestyles.map((lifestyle) {
             final isSelected = cubit.selectedLifestyles.contains(lifestyle);
 
-            return InkWell(
+            return AppInkWell(
               borderRadius: BorderRadius.circular(48),
               onTap: () => cubit.toggleLifestyle(lifestyle),
               child: Container(

@@ -33,9 +33,9 @@ abstract class ChatModel with _$ChatModel {
     required String type,
     required String id,
     required String name,
-    required String image,
-    required String lastMessage,
-    required DateTime lastMessageAt,
+    @Default('') String image,
+    @Default('') String lastMessage,
+    DateTime? lastMessageAt,
     required int unreadCount,
     required Map<String, dynamic> meta,
     List<MemberModel>? members,
@@ -114,7 +114,7 @@ abstract class PokeDetailData with _$PokeDetailData {
 @freezed
 abstract class PokeModel with _$PokeModel {
   const factory PokeModel({
-    @JsonKey(name: '_id') required String id,
+    required String id,
     required String fromUserId,
     required String toUserId,
     required String targetType,
@@ -126,20 +126,20 @@ abstract class PokeModel with _$PokeModel {
   }) = _PokeModel;
 
   factory PokeModel.fromJson(Map<String, dynamic> json) =>
-      _$PokeModelFromJson(json);
+      _$PokeModelFromJson({...json, 'id': json['_id'] ?? json['id'] ?? ''});
 }
 
 @freezed
 abstract class PokerFromUser with _$PokerFromUser {
   const factory PokerFromUser({
-    @JsonKey(name: '_id') required String id,
+    required String id,
     required String firstName,
     required String lastName,
     required List<String> bestShorts,
   }) = _PokerFromUser;
 
   factory PokerFromUser.fromJson(Map<String, dynamic> json) =>
-      _$PokerFromUserFromJson(json);
+      _$PokerFromUserFromJson({...json, 'id': json['_id'] ?? json['id'] ?? ''});
 }
 
 @freezed
@@ -157,10 +157,8 @@ abstract class PokedTargetDetail with _$PokedTargetDetail {
 
 @freezed
 abstract class PokePhotoDetail with _$PokePhotoDetail {
-  const factory PokePhotoDetail({
-    required int index,
-    required String url,
-  }) = _PokePhotoDetail;
+  const factory PokePhotoDetail({required int index, required String url}) =
+      _PokePhotoDetail;
 
   factory PokePhotoDetail.fromJson(Map<String, dynamic> json) =>
       _$PokePhotoDetailFromJson(json);
@@ -168,9 +166,7 @@ abstract class PokePhotoDetail with _$PokePhotoDetail {
 
 @freezed
 abstract class PokeAudioDetail with _$PokeAudioDetail {
-  const factory PokeAudioDetail({
-    required String url,
-  }) = _PokeAudioDetail;
+  const factory PokeAudioDetail({required String url}) = _PokeAudioDetail;
 
   factory PokeAudioDetail.fromJson(Map<String, dynamic> json) =>
       _$PokeAudioDetailFromJson(json);

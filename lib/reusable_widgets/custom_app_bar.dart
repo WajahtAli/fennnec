@@ -7,24 +7,54 @@ import 'package:flutter/material.dart';
 class CustomAppBar extends StatelessWidget {
   final String? title;
   final TextStyle? titleStyle;
-  const CustomAppBar({super.key, this.title, this.titleStyle});
+  final Widget? action;
+  final bool? allowSpace;
+
+  const CustomAppBar({
+    super.key,
+    this.title,
+    this.titleStyle,
+    this.action,
+    this.allowSpace = false,
+  });
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: SizedBox(
-        height: 30,
+        height: 48,
         child: Row(
           children: [
-            const CustomBackButton(),
-            const Spacer(),
-            AppText(
-              text: title ?? 'Find a Group',
-              style:
-                  titleStyle ??
-                  AppTextStyles.h4(context).copyWith(letterSpacing: 0.2),
+            if (allowSpace ?? false) CustomSizedBox(width: 14),
+            const SizedBox(
+              width: 58,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: CustomBackButton(),
+              ),
             ),
-            const Spacer(),
-            const CustomSizedBox(width: 58),
+
+            Expanded(
+              child: Center(
+                child: AppText(
+                  text: title ?? 'Find a Group',
+                  style:
+                      titleStyle ??
+                      AppTextStyles.h4(context).copyWith(letterSpacing: 0.2),
+                ),
+              ),
+            ),
+
+            SizedBox(
+              width: 58,
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  child: action ?? const SizedBox(),
+                ),
+              ),
+            ),
           ],
         ),
       ),

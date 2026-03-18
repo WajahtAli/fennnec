@@ -23,6 +23,7 @@ import 'package:fennac_app/pages/buy_poke/data/datasource/poke_datasource.dart';
 import 'package:fennac_app/pages/buy_poke/data/repository/poke_repository_impl.dart';
 import 'package:fennac_app/pages/buy_poke/domain/repository/poke_repository.dart';
 import 'package:fennac_app/pages/buy_poke/domain/usecase/fetch_pokes_usecase.dart';
+import 'package:fennac_app/pages/buy_poke/domain/usecase/purchase_pokes_usecase.dart';
 import 'package:fennac_app/pages/buy_poke/domain/usecase/send_poke_usecase.dart';
 import 'package:fennac_app/pages/buy_poke/presentation/bloc/cubit/poke_cubit.dart';
 import 'package:fennac_app/pages/call/presentation/bloc/cubit/call_cubit.dart';
@@ -94,8 +95,6 @@ import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../bloc/cubit/background_cubit.dart';
-import '../pages/chats/data/repository/chat_repository.dart';
-import '../pages/get_poked/presentation/bloc/cubit/poke_detail_cubit.dart';
 import '../pages/home/domain/repository/groups_repository.dart'
     show GroupsRepository;
 import '../pages/home/domain/usecase/groups_usecase.dart';
@@ -243,10 +242,14 @@ class Di {
     );
     sl.registerLazySingleton<FetchPokesUseCase>(() => FetchPokesUseCase(sl()));
     sl.registerLazySingleton<SendPokeUseCase>(() => SendPokeUseCase(sl()));
+    sl.registerLazySingleton<PurchasePokesUseCase>(
+      () => PurchasePokesUseCase(sl()),
+    );
 
     // Cubits
     sl.registerLazySingleton<AuthCubit>(() => AuthCubit());
     sl.registerLazySingleton<BackgroundCubit>(() => BackgroundCubit());
+    sl.registerLazySingleton<ChatLandingCubit>(() => ChatLandingCubit());
     sl.registerLazySingleton<FilterCubit>(() => FilterCubit());
     sl.registerLazySingleton<KycCubit>(() => KycCubit());
     sl.registerLazySingleton<KycPromptCubit>(() => KycPromptCubit());
@@ -267,6 +270,7 @@ class Di {
     sl.registerLazySingleton<WaveformCubit>(
       () => WaveformCubit(sl<WaveformExtractionController>()),
     );
+    sl.registerLazySingleton<MessageCubit>(() => MessageCubit(sl()));
     sl.registerLazySingleton<CallCubit>(() => CallCubit());
     sl.registerLazySingleton<ProfileCubit>(() => ProfileCubit(sl()));
     sl.registerLazySingleton<PrivacyPermissionCubit>(
@@ -289,12 +293,6 @@ class Di {
     sl.registerLazySingleton<MyGroupCubit>(() => MyGroupCubit(sl()));
     sl.registerLazySingleton<GoogleMapCubit>(() => GoogleMapCubit());
     sl.registerLazySingleton<ContactListCubit>(() => ContactListCubit(sl()));
-    sl.registerLazySingleton<PokeCubit>(() => PokeCubit(sl()));
-
-    sl.registerLazySingleton<ChatRepository>(() => ChatRepositoryImpl(sl()));
-
-    sl.registerLazySingleton<ChatLandingCubit>(() => ChatLandingCubit(sl()));
-    sl.registerLazySingleton<MessageCubit>(() => MessageCubit(sl(), sl()));
-    sl.registerLazySingleton<PokeDetailCubit>(() => PokeDetailCubit(sl()));
+    sl.registerLazySingleton<PokeCubit>(() => PokeCubit(sl(), sl()));
   }
 }

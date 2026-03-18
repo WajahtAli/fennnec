@@ -6,12 +6,10 @@ import 'package:fennac_app/app/constants/media_query_constants.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/core/di_container.dart';
-import 'package:fennac_app/core/extensions/string_extension.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
-import 'package:fennac_app/helpers/gradient_toast.dart';
 import 'package:fennac_app/helpers/cached_network_image_helper.dart';
+import 'package:fennac_app/helpers/gradient_toast.dart';
 import 'package:fennac_app/pages/create_group/presentation/screen/create_group_gallery_screen.dart';
-import 'package:fennac_app/pages/auth/presentation/bloc/cubit/login_cubit.dart';
 import 'package:fennac_app/pages/my_group/presentation/bloc/cubit/my_group_cubit.dart';
 import 'package:fennac_app/pages/my_group/presentation/bloc/state/my_group_state.dart';
 import 'package:fennac_app/reusable_widgets/custom_app_bar.dart';
@@ -27,7 +25,6 @@ import 'package:flutter_svg/svg.dart';
 import 'dart:math' as math;
 import 'package:fennac_app/pages/kyc/presentation/bloc/cubit/kyc_prompt_cubit.dart';
 import 'package:fennac_app/widgets/prompt_audio_row.dart';
-import '../../../../reusable_widgets/custom_video_player.dart';
 import '../../../../reusable_widgets/group_card.dart' show GroupCard;
 import '../../../../reusable_widgets/group_settings_widget.dart';
 import '../../data/model/my_group_model.dart';
@@ -46,34 +43,6 @@ class EditGroupScreen extends StatefulWidget {
 
 class _EditGroupScreenState extends State<EditGroupScreen> {
   final MyGroupCubit _myGroupCubit = Di().sl<MyGroupCubit>();
-
-  bool _isCurrentUserAdmin() {
-    final currentUserId = Di().sl<LoginCubit>().userData?.user?.id;
-    final createdById = _myGroupCubit.myGroupModel?.data?.createdBy?.id;
-    if (currentUserId == null || currentUserId.isEmpty) return false;
-    if (createdById == null || createdById.isEmpty) return false;
-    return currentUserId == createdById;
-  }
-
-  bool _canUpdatePhotosVideos() {
-    if (_isCurrentUserAdmin()) return true;
-    return _myGroupCubit
-            .myGroupModel
-            ?.data
-            ?.groupSettings
-            ?.anyoneCanUpdatePhotosVideos ==
-        true;
-  }
-
-  bool _canUpdatePrompts() {
-    if (_isCurrentUserAdmin()) return true;
-    return _myGroupCubit
-            .myGroupModel
-            ?.data
-            ?.groupSettings
-            ?.anyoneCanUpdatePrompts ==
-        true;
-  }
 
   late TextEditingController _titleController;
   late TextEditingController _bioController;
@@ -142,16 +111,6 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
                 }
 
                 final groupData = _myGroupCubit.myGroupModel?.data;
-                final avatarPaths =
-                    groupData?.members
-                        ?.map((member) => member.image ?? '')
-                        .toList() ??
-                    [];
-                final avatarInitials =
-                    groupData?.members
-                        ?.map((member) => validateString(member.firstName))
-                        .toList() ??
-                    [];
                 if (groupData == null) {
                   return Center(
                     child: Text(
@@ -174,21 +133,34 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
                     GroupCard(
                       title: groupData.titleMembers ?? '',
                       subtitle: groupData.bio ?? '',
-                      avatarPaths: avatarPaths,
-
+                      avatarPaths: validateStringList(
+                        groupData.members
+                                ?.map((member) => member.image)
+                                .toList() ??
+                            [],
+                      ),
                       onMenuPressed: () {
-                        AutoRouter.of(
-                          context,
-                        ).push(CreateGroupRoute(isEditMode: true));
+                        if (groupData.groupSettings?.anyoneCanInviteMembers ==
+                            true) {
+                          AutoRouter.of(
+                            context,
+                          ).push(CreateGroupRoute(isEditMode: true));
+                        } else {
+                          VxToast.show(
+                            message:
+                                'You dont have permission to edit group details. Please contact the group admin.',
+                          );
+                        }
                       },
                       chipLabel: groupData.fitsForGroup,
-                      memberNames: avatarInitials,
                       isEditMode: true,
                     ),
                     _buildPhotosVideosGrid(context),
                     const CustomSizedBox(height: 24),
+
                     _buildPromptsSection(context),
                     const CustomSizedBox(height: 24),
+
                     _buildGroupSettingsSection(context),
                     const CustomSizedBox(height: 32),
                   ],
@@ -202,6 +174,8 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
   }
 
   Widget _buildGroupAvatarSection(BuildContext context) {
+    final settings = _myGroupCubit.myGroupModel?.data?.groupSettings;
+    final canEditPhotos = settings?.anyoneCanUpdatePhotosVideos == true;
     final avatarPath =
         (_myGroupCubit.myGroupModel?.data?.photosVideos
             ?.where((e) => e.trim().isNotEmpty)
@@ -230,51 +204,55 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
                 : Image.asset(avatarPath, fit: BoxFit.cover),
           ),
         ),
-        Positioned(
-          bottom: 16,
-          right: 16,
-          child: GestureDetector(
-            onTap: () {
-              _handleEditTap(context, EditableGroupCardType.image);
-            },
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: ColorPalette.primary,
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
+        if (canEditPhotos)
+          Positioned(
+            bottom: 16,
+            right: 16,
+            child: GestureDetector(
+              onTap: () {
+                _handleEditTap(context, EditableGroupCardType.image);
+              },
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: ColorPalette.primary,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: SvgPicture.asset(
+                  Assets.icons.refreshCcw.path,
+                  height: 20,
+                  width: 20,
+                  colorFilter: const ColorFilter.mode(
+                    Colors.white,
+                    BlendMode.srcIn,
                   ),
-                ],
-              ),
-              child: SvgPicture.asset(
-                Assets.icons.refreshCcw.path,
-                height: 20,
-                width: 20,
-                colorFilter: const ColorFilter.mode(
-                  Colors.white,
-                  BlendMode.srcIn,
                 ),
               ),
             ),
           ),
-        ),
       ],
     );
   }
 
   Widget _buildPhotosVideosGrid(BuildContext context) {
-    final photosVideos = _myGroupCubit.myGroupModel?.data?.photosVideos;
+    final settings = _myGroupCubit.myGroupModel?.data?.groupSettings;
+    final canEditPhotos = settings?.anyoneCanUpdatePhotosVideos == true;
+    final photosVideos = _myGroupCubit.myGroupModel?.data?.photosVideos ?? [];
+    final prompts = _myGroupCubit.myGroupModel?.data?.groupPrompts ?? [];
 
-    if (_myGroupCubit.myGroupModel?.data?.photosVideos?.isEmpty ?? true) {
+    if (photosVideos.isEmpty && prompts.isEmpty) {
       return Container(
         padding: const EdgeInsets.symmetric(vertical: 24),
         alignment: Alignment.center,
         child: Text(
-          'No photos or videos yet. Add some to showcase your group!',
+          'No photos, videos, or prompts yet. Add some to showcase your group!',
           style: AppTextStyles.body(context).copyWith(
             color: isLightTheme(context) ? Colors.black54 : Colors.white54,
           ),
@@ -282,76 +260,110 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
       );
     }
 
+    // Build combined list: two images, one prompt, one image, one prompt, repeat
+    final List<dynamic> combinedList = [];
+    int imgIdx = 0;
+    int promptIdx = 0;
+    while (imgIdx < photosVideos.length || promptIdx < prompts.length) {
+      // Add two images
+      for (int i = 0; i < 2 && imgIdx < photosVideos.length; i++) {
+        combinedList.add({'type': 'image', 'data': photosVideos[imgIdx]});
+        imgIdx++;
+      }
+      // Add one prompt
+      if (promptIdx < prompts.length) {
+        combinedList.add({'type': 'prompt', 'data': prompts[promptIdx]});
+        promptIdx++;
+      }
+      // Add one image
+      if (imgIdx < photosVideos.length) {
+        combinedList.add({'type': 'image', 'data': photosVideos[imgIdx]});
+        imgIdx++;
+      }
+      // Add one prompt
+      if (promptIdx < prompts.length) {
+        combinedList.add({'type': 'prompt', 'data': prompts[promptIdx]});
+        promptIdx++;
+      }
+    }
+
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-
-      itemCount: photosVideos?.length ?? 0,
+      itemCount: combinedList.length,
       itemBuilder: (context, index) {
-        return Stack(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: Container(
-                margin: EdgeInsets.symmetric(vertical: 8),
-                decoration: BoxDecoration(
-                  color: isDarkTheme(context)
-                      ? Colors.grey[800]
-                      : Colors.grey[300],
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: photosVideos?[index].isVideo ?? false
-                    ? CustomVideoPlayer(
-                        videoUrl: photosVideos?[index] ?? '',
-                        aspectRatio: 1,
-                        height: 400,
-                        borderRadius: BorderRadius.circular(16),
-                        showControls: true,
-                        sourceType: VideoSourceType.network,
-                      )
-                    : photosVideos?[index].isImageUrl ?? false
-                    ? CachedImageHelper(
-                        imageUrl: photosVideos?[index] ?? '',
-                        fit: BoxFit.cover,
-                        radius: 16,
-                      )
-                    : Image.asset(
-                        photosVideos?[index] ?? '',
-                        fit: BoxFit.cover,
-                      ),
-              ),
-            ),
-            Positioned(
-              top: 16,
-              right: 8,
-              child: GestureDetector(
-                onTap: () =>
-                    _handleEditTap(context, EditableGroupCardType.image),
+        final item = combinedList[index];
+        if (item['type'] == 'image') {
+          final imagePath = item['data'] as String;
+          return Stack(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(16),
                 child: Container(
-                  padding: const EdgeInsets.all(8),
+                  margin: EdgeInsets.symmetric(vertical: 8),
                   decoration: BoxDecoration(
-                    color: ColorPalette.primary,
-                    shape: BoxShape.circle,
+                    color: isDarkTheme(context)
+                        ? Colors.grey[800]
+                        : Colors.grey[300],
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                  child: SvgPicture.asset(
-                    Assets.icons.edit.path,
-                    height: 14,
-                    width: 14,
-                    colorFilter: const ColorFilter.mode(
-                      Colors.white,
-                      BlendMode.srcIn,
+                  child: imagePath.startsWith('http')
+                      ? CachedImageHelper(
+                          imageUrl: imagePath,
+                          fit: BoxFit.cover,
+                          radius: 16,
+                        )
+                      : Image.asset(imagePath, fit: BoxFit.cover),
+                ),
+              ),
+              if (canEditPhotos)
+                Positioned(
+                  top: 16,
+                  right: 8,
+                  child: GestureDetector(
+                    onTap: () =>
+                        _handleEditTap(context, EditableGroupCardType.image),
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: ColorPalette.primary,
+                        shape: BoxShape.circle,
+                      ),
+                      child: SvgPicture.asset(
+                        Assets.icons.edit.path,
+                        height: 14,
+                        width: 14,
+                        colorFilter: const ColorFilter.mode(
+                          Colors.white,
+                          BlendMode.srcIn,
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
+            ],
+          );
+        } else if (item['type'] == 'prompt') {
+          final prompt = item['data'];
+          // Use your existing _buildPromptCard for rendering
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: _buildPromptCard(
+              context,
+              prompt,
+              settings?.anyoneCanUpdatePrompts == true,
             ),
-          ],
-        );
+          );
+        } else {
+          return const SizedBox.shrink();
+        }
       },
     );
   }
 
   Widget _buildPromptsSection(BuildContext context) {
+    final settings = _myGroupCubit.myGroupModel?.data?.groupSettings;
+    final canEditPrompts = settings?.anyoneCanUpdatePrompts == true;
     final prompts = _myGroupCubit.myGroupModel?.data?.groupPrompts ?? [];
 
     if (prompts.isEmpty) {
@@ -366,53 +378,54 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
               waveformData: [],
             ),
           ),
-          Positioned(
-            top: 0,
-            right: 0,
-            child: GestureDetector(
-              onTap: () {
-                createGroupCubit.groupId =
-                    _myGroupCubit.myGroupModel?.data?.id ?? "";
-                Di().sl<KycPromptCubit>().resetAllData();
-                int id = DateTime.now().millisecondsSinceEpoch;
-                AudioPromptData audioPromptData = AudioPromptData(
-                  id: id.toString(),
-                  oldId: id.toString(),
-                  promptText:
-                      "${_myGroupCubit.myGroupModel?.data?.titleMembers} Prompt",
-                  promptAnswer: "",
-                  isCustom: false,
-                  waveformData: List.generate(
-                    100,
-                    (index) => 0.2 * math.Random().nextDouble(),
+          if (canEditPrompts)
+            Positioned(
+              top: 0,
+              right: 0,
+              child: GestureDetector(
+                onTap: () {
+                  createGroupCubit.groupId =
+                      _myGroupCubit.myGroupModel?.data?.id ?? "";
+                  Di().sl<KycPromptCubit>().resetAllData();
+                  int id = DateTime.now().millisecondsSinceEpoch;
+                  AudioPromptData audioPromptData = AudioPromptData(
+                    id: id.toString(),
+                    oldId: id.toString(),
+                    promptText:
+                        "${_myGroupCubit.myGroupModel?.data?.titleMembers} Prompt",
+                    promptAnswer: "",
+                    isCustom: false,
+                    waveformData: List.generate(
+                      100,
+                      (index) => 0.2 * math.Random().nextDouble(),
+                    ),
+                    duration: "15:00",
+                  );
+                  Di().sl<KycPromptCubit>().addPrompt(audioPromptData);
+                  _handleEditTap(
+                    context,
+                    EditableGroupCardType.prompt,
+                    isNeedToAddPrompt: true,
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: ColorPalette.primary,
+                    shape: BoxShape.circle,
                   ),
-                  duration: "15:00",
-                );
-                Di().sl<KycPromptCubit>().addPrompt(audioPromptData);
-                _handleEditTap(
-                  context,
-                  EditableGroupCardType.prompt,
-                  isNeedToAddPrompt: true,
-                );
-              },
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: ColorPalette.primary,
-                  shape: BoxShape.circle,
-                ),
-                child: SvgPicture.asset(
-                  Assets.icons.edit.path,
-                  height: 16,
-                  width: 16,
-                  colorFilter: const ColorFilter.mode(
-                    Colors.white,
-                    BlendMode.srcIn,
+                  child: SvgPicture.asset(
+                    Assets.icons.edit.path,
+                    height: 16,
+                    width: 16,
+                    colorFilter: const ColorFilter.mode(
+                      Colors.white,
+                      BlendMode.srcIn,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
         ],
       );
     }
@@ -437,7 +450,7 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
             final prompt = prompts[index];
             return Padding(
               padding: const EdgeInsets.only(bottom: 12),
-              child: _buildPromptCard(context, prompt),
+              child: _buildPromptCard(context, prompt, canEditPrompts),
             );
           },
         ),
@@ -445,7 +458,11 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
     );
   }
 
-  Widget _buildPromptCard(BuildContext context, GroupPrompt prompt) {
+  Widget _buildPromptCard(
+    BuildContext context,
+    GroupPrompt prompt,
+    bool canEditPrompts,
+  ) {
     String promptTitle = prompt.promptTitle?.toString() ?? '';
     String promptAnswer = prompt.promptAnswer?.toString() ?? '';
     String promptType = prompt.type?.toString() ?? 'text';
@@ -487,48 +504,51 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
                 ),
             ],
           ),
-          Positioned(
-            top: 0,
-            right: 0,
-            child: GestureDetector(
-              onTap: () {
-                createGroupCubit.groupId =
-                    _myGroupCubit.myGroupModel?.data?.id ?? "";
-                Di().sl<KycPromptCubit>().resetAllData();
-                AudioPromptData audioPromptData = AudioPromptData(
-                  id: prompt.id,
-                  oldId: prompt.id,
-                  promptText: promptTitle,
-                  promptAnswer: promptAnswer,
-                  isCustom: false,
-                  waveformData: prompt.waves,
-                  duration: prompt.duration?.toString() ?? "15:00",
-                );
-                Di().sl<KycPromptCubit>().addPrompt(audioPromptData);
-                _handleEditTap(
-                  context,
-                  EditableGroupCardType.prompt,
-                  isNeedToAddPrompt: false,
-                );
-              },
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: ColorPalette.primary,
-                  shape: BoxShape.circle,
-                ),
-                child: SvgPicture.asset(
-                  Assets.icons.edit.path,
-                  height: 16,
-                  width: 16,
-                  colorFilter: const ColorFilter.mode(
-                    Colors.white,
-                    BlendMode.srcIn,
+          if (canEditPrompts)
+            Positioned(
+              top: 0,
+              right: 0,
+              child: GestureDetector(
+                onTap: () {
+                  createGroupCubit.groupId =
+                      _myGroupCubit.myGroupModel?.data?.id ?? "";
+                  Di().sl<KycPromptCubit>().resetAllData();
+                  AudioPromptData audioPromptData = AudioPromptData(
+                    id: prompt.id,
+                    oldId: prompt.id,
+                    promptText: promptTitle,
+                    promptAnswer: promptAnswer,
+                    isCustom: !DummyConstants.predefinedPrompts.contains(
+                      promptTitle,
+                    ),
+                    waveformData: prompt.waves,
+                    duration: prompt.duration?.toString() ?? "15:00",
+                  );
+                  Di().sl<KycPromptCubit>().addPrompt(audioPromptData);
+                  _handleEditTap(
+                    context,
+                    EditableGroupCardType.prompt,
+                    isNeedToAddPrompt: false,
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: ColorPalette.primary,
+                    shape: BoxShape.circle,
+                  ),
+                  child: SvgPicture.asset(
+                    Assets.icons.edit.path,
+                    height: 16,
+                    width: 16,
+                    colorFilter: const ColorFilter.mode(
+                      Colors.white,
+                      BlendMode.srcIn,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
         ],
       ),
     );
@@ -577,30 +597,31 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
             ),
           ],
         ),
-        Positioned(
-          top: 0,
-          right: 0,
-          child: GestureDetector(
-            onTap: () =>
-                _handleEditTap(context, EditableGroupCardType.settings),
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: ColorPalette.primary,
-                shape: BoxShape.circle,
-              ),
-              child: SvgPicture.asset(
-                Assets.icons.edit.path,
-                height: 16,
-                width: 16,
-                colorFilter: const ColorFilter.mode(
-                  Colors.white,
-                  BlendMode.srcIn,
+        if (settings?.anyoneCanInviteMembers == true)
+          Positioned(
+            top: 0,
+            right: 0,
+            child: GestureDetector(
+              onTap: () =>
+                  _handleEditTap(context, EditableGroupCardType.settings),
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: ColorPalette.primary,
+                  shape: BoxShape.circle,
+                ),
+                child: SvgPicture.asset(
+                  Assets.icons.edit.path,
+                  height: 16,
+                  width: 16,
+                  colorFilter: const ColorFilter.mode(
+                    Colors.white,
+                    BlendMode.srcIn,
+                  ),
                 ),
               ),
             ),
           ),
-        ),
       ],
     );
   }
@@ -611,27 +632,6 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
     bool isNeedToAddPrompt = false,
   }) {
     log('Edit tapped for type: $editType');
-
-    if ((editType == EditableGroupCardType.title ||
-            editType == EditableGroupCardType.bio ||
-            editType == EditableGroupCardType.category ||
-            editType == EditableGroupCardType.settings) &&
-        !_isCurrentUserAdmin()) {
-      VxToast.show(message: 'Only group admin can edit this section.');
-      return;
-    }
-
-    if (editType == EditableGroupCardType.image && !_canUpdatePhotosVideos()) {
-      VxToast.show(
-        message: 'You do not have permission to update photos/videos.',
-      );
-      return;
-    }
-
-    if (editType == EditableGroupCardType.prompt && !_canUpdatePrompts()) {
-      VxToast.show(message: 'You do not have permission to update prompts.');
-      return;
-    }
 
     switch (editType) {
       case EditableGroupCardType.image:
@@ -820,5 +820,27 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
 
     _myGroupCubit.updateGroupById(widget.groupId, body);
     log('Group updated with data: $body');
+  }
+
+  void _updateGroupSettings(
+    bool anyoneCanInvite,
+    bool anyoneCanUpdatePhotos,
+    bool anyoneCanUpdatePrompts,
+  ) {
+    final body = {
+      'title': _titleController.text,
+      'bio': _bioController.text,
+      'fitsForGroup': _categoryController.text,
+      'groupSettings': {
+        'anyoneCanInviteMembers': anyoneCanInvite,
+        'anyoneCanUpdatePhotosVideos': anyoneCanUpdatePhotos,
+        'anyoneCanUpdatePrompts': anyoneCanUpdatePrompts,
+      },
+      'photosVideos': _myGroupCubit.myGroupModel?.data?.photosVideos ?? [],
+      'members': _myGroupCubit.myGroupModel?.data?.members?.toList() ?? [],
+    };
+
+    _myGroupCubit.updateGroupById(widget.groupId, body);
+    log('Group settings updated: $body');
   }
 }

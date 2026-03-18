@@ -3,6 +3,7 @@ import 'package:fennac_app/core/network/api_helper.dart';
 import '../model/my_group_model.dart';
 
 abstract class MyGroupDatasource {
+  Future<dynamic> setActiveGroup(String groupId);
   Future<MyGroupModel> fetchGroupById(String groupId);
   Future<MyGroupModel> updateGroupById(
     String groupId,
@@ -66,6 +67,20 @@ abstract class MyGroupDatasource {
 }
 
 class MyGroupDatasourceImpl extends MyGroupDatasource {
+  @override
+  Future<dynamic> setActiveGroup(String groupId) async {
+    try {
+      final response = await apiHelper.put(
+        'groups/set-active',
+        body: {'groupId': groupId},
+        requiresAuth: true,
+      );
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   final ApiHelper apiHelper;
 
   MyGroupDatasourceImpl(this.apiHelper);
@@ -176,7 +191,7 @@ class MyGroupDatasourceImpl extends MyGroupDatasource {
       };
 
       final response = await apiHelper.get(
-        '${AppConstants.directChat}$userId/chat/messages',
+        'users/$userId/chat/messages',
         queryParameters: queryParameters,
         requiresAuth: true,
       );
@@ -232,7 +247,7 @@ class MyGroupDatasourceImpl extends MyGroupDatasource {
       };
 
       final response = await apiHelper.post(
-        '${AppConstants.directChat}$userId/chat/messages',
+        '${AppConstants.baseUrl}users/$userId/chat/messages',
         body: body,
         requiresAuth: true,
       );
@@ -278,7 +293,7 @@ class MyGroupDatasourceImpl extends MyGroupDatasource {
   }) async {
     try {
       final String url =
-          '${AppConstants.directChat}$userId/chat/messages/$messageId/reactions';
+          '${AppConstants.baseUrl}users/$userId/chat/messages/$messageId/reactions';
       final response = isRemove
           ? await apiHelper.delete(
               url,
@@ -313,7 +328,7 @@ class MyGroupDatasourceImpl extends MyGroupDatasource {
   Future<dynamic> deleteDirectMessage(String userId, String messageId) async {
     try {
       final response = await apiHelper.delete(
-        '${AppConstants.directChat}$userId/chat/messages/$messageId',
+        '${AppConstants.baseUrl}users/$userId/chat/messages/$messageId',
         requiresAuth: true,
       );
       return response;
@@ -345,7 +360,7 @@ class MyGroupDatasourceImpl extends MyGroupDatasource {
   ) async {
     try {
       final response = await apiHelper.post(
-        '${AppConstants.directChat}$userId/chat/messages/$messageId/read',
+        '${AppConstants.baseUrl}users/$userId/chat/messages/$messageId/read',
         requiresAuth: true,
       );
       return response;

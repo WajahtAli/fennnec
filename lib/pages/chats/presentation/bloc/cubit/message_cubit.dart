@@ -7,17 +7,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
 
-import 'package:fennac_app/app/constants/app_constants.dart';
-import 'package:fennac_app/core/network/api_helper.dart';
-
 part '../state/message_state.dart';
 
 class MessageCubit extends Cubit<MessageState> {
   final MyGroupRepository _myGroupRepository;
-  final ApiHelper _apiHelper;
 
-  MessageCubit(this._myGroupRepository, this._apiHelper)
-    : super(MessageInitial());
+  MessageCubit(this._myGroupRepository) : super(MessageInitial());
 
   final TextEditingController messageController = TextEditingController();
   bool showAttachmentPanel = false;
@@ -205,47 +200,6 @@ class MessageCubit extends Cubit<MessageState> {
     String? duration,
   }) async {
     emit(MessageLoading());
-
-    // Upload files if they are local paths
-    List<String> uploadedUrls = [];
-    try {
-      for (String path in mediaPath) {
-        if (path.startsWith('http')) {
-          uploadedUrls.add(path);
-        } else {
-          final uploadResponse = await _apiHelper.uploadFile(
-            AppConstants.uploadSingle,
-            fileFieldName: 'file',
-            filePath: path,
-          );
-
-          if (uploadResponse != null) {
-            String? url;
-            if (uploadResponse is Map<String, dynamic>) {
-              if (uploadResponse.containsKey('data') &&
-                  uploadResponse['data'] is Map) {
-                final data = uploadResponse['data'] as Map<String, dynamic>;
-                url = data['url'] as String?;
-              } else if (uploadResponse.containsKey('url')) {
-                url = uploadResponse['url'] as String?;
-              }
-            }
-
-            if (url != null && url.isNotEmpty) {
-              uploadedUrls.add(url);
-            } else {
-              throw Exception("Failed to get URL from upload response");
-            }
-          } else {
-            throw Exception("Upload failed: No response from server");
-          }
-        }
-      }
-    } catch (e) {
-      emit(MessageError("Media upload failed: ${e.toString()}"));
-      return;
-    }
-
     final message = MessageModel(
       id: _uuid.v4(),
       senderId: currentUserId,
@@ -253,8 +207,8 @@ class MessageCubit extends Cubit<MessageState> {
       senderAvatar: currentUserAvatar,
       content: caption ?? '',
       type: type,
-      mediaUrl: uploadedUrls.length == 1 ? uploadedUrls.first : null,
-      imageUrls: uploadedUrls,
+      mediaUrl: mediaPath.length == 1 ? mediaPath.first : null,
+      imageUrls: mediaPath,
       mediaDuration: duration,
       waveformData: waveformData ?? [],
       sentAt: DateTime.now(),
@@ -272,14 +226,14 @@ class MessageCubit extends Cubit<MessageState> {
             _groupId!,
             content: caption ?? '',
             type: type.name,
-            attachments: uploadedUrls,
+            attachments: mediaPath,
           );
         } else {
           await _myGroupRepository.sendDirectMessage(
             _groupId!,
             content: caption ?? '',
             type: type.name,
-            attachments: uploadedUrls,
+            attachments: mediaPath,
           );
         }
         messages[index] = message.copyWith(isSending: false);

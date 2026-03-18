@@ -69,14 +69,22 @@ class _SwitchGroupsBottomSheetState extends State<SwitchGroupsBottomSheet> {
               bloc: _myGroupCubit,
               builder: (context, state) {
                 if (state is MyGroupLoading) {
+                  final groupList = _myGroupCubit.myGroupList?.groupList;
+                  final skeletonCount = groupList?.length ?? 2;
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 32),
                     child: Column(
-                      children: [
-                        GroupCardSkeleton(),
-                        const CustomSizedBox(height: 8),
-                        GroupCardSkeleton(),
-                      ],
+                      mainAxisSize: MainAxisSize.min,
+                      children: List.generate(
+                        skeletonCount,
+                        (i) => Column(
+                          children: [
+                            GroupCardSkeleton(),
+                            if (i != skeletonCount - 1)
+                              const CustomSizedBox(height: 8),
+                          ],
+                        ),
+                      ),
                     ),
                   );
                 }
@@ -122,8 +130,12 @@ class _SwitchGroupsBottomSheetState extends State<SwitchGroupsBottomSheet> {
                           avatarPaths: avatarPaths,
                           memberNames: memberNames,
                           isSelected: isSelected,
-                          onTap: () {
+                          onTap: () async {
                             _selectedGroupIndex.value = index;
+                            final groupId = group.id ?? '';
+                            if (groupId.isNotEmpty) {
+                              await _myGroupCubit.setActiveGroup(groupId);
+                            }
                           },
                         );
                       },

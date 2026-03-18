@@ -45,7 +45,7 @@ class HomeLandingBanner extends StatelessWidget {
           // Get inviter name
           final inviterName = inviter != null
               ? '${inviter.firstName ?? ''} ${inviter.lastName ?? ''}'.trim()
-              : 'Group Creator';
+              : '';
           return Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -165,7 +165,6 @@ class HomeLandingBanner extends StatelessWidget {
               final double overlap = 12.0;
               final double totalWidth =
                   itemWidth + (count - 1) * (itemWidth - overlap);
-              final double startOffset = -totalWidth / 2;
 
               return Align(
                 alignment: (count == 1) ? Alignment.center : Alignment.center,
@@ -180,21 +179,16 @@ class HomeLandingBanner extends StatelessWidget {
                           Positioned(
                             left: entry.$1 * (itemWidth - overlap),
                             child: _buildMemberAvatar(
-                              entry.$2.image ?? '',
                               context,
                               entry.$2,
+                              entry.$1,
                             ),
                           )
                       else
-                        for (final entry in [
-                          Assets.dummy.a1.path,
-                          Assets.dummy.b1.path,
-                          Assets.dummy.c1.path,
-                          Assets.dummy.d1.path,
-                        ].indexed)
+                        for (int i = 0; i < 4; i++)
                           Positioned(
-                            left: entry.$1 * (itemWidth - overlap),
-                            child: _buildMemberAvatar(entry.$2, context, null),
+                            left: i * (itemWidth - overlap),
+                            child: _buildMemberAvatar(context, null, i),
                           ),
                     ],
                   ),
@@ -221,15 +215,19 @@ class HomeLandingBanner extends StatelessWidget {
     return Image.asset(Assets.dummy.groupSelfie.path, fit: BoxFit.cover);
   }
 
-  Widget _buildMemberAvatar(
-    String imagePath,
-    BuildContext context,
-    Member? member,
-  ) {
+  static const _dummyAvatars = [
+    'assets/dummy/a1.png',
+    'assets/dummy/b1.png',
+    'assets/dummy/c1.png',
+    'assets/dummy/d1.png',
+  ];
+
+  Widget _buildMemberAvatar(BuildContext context, Member? member, int index) {
     final bool isDeclined =
         _homeLandingCubit.invitationStatus == InvitationStatus.declined;
 
     final double size = getWidth(context) > 370 ? 64 : 54;
+    final String dummyPath = _dummyAvatars[index % _dummyAvatars.length];
 
     return SizedBox(
       width: size,
@@ -282,12 +280,12 @@ class HomeLandingBanner extends StatelessWidget {
                   ? Image.network(
                       member.image!,
                       fit: BoxFit.cover,
-                      alignment: Alignment.center, // ← anchors from center
+                      alignment: Alignment.center,
                       errorBuilder: (context, error, stackTrace) {
-                        return _buildPlaceholderAvatar(imagePath);
+                        return Image.asset(dummyPath, fit: BoxFit.cover);
                       },
                     )
-                  : _buildPlaceholderAvatar(imagePath),
+                  : Image.asset(dummyPath, fit: BoxFit.cover),
             ),
           ),
         ),

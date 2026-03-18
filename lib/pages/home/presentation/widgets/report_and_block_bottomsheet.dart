@@ -19,6 +19,7 @@ import 'package:fennac_app/widgets/custom_sized_box.dart';
 import 'package:fennac_app/widgets/custom_text.dart';
 import 'package:fennac_app/widgets/custom_text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:fennac_app/widgets/app_inkwell.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lottie/lottie.dart';
 
@@ -143,7 +144,7 @@ class _ReportAndBlockBottomSheetState extends State<ReportAndBlockBottomSheet> {
 
                               return Column(
                                 children: [
-                                  InkWell(
+                                  AppInkWell(
                                     onTap: () {
                                       setState(() {
                                         _selectedReason = reason;

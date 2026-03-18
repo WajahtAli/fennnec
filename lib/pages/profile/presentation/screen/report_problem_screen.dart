@@ -43,6 +43,8 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
     _subjectController = TextEditingController();
     _descriptionController = TextEditingController();
     _isBlurNotifier = ValueNotifier<bool>(false);
+    // Clear previous media when entering the screen
+    _imagePickerCubit.clearAllMedia();
   }
 
   @override

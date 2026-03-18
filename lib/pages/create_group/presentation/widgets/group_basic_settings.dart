@@ -1,3 +1,4 @@
+import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/pages/create_group/presentation/bloc/cubit/create_group_cubit.dart';
 import 'package:fennac_app/pages/create_group/presentation/bloc/state/create_group_state.dart';
 import 'package:fennac_app/reusable_widgets/group_settings_widget.dart';
@@ -5,13 +6,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class GroupBasicSettings extends StatelessWidget {
-  final CreateGroupCubit cubit;
+  const GroupBasicSettings({super.key, this.isEditMode = false});
 
-  const GroupBasicSettings({super.key, required this.cubit});
+  final bool isEditMode;
 
   @override
   Widget build(BuildContext context) {
-    final canManageSettings = cubit.canCurrentUserEditGroupSettings();
+    final canManageSettings =
+        !isEditMode || cubit.canCurrentUserEditGroupSettings();
 
     return BlocBuilder<CreateGroupCubit, CreateGroupState>(
       bloc: cubit,
@@ -54,3 +56,5 @@ class GroupBasicSettings extends StatelessWidget {
     );
   }
 }
+
+final cubit = Di().sl<CreateGroupCubit>();

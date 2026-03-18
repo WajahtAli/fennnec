@@ -1,6 +1,7 @@
 import 'package:fennac_app/app/constants/media_query_constants.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:flutter/material.dart';
+import 'package:fennac_app/widgets/app_inkwell.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/app/app.dart';
@@ -121,7 +122,7 @@ class _ActionButton extends StatelessWidget {
       child: Material(
         color: ColorPalette.primary,
         borderRadius: BorderRadius.circular(28),
-        child: InkWell(
+        child: AppInkWell(
           borderRadius: BorderRadius.circular(28),
           onTap: onTap,
           child: Padding(

@@ -12,6 +12,7 @@ import 'package:fennac_app/pages/kyc/presentation/widgets/create_prompt_bottom_s
 import 'package:fennac_app/widgets/prompt_audio_row.dart';
 import 'package:fennac_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
+import 'package:fennac_app/widgets/app_inkwell.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class PromptCard extends StatelessWidget {
@@ -69,7 +70,7 @@ class PromptCard extends StatelessWidget {
             ),
             child: Material(
               color: Colors.transparent,
-              child: InkWell(
+              child: AppInkWell(
                 onTap: isMaxReached
                     ? null
                     : () async {

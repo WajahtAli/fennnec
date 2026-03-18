@@ -1,6 +1,7 @@
 import 'package:fennac_app/app/constants/media_query_constants.dart';
 import 'package:fennac_app/pages/chats/presentation/bloc/cubit/message_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:fennac_app/widgets/app_inkwell.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/text_styles.dart';
@@ -70,7 +71,7 @@ class _AttachmentPanelBelow extends StatelessWidget {
         ),
         itemBuilder: (context, index) {
           final option = options[index];
-          return InkWell(
+          return AppInkWell(
             onTap: () {
               final picker = Di().sl<ImagePickerCubit>();
               Di().sl<MessageCubit>().toggleAttachmentPanel(close: true);

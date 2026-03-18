@@ -5,6 +5,7 @@ import 'package:fennac_app/pages/kyc/presentation/bloc/cubit/kyc_prompt_cubit.da
 import 'package:fennac_app/pages/kyc/presentation/widgets/create_prompt_bottom_sheet.dart';
 import 'package:fennac_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
+import 'package:fennac_app/widgets/app_inkwell.dart';
 
 class CreateCustomPromptButton extends StatelessWidget {
   final KycPromptCubit kycPromptCubit;
@@ -32,7 +33,7 @@ class CreateCustomPromptButton extends StatelessWidget {
       ),
       child: Material(
         color: Colors.transparent,
-        child: InkWell(
+        child: AppInkWell(
           onTap: () async {
             if (kycPromptCubit.isMaxReached()) {
               onMaxPromptsReached();

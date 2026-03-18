@@ -46,9 +46,11 @@ _ChatModel _$ChatModelFromJson(Map<String, dynamic> json) => _ChatModel(
   type: json['type'] as String,
   id: json['id'] as String,
   name: json['name'] as String,
-  image: json['image'] as String,
-  lastMessage: json['lastMessage'] as String,
-  lastMessageAt: DateTime.parse(json['lastMessageAt'] as String),
+  image: json['image'] as String? ?? '',
+  lastMessage: json['lastMessage'] as String? ?? '',
+  lastMessageAt: json['lastMessageAt'] == null
+      ? null
+      : DateTime.parse(json['lastMessageAt'] as String),
   unreadCount: (json['unreadCount'] as num).toInt(),
   meta: json['meta'] as Map<String, dynamic>,
   members: (json['members'] as List<dynamic>?)
@@ -63,7 +65,7 @@ Map<String, dynamic> _$ChatModelToJson(_ChatModel instance) =>
       'name': instance.name,
       'image': instance.image,
       'lastMessage': instance.lastMessage,
-      'lastMessageAt': instance.lastMessageAt.toIso8601String(),
+      'lastMessageAt': instance.lastMessageAt?.toIso8601String(),
       'unreadCount': instance.unreadCount,
       'meta': instance.meta,
       'members': instance.members,
@@ -156,7 +158,7 @@ Map<String, dynamic> _$PokeDetailDataToJson(_PokeDetailData instance) =>
     };
 
 _PokeModel _$PokeModelFromJson(Map<String, dynamic> json) => _PokeModel(
-  id: json['_id'] as String,
+  id: json['id'] as String,
   fromUserId: json['fromUserId'] as String,
   toUserId: json['toUserId'] as String,
   targetType: json['targetType'] as String,
@@ -169,7 +171,7 @@ _PokeModel _$PokeModelFromJson(Map<String, dynamic> json) => _PokeModel(
 
 Map<String, dynamic> _$PokeModelToJson(_PokeModel instance) =>
     <String, dynamic>{
-      '_id': instance.id,
+      'id': instance.id,
       'fromUserId': instance.fromUserId,
       'toUserId': instance.toUserId,
       'targetType': instance.targetType,
@@ -182,7 +184,7 @@ Map<String, dynamic> _$PokeModelToJson(_PokeModel instance) =>
 
 _PokerFromUser _$PokerFromUserFromJson(Map<String, dynamic> json) =>
     _PokerFromUser(
-      id: json['_id'] as String,
+      id: json['id'] as String,
       firstName: json['firstName'] as String,
       lastName: json['lastName'] as String,
       bestShorts: (json['bestShorts'] as List<dynamic>)
@@ -192,7 +194,7 @@ _PokerFromUser _$PokerFromUserFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$PokerFromUserToJson(_PokerFromUser instance) =>
     <String, dynamic>{
-      '_id': instance.id,
+      'id': instance.id,
       'firstName': instance.firstName,
       'lastName': instance.lastName,
       'bestShorts': instance.bestShorts,

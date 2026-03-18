@@ -52,34 +52,41 @@ class CustomBottomSheet extends StatelessWidget {
     String? secondaryButtonText,
     VoidCallback? onSecondaryButtonPressed,
     ValueNotifier<bool>? blurNotifier,
+    bool? dismissible = true,
     bool isHorizontalButton = false,
     bool isSecondaryButtonFirst = false,
   }) async {
+    final bool canDismiss = dismissible ?? true;
     blurNotifier?.value = true;
     try {
       await showModalBottomSheet(
         context: context,
         backgroundColor: Colors.transparent,
         barrierColor: barrierColor,
+        isDismissible: canDismiss,
+        enableDrag: canDismiss,
         isScrollControlled: true,
-        builder: (context) => CustomBottomSheet(
-          title: title,
-          description: description,
-          description1: description1,
-          buttonText: buttonText,
-          onButtonPressed: () {
-            if (onButtonPressed != null) {
-              onButtonPressed();
-            }
-            Navigator.of(context).maybePop();
-          },
-          icon: icon,
-          secondaryButtonText: secondaryButtonText,
-          onSecondaryButtonPressed: onSecondaryButtonPressed,
-          isHorizontalButton: isHorizontalButton,
-          descriptionStyle: descriptionStyle,
-          description1Style: description1Style,
-          isSecondaryButtonFirst: isSecondaryButtonFirst,
+        builder: (context) => PopScope(
+          canPop: canDismiss,
+          child: CustomBottomSheet(
+            title: title,
+            description: description,
+            description1: description1,
+            buttonText: buttonText,
+            onButtonPressed: () {
+              if (onButtonPressed != null) {
+                onButtonPressed();
+              }
+              Navigator.of(context).maybePop();
+            },
+            icon: icon,
+            secondaryButtonText: secondaryButtonText,
+            onSecondaryButtonPressed: onSecondaryButtonPressed,
+            isHorizontalButton: isHorizontalButton,
+            descriptionStyle: descriptionStyle,
+            description1Style: description1Style,
+            isSecondaryButtonFirst: isSecondaryButtonFirst,
+          ),
         ),
       );
     } finally {

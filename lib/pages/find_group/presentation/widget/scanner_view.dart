@@ -33,7 +33,10 @@ class ScannerView extends StatelessWidget {
             fit: StackFit.expand,
             children: [
               RepaintBoundary(
-                child: MobileScanner(controller: controller, onDetect: onDetect),
+                child: MobileScanner(
+                  controller: controller,
+                  onDetect: onDetect,
+                ),
               ),
               BlocBuilder<ImagePickerCubit, ImagePickerState>(
                 builder: (context, state) {

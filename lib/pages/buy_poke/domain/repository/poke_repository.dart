@@ -8,4 +8,10 @@ abstract class PokeRepository {
     String? targetId,
     required String message,
   });
+
+  Future<Map<String, dynamic>> purchasePokes({required String productId});
+
+  Future<Map<String, dynamic>> purchaseSubscription({
+    required String productId,
+  });
 }

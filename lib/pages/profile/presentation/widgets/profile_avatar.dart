@@ -3,6 +3,7 @@ import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/helpers/cached_network_image_helper.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:flutter/material.dart';
+import 'package:fennac_app/widgets/app_inkwell.dart';
 
 class ProfileAvatar extends StatelessWidget {
   final String? imageUrl;
@@ -54,7 +55,7 @@ class ProfileAvatar extends StatelessWidget {
             Positioned(
               bottom: 4,
               right: 4,
-              child: InkWell(
+              child: AppInkWell(
                 borderRadius: BorderRadius.circular(24),
                 onTap: onEditTap ?? () {},
                 child: Container(

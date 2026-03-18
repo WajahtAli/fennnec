@@ -71,13 +71,24 @@ class _HomeCardDesignState extends State<HomeCardDesign> {
               ),
               const SizedBox(height: 32),
               if (_homeCubit.selectedProfile == null) ...[
+                //todo client req to add group name
+                // Padding(
+                //   padding: const EdgeInsets.symmetric(horizontal: 12),
+                //   child: Text(
+                //     widget.group?.members
+                //             ?.map((e) => e.name ?? "")
+                //             .join(", ") ??
+                //         '',
+                //     textAlign: TextAlign.center,
+                //     style: AppTextStyles.h1Large(
+                //       context,
+                //     ).copyWith(fontWeight: FontWeight.bold, fontSize: 24),
+                //   ),
+                // ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   child: Text(
-                    widget.group?.members
-                            ?.map((e) => e.name ?? "")
-                            .join(", ") ??
-                        '',
+                    widget.group?.name ?? '',
                     textAlign: TextAlign.center,
                     style: AppTextStyles.h1Large(
                       context,

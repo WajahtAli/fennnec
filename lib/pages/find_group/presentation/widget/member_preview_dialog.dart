@@ -20,11 +20,13 @@ import '../../../create_group/presentation/bloc/cubit/contact_list_cubit.dart';
 class MemberPreviewDialog extends StatelessWidget {
   final FindGroupCubit findGroupCubit;
   final String? widgetQrCode;
+  final bool isFromCreateGroup;
 
   const MemberPreviewDialog({
     super.key,
     required this.findGroupCubit,
     this.widgetQrCode,
+    this.isFromCreateGroup = false,
   });
 
   @override
@@ -120,6 +122,9 @@ class MemberPreviewDialog extends StatelessWidget {
                                 );
                                 AutoRouter.of(context).pop();
                                 AutoRouter.of(context).pop();
+                                if (!isFromCreateGroup) {
+                                  AutoRouter.of(context).pop();
+                                }
                               } else {
                                 AutoRouter.of(context).pop();
                               }

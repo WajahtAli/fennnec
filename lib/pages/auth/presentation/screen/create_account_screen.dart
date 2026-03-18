@@ -488,7 +488,8 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                                           return;
                                         }
                                         if (state is CreateAccountLoaded) {
-                                          _authCubit.clearCreateAccountFields();
+                                          //todo sir hamza mention not to clear
+                                          // _authCubit.clearCreateAccountFields();
                                         }
                                       }
                                     }

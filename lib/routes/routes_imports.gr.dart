@@ -510,6 +510,7 @@ class FindGroupRoute extends _i50.PageRouteInfo<FindGroupRouteArgs> {
     _i51.Key? key,
     String? qrCode,
     _i52.FindGroupScreenType? findGroupScreenType,
+    bool isFromCreateGroup = false,
     List<_i50.PageRouteInfo>? children,
   }) : super(
          FindGroupRoute.name,
@@ -517,6 +518,7 @@ class FindGroupRoute extends _i50.PageRouteInfo<FindGroupRouteArgs> {
            key: key,
            qrCode: qrCode,
            findGroupScreenType: findGroupScreenType,
+           isFromCreateGroup: isFromCreateGroup,
          ),
          initialChildren: children,
        );
@@ -533,13 +535,19 @@ class FindGroupRoute extends _i50.PageRouteInfo<FindGroupRouteArgs> {
         key: args.key,
         qrCode: args.qrCode,
         findGroupScreenType: args.findGroupScreenType,
+        isFromCreateGroup: args.isFromCreateGroup,
       );
     },
   );
 }
 
 class FindGroupRouteArgs {
-  const FindGroupRouteArgs({this.key, this.qrCode, this.findGroupScreenType});
+  const FindGroupRouteArgs({
+    this.key,
+    this.qrCode,
+    this.findGroupScreenType,
+    this.isFromCreateGroup = false,
+  });
 
   final _i51.Key? key;
 
@@ -547,9 +555,11 @@ class FindGroupRouteArgs {
 
   final _i52.FindGroupScreenType? findGroupScreenType;
 
+  final bool isFromCreateGroup;
+
   @override
   String toString() {
-    return 'FindGroupRouteArgs{key: $key, qrCode: $qrCode, findGroupScreenType: $findGroupScreenType}';
+    return 'FindGroupRouteArgs{key: $key, qrCode: $qrCode, findGroupScreenType: $findGroupScreenType, isFromCreateGroup: $isFromCreateGroup}';
   }
 
   @override
@@ -558,12 +568,16 @@ class FindGroupRouteArgs {
     if (other is! FindGroupRouteArgs) return false;
     return key == other.key &&
         qrCode == other.qrCode &&
-        findGroupScreenType == other.findGroupScreenType;
+        findGroupScreenType == other.findGroupScreenType &&
+        isFromCreateGroup == other.isFromCreateGroup;
   }
 
   @override
   int get hashCode =>
-      key.hashCode ^ qrCode.hashCode ^ findGroupScreenType.hashCode;
+      key.hashCode ^
+      qrCode.hashCode ^
+      findGroupScreenType.hashCode ^
+      isFromCreateGroup.hashCode;
 }
 
 /// generated route for

@@ -18,8 +18,14 @@ import '../widget/scanner_view.dart';
 class FindGroupScreen extends StatefulWidget {
   final String? qrCode;
   final FindGroupScreenType? findGroupScreenType;
+  final bool isFromCreateGroup;
 
-  const FindGroupScreen({super.key, this.qrCode, this.findGroupScreenType});
+  const FindGroupScreen({
+    super.key,
+    this.qrCode,
+    this.findGroupScreenType,
+    this.isFromCreateGroup = false,
+  });
 
   @override
   State<FindGroupScreen> createState() => _FindGroupScreenState();
@@ -76,6 +82,7 @@ class _FindGroupScreenState extends State<FindGroupScreen> {
           return MemberPreviewDialog(
             findGroupCubit: _findGroupCubit,
             widgetQrCode: widget.qrCode,
+            isFromCreateGroup: widget.isFromCreateGroup,
           );
         } else {
           return GroupPreviewDialog(

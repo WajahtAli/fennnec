@@ -38,6 +38,7 @@ extension StringExtension on String {
 
   bool get isAudioUrl => isAudio && !isVideoUrl;
 
+  bool get isUrl => Uri.tryParse(this) != null;
   String capitalize() {
     if (isEmpty) return this;
     return this[0].toUpperCase() + substring(1);

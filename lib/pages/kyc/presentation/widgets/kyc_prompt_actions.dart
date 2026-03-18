@@ -10,6 +10,7 @@ import 'package:fennac_app/reusable_widgets/animated_background_container.dart';
 import 'package:fennac_app/routes/routes_imports.gr.dart';
 import 'package:fennac_app/widgets/custom_bottom_sheet.dart';
 import 'package:fennac_app/widgets/custom_outlined_button.dart';
+import 'package:fennac_app/widgets/share_qr_bottomsheet.dart';
 import 'package:flutter/material.dart';
 
 class KycPromptActions extends StatelessWidget {
@@ -61,6 +62,7 @@ class KycPromptActions extends StatelessWidget {
                           isPng: true,
                           icon: Assets.icons.checkGreen.path,
                         ),
+                        dismissible: false,
                         context: context,
                         title: 'Group Created Successfully!',
                         description:
@@ -73,9 +75,11 @@ class KycPromptActions extends StatelessWidget {
                         },
                         secondaryButtonText: 'Share QR Code',
                         onSecondaryButtonPressed: () {
-                          AutoRouter.of(context).push(const DashboardRoute());
-
-                          Di().sl<DashboardCubit>().changePage(0, HomeScreen());
+                          ShareQrBottomSheet.show(
+                            context: context,
+                            qrData: createGroupCubit.groupId ?? '',
+                            barrierColor: Colors.black.withOpacity(0.5),
+                          );
                         },
                         blurNotifier: backgroundBlurNotifier,
                       );

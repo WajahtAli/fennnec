@@ -1,6 +1,7 @@
 import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
+import 'package:fennac_app/widgets/app_inkwell.dart';
 
 class TileWidget extends StatelessWidget {
   final String? title;
@@ -26,7 +27,7 @@ class TileWidget extends StatelessWidget {
               context,
             ).copyWith(color: Colors.white),
           ),
-          InkWell(
+          AppInkWell(
             onTap: onTap ?? () {},
             child: AppText(
               text: actionText ?? 'Resend',

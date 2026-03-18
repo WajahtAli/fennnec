@@ -13,6 +13,7 @@ import 'package:fennac_app/widgets/custom_country_field.dart';
 import 'package:fennac_app/widgets/custom_text_field.dart';
 import 'package:fennac_app/widgets/movable_background.dart';
 import 'package:flutter/material.dart';
+import 'package:fennac_app/widgets/app_inkwell.dart';
 import 'package:fennac_app/widgets/custom_sized_box.dart';
 import 'package:fennac_app/widgets/custom_text.dart';
 import 'package:fennac_app/widgets/custom_elevated_button.dart';
@@ -196,7 +197,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                     text: 'Can’t access your email?',
                                     style: AppTextStyles.description(context),
                                   ),
-                                  InkWell(
+                                  AppInkWell(
                                     onTap: () {
                                       _authCubit.toggleEmailOrPhone();
                                     },

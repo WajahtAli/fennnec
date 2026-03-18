@@ -5,6 +5,7 @@ import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
+import 'package:fennac_app/pages/auth/presentation/bloc/cubit/login_cubit.dart';
 import 'package:fennac_app/pages/my_group/data/model/my_group_model.dart';
 import 'package:fennac_app/pages/my_group/presentation/bloc/cubit/my_group_cubit.dart';
 import 'package:fennac_app/pages/create_group/presentation/bloc/cubit/contact_list_cubit.dart';
@@ -37,7 +38,6 @@ class _SelectedMembersListState extends State<SelectedMembersList> {
   @override
   void initState() {
     super.initState();
-    // Add edit members to cubit's selectedMembers if in edit mode
     if (widget.isEditMode) {
       widget.contactListCubit.selectedMembers.clear();
       for (final member in widget.editMembers) {
@@ -56,7 +56,7 @@ class _SelectedMembersListState extends State<SelectedMembersList> {
               isFennecUser: true,
               profileImageUrl: member.image,
             ),
-            isApiCallNeeded: false, // Avoid API call for pre-filling
+            isApiCallNeeded: false,
           );
         }
       }
@@ -71,6 +71,7 @@ class _SelectedMembersListState extends State<SelectedMembersList> {
         final selectedMembers = widget.contactListCubit.selectedMembers;
 
         return _MembersWrap(
+          isEditMode: widget.isEditMode,
           selectedMembers: selectedMembers,
           onAddTap: widget.canEditMembers
               ? () {
@@ -89,69 +90,112 @@ class _SelectedMembersListState extends State<SelectedMembersList> {
 }
 
 class _MembersWrap extends StatelessWidget {
+  final bool isEditMode;
   final List<SelectedMember> selectedMembers;
   final VoidCallback? onAddTap;
   final Function(int)? onRemove;
 
   const _MembersWrap({
+    required this.isEditMode,
     required this.selectedMembers,
     required this.onAddTap,
     required this.onRemove,
   });
 
-  /// Generates the UI slots for members from the unified list
-  List<Widget> _generateMemberSlots() {
-    return List.generate(4, (index) {
-      if (index < selectedMembers.length) {
-        final member = selectedMembers[index];
-        return _MemberSlot(
-          selectedMember: member,
-          label: member.displayName.isNotEmpty ? member.displayName : 'Member',
-          subtitle: member.phoneNumber,
-          roleLabel: 'Invited',
-          onRemove: onRemove != null ? () => onRemove!(index) : null,
-        );
-      }
-      return _MemberSlot(isAdd: true, label: 'Add Member', onAdd: onAddTap);
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    final memberSlots = _generateMemberSlots();
     final myGroupCubit = Di().sl<MyGroupCubit>();
+    final loginCubit = Di().sl<LoginCubit>();
+    final currentUser = loginCubit.userData?.user;
+
     final createdBy =
         myGroupCubit.myGroupModel?.data?.createdBy ??
         ((myGroupCubit.myGroupList?.groupList?.isNotEmpty ?? false)
             ? myGroupCubit.myGroupList!.groupList!.first.createdBy
             : null);
-    final createdByName = [
-      createdBy?.firstName?.trim(),
-      createdBy?.lastName?.trim(),
-    ].whereType<String>().where((name) => name.isNotEmpty).join(' ').trim();
-    final createdByMember = SelectedMember(
-      id: createdBy?.id ?? 'group-admin',
-      displayName: createdByName.isNotEmpty ? createdByName : 'Admin',
-      profileImageUrl: createdBy?.image,
-      email: createdBy?.email,
-      isFennecUser: true,
 
-      fennecId: createdBy?.id,
+    final adminFirstName = isEditMode
+        ? createdBy?.firstName?.trim()
+        : currentUser?.firstName?.trim();
+    final adminLastName = isEditMode
+        ? createdBy?.lastName?.trim()
+        : currentUser?.lastName?.trim();
+    final adminId = isEditMode ? createdBy?.id : currentUser?.id;
+    final adminEmail = isEditMode ? createdBy?.email : currentUser?.email;
+    final adminImage = isEditMode
+        ? createdBy?.image
+        : (currentUser?.bestShorts?.first ?? '');
+
+    final createdByName = [
+      adminFirstName,
+      adminLastName,
+    ].whereType<String>().where((name) => name.isNotEmpty).join(' ').trim();
+
+    final createdByMember = SelectedMember(
+      id: adminId ?? 'group-admin',
+      displayName: createdByName.isNotEmpty ? createdByName : 'Admin',
+      profileImageUrl: adminImage,
+      email: adminEmail,
+      isFennecUser: true,
+      fennecId: adminId,
     );
 
-    final allSlots = [
+    // Filter out admin from members to avoid duplicate
+    final filteredMembers = selectedMembers
+        .where((m) => m.id != createdByMember.id)
+        .toList();
+
+    // Total non-admin slots = 4 (slots 2–5)
+    // Slot layout: [Admin, member/addMember/empty, member/addMember/empty, member/addMember/empty, member/addMember/empty]
+    // The first empty slot after all real members becomes "Add Member" (tappable)
+    // Remaining slots are plain empty placeholders
+
+    // Build the 5 fixed slots
+    List<Widget> allSlots = [];
+
+    // Slot 0: Admin (always)
+    allSlots.add(
       _MemberSlot(
         isAdmin: true,
         selectedMember: createdByMember,
-        imagePath: createdBy?.image?.isNotEmpty == true
-            ? createdBy!.image
-            : null,
+        imagePath: adminImage?.isNotEmpty == true ? adminImage : null,
         label: createdByMember.displayName,
         roleLabel: 'Admin',
       ),
-      ...memberSlots,
-    ];
+    );
 
+    // Slots 1–4: member data, then one "Add Member", then empty placeholders
+    bool addMemberSlotPlaced = false;
+    for (int i = 0; i < 4; i++) {
+      if (i < filteredMembers.length) {
+        // Real member
+        final member = filteredMembers[i];
+        allSlots.add(
+          _MemberSlot(
+            selectedMember: member,
+            label: member.displayName.isNotEmpty
+                ? member.displayName
+                : 'Member',
+            subtitle: member.phoneNumber,
+            roleLabel: 'Invited',
+            onRemove: onRemove != null ? () => onRemove!(i) : null,
+          ),
+        );
+      } else if (!addMemberSlotPlaced && onAddTap != null) {
+        // First empty slot becomes the tappable "Add Member"
+        allSlots.add(
+          _MemberSlot(isAdd: true, label: 'Add Member', onAdd: onAddTap),
+        );
+        addMemberSlotPlaced = true;
+      } else {
+        // Remaining slots: plain empty placeholder (non-tappable)
+        allSlots.add(
+          const _MemberSlot(isAdd: true, isEmptyPlaceholder: true, label: ''),
+        );
+      }
+    }
+
+    // Split into top row (3) and bottom row (2)
     final topRow = allSlots.take(3).toList();
     final bottomRow = allSlots.skip(3).take(2).toList();
 
@@ -186,6 +230,7 @@ class _MemberSlot extends StatelessWidget {
   final SelectedMember? selectedMember;
   final bool isAdd;
   final bool isAdmin;
+  final bool isEmptyPlaceholder; // true = non-tappable empty slot
   final String? imagePath;
   final String label;
   final String? subtitle;
@@ -197,6 +242,7 @@ class _MemberSlot extends StatelessWidget {
     this.selectedMember,
     this.isAdd = false,
     this.isAdmin = false,
+    this.isEmptyPlaceholder = false,
     this.imagePath,
     this.label = '',
     this.subtitle,
@@ -222,7 +268,8 @@ class _MemberSlot extends StatelessWidget {
           clipBehavior: Clip.none,
           children: [
             GestureDetector(
-              onTap: isAdd ? onAdd : null,
+              // Only tappable if it's the active "Add Member" slot
+              onTap: (isAdd && !isEmptyPlaceholder) ? onAdd : null,
               child: Container(
                 width: size,
                 height: size,
@@ -246,7 +293,11 @@ class _MemberSlot extends StatelessWidget {
                         width: 34,
                         height: 34,
                         colorFilter: ColorFilter.mode(
-                          isLight ? Colors.black : Colors.white,
+                          // Dim the icon for empty placeholders
+                          isEmptyPlaceholder
+                              ? (isLight ? Colors.black : Colors.white)
+                                    .withValues(alpha: 0.3)
+                              : (isLight ? Colors.black : Colors.white),
                           BlendMode.srcIn,
                         ),
                       )
@@ -263,7 +314,7 @@ class _MemberSlot extends StatelessWidget {
                                     width: size,
                                     height: size,
                                     color: avatarBgColor,
-                                    child: Icon(
+                                    child: const Icon(
                                       Icons.person,
                                       color: Colors.grey,
                                     ),
@@ -333,29 +384,34 @@ class _MemberSlot extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 16),
-        AppText(
-          text: label,
-          style: AppTextStyles.description(context).copyWith(
-            color: isLightTheme(context)
-                ? ColorPalette.black
-                : ColorPalette.textSecondary,
+        // Only show label text for non-empty-placeholder slots
+        if (!isEmptyPlaceholder) ...[
+          AppText(
+            text: label,
+            style: AppTextStyles.description(context).copyWith(
+              color: isLightTheme(context)
+                  ? ColorPalette.black
+                  : ColorPalette.textSecondary,
+            ),
           ),
-        ),
-        if (subtitle != null && subtitle!.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.only(top: 4),
-            child: SizedBox(
-              width: 90,
-              child: AppText(
-                text: subtitle!,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: AppTextStyles.bodySmall(context).copyWith(
-                  color: ColorPalette.textPrimary.withValues(alpha: 0.6),
+          if (subtitle != null && subtitle!.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: SizedBox(
+                width: 90,
+                child: AppText(
+                  text: subtitle!,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTextStyles.bodySmall(context).copyWith(
+                    color: ColorPalette.textPrimary.withValues(alpha: 0.6),
+                  ),
                 ),
               ),
             ),
-          ),
+        ] else
+          // Reserve the same space as label text to keep layout consistent
+          const SizedBox(height: 20),
       ],
     );
   }
