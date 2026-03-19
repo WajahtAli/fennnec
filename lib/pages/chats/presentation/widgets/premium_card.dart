@@ -177,28 +177,39 @@ class PremiumCard extends StatelessWidget {
                     Builder(
                       builder: (context) {
                         final pokeCubit = Di().sl<PokeCubit>();
-                        return CustomElevatedButton(
-                          text: 'Upgrade to Premium',
-                          icon: pokeCubit.isSubscriptionPurchasing
-                              ? SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: Lottie.asset(
-                                    Assets.animations.loadingSpinner,
-                                  ),
-                                )
-                              : SizedBox.shrink(),
-                          isLoading: pokeCubit.isSubscriptionPurchasing,
-                          onTap: () {
-                            if (isGradientTitle == true) {
-                              //todo - implement premium subscription flow
-                              // VxToast.show(message: 'Coming Soon!');
-                              // AutoRouter.of(context).push(const MyGroupRoute());
-                              pokeCubit.purchaseSubscription('monthly');
-                            } else {
-                              pokeCubit.purchaseSubscription('monthly');
-                            }
-                          },
+                        return Column(
+                          children: [
+                            CustomElevatedButton(
+                              text: 'Upgrade to Premium',
+                              icon: pokeCubit.isSubscriptionPurchasing
+                                  ? SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: Lottie.asset(
+                                        Assets.animations.loadingSpinner,
+                                      ),
+                                    )
+                                  : const SizedBox.shrink(),
+                              isLoading: pokeCubit.isSubscriptionPurchasing,
+                              onTap: () {
+                                pokeCubit.purchaseSubscription('monthly');
+                              },
+                            ),
+                            // const CustomSizedBox(height: 12),
+                            // TextButton(
+                            //   onPressed: () {
+                            //     pokeCubit.restorePurchases();
+                            //   },
+                            //   child: Text(
+                            //     'Restore Purchases',
+                            //     style: AppTextStyles.description(context).copyWith(
+                            //       color: ColorPalette.primary,
+                            //       decoration: TextDecoration.underline,
+                            //       fontWeight: FontWeight.w600,
+                            //     ),
+                            //   ),
+                            // ),
+                          ],
                         );
                       },
                     ),

@@ -202,6 +202,7 @@ class CreateAccountCubit extends Cubit<CreateAccountState> {
   Future<void> updateProfile({
     final List<String>? bestShorts,
     final Map<String, List<String>>? vibes,
+    final String? fcmToken,
   }) async {
     emit(CreateAccountLoading());
 
@@ -298,6 +299,7 @@ class CreateAccountCubit extends Cubit<CreateAccountState> {
             vibes: vibesMap,
             mediaLinks: mediaLinksToSend,
             countryCode: countryCode,
+            fcmToken: fcmToken,
           );
 
       loginCubit.userData = profileResponse.data;

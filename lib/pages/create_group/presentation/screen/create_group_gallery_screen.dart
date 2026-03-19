@@ -185,10 +185,10 @@ class _CreateGroupGalleryScreenState extends State<CreateGroupGalleryScreen> {
                   await createGroupCubit.updateGroupWithChangedFields(
                     groupId: _myGroupCubit.myGroupModel?.data?.id ?? '',
                   );
-                  // Clear media after successful update
-                  if (mounted) {
-                    imagePickerCubit.updateMediaList([]);
-                  }
+                  // // Clear media after successful update
+                  // if (mounted) {
+                  //   imagePickerCubit.updateMediaList([]);
+                  // }
                 } else {
                   await createGroupCubit.createGroup(context: context);
                   // Clear media after successful creation

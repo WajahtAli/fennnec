@@ -33,6 +33,7 @@ abstract class CreateAccountRepo {
     final Map<String, List<String>>? vibes,
     final List<String>? mediaLinks,
     final String? countryCode,
+    final String? fcmToken,
   });
 
   Future<dynamic> uploadMedia({required final String filePath});

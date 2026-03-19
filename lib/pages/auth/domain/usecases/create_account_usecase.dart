@@ -59,6 +59,7 @@ class CreateAccountUsecase {
     final Map<String, List<String>>? vibes,
     final List<String>? mediaLinks,
     final String? countryCode,
+    final String? fcmToken,
   }) async {
     return await _createAccountRepo.updateProfile(
       dob: dob,
@@ -73,6 +74,7 @@ class CreateAccountUsecase {
       vibes: vibes,
       mediaLinks: mediaLinks,
       countryCode: countryCode,
+      fcmToken: fcmToken,
     );
   }
 

@@ -55,4 +55,7 @@ class AppConstants {
   static const String remindMeLater = "remind_me_later";
   static const String turnOffScheduler = "turn_off_scheduler";
   static const int notificationIntervalInMins = 15;
+  static const String chatsChannelKey = "chats_channel";
+  static const String messagesChannelKey = "messages_channel";
+  static const String pokesChannelKey = "pokes_channel";
 }

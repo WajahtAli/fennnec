@@ -86,7 +86,7 @@ class GroupGalleryWidget extends StatelessWidget {
     int promptIndex = 0;
 
     while (imageIndex < images.length || promptIndex < prompts.length) {
-      for (int i = 0; i < 2 && imageIndex < images.length; i++) {
+      for (int i = 0; i < 1 && imageIndex < images.length; i++) {
         interleavedItems.add(images[imageIndex++]);
       }
 

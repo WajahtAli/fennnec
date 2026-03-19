@@ -126,6 +126,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                           Di().sl<MyGroupCubit>().myGroupModel?.data?.id ?? '',
                     );
                   } else {
+                    // if () {
+                    // }
                     AutoRouter.of(context).push(
                       CreateGroupGalleryRoute(isEditMode: widget.isEditMode),
                     );

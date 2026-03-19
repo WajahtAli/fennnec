@@ -64,6 +64,7 @@ class CreateAccountRepoImpl extends CreateAccountRepo {
     final Map<String, List<String>>? vibes,
     final List<String>? mediaLinks,
     final String? countryCode,
+    final String? fcmToken,
   }) async {
     return await _createAccountDatasource.updateProfile(
       dob: dob,
@@ -77,6 +78,7 @@ class CreateAccountRepoImpl extends CreateAccountRepo {
       bestShorts: bestShorts,
       vibes: vibes,
       countryCode: countryCode,
+      fcmToken: fcmToken,
     );
   }
 

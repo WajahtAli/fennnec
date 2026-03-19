@@ -55,7 +55,7 @@ class InterleavedMediaSection extends StatelessWidget {
 
     while (imageIndex < bestShorts.length ||
         promptIndex < validPrompts.length) {
-      for (int i = 0; i < 2 && imageIndex < bestShorts.length; i++) {
+      for (int i = 0; i < 1 && imageIndex < bestShorts.length; i++) {
         interleavedItems.add(bestShorts[imageIndex++]);
       }
 

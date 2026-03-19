@@ -41,6 +41,7 @@ abstract class CreateAccountDatasource {
     final List<String>? bestShorts,
     final Map<String, List<String>>? vibes,
     final String? countryCode,
+    final String? fcmToken,
   });
 
   // load profile
@@ -118,6 +119,7 @@ class CreateAccountDatasourceImpl extends CreateAccountDatasource {
     final List<String>? bestShorts,
     final Map<String, List<String>>? vibes,
     final String? countryCode,
+    final String? fcmToken,
   }) async {
     final data = await apiHelper.put(
       AppConstants.updateProfile,
@@ -134,6 +136,7 @@ class CreateAccountDatasourceImpl extends CreateAccountDatasource {
         if (bestShorts != null) "bestShorts": bestShorts,
         if (vibes != null) "vibes": vibes,
         if (countryCode != null) "countryCode": countryCode,
+        if (fcmToken != null) "fcmToken": fcmToken,
       },
     );
     return LoginModel.fromJson(data);

@@ -5,6 +5,7 @@ import 'package:fennac_app/pages/buy_poke/domain/usecase/purchase_pokes_usecase.
 import 'package:fennac_app/helpers/gradient_toast.dart';
 import 'package:fennac_app/pages/buy_poke/presentation/bloc/state/poke_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fennac_app/pages/buy_poke/data/datasource/iap_service.dart';
 
 class PokeCubit extends Cubit<PokeState> {
   PurchaseSubscriptionUseCase? purchaseSubscriptionUseCase;
@@ -39,13 +40,43 @@ class PokeCubit extends Cubit<PokeState> {
     isSubscriptionPurchasing = true;
     emit(PokeLoading());
     try {
-      final response = await purchaseSubscriptionUseCase?.call(
-        productId: productId,
-      );
-      final message = response?['message'] ?? 'Subscription purchased';
-      VxToast.show(message: message, icon: Assets.icons.checkGreen.path);
+      final isSuccess = await IAPService.purchaseProduct(productId);
+      if (isSuccess) {
+        final response = await purchaseSubscriptionUseCase?.call(
+          productId: productId,
+        );
+        final message = response?['message'] ?? 'Subscription purchased';
+        VxToast.show(message: message, icon: Assets.icons.checkGreen.path);
+        emit(PokeLoaded());
+      } else {
+        VxToast.show(message: 'Purchase cancelled or failed');
+        emit(PokeError('Purchase cancelled or failed'));
+      }
     } catch (e) {
-      VxToast.show(message: 'Subscription failed: \\${e.toString()}');
+      VxToast.show(message: 'Subscription failed.');
+      emit(PokeError(e.toString()));
+    }
+    isSubscriptionPurchasing = false;
+  }
+
+  Future<void> restorePurchases() async {
+    isSubscriptionPurchasing = true;
+    emit(PokeLoading());
+    try {
+      final isSuccess = await IAPService.restorePurchases();
+      if (isSuccess) {
+        // Assume restoring also gives premium monthly for now.
+        await purchaseSubscriptionUseCase?.call(
+          productId: 'monthly',
+        );
+        VxToast.show(message: 'Purchases restored successfully', icon: Assets.icons.checkGreen.path);
+        emit(PokeLoaded());
+      } else {
+        VxToast.show(message: 'No active subscriptions found');
+        emit(PokeError('No active subscriptions found'));
+      }
+    } catch (e) {
+      VxToast.show(message: 'Failed to restore purchases');
       emit(PokeError(e.toString()));
     }
     isSubscriptionPurchasing = false;
