@@ -5,7 +5,8 @@ import 'package:fennac_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
 
 class PokeMessageBubble extends StatelessWidget {
-  const PokeMessageBubble({super.key});
+  final String? message;
+  const PokeMessageBubble({super.key, this.message});
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +24,7 @@ class PokeMessageBubble extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
           ),
           child: AppText(
-            text: 'Poking because overthinking a\nmessage seemed harder 😂',
+            text: message ?? 'Poking because overthinking a\nmessage seemed harder 😂',
             style: AppTextStyles.bodyRegular(context).copyWith(
               color: isLightTheme(context)
                   ? ColorPalette.black

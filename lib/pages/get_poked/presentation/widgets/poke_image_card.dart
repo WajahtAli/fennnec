@@ -5,15 +5,16 @@ import 'package:flutter/material.dart';
 
 class PokeImageCard extends StatelessWidget {
   final String imageUrl;
+  final bool isAsset;
 
-  const PokeImageCard({super.key, required this.imageUrl});
+  const PokeImageCard({super.key, required this.imageUrl, this.isAsset = true});
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       alignment: Alignment.topCenter,
       children: [
-        SizedBox(height: 260, width: 260),
+        const SizedBox(height: 260, width: 260),
         Transform.rotate(
           angle: -0.1,
           child: Container(
@@ -26,7 +27,7 @@ class PokeImageCard extends StatelessWidget {
                 width: 1,
               ),
               image: DecorationImage(
-                image: AssetImage(imageUrl),
+                image: isAsset ? AssetImage(imageUrl) as ImageProvider : NetworkImage(imageUrl),
                 fit: BoxFit.cover,
               ),
             ),

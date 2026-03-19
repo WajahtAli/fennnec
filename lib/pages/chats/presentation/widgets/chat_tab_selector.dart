@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../bloc/cubit/chat_landing_cubit.dart';
+import '../bloc/state/chat_landing_state.dart';
 
 class ChatTabSelector extends StatelessWidget {
   final String? title1;
@@ -16,7 +17,7 @@ class ChatTabSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder(
+    return BlocBuilder<ChatLandingCubit, ChatLandingState>(
       bloc: _chatLandingCubit,
       builder: (context, state) {
         return Container(
@@ -37,7 +38,7 @@ class ChatTabSelector extends StatelessWidget {
                   onTap: () => _chatLandingCubit.selectTab(0),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: _chatLandingCubit.selectedTabIndex == 0
+                      color: state.selectedTab == 0
                           ? ColorPalette.primary
                           : Colors.transparent,
                       borderRadius: BorderRadius.circular(100),
@@ -46,7 +47,7 @@ class ChatTabSelector extends StatelessWidget {
                     child: AppText(
                       text: title1 ?? 'Chats',
                       style: AppTextStyles.subHeading(context).copyWith(
-                        color: _chatLandingCubit.selectedTabIndex == 0
+                        color: state.selectedTab == 0
                             ? ColorPalette.white
                             : isLightTheme(context)
                             ? ColorPalette.black
@@ -61,7 +62,7 @@ class ChatTabSelector extends StatelessWidget {
                   onTap: () => _chatLandingCubit.selectTab(1),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: _chatLandingCubit.selectedTabIndex == 1
+                      color: state.selectedTab == 1
                           ? ColorPalette.primary
                           : isLightTheme(context)
                           ? ColorPalette.textSecondary
@@ -72,7 +73,7 @@ class ChatTabSelector extends StatelessWidget {
                     child: AppText(
                       text: title2 ?? 'Calls',
                       style: AppTextStyles.subHeading(context).copyWith(
-                        color: _chatLandingCubit.selectedTabIndex == 1
+                        color: state.selectedTab == 1
                             ? ColorPalette.white
                             : isLightTheme(context)
                             ? ColorPalette.black

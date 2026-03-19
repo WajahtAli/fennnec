@@ -9,7 +9,7 @@ import 'package:fennac_app/reusable_widgets/custom_video_player.dart';
 import 'package:fennac_app/widgets/prompt_audio_row.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:lottie/lottie.dart';
+import 'package:fennac_app/reusable_widgets/dynamic_ratio_image_widget.dart';
 
 class InterleavedMediaSection extends StatelessWidget {
   final List<String> bestShorts;
@@ -141,29 +141,10 @@ class _ImageItem extends StatelessWidget {
                       width: double.infinity,
                       fit: BoxFit.cover,
                     )
-                  : Image.network(
-                      imagePath,
-                      fit: BoxFit.cover,
+                  : DynamicRatioImageWidget(
+                      imageUrl: imagePath,
                       height: 400,
-                      width: double.infinity,
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return Container(
-                          height: 400,
-                          alignment: Alignment.center,
-                          child: Lottie.asset(Assets.animations.loadingSpinner),
-                        );
-                      },
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          height: 400,
-                          alignment: Alignment.center,
-                          child: const Icon(
-                            Icons.image_not_supported,
-                            color: Colors.grey,
-                          ),
-                        );
-                      },
+                      borderRadius: 16,
                     ),
             ),
           ),

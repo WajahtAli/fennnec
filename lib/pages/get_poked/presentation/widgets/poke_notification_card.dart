@@ -1,30 +1,25 @@
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
-import 'package:fennac_app/pages/home/data/models/groups_model.dart';
-import 'package:fennac_app/pages/home/presentation/blur_controller.dart';
-import 'package:fennac_app/pages/home/presentation/widgets/report_and_block_bottomsheet.dart';
-import 'package:fennac_app/pages/profile/presentation/widgets/full_profile_dialog.dart';
 import 'package:fennac_app/widgets/custom_elevated_button.dart';
 import 'package:fennac_app/widgets/custom_outlined_button.dart';
 import 'package:fennac_app/widgets/custom_sized_box.dart';
 import 'package:fennac_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
 import 'package:fennac_app/widgets/app_inkwell.dart';
+import 'package:fennac_app/pages/chats/data/models/chat_and_calls_response.dart';
 
 import '../../../../app/constants/media_query_constants.dart';
-import '../../../../core/di_container.dart';
-import '../../../home/presentation/bloc/cubit/home_cubit.dart';
 
 class PokeNotificationCard extends StatelessWidget {
-  final Group group;
-  final Member poker;
+  final PokerFromUser fromUser;
+  final PokedTargetDetail targetDetail;
   final VoidCallback onIgnore;
   final VoidCallback onStartChat;
 
   const PokeNotificationCard({
     super.key,
-    required this.group,
-    required this.poker,
+    required this.fromUser,
+    required this.targetDetail,
     required this.onIgnore,
     required this.onStartChat,
   });
@@ -73,7 +68,7 @@ class PokeNotificationCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       image: DecorationImage(
-                        image: AssetImage(poker.coverImage ?? ''),
+                        image: NetworkImage(fromUser.bestShorts.isNotEmpty ? fromUser.bestShorts.first : ''),
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -96,94 +91,87 @@ class PokeNotificationCard extends StatelessWidget {
                   ).copyWith(color: ColorPalette.textSecondary, height: 1.5),
                   children: [
                     TextSpan(
-                      text: poker.firstName,
-                      style: AppTextStyles.body(context),
+                      text: '${fromUser.firstName} ${fromUser.lastName ?? ''}',
+                      style: AppTextStyles.body(context).copyWith(fontWeight: FontWeight.bold),
                     ),
                     TextSpan(
                       text:
-                          ' poked you on your photo — guess it caught\nhis attention 👀',
+                          ' poked you on your ${targetDetail.type} — guess it caught\ntheir attention 👀',
                       style: AppTextStyles.body(context),
                     ),
                   ],
                 ),
               ),
               const CustomSizedBox(height: 24),
-              // Group Stack Container
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-                decoration: BoxDecoration(
-                  color: isLightTheme(context)
-                      ? ColorPalette.textGrey
-                      : ColorPalette.primary.withValues(
-                          alpha: 0.5,
-                        ), // Slightly lighter purple
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: Row(
-                  children: [
-                    SizedBox(
-                      height: 44,
-                      width: 130,
-                      child: Stack(
-                        children: List.generate(
-                          (group.members?.take(4).length ?? 0),
-                          (index) {
-                            return Positioned(
-                              left: index * 24.0,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: ColorPalette.secondary,
-                                    width: 2,
+              // Profile/Target Info Area
+              if (targetDetail.type == 'profile' && targetDetail.profile != null)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isLightTheme(context)
+                        ? ColorPalette.textGrey
+                        : ColorPalette.primary.withValues(
+                            alpha: 0.5,
+                          ),
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        height: 44,
+                        width: 130,
+                        child: Stack(
+                          children: List.generate(
+                            (targetDetail.profile!.bestShorts?.take(4).length ?? 0),
+                            (index) {
+                              return Positioned(
+                                left: index * 24.0,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: ColorPalette.secondary,
+                                      width: 2,
+                                    ),
+                                  ),
+                                  child: CircleAvatar(
+                                    radius: 20,
+                                    backgroundImage: NetworkImage(
+                                      targetDetail.profile!.bestShorts![index],
+                                    ),
                                   ),
                                 ),
-                                child: CircleAvatar(
-                                  radius: 20,
-                                  backgroundImage: AssetImage(
-                                    group.members?[index].coverImage ?? '',
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
+                              );
+                            },
+                          ),
                         ),
                       ),
-                    ),
-                    const Spacer(),
-                    AppInkWell(
-                      onTap: () {
-                        showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          backgroundColor: Colors.transparent,
-                          builder: (_) => FractionallySizedBox(
-                            heightFactor: 0.8,
-                            child: FullProfileDialog(),
-                          ),
-                        );
-                      },
-                      child: AppText(
-                        text: 'View Group Profile',
-                        style: AppTextStyles.bodySmall(
-                          context,
-                        ).copyWith(fontWeight: FontWeight.w600),
+                      const Spacer(),
+                      AppInkWell(
+                        onTap: () {
+                          // View Profile logic using targetDetail.profile
+                        },
+                        child: AppText(
+                          text: 'View Profile',
+                          style: AppTextStyles.bodySmall(
+                            context,
+                          ).copyWith(fontWeight: FontWeight.w600),
+                        ),
                       ),
-                    ),
-                    const CustomSizedBox(width: 4),
-                    Icon(
-                      Icons.arrow_outward_rounded,
-                      color: isLightTheme(context)
-                          ? ColorPalette.black
-                          : ColorPalette.white,
-                      size: 16,
-                    ),
-                  ],
+                      const CustomSizedBox(width: 4),
+                      Icon(
+                        Icons.arrow_outward_rounded,
+                        color: isLightTheme(context)
+                            ? ColorPalette.black
+                            : ColorPalette.white,
+                        size: 16,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
               const CustomSizedBox(height: 24),
               Row(
                 children: [
@@ -213,19 +201,7 @@ class PokeNotificationCard extends StatelessWidget {
               const CustomSizedBox(height: 16),
               AppInkWell(
                 onTap: () {
-                  final groupId = Di().sl<HomeCubit>().currentGroup?.id;
-                  if (groupId == null || groupId.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Unable to report this group right now.'),
-                      ),
-                    );
-                    return;
-                  }
-                  HomeBlurController.showWithBlur(
-                    context: context,
-                    builder: (_) => ReportAndBlockBottomSheet(groupId: ''),
-                  );
+                  // Report and Block
                 },
                 child: AppText(
                   text: 'Report and block',

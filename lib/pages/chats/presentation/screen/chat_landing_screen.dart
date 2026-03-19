@@ -31,6 +31,12 @@ class _ChatLandingScreenState extends State<ChatLandingScreen> {
   final ChatLandingCubit _chatLandingCubit = Di().sl<ChatLandingCubit>();
 
   @override
+  void initState() {
+    super.initState();
+    _chatLandingCubit.fetchChatsAndCalls();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ColorPalette.secondary,
@@ -46,9 +52,9 @@ class _ChatLandingScreenState extends State<ChatLandingScreen> {
                   ChatTabSelector(),
                   const CustomSizedBox(height: 8),
                   Expanded(
-                    child: _chatLandingCubit.selectedTabIndex == 0
-                        ? _buildChatsContent()
-                        : _buildCallsContent(),
+                    child: state.selectedTab == 0
+                        ? _buildChatsContent(state)
+                        : _buildCallsContent(state),
                   ),
                   CustomSizedBox(
                     height: MediaQuery.paddingOf(context).bottom + 30,
@@ -62,10 +68,10 @@ class _ChatLandingScreenState extends State<ChatLandingScreen> {
     );
   }
 
-  Widget _buildChatsContent() {
+  Widget _buildChatsContent(ChatLandingState state) {
     // Check if user is subscribed
     final isSubscribed =
-        _chatLandingCubit.subscriptionStatus == SubscriptionStatus.subscribed;
+        state.subscriptionStatus == SubscriptionStatus.subscribed;
 
     if (isSubscribed) {
       return const SubscribedChatWidget();
@@ -112,13 +118,13 @@ class _ChatLandingScreenState extends State<ChatLandingScreen> {
     );
   }
 
-  Widget _buildCallsContent() {
+  Widget _buildCallsContent(ChatLandingState state) {
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const CustomSizedBox(height: 12),
-          CustomSearchField(hintText: 'Search'),
+          const CustomSearchField(hintText: 'Search'),
 
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
@@ -130,8 +136,22 @@ class _ChatLandingScreenState extends State<ChatLandingScreen> {
             ),
           ),
 
-          ...DummyConstants.callHistory.map((call) {
-            if (call['isGroup']) {
+          if (state.isLoadingData && state.calls.isEmpty)
+            const Center(child: CircularProgressIndicator())
+          else if (state.calls.isEmpty)
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Text(
+                  'No call history yet',
+                  style: AppTextStyles.description(context),
+                ),
+              ),
+            )
+          else
+            ...state.calls.map((call) {
+              final isGroup =
+                  (call.members?.length ?? 0) > 1 || (call.name == null);
               return AppInkWell(
                 borderRadius: BorderRadius.circular(12),
                 onTap: () {
@@ -139,32 +159,17 @@ class _ChatLandingScreenState extends State<ChatLandingScreen> {
                   VxToast.show(message: 'Call feature coming soon!');
                 },
                 child: CallHistoryItem(
-                  names: List<String>.from(call['names']),
-                  callType: call['callType'],
-                  duration: call['duration'],
-                  timeAgo: call['timeAgo'],
-                  avatars: List<String>.from(call['avatars']),
-                  isGroup: true,
+                  name: call.name,
+                  names: call.members?.map((m) => m.name).toList(),
+                  callType: call.callTypeLabel,
+                  duration: call.duration,
+                  timeAgo: call.timeAgo ?? '',
+                  avatar: call.image,
+                  avatars: call.members?.map((m) => m.image).toList(),
+                  isGroup: isGroup,
                 ),
               );
-            } else {
-              return AppInkWell(
-                borderRadius: BorderRadius.circular(12),
-                onTap: () {
-                  if (!mounted) return;
-                  VxToast.show(message: 'Call feature coming soon!');
-                },
-                child: CallHistoryItem(
-                  name: call['name'],
-                  callType: call['callType'],
-                  duration: call['duration'],
-                  timeAgo: call['timeAgo'],
-                  avatar: call['avatar'],
-                  isGroup: false,
-                ),
-              );
-            }
-          }),
+            }),
           CustomSizedBox(height: MediaQuery.paddingOf(context).bottom + 30),
         ],
       ),

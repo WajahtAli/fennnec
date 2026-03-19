@@ -162,7 +162,7 @@ _PokeModel _$PokeModelFromJson(Map<String, dynamic> json) => _PokeModel(
   fromUserId: json['fromUserId'] as String,
   toUserId: json['toUserId'] as String,
   targetType: json['targetType'] as String,
-  targetId: json['targetId'] as String,
+  targetId: json['targetId'] as String?,
   message: json['message'] as String,
   status: json['status'] as String,
   createdAt: DateTime.parse(json['createdAt'] as String),
@@ -186,7 +186,7 @@ _PokerFromUser _$PokerFromUserFromJson(Map<String, dynamic> json) =>
     _PokerFromUser(
       id: json['id'] as String,
       firstName: json['firstName'] as String,
-      lastName: json['lastName'] as String,
+      lastName: json['lastName'] as String?,
       bestShorts: (json['bestShorts'] as List<dynamic>)
           .map((e) => e as String)
           .toList(),
@@ -209,6 +209,11 @@ _PokedTargetDetail _$PokedTargetDetailFromJson(Map<String, dynamic> json) =>
       audio: json['audio'] == null
           ? null
           : PokeAudioDetail.fromJson(json['audio'] as Map<String, dynamic>),
+      profile: json['profile'] == null
+          ? null
+          : PokedProfileDetail.fromJson(
+              json['profile'] as Map<String, dynamic>,
+            ),
       text: json['text'] as String?,
     );
 
@@ -217,7 +222,32 @@ Map<String, dynamic> _$PokedTargetDetailToJson(_PokedTargetDetail instance) =>
       'type': instance.type,
       'photo': instance.photo,
       'audio': instance.audio,
+      'profile': instance.profile,
       'text': instance.text,
+    };
+
+_PokedProfileDetail _$PokedProfileDetailFromJson(Map<String, dynamic> json) =>
+    _PokedProfileDetail(
+      id: json['_id'] as String,
+      firstName: json['firstName'] as String,
+      lastName: json['lastName'] as String?,
+      bestShorts: (json['bestShorts'] as List<dynamic>)
+          .map((e) => e as String)
+          .toList(),
+      shortBio: json['shortBio'] as String?,
+      lifestyleLikes: (json['lifestyleLikes'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList(),
+    );
+
+Map<String, dynamic> _$PokedProfileDetailToJson(_PokedProfileDetail instance) =>
+    <String, dynamic>{
+      '_id': instance.id,
+      'firstName': instance.firstName,
+      'lastName': instance.lastName,
+      'bestShorts': instance.bestShorts,
+      'shortBio': instance.shortBio,
+      'lifestyleLikes': instance.lifestyleLikes,
     };
 
 _PokePhotoDetail _$PokePhotoDetailFromJson(Map<String, dynamic> json) =>

@@ -26,6 +26,7 @@ import 'package:fennac_app/pages/buy_poke/domain/usecase/fetch_pokes_usecase.dar
 import 'package:fennac_app/pages/buy_poke/domain/usecase/purchase_pokes_usecase.dart';
 import 'package:fennac_app/pages/buy_poke/domain/usecase/send_poke_usecase.dart';
 import 'package:fennac_app/pages/buy_poke/presentation/bloc/cubit/poke_cubit.dart';
+import 'package:fennac_app/pages/get_poked/presentation/bloc/cubit/get_poked_details_cubit.dart';
 import 'package:fennac_app/pages/call/presentation/bloc/cubit/call_cubit.dart';
 import 'package:fennac_app/pages/chats/presentation/bloc/cubit/chat_landing_cubit.dart';
 import 'package:fennac_app/pages/chats/presentation/bloc/cubit/message_cubit.dart';
@@ -95,6 +96,7 @@ import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../bloc/cubit/background_cubit.dart';
+import '../pages/chats/data/repository/chat_repository.dart';
 import '../pages/home/domain/repository/groups_repository.dart'
     show GroupsRepository;
 import '../pages/home/domain/usecase/groups_usecase.dart';
@@ -294,5 +296,9 @@ class Di {
     sl.registerLazySingleton<GoogleMapCubit>(() => GoogleMapCubit());
     sl.registerLazySingleton<ContactListCubit>(() => ContactListCubit(sl()));
     sl.registerLazySingleton<PokeCubit>(() => PokeCubit(sl(), sl()));
+    sl.registerLazySingleton<GetPokedDetailsCubit>(
+      () => GetPokedDetailsCubit(sl()),
+    );
+    sl.registerLazySingleton<ChatRepository>(() => ChatRepositoryImpl(sl()));
   }
 }

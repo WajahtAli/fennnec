@@ -118,7 +118,7 @@ abstract class PokeModel with _$PokeModel {
     required String fromUserId,
     required String toUserId,
     required String targetType,
-    required String targetId,
+    String? targetId,
     required String message,
     required String status,
     required DateTime createdAt,
@@ -134,7 +134,7 @@ abstract class PokerFromUser with _$PokerFromUser {
   const factory PokerFromUser({
     required String id,
     required String firstName,
-    required String lastName,
+    String? lastName,
     required List<String> bestShorts,
   }) = _PokerFromUser;
 
@@ -148,11 +148,27 @@ abstract class PokedTargetDetail with _$PokedTargetDetail {
     required String type,
     PokePhotoDetail? photo,
     PokeAudioDetail? audio,
+    PokedProfileDetail? profile,
     String? text,
   }) = _PokedTargetDetail;
 
   factory PokedTargetDetail.fromJson(Map<String, dynamic> json) =>
       _$PokedTargetDetailFromJson(json);
+}
+
+@freezed
+abstract class PokedProfileDetail with _$PokedProfileDetail {
+  const factory PokedProfileDetail({
+    @JsonKey(name: '_id') required String id,
+    required String firstName,
+    String? lastName,
+    required List<String> bestShorts,
+    String? shortBio,
+    List<String>? lifestyleLikes,
+  }) = _PokedProfileDetail;
+
+  factory PokedProfileDetail.fromJson(Map<String, dynamic> json) =>
+      _$PokedProfileDetailFromJson(json);
 }
 
 @freezed

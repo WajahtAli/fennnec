@@ -2345,7 +2345,7 @@ $PokedTargetDetailCopyWith<$Res> get pokedTargetDetail {
 /// @nodoc
 mixin _$PokeModel {
 
- String get id; String get fromUserId; String get toUserId; String get targetType; String get targetId; String get message; String get status; DateTime get createdAt; DateTime get updatedAt;
+ String get id; String get fromUserId; String get toUserId; String get targetType; String? get targetId; String get message; String get status; DateTime get createdAt; DateTime get updatedAt;
 /// Create a copy of PokeModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -2378,7 +2378,7 @@ abstract mixin class $PokeModelCopyWith<$Res>  {
   factory $PokeModelCopyWith(PokeModel value, $Res Function(PokeModel) _then) = _$PokeModelCopyWithImpl;
 @useResult
 $Res call({
- String id, String fromUserId, String toUserId, String targetType, String targetId, String message, String status, DateTime createdAt, DateTime updatedAt
+ String id, String fromUserId, String toUserId, String targetType, String? targetId, String message, String status, DateTime createdAt, DateTime updatedAt
 });
 
 
@@ -2395,14 +2395,14 @@ class _$PokeModelCopyWithImpl<$Res>
 
 /// Create a copy of PokeModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? fromUserId = null,Object? toUserId = null,Object? targetType = null,Object? targetId = null,Object? message = null,Object? status = null,Object? createdAt = null,Object? updatedAt = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? fromUserId = null,Object? toUserId = null,Object? targetType = null,Object? targetId = freezed,Object? message = null,Object? status = null,Object? createdAt = null,Object? updatedAt = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,fromUserId: null == fromUserId ? _self.fromUserId : fromUserId // ignore: cast_nullable_to_non_nullable
 as String,toUserId: null == toUserId ? _self.toUserId : toUserId // ignore: cast_nullable_to_non_nullable
 as String,targetType: null == targetType ? _self.targetType : targetType // ignore: cast_nullable_to_non_nullable
-as String,targetId: null == targetId ? _self.targetId : targetId // ignore: cast_nullable_to_non_nullable
-as String,message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
+as String,targetId: freezed == targetId ? _self.targetId : targetId // ignore: cast_nullable_to_non_nullable
+as String?,message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
 as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as String,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
@@ -2491,7 +2491,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String fromUserId,  String toUserId,  String targetType,  String targetId,  String message,  String status,  DateTime createdAt,  DateTime updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String fromUserId,  String toUserId,  String targetType,  String? targetId,  String message,  String status,  DateTime createdAt,  DateTime updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PokeModel() when $default != null:
 return $default(_that.id,_that.fromUserId,_that.toUserId,_that.targetType,_that.targetId,_that.message,_that.status,_that.createdAt,_that.updatedAt);case _:
@@ -2512,7 +2512,7 @@ return $default(_that.id,_that.fromUserId,_that.toUserId,_that.targetType,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String fromUserId,  String toUserId,  String targetType,  String targetId,  String message,  String status,  DateTime createdAt,  DateTime updatedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String fromUserId,  String toUserId,  String targetType,  String? targetId,  String message,  String status,  DateTime createdAt,  DateTime updatedAt)  $default,) {final _that = this;
 switch (_that) {
 case _PokeModel():
 return $default(_that.id,_that.fromUserId,_that.toUserId,_that.targetType,_that.targetId,_that.message,_that.status,_that.createdAt,_that.updatedAt);case _:
@@ -2532,7 +2532,7 @@ return $default(_that.id,_that.fromUserId,_that.toUserId,_that.targetType,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String fromUserId,  String toUserId,  String targetType,  String targetId,  String message,  String status,  DateTime createdAt,  DateTime updatedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String fromUserId,  String toUserId,  String targetType,  String? targetId,  String message,  String status,  DateTime createdAt,  DateTime updatedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _PokeModel() when $default != null:
 return $default(_that.id,_that.fromUserId,_that.toUserId,_that.targetType,_that.targetId,_that.message,_that.status,_that.createdAt,_that.updatedAt);case _:
@@ -2547,14 +2547,14 @@ return $default(_that.id,_that.fromUserId,_that.toUserId,_that.targetType,_that.
 @JsonSerializable()
 
 class _PokeModel implements PokeModel {
-  const _PokeModel({required this.id, required this.fromUserId, required this.toUserId, required this.targetType, required this.targetId, required this.message, required this.status, required this.createdAt, required this.updatedAt});
+  const _PokeModel({required this.id, required this.fromUserId, required this.toUserId, required this.targetType, this.targetId, required this.message, required this.status, required this.createdAt, required this.updatedAt});
   factory _PokeModel.fromJson(Map<String, dynamic> json) => _$PokeModelFromJson(json);
 
 @override final  String id;
 @override final  String fromUserId;
 @override final  String toUserId;
 @override final  String targetType;
-@override final  String targetId;
+@override final  String? targetId;
 @override final  String message;
 @override final  String status;
 @override final  DateTime createdAt;
@@ -2593,7 +2593,7 @@ abstract mixin class _$PokeModelCopyWith<$Res> implements $PokeModelCopyWith<$Re
   factory _$PokeModelCopyWith(_PokeModel value, $Res Function(_PokeModel) _then) = __$PokeModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String fromUserId, String toUserId, String targetType, String targetId, String message, String status, DateTime createdAt, DateTime updatedAt
+ String id, String fromUserId, String toUserId, String targetType, String? targetId, String message, String status, DateTime createdAt, DateTime updatedAt
 });
 
 
@@ -2610,14 +2610,14 @@ class __$PokeModelCopyWithImpl<$Res>
 
 /// Create a copy of PokeModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? fromUserId = null,Object? toUserId = null,Object? targetType = null,Object? targetId = null,Object? message = null,Object? status = null,Object? createdAt = null,Object? updatedAt = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? fromUserId = null,Object? toUserId = null,Object? targetType = null,Object? targetId = freezed,Object? message = null,Object? status = null,Object? createdAt = null,Object? updatedAt = null,}) {
   return _then(_PokeModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,fromUserId: null == fromUserId ? _self.fromUserId : fromUserId // ignore: cast_nullable_to_non_nullable
 as String,toUserId: null == toUserId ? _self.toUserId : toUserId // ignore: cast_nullable_to_non_nullable
 as String,targetType: null == targetType ? _self.targetType : targetType // ignore: cast_nullable_to_non_nullable
-as String,targetId: null == targetId ? _self.targetId : targetId // ignore: cast_nullable_to_non_nullable
-as String,message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
+as String,targetId: freezed == targetId ? _self.targetId : targetId // ignore: cast_nullable_to_non_nullable
+as String?,message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
 as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as String,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
@@ -2632,7 +2632,7 @@ as DateTime,
 /// @nodoc
 mixin _$PokerFromUser {
 
- String get id; String get firstName; String get lastName; List<String> get bestShorts;
+ String get id; String get firstName; String? get lastName; List<String> get bestShorts;
 /// Create a copy of PokerFromUser
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -2665,7 +2665,7 @@ abstract mixin class $PokerFromUserCopyWith<$Res>  {
   factory $PokerFromUserCopyWith(PokerFromUser value, $Res Function(PokerFromUser) _then) = _$PokerFromUserCopyWithImpl;
 @useResult
 $Res call({
- String id, String firstName, String lastName, List<String> bestShorts
+ String id, String firstName, String? lastName, List<String> bestShorts
 });
 
 
@@ -2682,12 +2682,12 @@ class _$PokerFromUserCopyWithImpl<$Res>
 
 /// Create a copy of PokerFromUser
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? firstName = null,Object? lastName = null,Object? bestShorts = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? firstName = null,Object? lastName = freezed,Object? bestShorts = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,firstName: null == firstName ? _self.firstName : firstName // ignore: cast_nullable_to_non_nullable
-as String,lastName: null == lastName ? _self.lastName : lastName // ignore: cast_nullable_to_non_nullable
-as String,bestShorts: null == bestShorts ? _self.bestShorts : bestShorts // ignore: cast_nullable_to_non_nullable
+as String,lastName: freezed == lastName ? _self.lastName : lastName // ignore: cast_nullable_to_non_nullable
+as String?,bestShorts: null == bestShorts ? _self.bestShorts : bestShorts // ignore: cast_nullable_to_non_nullable
 as List<String>,
   ));
 }
@@ -2773,7 +2773,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String firstName,  String lastName,  List<String> bestShorts)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String firstName,  String? lastName,  List<String> bestShorts)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PokerFromUser() when $default != null:
 return $default(_that.id,_that.firstName,_that.lastName,_that.bestShorts);case _:
@@ -2794,7 +2794,7 @@ return $default(_that.id,_that.firstName,_that.lastName,_that.bestShorts);case _
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String firstName,  String lastName,  List<String> bestShorts)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String firstName,  String? lastName,  List<String> bestShorts)  $default,) {final _that = this;
 switch (_that) {
 case _PokerFromUser():
 return $default(_that.id,_that.firstName,_that.lastName,_that.bestShorts);case _:
@@ -2814,7 +2814,7 @@ return $default(_that.id,_that.firstName,_that.lastName,_that.bestShorts);case _
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String firstName,  String lastName,  List<String> bestShorts)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String firstName,  String? lastName,  List<String> bestShorts)?  $default,) {final _that = this;
 switch (_that) {
 case _PokerFromUser() when $default != null:
 return $default(_that.id,_that.firstName,_that.lastName,_that.bestShorts);case _:
@@ -2829,12 +2829,12 @@ return $default(_that.id,_that.firstName,_that.lastName,_that.bestShorts);case _
 @JsonSerializable()
 
 class _PokerFromUser implements PokerFromUser {
-  const _PokerFromUser({required this.id, required this.firstName, required this.lastName, required final  List<String> bestShorts}): _bestShorts = bestShorts;
+  const _PokerFromUser({required this.id, required this.firstName, this.lastName, required final  List<String> bestShorts}): _bestShorts = bestShorts;
   factory _PokerFromUser.fromJson(Map<String, dynamic> json) => _$PokerFromUserFromJson(json);
 
 @override final  String id;
 @override final  String firstName;
-@override final  String lastName;
+@override final  String? lastName;
  final  List<String> _bestShorts;
 @override List<String> get bestShorts {
   if (_bestShorts is EqualUnmodifiableListView) return _bestShorts;
@@ -2876,7 +2876,7 @@ abstract mixin class _$PokerFromUserCopyWith<$Res> implements $PokerFromUserCopy
   factory _$PokerFromUserCopyWith(_PokerFromUser value, $Res Function(_PokerFromUser) _then) = __$PokerFromUserCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String firstName, String lastName, List<String> bestShorts
+ String id, String firstName, String? lastName, List<String> bestShorts
 });
 
 
@@ -2893,12 +2893,12 @@ class __$PokerFromUserCopyWithImpl<$Res>
 
 /// Create a copy of PokerFromUser
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? firstName = null,Object? lastName = null,Object? bestShorts = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? firstName = null,Object? lastName = freezed,Object? bestShorts = null,}) {
   return _then(_PokerFromUser(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,firstName: null == firstName ? _self.firstName : firstName // ignore: cast_nullable_to_non_nullable
-as String,lastName: null == lastName ? _self.lastName : lastName // ignore: cast_nullable_to_non_nullable
-as String,bestShorts: null == bestShorts ? _self._bestShorts : bestShorts // ignore: cast_nullable_to_non_nullable
+as String,lastName: freezed == lastName ? _self.lastName : lastName // ignore: cast_nullable_to_non_nullable
+as String?,bestShorts: null == bestShorts ? _self._bestShorts : bestShorts // ignore: cast_nullable_to_non_nullable
 as List<String>,
   ));
 }
@@ -2910,7 +2910,7 @@ as List<String>,
 /// @nodoc
 mixin _$PokedTargetDetail {
 
- String get type; PokePhotoDetail? get photo; PokeAudioDetail? get audio; String? get text;
+ String get type; PokePhotoDetail? get photo; PokeAudioDetail? get audio; PokedProfileDetail? get profile; String? get text;
 /// Create a copy of PokedTargetDetail
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -2923,16 +2923,16 @@ $PokedTargetDetailCopyWith<PokedTargetDetail> get copyWith => _$PokedTargetDetai
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PokedTargetDetail&&(identical(other.type, type) || other.type == type)&&(identical(other.photo, photo) || other.photo == photo)&&(identical(other.audio, audio) || other.audio == audio)&&(identical(other.text, text) || other.text == text));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PokedTargetDetail&&(identical(other.type, type) || other.type == type)&&(identical(other.photo, photo) || other.photo == photo)&&(identical(other.audio, audio) || other.audio == audio)&&(identical(other.profile, profile) || other.profile == profile)&&(identical(other.text, text) || other.text == text));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,type,photo,audio,text);
+int get hashCode => Object.hash(runtimeType,type,photo,audio,profile,text);
 
 @override
 String toString() {
-  return 'PokedTargetDetail(type: $type, photo: $photo, audio: $audio, text: $text)';
+  return 'PokedTargetDetail(type: $type, photo: $photo, audio: $audio, profile: $profile, text: $text)';
 }
 
 
@@ -2943,11 +2943,11 @@ abstract mixin class $PokedTargetDetailCopyWith<$Res>  {
   factory $PokedTargetDetailCopyWith(PokedTargetDetail value, $Res Function(PokedTargetDetail) _then) = _$PokedTargetDetailCopyWithImpl;
 @useResult
 $Res call({
- String type, PokePhotoDetail? photo, PokeAudioDetail? audio, String? text
+ String type, PokePhotoDetail? photo, PokeAudioDetail? audio, PokedProfileDetail? profile, String? text
 });
 
 
-$PokePhotoDetailCopyWith<$Res>? get photo;$PokeAudioDetailCopyWith<$Res>? get audio;
+$PokePhotoDetailCopyWith<$Res>? get photo;$PokeAudioDetailCopyWith<$Res>? get audio;$PokedProfileDetailCopyWith<$Res>? get profile;
 
 }
 /// @nodoc
@@ -2960,12 +2960,13 @@ class _$PokedTargetDetailCopyWithImpl<$Res>
 
 /// Create a copy of PokedTargetDetail
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? type = null,Object? photo = freezed,Object? audio = freezed,Object? text = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? type = null,Object? photo = freezed,Object? audio = freezed,Object? profile = freezed,Object? text = freezed,}) {
   return _then(_self.copyWith(
 type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
 as String,photo: freezed == photo ? _self.photo : photo // ignore: cast_nullable_to_non_nullable
 as PokePhotoDetail?,audio: freezed == audio ? _self.audio : audio // ignore: cast_nullable_to_non_nullable
-as PokeAudioDetail?,text: freezed == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
+as PokeAudioDetail?,profile: freezed == profile ? _self.profile : profile // ignore: cast_nullable_to_non_nullable
+as PokedProfileDetail?,text: freezed == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -2992,6 +2993,18 @@ $PokeAudioDetailCopyWith<$Res>? get audio {
 
   return $PokeAudioDetailCopyWith<$Res>(_self.audio!, (value) {
     return _then(_self.copyWith(audio: value));
+  });
+}/// Create a copy of PokedTargetDetail
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$PokedProfileDetailCopyWith<$Res>? get profile {
+    if (_self.profile == null) {
+    return null;
+  }
+
+  return $PokedProfileDetailCopyWith<$Res>(_self.profile!, (value) {
+    return _then(_self.copyWith(profile: value));
   });
 }
 }
@@ -3075,10 +3088,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String type,  PokePhotoDetail? photo,  PokeAudioDetail? audio,  String? text)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String type,  PokePhotoDetail? photo,  PokeAudioDetail? audio,  PokedProfileDetail? profile,  String? text)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PokedTargetDetail() when $default != null:
-return $default(_that.type,_that.photo,_that.audio,_that.text);case _:
+return $default(_that.type,_that.photo,_that.audio,_that.profile,_that.text);case _:
   return orElse();
 
 }
@@ -3096,10 +3109,10 @@ return $default(_that.type,_that.photo,_that.audio,_that.text);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String type,  PokePhotoDetail? photo,  PokeAudioDetail? audio,  String? text)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String type,  PokePhotoDetail? photo,  PokeAudioDetail? audio,  PokedProfileDetail? profile,  String? text)  $default,) {final _that = this;
 switch (_that) {
 case _PokedTargetDetail():
-return $default(_that.type,_that.photo,_that.audio,_that.text);case _:
+return $default(_that.type,_that.photo,_that.audio,_that.profile,_that.text);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -3116,10 +3129,10 @@ return $default(_that.type,_that.photo,_that.audio,_that.text);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String type,  PokePhotoDetail? photo,  PokeAudioDetail? audio,  String? text)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String type,  PokePhotoDetail? photo,  PokeAudioDetail? audio,  PokedProfileDetail? profile,  String? text)?  $default,) {final _that = this;
 switch (_that) {
 case _PokedTargetDetail() when $default != null:
-return $default(_that.type,_that.photo,_that.audio,_that.text);case _:
+return $default(_that.type,_that.photo,_that.audio,_that.profile,_that.text);case _:
   return null;
 
 }
@@ -3131,12 +3144,13 @@ return $default(_that.type,_that.photo,_that.audio,_that.text);case _:
 @JsonSerializable()
 
 class _PokedTargetDetail implements PokedTargetDetail {
-  const _PokedTargetDetail({required this.type, this.photo, this.audio, this.text});
+  const _PokedTargetDetail({required this.type, this.photo, this.audio, this.profile, this.text});
   factory _PokedTargetDetail.fromJson(Map<String, dynamic> json) => _$PokedTargetDetailFromJson(json);
 
 @override final  String type;
 @override final  PokePhotoDetail? photo;
 @override final  PokeAudioDetail? audio;
+@override final  PokedProfileDetail? profile;
 @override final  String? text;
 
 /// Create a copy of PokedTargetDetail
@@ -3152,16 +3166,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PokedTargetDetail&&(identical(other.type, type) || other.type == type)&&(identical(other.photo, photo) || other.photo == photo)&&(identical(other.audio, audio) || other.audio == audio)&&(identical(other.text, text) || other.text == text));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PokedTargetDetail&&(identical(other.type, type) || other.type == type)&&(identical(other.photo, photo) || other.photo == photo)&&(identical(other.audio, audio) || other.audio == audio)&&(identical(other.profile, profile) || other.profile == profile)&&(identical(other.text, text) || other.text == text));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,type,photo,audio,text);
+int get hashCode => Object.hash(runtimeType,type,photo,audio,profile,text);
 
 @override
 String toString() {
-  return 'PokedTargetDetail(type: $type, photo: $photo, audio: $audio, text: $text)';
+  return 'PokedTargetDetail(type: $type, photo: $photo, audio: $audio, profile: $profile, text: $text)';
 }
 
 
@@ -3172,11 +3186,11 @@ abstract mixin class _$PokedTargetDetailCopyWith<$Res> implements $PokedTargetDe
   factory _$PokedTargetDetailCopyWith(_PokedTargetDetail value, $Res Function(_PokedTargetDetail) _then) = __$PokedTargetDetailCopyWithImpl;
 @override @useResult
 $Res call({
- String type, PokePhotoDetail? photo, PokeAudioDetail? audio, String? text
+ String type, PokePhotoDetail? photo, PokeAudioDetail? audio, PokedProfileDetail? profile, String? text
 });
 
 
-@override $PokePhotoDetailCopyWith<$Res>? get photo;@override $PokeAudioDetailCopyWith<$Res>? get audio;
+@override $PokePhotoDetailCopyWith<$Res>? get photo;@override $PokeAudioDetailCopyWith<$Res>? get audio;@override $PokedProfileDetailCopyWith<$Res>? get profile;
 
 }
 /// @nodoc
@@ -3189,12 +3203,13 @@ class __$PokedTargetDetailCopyWithImpl<$Res>
 
 /// Create a copy of PokedTargetDetail
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? type = null,Object? photo = freezed,Object? audio = freezed,Object? text = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? type = null,Object? photo = freezed,Object? audio = freezed,Object? profile = freezed,Object? text = freezed,}) {
   return _then(_PokedTargetDetail(
 type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
 as String,photo: freezed == photo ? _self.photo : photo // ignore: cast_nullable_to_non_nullable
 as PokePhotoDetail?,audio: freezed == audio ? _self.audio : audio // ignore: cast_nullable_to_non_nullable
-as PokeAudioDetail?,text: freezed == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
+as PokeAudioDetail?,profile: freezed == profile ? _self.profile : profile // ignore: cast_nullable_to_non_nullable
+as PokedProfileDetail?,text: freezed == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -3223,7 +3238,311 @@ $PokeAudioDetailCopyWith<$Res>? get audio {
   return $PokeAudioDetailCopyWith<$Res>(_self.audio!, (value) {
     return _then(_self.copyWith(audio: value));
   });
+}/// Create a copy of PokedTargetDetail
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$PokedProfileDetailCopyWith<$Res>? get profile {
+    if (_self.profile == null) {
+    return null;
+  }
+
+  return $PokedProfileDetailCopyWith<$Res>(_self.profile!, (value) {
+    return _then(_self.copyWith(profile: value));
+  });
 }
+}
+
+
+/// @nodoc
+mixin _$PokedProfileDetail {
+
+@JsonKey(name: '_id') String get id; String get firstName; String? get lastName; List<String> get bestShorts; String? get shortBio; List<String>? get lifestyleLikes;
+/// Create a copy of PokedProfileDetail
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$PokedProfileDetailCopyWith<PokedProfileDetail> get copyWith => _$PokedProfileDetailCopyWithImpl<PokedProfileDetail>(this as PokedProfileDetail, _$identity);
+
+  /// Serializes this PokedProfileDetail to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PokedProfileDetail&&(identical(other.id, id) || other.id == id)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&const DeepCollectionEquality().equals(other.bestShorts, bestShorts)&&(identical(other.shortBio, shortBio) || other.shortBio == shortBio)&&const DeepCollectionEquality().equals(other.lifestyleLikes, lifestyleLikes));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,firstName,lastName,const DeepCollectionEquality().hash(bestShorts),shortBio,const DeepCollectionEquality().hash(lifestyleLikes));
+
+@override
+String toString() {
+  return 'PokedProfileDetail(id: $id, firstName: $firstName, lastName: $lastName, bestShorts: $bestShorts, shortBio: $shortBio, lifestyleLikes: $lifestyleLikes)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $PokedProfileDetailCopyWith<$Res>  {
+  factory $PokedProfileDetailCopyWith(PokedProfileDetail value, $Res Function(PokedProfileDetail) _then) = _$PokedProfileDetailCopyWithImpl;
+@useResult
+$Res call({
+@JsonKey(name: '_id') String id, String firstName, String? lastName, List<String> bestShorts, String? shortBio, List<String>? lifestyleLikes
+});
+
+
+
+
+}
+/// @nodoc
+class _$PokedProfileDetailCopyWithImpl<$Res>
+    implements $PokedProfileDetailCopyWith<$Res> {
+  _$PokedProfileDetailCopyWithImpl(this._self, this._then);
+
+  final PokedProfileDetail _self;
+  final $Res Function(PokedProfileDetail) _then;
+
+/// Create a copy of PokedProfileDetail
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? firstName = null,Object? lastName = freezed,Object? bestShorts = null,Object? shortBio = freezed,Object? lifestyleLikes = freezed,}) {
+  return _then(_self.copyWith(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,firstName: null == firstName ? _self.firstName : firstName // ignore: cast_nullable_to_non_nullable
+as String,lastName: freezed == lastName ? _self.lastName : lastName // ignore: cast_nullable_to_non_nullable
+as String?,bestShorts: null == bestShorts ? _self.bestShorts : bestShorts // ignore: cast_nullable_to_non_nullable
+as List<String>,shortBio: freezed == shortBio ? _self.shortBio : shortBio // ignore: cast_nullable_to_non_nullable
+as String?,lifestyleLikes: freezed == lifestyleLikes ? _self.lifestyleLikes : lifestyleLikes // ignore: cast_nullable_to_non_nullable
+as List<String>?,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [PokedProfileDetail].
+extension PokedProfileDetailPatterns on PokedProfileDetail {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _PokedProfileDetail value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _PokedProfileDetail() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _PokedProfileDetail value)  $default,){
+final _that = this;
+switch (_that) {
+case _PokedProfileDetail():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _PokedProfileDetail value)?  $default,){
+final _that = this;
+switch (_that) {
+case _PokedProfileDetail() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: '_id')  String id,  String firstName,  String? lastName,  List<String> bestShorts,  String? shortBio,  List<String>? lifestyleLikes)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _PokedProfileDetail() when $default != null:
+return $default(_that.id,_that.firstName,_that.lastName,_that.bestShorts,_that.shortBio,_that.lifestyleLikes);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: '_id')  String id,  String firstName,  String? lastName,  List<String> bestShorts,  String? shortBio,  List<String>? lifestyleLikes)  $default,) {final _that = this;
+switch (_that) {
+case _PokedProfileDetail():
+return $default(_that.id,_that.firstName,_that.lastName,_that.bestShorts,_that.shortBio,_that.lifestyleLikes);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: '_id')  String id,  String firstName,  String? lastName,  List<String> bestShorts,  String? shortBio,  List<String>? lifestyleLikes)?  $default,) {final _that = this;
+switch (_that) {
+case _PokedProfileDetail() when $default != null:
+return $default(_that.id,_that.firstName,_that.lastName,_that.bestShorts,_that.shortBio,_that.lifestyleLikes);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _PokedProfileDetail implements PokedProfileDetail {
+  const _PokedProfileDetail({@JsonKey(name: '_id') required this.id, required this.firstName, this.lastName, required final  List<String> bestShorts, this.shortBio, final  List<String>? lifestyleLikes}): _bestShorts = bestShorts,_lifestyleLikes = lifestyleLikes;
+  factory _PokedProfileDetail.fromJson(Map<String, dynamic> json) => _$PokedProfileDetailFromJson(json);
+
+@override@JsonKey(name: '_id') final  String id;
+@override final  String firstName;
+@override final  String? lastName;
+ final  List<String> _bestShorts;
+@override List<String> get bestShorts {
+  if (_bestShorts is EqualUnmodifiableListView) return _bestShorts;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_bestShorts);
+}
+
+@override final  String? shortBio;
+ final  List<String>? _lifestyleLikes;
+@override List<String>? get lifestyleLikes {
+  final value = _lifestyleLikes;
+  if (value == null) return null;
+  if (_lifestyleLikes is EqualUnmodifiableListView) return _lifestyleLikes;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(value);
+}
+
+
+/// Create a copy of PokedProfileDetail
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$PokedProfileDetailCopyWith<_PokedProfileDetail> get copyWith => __$PokedProfileDetailCopyWithImpl<_PokedProfileDetail>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$PokedProfileDetailToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PokedProfileDetail&&(identical(other.id, id) || other.id == id)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&const DeepCollectionEquality().equals(other._bestShorts, _bestShorts)&&(identical(other.shortBio, shortBio) || other.shortBio == shortBio)&&const DeepCollectionEquality().equals(other._lifestyleLikes, _lifestyleLikes));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,firstName,lastName,const DeepCollectionEquality().hash(_bestShorts),shortBio,const DeepCollectionEquality().hash(_lifestyleLikes));
+
+@override
+String toString() {
+  return 'PokedProfileDetail(id: $id, firstName: $firstName, lastName: $lastName, bestShorts: $bestShorts, shortBio: $shortBio, lifestyleLikes: $lifestyleLikes)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$PokedProfileDetailCopyWith<$Res> implements $PokedProfileDetailCopyWith<$Res> {
+  factory _$PokedProfileDetailCopyWith(_PokedProfileDetail value, $Res Function(_PokedProfileDetail) _then) = __$PokedProfileDetailCopyWithImpl;
+@override @useResult
+$Res call({
+@JsonKey(name: '_id') String id, String firstName, String? lastName, List<String> bestShorts, String? shortBio, List<String>? lifestyleLikes
+});
+
+
+
+
+}
+/// @nodoc
+class __$PokedProfileDetailCopyWithImpl<$Res>
+    implements _$PokedProfileDetailCopyWith<$Res> {
+  __$PokedProfileDetailCopyWithImpl(this._self, this._then);
+
+  final _PokedProfileDetail _self;
+  final $Res Function(_PokedProfileDetail) _then;
+
+/// Create a copy of PokedProfileDetail
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? firstName = null,Object? lastName = freezed,Object? bestShorts = null,Object? shortBio = freezed,Object? lifestyleLikes = freezed,}) {
+  return _then(_PokedProfileDetail(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,firstName: null == firstName ? _self.firstName : firstName // ignore: cast_nullable_to_non_nullable
+as String,lastName: freezed == lastName ? _self.lastName : lastName // ignore: cast_nullable_to_non_nullable
+as String?,bestShorts: null == bestShorts ? _self._bestShorts : bestShorts // ignore: cast_nullable_to_non_nullable
+as List<String>,shortBio: freezed == shortBio ? _self.shortBio : shortBio // ignore: cast_nullable_to_non_nullable
+as String?,lifestyleLikes: freezed == lifestyleLikes ? _self._lifestyleLikes : lifestyleLikes // ignore: cast_nullable_to_non_nullable
+as List<String>?,
+  ));
+}
+
+
 }
 
 

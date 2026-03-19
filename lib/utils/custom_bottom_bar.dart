@@ -27,7 +27,7 @@ class CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
       height: 64,
-
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(32)),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(32),
@@ -53,7 +53,7 @@ class CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
               ],
             ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: widget.items.asMap().entries.map((entry) {
                 int index = entry.key;
                 BottomNavItem item = entry.value;
@@ -62,63 +62,58 @@ class CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
                 return Expanded(
                   child: GestureDetector(
                     onTap: () => widget.onTap(index),
-                    child: Container(
-                      color: Colors.transparent,
-                      child: Center(
-                        child: AnimatedContainer(
-                          height: 56,
-                          constraints: const BoxConstraints(
-                            minWidth: 110,
-                            maxWidth: 140,
+                    child: AnimatedContainer(
+                      height: 56,
+                      // constraints: const BoxConstraints(
+                      //   minWidth: 110,
+                      //   maxWidth: 140,
+                      // ),
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: isSelected ? 20 : 16,
+                        vertical: 12,
+                      ),
+                      decoration: BoxDecoration(
+                        gradient: isSelected
+                            ? LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  ColorPalette.primary,
+                                  ColorPalette.secondary,
+                                ],
+                              )
+                            : null,
+                        borderRadius: BorderRadius.circular(36),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SvgPicture.asset(
+                            item.iconPath,
+                            colorFilter: ColorFilter.mode(
+                              Theme.of(context).brightness ==
+                                          Brightness.light &&
+                                      !isSelected
+                                  ? ColorPalette.primary
+                                  : isSelected
+                                  ? ColorPalette.white
+                                  : ColorPalette.white,
+                              BlendMode.srcIn,
+                            ),
+                            width: 24,
+                            height: 24,
                           ),
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                          padding: EdgeInsets.symmetric(
-                            horizontal: isSelected ? 20 : 16,
-                            vertical: 12,
-                          ),
-                          decoration: BoxDecoration(
-                            gradient: isSelected
-                                ? LinearGradient(
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                    colors: [
-                                      ColorPalette.primary,
-                                      ColorPalette.secondary,
-                                    ],
-                                  )
-                                : null,
-                            borderRadius: BorderRadius.circular(24),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SvgPicture.asset(
-                                item.iconPath,
-                                colorFilter: ColorFilter.mode(
-                                  Theme.of(context).brightness ==
-                                              Brightness.light &&
-                                          !isSelected
-                                      ? ColorPalette.primary
-                                      : isSelected
-                                      ? ColorPalette.white
-                                      : ColorPalette.white,
-                                  BlendMode.srcIn,
-                                ),
-                                width: 24,
-                                height: 24,
-                              ),
-                              if (isSelected && item.label != null) ...[
-                                const SizedBox(width: 8),
-                                Text(
-                                  item.label!,
-                                  style: AppTextStyles.bodyRegular(context),
-                                ),
-                              ],
-                            ],
-                          ),
-                        ),
+                          if (isSelected && item.label != null) ...[
+                            const SizedBox(width: 8),
+                            Text(
+                              item.label!,
+                              style: AppTextStyles.bodyRegular(context),
+                            ),
+                          ],
+                        ],
                       ),
                     ),
                   ),

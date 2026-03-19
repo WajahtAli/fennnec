@@ -7,7 +7,6 @@ import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
-import 'package:fennac_app/helpers/cached_network_image_helper.dart';
 import 'package:fennac_app/helpers/gradient_toast.dart';
 import 'package:fennac_app/pages/create_group/presentation/screen/create_group_gallery_screen.dart';
 import 'package:fennac_app/pages/my_group/presentation/bloc/cubit/my_group_cubit.dart';
@@ -21,6 +20,7 @@ import 'package:fennac_app/widgets/movable_background.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:fennac_app/reusable_widgets/dynamic_ratio_image_widget.dart';
 
 import 'dart:math' as math;
 import 'package:fennac_app/pages/kyc/presentation/bloc/cubit/kyc_prompt_cubit.dart';
@@ -195,13 +195,12 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
               color: isDarkTheme(context) ? Colors.grey[800] : Colors.grey[300],
               borderRadius: BorderRadius.circular(24),
             ),
-            child: avatarPath.startsWith('http')
-                ? CachedImageHelper(
-                    imageUrl: avatarPath,
-                    fit: BoxFit.cover,
-                    radius: 24,
-                  )
-                : Image.asset(avatarPath, fit: BoxFit.cover),
+            child: DynamicRatioImageWidget(
+              imageUrl: avatarPath,
+              isAsset: !avatarPath.startsWith('http'),
+              height: 250,
+              borderRadius: 24,
+            ),
           ),
         ),
         if (canEditPhotos)
@@ -266,7 +265,7 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
     int promptIdx = 0;
     while (imgIdx < photosVideos.length || promptIdx < prompts.length) {
       // Add two images
-      for (int i = 0; i < 2 && imgIdx < photosVideos.length; i++) {
+      for (int i = 0; i < 1 && imgIdx < photosVideos.length; i++) {
         combinedList.add({'type': 'image', 'data': photosVideos[imgIdx]});
         imgIdx++;
       }
@@ -307,13 +306,12 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
                         : Colors.grey[300],
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  child: imagePath.startsWith('http')
-                      ? CachedImageHelper(
-                          imageUrl: imagePath,
-                          fit: BoxFit.cover,
-                          radius: 16,
-                        )
-                      : Image.asset(imagePath, fit: BoxFit.cover),
+                  child: DynamicRatioImageWidget(
+                    imageUrl: imagePath,
+                    isAsset: !imagePath.startsWith('http'),
+                    height: 400,
+                    borderRadius: 16,
+                  ),
                 ),
               ),
               if (canEditPhotos)

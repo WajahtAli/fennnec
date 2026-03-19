@@ -129,7 +129,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
           BlocBuilder<ChatLandingCubit, ChatLandingState>(
             bloc: Di().sl<ChatLandingCubit>(),
             builder: (context, state) {
-              final selectedTab = Di().sl<ChatLandingCubit>().selectedTabIndex;
+              final selectedTab = state.selectedTab;
               return selectedTab == 0
                   ? _buildAboutThisGroupContent(context)
                   : _buildSharedMediaContent(context);

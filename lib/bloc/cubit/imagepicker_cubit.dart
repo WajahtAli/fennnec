@@ -3,14 +3,12 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:fennac_app/app/app.dart';
-import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/bloc/state/imagepicker_state.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:image_cropper/image_cropper.dart';
 import 'package:giphy_get/giphy_get.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -30,7 +28,6 @@ class ImagePickerCubit extends Cubit<ImagePickerState> {
   ImagePickerCubit() : super(ImagePickerInitial());
 
   final ImagePicker _imagePicker = ImagePicker();
-  final ImageCropper _imageCropper = ImageCropper();
   List<MediaItem> mediaList = [];
   File? selectedImage;
 
@@ -54,50 +51,7 @@ class ImagePickerCubit extends Cubit<ImagePickerState> {
     emit(ImagePickerError(message, mediaList: _snapshotMediaList()));
   }
 
-  /// Crop image with selectable aspect ratios.
-  Future<String?> cropImage(String sourcePath) async {
-    try {
-      final sourceFile = File(sourcePath);
-      if (!await sourceFile.exists()) {
-        debugPrint('Source file does not exist: $sourcePath');
-        return null;
-      }
 
-      final croppedFile = await _imageCropper.cropImage(
-        sourcePath: sourcePath,
-        uiSettings: [
-          AndroidUiSettings(
-            backgroundColor: ColorPalette.secondary,
-            toolbarColor: ColorPalette.secondary,
-            toolbarTitle: 'Crop Image',
-            lockAspectRatio: false,
-            hideBottomControls: false,
-            toolbarWidgetColor: Colors.white,
-            statusBarLight: true,
-            initAspectRatio: CropAspectRatioPreset.square,
-            aspectRatioPresets: [
-              CropAspectRatioPreset.square,
-              CropAspectRatioPreset.ratio16x9,
-            ],
-          ),
-          IOSUiSettings(
-            title: 'Crop Image',
-            aspectRatioLockEnabled: false,
-            resetAspectRatioEnabled: true,
-            aspectRatioPresets: [
-              CropAspectRatioPreset.square,
-              CropAspectRatioPreset.ratio16x9,
-            ],
-          ),
-        ],
-      );
-
-      return croppedFile?.path;
-    } catch (e) {
-      debugPrint('Error while cropping image: $e');
-      return null;
-    }
-  }
 
   /// Pick single image from gallery and add to specific index
   Future<void> pickImagesFromGallery({int? containerIndex}) async {
@@ -139,7 +93,7 @@ class ImagePickerCubit extends Cubit<ImagePickerState> {
       int currentIndex = containerIndex ?? mediaList.length;
 
       for (final file in pickedFiles) {
-        final croppedPath = await cropImage(file.path) ?? file.path;
+        final croppedPath = file.path;
 
         final newItem = MediaItem(
           path: croppedPath,
@@ -245,7 +199,7 @@ class ImagePickerCubit extends Cubit<ImagePickerState> {
         return;
       }
 
-      final croppedPath = await cropImage(pickedFile.path) ?? pickedFile.path;
+      final croppedPath = pickedFile.path;
 
       final newItem = MediaItem(
         path: croppedPath,

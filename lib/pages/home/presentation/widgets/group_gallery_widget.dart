@@ -7,7 +7,6 @@ import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/bloc/cubit/wave_form_cubit.dart';
 import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
-import 'package:fennac_app/helpers/cached_network_image_helper.dart';
 import 'package:fennac_app/helpers/gradient_toast.dart';
 import 'package:fennac_app/pages/home/presentation/bloc/cubit/home_cubit.dart';
 import 'package:fennac_app/pages/home/presentation/widgets/report_and_block_bottomsheet.dart';
@@ -23,6 +22,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:fennac_app/core/extensions/string_extension.dart';
 import 'package:fennac_app/reusable_widgets/custom_video_player.dart';
+import 'package:fennac_app/reusable_widgets/dynamic_ratio_image_widget.dart';
 
 import '../../../../bloc/state/wave_form_state.dart';
 import '../bloc/state/home_state.dart';
@@ -139,23 +139,12 @@ class GroupGalleryWidget extends StatelessWidget {
                                   fit: BoxFit.cover,
                                 ),
                               )
-                            : (item.startsWith('assets/')
-                                  ? ClipRRect(
-                                      borderRadius: BorderRadius.circular(24),
-                                      child: Image.asset(
-                                        item,
-                                        width: double.infinity,
-                                        height: 450,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    )
-                                  : CachedImageHelper(
-                                      imageUrl: item,
-                                      width: double.infinity,
-                                      fit: BoxFit.cover,
-                                      height: 450,
-                                      radius: 24,
-                                    )),
+                            : DynamicRatioImageWidget(
+                                imageUrl: item,
+                                isAsset: item.startsWith('assets/'),
+                                height: 450,
+                                borderRadius: 24,
+                              ),
                         if (isShowEditButton == true)
                           Positioned(
                             top: 16,
@@ -233,7 +222,7 @@ class GroupGalleryWidget extends StatelessWidget {
     int promptIndex = 0;
 
     while (imageIndex < images.length || promptIndex < prompts.length) {
-      for (int i = 0; i < 2 && imageIndex < images.length; i++) {
+      for (int i = 0; i < 1 && imageIndex < images.length; i++) {
         interleavedItems.add(images[imageIndex++]);
       }
 
@@ -282,12 +271,11 @@ class GroupGalleryWidget extends StatelessWidget {
                               fit: BoxFit.cover,
                             ),
                           )
-                        : CachedImageHelper(
+                        : DynamicRatioImageWidget(
                             imageUrl: item,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
+                            isAsset: item.startsWith('assets/'),
                             height: 450,
-                            radius: 24,
+                            borderRadius: 24,
                           ),
 
                     if (isShowEditButton == true)

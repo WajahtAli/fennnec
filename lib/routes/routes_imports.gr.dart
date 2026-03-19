@@ -585,11 +585,12 @@ class FindGroupRouteArgs {
 class GetPockedRoute extends _i50.PageRouteInfo<GetPockedRouteArgs> {
   GetPockedRoute({
     _i51.Key? key,
-    required _i53.Group group,
+    _i53.Group? group,
+    String? pokeId,
     List<_i50.PageRouteInfo>? children,
   }) : super(
          GetPockedRoute.name,
-         args: GetPockedRouteArgs(key: key, group: group),
+         args: GetPockedRouteArgs(key: key, group: group, pokeId: pokeId),
          initialChildren: children,
        );
 
@@ -598,33 +599,41 @@ class GetPockedRoute extends _i50.PageRouteInfo<GetPockedRouteArgs> {
   static _i50.PageInfo page = _i50.PageInfo(
     name,
     builder: (data) {
-      final args = data.argsAs<GetPockedRouteArgs>();
-      return _i20.GetPockedScreen(key: args.key, group: args.group);
+      final args = data.argsAs<GetPockedRouteArgs>(
+        orElse: () => const GetPockedRouteArgs(),
+      );
+      return _i20.GetPockedScreen(
+        key: args.key,
+        group: args.group,
+        pokeId: args.pokeId,
+      );
     },
   );
 }
 
 class GetPockedRouteArgs {
-  const GetPockedRouteArgs({this.key, required this.group});
+  const GetPockedRouteArgs({this.key, this.group, this.pokeId});
 
   final _i51.Key? key;
 
-  final _i53.Group group;
+  final _i53.Group? group;
+
+  final String? pokeId;
 
   @override
   String toString() {
-    return 'GetPockedRouteArgs{key: $key, group: $group}';
+    return 'GetPockedRouteArgs{key: $key, group: $group, pokeId: $pokeId}';
   }
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other is! GetPockedRouteArgs) return false;
-    return key == other.key && group == other.group;
+    return key == other.key && group == other.group && pokeId == other.pokeId;
   }
 
   @override
-  int get hashCode => key.hashCode ^ group.hashCode;
+  int get hashCode => key.hashCode ^ group.hashCode ^ pokeId.hashCode;
 }
 
 /// generated route for
