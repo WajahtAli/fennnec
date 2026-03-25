@@ -55,26 +55,26 @@ abstract class MemberModel with _$MemberModel {
   }) = _MemberModel;
 
   factory MemberModel.fromJson(Map<String, dynamic> json) =>
-      _$MemberModelFromJson(json);
+      _$MemberModelFromJson({...json, 'id': json['id'] ?? json['_id'] ?? ''});
 }
 
 @freezed
 abstract class CallUserInfo with _$CallUserInfo {
   const factory CallUserInfo({
-    @JsonKey(name: '_id') required String id,
+    required String id,
     required String firstName,
     String? lastName,
     @Default([]) List<String> bestShorts,
   }) = _CallUserInfo;
 
   factory CallUserInfo.fromJson(Map<String, dynamic> json) =>
-      _$CallUserInfoFromJson(json);
+      _$CallUserInfoFromJson({...json, 'id': json['id'] ?? json['_id'] ?? ''});
 }
 
 @freezed
 abstract class CallModel with _$CallModel {
   const factory CallModel({
-    @JsonKey(name: '_id') required String id,
+    required String id,
     String? name,
     String? image,
     List<MemberModel>? members,
@@ -91,7 +91,7 @@ abstract class CallModel with _$CallModel {
   }) = _CallModel;
 
   factory CallModel.fromJson(Map<String, dynamic> json) =>
-      _$CallModelFromJson(json);
+      _$CallModelFromJson({...json, 'id': json['id'] ?? json['_id'] ?? ''});
 }
 
 @freezed
@@ -179,7 +179,7 @@ abstract class PokedTargetDetail with _$PokedTargetDetail {
 @freezed
 abstract class PokedProfileDetail with _$PokedProfileDetail {
   const factory PokedProfileDetail({
-    @JsonKey(name: '_id') required String id,
+    required String id,
     required String firstName,
     String? lastName,
     required List<String> bestShorts,
@@ -188,7 +188,10 @@ abstract class PokedProfileDetail with _$PokedProfileDetail {
   }) = _PokedProfileDetail;
 
   factory PokedProfileDetail.fromJson(Map<String, dynamic> json) =>
-      _$PokedProfileDetailFromJson(json);
+      _$PokedProfileDetailFromJson({
+        ...json,
+        'id': json['id'] ?? json['_id'] ?? '',
+      });
 }
 
 @freezed
