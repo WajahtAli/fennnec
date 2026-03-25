@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fennac_app/pages/home/data/models/groups_model.dart';
 import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/pages/home/presentation/bloc/cubit/home_cubit.dart';
+import '../../../../liked_groups/presentation/bloc/cubit/liked_groups_cubit.dart';
 import '../../../domain/usecase/groups_usecase.dart';
 import '../state/groups_state.dart';
 
@@ -22,13 +23,15 @@ class GroupsCubit extends Cubit<GroupsState> {
   }) async {
     emit(GroupsLoading());
     try {
-      final result = await _groupsUsecase.fetchAllGroups(
-        page: page,
-        limit: limit,
-        queryParameters: queryParameters,
-      );
-      groupsModel = result;
-      final groups = result.data?.groups ?? [];
+      // final result = await _groupsUsecase.fetchAllGroups(
+      //   page: page,
+      //   limit: limit,
+      //   queryParameters: queryParameters,
+      // );
+      await Di().sl<LikedGroupsCubit>().fetchPeopleWhoLikedMe();
+      // groupsModel = result;
+      final groups =
+          Di().sl<LikedGroupsCubit>().groupsModel?.data?.groups ?? [];
       Di().sl<HomeCubit>().updateGroups(groups);
       log('Fetched Groups: ${groupsModel?.data?.groups?.first.groupTag}');
       emit(GroupsSuccess());

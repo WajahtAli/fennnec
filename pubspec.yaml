@@ -36,6 +36,7 @@ dependencies:
   path_provider: ^2.1.4
   just_audio: ^0.10.5
   fast_contacts: ^5.0.1
+  wechat_assets_picker:
 
   freezed_annotation: ^3.0.0
   json_annotation: ^4.9.0

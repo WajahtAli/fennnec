@@ -117,12 +117,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     showDivider: false,
                                     title: 'People Who Liked You',
                                     onTap: () {
-                                      Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              const LikedGroupsScreen(),
-                                        ),
-                                      );
+                                      AutoRouter.of(context).push(HomeRoute());
+                                      // Navigator.of(context).push(
+                                      //   MaterialPageRoute(
+                                      //     builder: (context) =>
+                                      //         const LikedGroupsScreen(),
+                                      //   ),
+                                      // );
                                     },
                                   ),
                                   Divider(

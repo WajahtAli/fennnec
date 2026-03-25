@@ -184,7 +184,7 @@ class MyGroupDatasourceImpl extends MyGroupDatasource {
         queryParameters: queryParameters,
         requiresAuth: true,
       );
-      return response as List<dynamic>;
+      return response['data']['messages'] as List<dynamic>;
     } catch (e) {
       rethrow;
     }
@@ -209,7 +209,7 @@ class MyGroupDatasourceImpl extends MyGroupDatasource {
         queryParameters: queryParameters,
         requiresAuth: true,
       );
-      return response as List<dynamic>;
+      return response['data']['messages'] as List<dynamic>;
     } catch (e) {
       rethrow;
     }
@@ -261,7 +261,7 @@ class MyGroupDatasourceImpl extends MyGroupDatasource {
       };
 
       final response = await apiHelper.post(
-        '${AppConstants.baseUrl}users/$userId/chat/messages',
+        'users/$userId/chat/messages',
         body: body,
         requiresAuth: true,
       );
@@ -306,8 +306,7 @@ class MyGroupDatasourceImpl extends MyGroupDatasource {
     bool isRemove = false,
   }) async {
     try {
-      final String url =
-          '${AppConstants.baseUrl}users/$userId/chat/messages/$messageId/reactions';
+      final String url = 'users/$userId/chat/messages/$messageId/reactions';
       final response = isRemove
           ? await apiHelper.delete(
               url,
@@ -342,7 +341,7 @@ class MyGroupDatasourceImpl extends MyGroupDatasource {
   Future<dynamic> deleteDirectMessage(String userId, String messageId) async {
     try {
       final response = await apiHelper.delete(
-        '${AppConstants.baseUrl}users/$userId/chat/messages/$messageId',
+        'users/$userId/chat/messages/$messageId',
         requiresAuth: true,
       );
       return response;
@@ -374,7 +373,7 @@ class MyGroupDatasourceImpl extends MyGroupDatasource {
   ) async {
     try {
       final response = await apiHelper.post(
-        '${AppConstants.baseUrl}users/$userId/chat/messages/$messageId/read',
+        'users/$userId/chat/messages/$messageId/read',
         requiresAuth: true,
       );
       return response;

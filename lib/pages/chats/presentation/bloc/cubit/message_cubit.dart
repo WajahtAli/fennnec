@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:equatable/equatable.dart';
 import 'package:fennac_app/pages/chats/data/models/message_model.dart';
 import 'package:fennac_app/pages/chats/data/models/message_type_enum.dart';
@@ -108,6 +110,7 @@ class MessageCubit extends Cubit<MessageState> {
       isLoading = false;
       hasError = true;
       errorMessage = e.toString();
+      log(e.toString());
       emit(MessageError(e.toString()));
     }
   }
