@@ -12,6 +12,16 @@ abstract class ReactionModel with _$ReactionModel {
     required DateTime reactedAt,
   }) = _ReactionModel;
 
-  factory ReactionModel.fromJson(Map<String, dynamic> json) =>
-      _$ReactionModelFromJson(json);
+  factory ReactionModel.fromJson(Map<String, dynamic> json) {
+    final userObj =
+        json['userId'] is Map ? json['userId'] as Map<String, dynamic> : null;
+    return _$ReactionModelFromJson({
+      ...json,
+      'userId': userObj?['_id'] ?? json['userId'],
+      'userName': userObj != null
+          ? '${userObj['firstName']} ${userObj['lastName']}'.trim()
+          : (json['userName'] ?? ''),
+      'reactedAt': json['createdAt'] ?? json['reactedAt'],
+    });
+  }
 }
