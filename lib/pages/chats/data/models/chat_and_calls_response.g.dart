@@ -30,6 +30,11 @@ _ChatAndCallsData _$ChatAndCallsDataFromJson(Map<String, dynamic> json) =>
       calls: (json['calls'] as List<dynamic>)
           .map((e) => CallModel.fromJson(e as Map<String, dynamic>))
           .toList(),
+      members:
+          (json['members'] as List<dynamic>?)
+              ?.map((e) => MemberModel.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
       pagination: PaginationModel.fromJson(
         json['pagination'] as Map<String, dynamic>,
       ),
@@ -39,6 +44,7 @@ Map<String, dynamic> _$ChatAndCallsDataToJson(_ChatAndCallsData instance) =>
     <String, dynamic>{
       'chats': instance.chats,
       'calls': instance.calls,
+      'members': instance.members,
       'pagination': instance.pagination,
     };
 
@@ -84,8 +90,28 @@ Map<String, dynamic> _$MemberModelToJson(_MemberModel instance) =>
       'image': instance.image,
     };
 
+_CallUserInfo _$CallUserInfoFromJson(Map<String, dynamic> json) =>
+    _CallUserInfo(
+      id: json['_id'] as String,
+      firstName: json['firstName'] as String,
+      lastName: json['lastName'] as String?,
+      bestShorts:
+          (json['bestShorts'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
+    );
+
+Map<String, dynamic> _$CallUserInfoToJson(_CallUserInfo instance) =>
+    <String, dynamic>{
+      '_id': instance.id,
+      'firstName': instance.firstName,
+      'lastName': instance.lastName,
+      'bestShorts': instance.bestShorts,
+    };
+
 _CallModel _$CallModelFromJson(Map<String, dynamic> json) => _CallModel(
-  id: json['id'] as String,
+  id: json['_id'] as String,
   name: json['name'] as String?,
   image: json['image'] as String?,
   members: (json['members'] as List<dynamic>?)
@@ -95,11 +121,23 @@ _CallModel _$CallModelFromJson(Map<String, dynamic> json) => _CallModel(
   duration: json['duration'] as String?,
   timeAgo: json['timeAgo'] as String?,
   status: json['status'] as String?,
+  channelName: json['channelName'] as String?,
+  mediaType: json['mediaType'] as String?,
+  callType: json['callType'] as String?,
+  startedAt: json['startedAt'] == null
+      ? null
+      : DateTime.parse(json['startedAt'] as String),
+  callerId: json['callerId'] == null
+      ? null
+      : CallUserInfo.fromJson(json['callerId'] as Map<String, dynamic>),
+  participantIds: (json['participantIds'] as List<dynamic>?)
+      ?.map((e) => CallUserInfo.fromJson(e as Map<String, dynamic>))
+      .toList(),
 );
 
 Map<String, dynamic> _$CallModelToJson(_CallModel instance) =>
     <String, dynamic>{
-      'id': instance.id,
+      '_id': instance.id,
       'name': instance.name,
       'image': instance.image,
       'members': instance.members,
@@ -107,6 +145,12 @@ Map<String, dynamic> _$CallModelToJson(_CallModel instance) =>
       'duration': instance.duration,
       'timeAgo': instance.timeAgo,
       'status': instance.status,
+      'channelName': instance.channelName,
+      'mediaType': instance.mediaType,
+      'callType': instance.callType,
+      'startedAt': instance.startedAt?.toIso8601String(),
+      'callerId': instance.callerId,
+      'participantIds': instance.participantIds,
     };
 
 _PaginationModel _$PaginationModelFromJson(Map<String, dynamic> json) =>

@@ -59,6 +59,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                   contactName: widget.contactName,
                   contactAvatar: widget.contactAvatar,
                   isOnline: widget.isOnline,
+                  chatId: widget.groupId,
                 ),
               ),
             ],

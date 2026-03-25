@@ -137,7 +137,7 @@ class CallHistoryItem extends StatelessWidget {
               width: 2,
             ),
             image: DecorationImage(
-              image: AssetImage(avatar!),
+              image: NetworkImage(avatar!),
               fit: BoxFit.cover,
             ),
           ),
@@ -198,7 +198,10 @@ class CallHistoryItem extends StatelessWidget {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(color: ColorPalette.secondary, width: 1),
-        image: DecorationImage(image: AssetImage(assetPath), fit: BoxFit.cover),
+        image: DecorationImage(
+          image: NetworkImage(assetPath),
+          fit: BoxFit.cover,
+        ),
       ),
     );
   }

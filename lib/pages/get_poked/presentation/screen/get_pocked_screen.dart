@@ -128,11 +128,10 @@ class _GetPockedScreenState extends State<GetPockedScreen> {
                         targetDetail: target,
                         onIgnore: () => context.router.pop(),
                         onStartChat: () {
-                          //todo due to pending status issue
-                          // Di().sl<GetPokedDetailsCubit>().startChat(
-                          //   detail.poke.id,
-                          // );
-                          VxToast.show(message: 'Chat feature coming soon!');
+                          Di().sl<GetPokedDetailsCubit>().startChat(
+                            detail.poke.id,
+                          );
+                          // VxToast.show(message: 'Chat feature coming soon!');
                         },
                       ),
                     ],

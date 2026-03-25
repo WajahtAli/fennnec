@@ -44,6 +44,7 @@ class AppConstants {
   static const startPokeChat = '/start-chat';
   static const directChat = 'users';
   static const peopleWhoLikedYou = 'groups/people-who-liked-you';
+  static const startCall = 'calls/start';
 
   //!Agora Constants
   static const agoraAppId = "e02d6c955f5947f0a671b1b2dbb67514";

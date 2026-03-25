@@ -20,6 +20,7 @@ abstract class ChatAndCallsData with _$ChatAndCallsData {
   const factory ChatAndCallsData({
     required List<ChatModel> chats,
     required List<CallModel> calls,
+    @Default([]) List<MemberModel> members, // added
     required PaginationModel pagination,
   }) = _ChatAndCallsData;
 
@@ -58,9 +59,22 @@ abstract class MemberModel with _$MemberModel {
 }
 
 @freezed
+abstract class CallUserInfo with _$CallUserInfo {
+  const factory CallUserInfo({
+    @JsonKey(name: '_id') required String id,
+    required String firstName,
+    String? lastName,
+    @Default([]) List<String> bestShorts,
+  }) = _CallUserInfo;
+
+  factory CallUserInfo.fromJson(Map<String, dynamic> json) =>
+      _$CallUserInfoFromJson(json);
+}
+
+@freezed
 abstract class CallModel with _$CallModel {
   const factory CallModel({
-    required String id,
+    @JsonKey(name: '_id') required String id,
     String? name,
     String? image,
     List<MemberModel>? members,
@@ -68,6 +82,12 @@ abstract class CallModel with _$CallModel {
     String? duration,
     String? timeAgo,
     String? status,
+    String? channelName, // added
+    String? mediaType, // added
+    String? callType, // added
+    DateTime? startedAt, // added
+    CallUserInfo? callerId, // added
+    List<CallUserInfo>? participantIds, // added
   }) = _CallModel;
 
   factory CallModel.fromJson(Map<String, dynamic> json) =>

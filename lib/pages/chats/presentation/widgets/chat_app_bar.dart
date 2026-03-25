@@ -5,19 +5,27 @@ import 'package:fennac_app/app/constants/dummy_constants.dart';
 import 'package:fennac_app/app/constants/media_query_constants.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
+import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
+import 'package:fennac_app/pages/auth/presentation/bloc/cubit/login_cubit.dart';
+import 'package:fennac_app/pages/call/presentation/bloc/cubit/call_cubit.dart';
+import 'package:fennac_app/pages/call/presentation/bloc/state/call_state.dart';
+import 'package:fennac_app/pages/chats/presentation/bloc/cubit/chat_landing_cubit.dart';
 import 'package:fennac_app/reusable_widgets/circle_icon_button.dart';
 import 'package:fennac_app/routes/routes_imports.gr.dart';
 import 'package:fennac_app/widgets/custom_back_button.dart';
 import 'package:fennac_app/widgets/custom_sized_box.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:lottie/lottie.dart';
 
 class ChatAppBar extends StatelessWidget {
   final bool isGroup;
   final String? contactName;
   final String? contactAvatar;
   final bool isOnline;
+  final String? chatId;
 
   const ChatAppBar({
     super.key,
@@ -25,6 +33,7 @@ class ChatAppBar extends StatelessWidget {
     this.contactName,
     this.contactAvatar,
     this.isOnline = false,
+    this.chatId,
   });
 
   @override
@@ -280,7 +289,7 @@ class ChatAppBar extends StatelessWidget {
                           shape: BoxShape.circle,
                           image: contactAvatar != null
                               ? DecorationImage(
-                                  image: AssetImage(contactAvatar!),
+                                  image: NetworkImage(contactAvatar!),
                                   fit: BoxFit.cover,
                                 )
                               : null,
@@ -335,19 +344,71 @@ class ChatAppBar extends StatelessWidget {
                   ),
                 ),
                 const CustomSizedBox(width: 12),
-                CircleIconButton(
-                  icon: Assets.icons.phone.path,
-                  onTap: () {
-                    AutoRouter.of(context).push(const CallRoute());
-                  },
-                ),
-                const CustomSizedBox(width: 8),
-                CircleIconButton(
-                  icon: Assets.icons.video.path,
-                  onTap: () {
-                    AutoRouter.of(context).push(VideoCallRoute());
+                BlocBuilder<CallCubit, CallState>(
+                  bloc: Di().sl<CallCubit>(),
+                  builder: (context, state) {
+                    final callCubit = Di().sl<CallCubit>();
+                    final isStartingCall = callCubit.isStartingCall;
 
-                    // AutoRouter.of(context).push(const CallRoute());
+                    return Row(
+                      children: [
+                        CircleIconButton(
+                          customChild: isStartingCall
+                              ? SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: Lottie.asset(
+                                    Assets.animations.loadingSpinner,
+                                  ),
+                                )
+                              : SvgPicture.asset(
+                                  Assets.icons.phone.path,
+                                  colorFilter: ColorFilter.mode(
+                                    isLightTheme(context)
+                                        ? ColorPalette.black
+                                        : ColorPalette.white,
+                                    BlendMode.srcIn,
+                                  ),
+                                  width: 20,
+                                  height: 20,
+                                ),
+                          onTap: isStartingCall
+                              ? null
+                              : () => _startCallFromHeader(
+                                  context,
+                                  isVideoCall: false,
+                                ),
+                        ),
+                        const CustomSizedBox(width: 8),
+                        CircleIconButton(
+                          customChild: isStartingCall
+                              ? SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: Lottie.asset(
+                                    Assets.animations.loadingSpinner,
+                                  ),
+                                )
+                              : SvgPicture.asset(
+                                  Assets.icons.video.path,
+                                  colorFilter: ColorFilter.mode(
+                                    isLightTheme(context)
+                                        ? ColorPalette.black
+                                        : ColorPalette.white,
+                                    BlendMode.srcIn,
+                                  ),
+                                  width: 20,
+                                  height: 20,
+                                ),
+                          onTap: isStartingCall
+                              ? null
+                              : () => _startCallFromHeader(
+                                  context,
+                                  isVideoCall: true,
+                                ),
+                        ),
+                      ],
+                    );
                   },
                 ),
               ],
@@ -356,5 +417,55 @@ class ChatAppBar extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _startCallFromHeader(
+    BuildContext context, {
+    required bool isVideoCall,
+  }) async {
+    final callCubit = Di().sl<CallCubit>();
+    final participantId = _resolveParticipantId();
+
+    if (participantId == null || participantId.isEmpty) {
+      return;
+    }
+
+    final response = await callCubit.startCall(
+      mediaType: isVideoCall ? 'video' : 'audio',
+      callType: 'individual',
+      participantIds: [participantId],
+    );
+
+    if (!context.mounted || response == null) return;
+
+    if (isVideoCall) {
+      AutoRouter.of(context).push(VideoCallRoute());
+    } else {
+      AutoRouter.of(context).push(AudioCallRoute());
+    }
+  }
+
+  String? _resolveParticipantId() {
+    final targetChatId = chatId;
+    if (targetChatId == null || targetChatId.isEmpty) return null;
+
+    final currentUserId = Di().sl<LoginCubit>().userData?.user?.id;
+    final chats = Di().sl<ChatLandingCubit>().state.chats;
+
+    for (final chat in chats) {
+      if (chat.id != targetChatId) continue;
+
+      final members = chat.members;
+      if (members != null && members.isNotEmpty) {
+        for (final member in members) {
+          if (member.id != currentUserId) {
+            return member.id;
+          }
+        }
+        return members.first.id;
+      }
+    }
+
+    return targetChatId;
   }
 }

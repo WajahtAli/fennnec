@@ -105,14 +105,12 @@ class _SwitchGroupsBottomSheetState extends State<SwitchGroupsBottomSheet> {
                     ),
                   );
                 }
-
                 return ListView.builder(
                   shrinkWrap: true,
                   padding: const EdgeInsets.only(bottom: 32),
                   itemCount: groupList.length,
                   itemBuilder: (context, index) {
                     final group = groupList[index];
-                    // Keep empty string for null images to maintain index alignment with memberNames
                     final avatarPaths =
                         group.members
                             ?.map((member) => member.image ?? '')

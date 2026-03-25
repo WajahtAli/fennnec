@@ -302,7 +302,8 @@ $ChatAndCallsDataCopyWith<$Res> get data {
 /// @nodoc
 mixin _$ChatAndCallsData {
 
- List<ChatModel> get chats; List<CallModel> get calls; PaginationModel get pagination;
+ List<ChatModel> get chats; List<CallModel> get calls; List<MemberModel> get members;// added
+ PaginationModel get pagination;
 /// Create a copy of ChatAndCallsData
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -315,16 +316,16 @@ $ChatAndCallsDataCopyWith<ChatAndCallsData> get copyWith => _$ChatAndCallsDataCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChatAndCallsData&&const DeepCollectionEquality().equals(other.chats, chats)&&const DeepCollectionEquality().equals(other.calls, calls)&&(identical(other.pagination, pagination) || other.pagination == pagination));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChatAndCallsData&&const DeepCollectionEquality().equals(other.chats, chats)&&const DeepCollectionEquality().equals(other.calls, calls)&&const DeepCollectionEquality().equals(other.members, members)&&(identical(other.pagination, pagination) || other.pagination == pagination));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(chats),const DeepCollectionEquality().hash(calls),pagination);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(chats),const DeepCollectionEquality().hash(calls),const DeepCollectionEquality().hash(members),pagination);
 
 @override
 String toString() {
-  return 'ChatAndCallsData(chats: $chats, calls: $calls, pagination: $pagination)';
+  return 'ChatAndCallsData(chats: $chats, calls: $calls, members: $members, pagination: $pagination)';
 }
 
 
@@ -335,7 +336,7 @@ abstract mixin class $ChatAndCallsDataCopyWith<$Res>  {
   factory $ChatAndCallsDataCopyWith(ChatAndCallsData value, $Res Function(ChatAndCallsData) _then) = _$ChatAndCallsDataCopyWithImpl;
 @useResult
 $Res call({
- List<ChatModel> chats, List<CallModel> calls, PaginationModel pagination
+ List<ChatModel> chats, List<CallModel> calls, List<MemberModel> members, PaginationModel pagination
 });
 
 
@@ -352,11 +353,12 @@ class _$ChatAndCallsDataCopyWithImpl<$Res>
 
 /// Create a copy of ChatAndCallsData
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? chats = null,Object? calls = null,Object? pagination = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? chats = null,Object? calls = null,Object? members = null,Object? pagination = null,}) {
   return _then(_self.copyWith(
 chats: null == chats ? _self.chats : chats // ignore: cast_nullable_to_non_nullable
 as List<ChatModel>,calls: null == calls ? _self.calls : calls // ignore: cast_nullable_to_non_nullable
-as List<CallModel>,pagination: null == pagination ? _self.pagination : pagination // ignore: cast_nullable_to_non_nullable
+as List<CallModel>,members: null == members ? _self.members : members // ignore: cast_nullable_to_non_nullable
+as List<MemberModel>,pagination: null == pagination ? _self.pagination : pagination // ignore: cast_nullable_to_non_nullable
 as PaginationModel,
   ));
 }
@@ -451,10 +453,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<ChatModel> chats,  List<CallModel> calls,  PaginationModel pagination)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<ChatModel> chats,  List<CallModel> calls,  List<MemberModel> members,  PaginationModel pagination)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ChatAndCallsData() when $default != null:
-return $default(_that.chats,_that.calls,_that.pagination);case _:
+return $default(_that.chats,_that.calls,_that.members,_that.pagination);case _:
   return orElse();
 
 }
@@ -472,10 +474,10 @@ return $default(_that.chats,_that.calls,_that.pagination);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<ChatModel> chats,  List<CallModel> calls,  PaginationModel pagination)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<ChatModel> chats,  List<CallModel> calls,  List<MemberModel> members,  PaginationModel pagination)  $default,) {final _that = this;
 switch (_that) {
 case _ChatAndCallsData():
-return $default(_that.chats,_that.calls,_that.pagination);case _:
+return $default(_that.chats,_that.calls,_that.members,_that.pagination);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -492,10 +494,10 @@ return $default(_that.chats,_that.calls,_that.pagination);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<ChatModel> chats,  List<CallModel> calls,  PaginationModel pagination)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<ChatModel> chats,  List<CallModel> calls,  List<MemberModel> members,  PaginationModel pagination)?  $default,) {final _that = this;
 switch (_that) {
 case _ChatAndCallsData() when $default != null:
-return $default(_that.chats,_that.calls,_that.pagination);case _:
+return $default(_that.chats,_that.calls,_that.members,_that.pagination);case _:
   return null;
 
 }
@@ -507,7 +509,7 @@ return $default(_that.chats,_that.calls,_that.pagination);case _:
 @JsonSerializable()
 
 class _ChatAndCallsData implements ChatAndCallsData {
-  const _ChatAndCallsData({required final  List<ChatModel> chats, required final  List<CallModel> calls, required this.pagination}): _chats = chats,_calls = calls;
+  const _ChatAndCallsData({required final  List<ChatModel> chats, required final  List<CallModel> calls, final  List<MemberModel> members = const [], required this.pagination}): _chats = chats,_calls = calls,_members = members;
   factory _ChatAndCallsData.fromJson(Map<String, dynamic> json) => _$ChatAndCallsDataFromJson(json);
 
  final  List<ChatModel> _chats;
@@ -524,6 +526,14 @@ class _ChatAndCallsData implements ChatAndCallsData {
   return EqualUnmodifiableListView(_calls);
 }
 
+ final  List<MemberModel> _members;
+@override@JsonKey() List<MemberModel> get members {
+  if (_members is EqualUnmodifiableListView) return _members;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_members);
+}
+
+// added
 @override final  PaginationModel pagination;
 
 /// Create a copy of ChatAndCallsData
@@ -539,16 +549,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChatAndCallsData&&const DeepCollectionEquality().equals(other._chats, _chats)&&const DeepCollectionEquality().equals(other._calls, _calls)&&(identical(other.pagination, pagination) || other.pagination == pagination));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChatAndCallsData&&const DeepCollectionEquality().equals(other._chats, _chats)&&const DeepCollectionEquality().equals(other._calls, _calls)&&const DeepCollectionEquality().equals(other._members, _members)&&(identical(other.pagination, pagination) || other.pagination == pagination));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_chats),const DeepCollectionEquality().hash(_calls),pagination);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_chats),const DeepCollectionEquality().hash(_calls),const DeepCollectionEquality().hash(_members),pagination);
 
 @override
 String toString() {
-  return 'ChatAndCallsData(chats: $chats, calls: $calls, pagination: $pagination)';
+  return 'ChatAndCallsData(chats: $chats, calls: $calls, members: $members, pagination: $pagination)';
 }
 
 
@@ -559,7 +569,7 @@ abstract mixin class _$ChatAndCallsDataCopyWith<$Res> implements $ChatAndCallsDa
   factory _$ChatAndCallsDataCopyWith(_ChatAndCallsData value, $Res Function(_ChatAndCallsData) _then) = __$ChatAndCallsDataCopyWithImpl;
 @override @useResult
 $Res call({
- List<ChatModel> chats, List<CallModel> calls, PaginationModel pagination
+ List<ChatModel> chats, List<CallModel> calls, List<MemberModel> members, PaginationModel pagination
 });
 
 
@@ -576,11 +586,12 @@ class __$ChatAndCallsDataCopyWithImpl<$Res>
 
 /// Create a copy of ChatAndCallsData
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? chats = null,Object? calls = null,Object? pagination = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? chats = null,Object? calls = null,Object? members = null,Object? pagination = null,}) {
   return _then(_ChatAndCallsData(
 chats: null == chats ? _self._chats : chats // ignore: cast_nullable_to_non_nullable
 as List<ChatModel>,calls: null == calls ? _self._calls : calls // ignore: cast_nullable_to_non_nullable
-as List<CallModel>,pagination: null == pagination ? _self.pagination : pagination // ignore: cast_nullable_to_non_nullable
+as List<CallModel>,members: null == members ? _self._members : members // ignore: cast_nullable_to_non_nullable
+as List<MemberModel>,pagination: null == pagination ? _self.pagination : pagination // ignore: cast_nullable_to_non_nullable
 as PaginationModel,
   ));
 }
@@ -1169,9 +1180,293 @@ as String,
 
 
 /// @nodoc
+mixin _$CallUserInfo {
+
+@JsonKey(name: '_id') String get id; String get firstName; String? get lastName; List<String> get bestShorts;
+/// Create a copy of CallUserInfo
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$CallUserInfoCopyWith<CallUserInfo> get copyWith => _$CallUserInfoCopyWithImpl<CallUserInfo>(this as CallUserInfo, _$identity);
+
+  /// Serializes this CallUserInfo to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CallUserInfo&&(identical(other.id, id) || other.id == id)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&const DeepCollectionEquality().equals(other.bestShorts, bestShorts));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,firstName,lastName,const DeepCollectionEquality().hash(bestShorts));
+
+@override
+String toString() {
+  return 'CallUserInfo(id: $id, firstName: $firstName, lastName: $lastName, bestShorts: $bestShorts)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $CallUserInfoCopyWith<$Res>  {
+  factory $CallUserInfoCopyWith(CallUserInfo value, $Res Function(CallUserInfo) _then) = _$CallUserInfoCopyWithImpl;
+@useResult
+$Res call({
+@JsonKey(name: '_id') String id, String firstName, String? lastName, List<String> bestShorts
+});
+
+
+
+
+}
+/// @nodoc
+class _$CallUserInfoCopyWithImpl<$Res>
+    implements $CallUserInfoCopyWith<$Res> {
+  _$CallUserInfoCopyWithImpl(this._self, this._then);
+
+  final CallUserInfo _self;
+  final $Res Function(CallUserInfo) _then;
+
+/// Create a copy of CallUserInfo
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? firstName = null,Object? lastName = freezed,Object? bestShorts = null,}) {
+  return _then(_self.copyWith(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,firstName: null == firstName ? _self.firstName : firstName // ignore: cast_nullable_to_non_nullable
+as String,lastName: freezed == lastName ? _self.lastName : lastName // ignore: cast_nullable_to_non_nullable
+as String?,bestShorts: null == bestShorts ? _self.bestShorts : bestShorts // ignore: cast_nullable_to_non_nullable
+as List<String>,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [CallUserInfo].
+extension CallUserInfoPatterns on CallUserInfo {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _CallUserInfo value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _CallUserInfo() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _CallUserInfo value)  $default,){
+final _that = this;
+switch (_that) {
+case _CallUserInfo():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _CallUserInfo value)?  $default,){
+final _that = this;
+switch (_that) {
+case _CallUserInfo() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: '_id')  String id,  String firstName,  String? lastName,  List<String> bestShorts)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _CallUserInfo() when $default != null:
+return $default(_that.id,_that.firstName,_that.lastName,_that.bestShorts);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: '_id')  String id,  String firstName,  String? lastName,  List<String> bestShorts)  $default,) {final _that = this;
+switch (_that) {
+case _CallUserInfo():
+return $default(_that.id,_that.firstName,_that.lastName,_that.bestShorts);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: '_id')  String id,  String firstName,  String? lastName,  List<String> bestShorts)?  $default,) {final _that = this;
+switch (_that) {
+case _CallUserInfo() when $default != null:
+return $default(_that.id,_that.firstName,_that.lastName,_that.bestShorts);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _CallUserInfo implements CallUserInfo {
+  const _CallUserInfo({@JsonKey(name: '_id') required this.id, required this.firstName, this.lastName, final  List<String> bestShorts = const []}): _bestShorts = bestShorts;
+  factory _CallUserInfo.fromJson(Map<String, dynamic> json) => _$CallUserInfoFromJson(json);
+
+@override@JsonKey(name: '_id') final  String id;
+@override final  String firstName;
+@override final  String? lastName;
+ final  List<String> _bestShorts;
+@override@JsonKey() List<String> get bestShorts {
+  if (_bestShorts is EqualUnmodifiableListView) return _bestShorts;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_bestShorts);
+}
+
+
+/// Create a copy of CallUserInfo
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$CallUserInfoCopyWith<_CallUserInfo> get copyWith => __$CallUserInfoCopyWithImpl<_CallUserInfo>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$CallUserInfoToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CallUserInfo&&(identical(other.id, id) || other.id == id)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&const DeepCollectionEquality().equals(other._bestShorts, _bestShorts));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,firstName,lastName,const DeepCollectionEquality().hash(_bestShorts));
+
+@override
+String toString() {
+  return 'CallUserInfo(id: $id, firstName: $firstName, lastName: $lastName, bestShorts: $bestShorts)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$CallUserInfoCopyWith<$Res> implements $CallUserInfoCopyWith<$Res> {
+  factory _$CallUserInfoCopyWith(_CallUserInfo value, $Res Function(_CallUserInfo) _then) = __$CallUserInfoCopyWithImpl;
+@override @useResult
+$Res call({
+@JsonKey(name: '_id') String id, String firstName, String? lastName, List<String> bestShorts
+});
+
+
+
+
+}
+/// @nodoc
+class __$CallUserInfoCopyWithImpl<$Res>
+    implements _$CallUserInfoCopyWith<$Res> {
+  __$CallUserInfoCopyWithImpl(this._self, this._then);
+
+  final _CallUserInfo _self;
+  final $Res Function(_CallUserInfo) _then;
+
+/// Create a copy of CallUserInfo
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? firstName = null,Object? lastName = freezed,Object? bestShorts = null,}) {
+  return _then(_CallUserInfo(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,firstName: null == firstName ? _self.firstName : firstName // ignore: cast_nullable_to_non_nullable
+as String,lastName: freezed == lastName ? _self.lastName : lastName // ignore: cast_nullable_to_non_nullable
+as String?,bestShorts: null == bestShorts ? _self._bestShorts : bestShorts // ignore: cast_nullable_to_non_nullable
+as List<String>,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
 mixin _$CallModel {
 
- String get id; String? get name; String? get image; List<MemberModel>? get members; String? get callTypeLabel; String? get duration; String? get timeAgo; String? get status;
+@JsonKey(name: '_id') String get id;// fixed
+ String? get name; String? get image; List<MemberModel>? get members; String? get callTypeLabel; String? get duration; String? get timeAgo; String? get status; String? get channelName;// added
+ String? get mediaType;// added
+ String? get callType;// added
+ DateTime? get startedAt;// added
+ CallUserInfo? get callerId;// added
+ List<CallUserInfo>? get participantIds;
 /// Create a copy of CallModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1184,16 +1479,16 @@ $CallModelCopyWith<CallModel> get copyWith => _$CallModelCopyWithImpl<CallModel>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CallModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.image, image) || other.image == image)&&const DeepCollectionEquality().equals(other.members, members)&&(identical(other.callTypeLabel, callTypeLabel) || other.callTypeLabel == callTypeLabel)&&(identical(other.duration, duration) || other.duration == duration)&&(identical(other.timeAgo, timeAgo) || other.timeAgo == timeAgo)&&(identical(other.status, status) || other.status == status));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CallModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.image, image) || other.image == image)&&const DeepCollectionEquality().equals(other.members, members)&&(identical(other.callTypeLabel, callTypeLabel) || other.callTypeLabel == callTypeLabel)&&(identical(other.duration, duration) || other.duration == duration)&&(identical(other.timeAgo, timeAgo) || other.timeAgo == timeAgo)&&(identical(other.status, status) || other.status == status)&&(identical(other.channelName, channelName) || other.channelName == channelName)&&(identical(other.mediaType, mediaType) || other.mediaType == mediaType)&&(identical(other.callType, callType) || other.callType == callType)&&(identical(other.startedAt, startedAt) || other.startedAt == startedAt)&&(identical(other.callerId, callerId) || other.callerId == callerId)&&const DeepCollectionEquality().equals(other.participantIds, participantIds));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,image,const DeepCollectionEquality().hash(members),callTypeLabel,duration,timeAgo,status);
+int get hashCode => Object.hash(runtimeType,id,name,image,const DeepCollectionEquality().hash(members),callTypeLabel,duration,timeAgo,status,channelName,mediaType,callType,startedAt,callerId,const DeepCollectionEquality().hash(participantIds));
 
 @override
 String toString() {
-  return 'CallModel(id: $id, name: $name, image: $image, members: $members, callTypeLabel: $callTypeLabel, duration: $duration, timeAgo: $timeAgo, status: $status)';
+  return 'CallModel(id: $id, name: $name, image: $image, members: $members, callTypeLabel: $callTypeLabel, duration: $duration, timeAgo: $timeAgo, status: $status, channelName: $channelName, mediaType: $mediaType, callType: $callType, startedAt: $startedAt, callerId: $callerId, participantIds: $participantIds)';
 }
 
 
@@ -1204,11 +1499,11 @@ abstract mixin class $CallModelCopyWith<$Res>  {
   factory $CallModelCopyWith(CallModel value, $Res Function(CallModel) _then) = _$CallModelCopyWithImpl;
 @useResult
 $Res call({
- String id, String? name, String? image, List<MemberModel>? members, String? callTypeLabel, String? duration, String? timeAgo, String? status
+@JsonKey(name: '_id') String id, String? name, String? image, List<MemberModel>? members, String? callTypeLabel, String? duration, String? timeAgo, String? status, String? channelName, String? mediaType, String? callType, DateTime? startedAt, CallUserInfo? callerId, List<CallUserInfo>? participantIds
 });
 
 
-
+$CallUserInfoCopyWith<$Res>? get callerId;
 
 }
 /// @nodoc
@@ -1221,7 +1516,7 @@ class _$CallModelCopyWithImpl<$Res>
 
 /// Create a copy of CallModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = freezed,Object? image = freezed,Object? members = freezed,Object? callTypeLabel = freezed,Object? duration = freezed,Object? timeAgo = freezed,Object? status = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = freezed,Object? image = freezed,Object? members = freezed,Object? callTypeLabel = freezed,Object? duration = freezed,Object? timeAgo = freezed,Object? status = freezed,Object? channelName = freezed,Object? mediaType = freezed,Object? callType = freezed,Object? startedAt = freezed,Object? callerId = freezed,Object? participantIds = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -1231,10 +1526,28 @@ as List<MemberModel>?,callTypeLabel: freezed == callTypeLabel ? _self.callTypeLa
 as String?,duration: freezed == duration ? _self.duration : duration // ignore: cast_nullable_to_non_nullable
 as String?,timeAgo: freezed == timeAgo ? _self.timeAgo : timeAgo // ignore: cast_nullable_to_non_nullable
 as String?,status: freezed == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,channelName: freezed == channelName ? _self.channelName : channelName // ignore: cast_nullable_to_non_nullable
+as String?,mediaType: freezed == mediaType ? _self.mediaType : mediaType // ignore: cast_nullable_to_non_nullable
+as String?,callType: freezed == callType ? _self.callType : callType // ignore: cast_nullable_to_non_nullable
+as String?,startedAt: freezed == startedAt ? _self.startedAt : startedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,callerId: freezed == callerId ? _self.callerId : callerId // ignore: cast_nullable_to_non_nullable
+as CallUserInfo?,participantIds: freezed == participantIds ? _self.participantIds : participantIds // ignore: cast_nullable_to_non_nullable
+as List<CallUserInfo>?,
   ));
 }
+/// Create a copy of CallModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$CallUserInfoCopyWith<$Res>? get callerId {
+    if (_self.callerId == null) {
+    return null;
+  }
 
+  return $CallUserInfoCopyWith<$Res>(_self.callerId!, (value) {
+    return _then(_self.copyWith(callerId: value));
+  });
+}
 }
 
 
@@ -1316,10 +1629,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String? name,  String? image,  List<MemberModel>? members,  String? callTypeLabel,  String? duration,  String? timeAgo,  String? status)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: '_id')  String id,  String? name,  String? image,  List<MemberModel>? members,  String? callTypeLabel,  String? duration,  String? timeAgo,  String? status,  String? channelName,  String? mediaType,  String? callType,  DateTime? startedAt,  CallUserInfo? callerId,  List<CallUserInfo>? participantIds)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CallModel() when $default != null:
-return $default(_that.id,_that.name,_that.image,_that.members,_that.callTypeLabel,_that.duration,_that.timeAgo,_that.status);case _:
+return $default(_that.id,_that.name,_that.image,_that.members,_that.callTypeLabel,_that.duration,_that.timeAgo,_that.status,_that.channelName,_that.mediaType,_that.callType,_that.startedAt,_that.callerId,_that.participantIds);case _:
   return orElse();
 
 }
@@ -1337,10 +1650,10 @@ return $default(_that.id,_that.name,_that.image,_that.members,_that.callTypeLabe
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String? name,  String? image,  List<MemberModel>? members,  String? callTypeLabel,  String? duration,  String? timeAgo,  String? status)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: '_id')  String id,  String? name,  String? image,  List<MemberModel>? members,  String? callTypeLabel,  String? duration,  String? timeAgo,  String? status,  String? channelName,  String? mediaType,  String? callType,  DateTime? startedAt,  CallUserInfo? callerId,  List<CallUserInfo>? participantIds)  $default,) {final _that = this;
 switch (_that) {
 case _CallModel():
-return $default(_that.id,_that.name,_that.image,_that.members,_that.callTypeLabel,_that.duration,_that.timeAgo,_that.status);case _:
+return $default(_that.id,_that.name,_that.image,_that.members,_that.callTypeLabel,_that.duration,_that.timeAgo,_that.status,_that.channelName,_that.mediaType,_that.callType,_that.startedAt,_that.callerId,_that.participantIds);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -1357,10 +1670,10 @@ return $default(_that.id,_that.name,_that.image,_that.members,_that.callTypeLabe
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String? name,  String? image,  List<MemberModel>? members,  String? callTypeLabel,  String? duration,  String? timeAgo,  String? status)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: '_id')  String id,  String? name,  String? image,  List<MemberModel>? members,  String? callTypeLabel,  String? duration,  String? timeAgo,  String? status,  String? channelName,  String? mediaType,  String? callType,  DateTime? startedAt,  CallUserInfo? callerId,  List<CallUserInfo>? participantIds)?  $default,) {final _that = this;
 switch (_that) {
 case _CallModel() when $default != null:
-return $default(_that.id,_that.name,_that.image,_that.members,_that.callTypeLabel,_that.duration,_that.timeAgo,_that.status);case _:
+return $default(_that.id,_that.name,_that.image,_that.members,_that.callTypeLabel,_that.duration,_that.timeAgo,_that.status,_that.channelName,_that.mediaType,_that.callType,_that.startedAt,_that.callerId,_that.participantIds);case _:
   return null;
 
 }
@@ -1372,10 +1685,11 @@ return $default(_that.id,_that.name,_that.image,_that.members,_that.callTypeLabe
 @JsonSerializable()
 
 class _CallModel implements CallModel {
-  const _CallModel({required this.id, this.name, this.image, final  List<MemberModel>? members, this.callTypeLabel, this.duration, this.timeAgo, this.status}): _members = members;
+  const _CallModel({@JsonKey(name: '_id') required this.id, this.name, this.image, final  List<MemberModel>? members, this.callTypeLabel, this.duration, this.timeAgo, this.status, this.channelName, this.mediaType, this.callType, this.startedAt, this.callerId, final  List<CallUserInfo>? participantIds}): _members = members,_participantIds = participantIds;
   factory _CallModel.fromJson(Map<String, dynamic> json) => _$CallModelFromJson(json);
 
-@override final  String id;
+@override@JsonKey(name: '_id') final  String id;
+// fixed
 @override final  String? name;
 @override final  String? image;
  final  List<MemberModel>? _members;
@@ -1391,6 +1705,26 @@ class _CallModel implements CallModel {
 @override final  String? duration;
 @override final  String? timeAgo;
 @override final  String? status;
+@override final  String? channelName;
+// added
+@override final  String? mediaType;
+// added
+@override final  String? callType;
+// added
+@override final  DateTime? startedAt;
+// added
+@override final  CallUserInfo? callerId;
+// added
+ final  List<CallUserInfo>? _participantIds;
+// added
+@override List<CallUserInfo>? get participantIds {
+  final value = _participantIds;
+  if (value == null) return null;
+  if (_participantIds is EqualUnmodifiableListView) return _participantIds;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(value);
+}
+
 
 /// Create a copy of CallModel
 /// with the given fields replaced by the non-null parameter values.
@@ -1405,16 +1739,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CallModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.image, image) || other.image == image)&&const DeepCollectionEquality().equals(other._members, _members)&&(identical(other.callTypeLabel, callTypeLabel) || other.callTypeLabel == callTypeLabel)&&(identical(other.duration, duration) || other.duration == duration)&&(identical(other.timeAgo, timeAgo) || other.timeAgo == timeAgo)&&(identical(other.status, status) || other.status == status));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CallModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.image, image) || other.image == image)&&const DeepCollectionEquality().equals(other._members, _members)&&(identical(other.callTypeLabel, callTypeLabel) || other.callTypeLabel == callTypeLabel)&&(identical(other.duration, duration) || other.duration == duration)&&(identical(other.timeAgo, timeAgo) || other.timeAgo == timeAgo)&&(identical(other.status, status) || other.status == status)&&(identical(other.channelName, channelName) || other.channelName == channelName)&&(identical(other.mediaType, mediaType) || other.mediaType == mediaType)&&(identical(other.callType, callType) || other.callType == callType)&&(identical(other.startedAt, startedAt) || other.startedAt == startedAt)&&(identical(other.callerId, callerId) || other.callerId == callerId)&&const DeepCollectionEquality().equals(other._participantIds, _participantIds));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,image,const DeepCollectionEquality().hash(_members),callTypeLabel,duration,timeAgo,status);
+int get hashCode => Object.hash(runtimeType,id,name,image,const DeepCollectionEquality().hash(_members),callTypeLabel,duration,timeAgo,status,channelName,mediaType,callType,startedAt,callerId,const DeepCollectionEquality().hash(_participantIds));
 
 @override
 String toString() {
-  return 'CallModel(id: $id, name: $name, image: $image, members: $members, callTypeLabel: $callTypeLabel, duration: $duration, timeAgo: $timeAgo, status: $status)';
+  return 'CallModel(id: $id, name: $name, image: $image, members: $members, callTypeLabel: $callTypeLabel, duration: $duration, timeAgo: $timeAgo, status: $status, channelName: $channelName, mediaType: $mediaType, callType: $callType, startedAt: $startedAt, callerId: $callerId, participantIds: $participantIds)';
 }
 
 
@@ -1425,11 +1759,11 @@ abstract mixin class _$CallModelCopyWith<$Res> implements $CallModelCopyWith<$Re
   factory _$CallModelCopyWith(_CallModel value, $Res Function(_CallModel) _then) = __$CallModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String? name, String? image, List<MemberModel>? members, String? callTypeLabel, String? duration, String? timeAgo, String? status
+@JsonKey(name: '_id') String id, String? name, String? image, List<MemberModel>? members, String? callTypeLabel, String? duration, String? timeAgo, String? status, String? channelName, String? mediaType, String? callType, DateTime? startedAt, CallUserInfo? callerId, List<CallUserInfo>? participantIds
 });
 
 
-
+@override $CallUserInfoCopyWith<$Res>? get callerId;
 
 }
 /// @nodoc
@@ -1442,7 +1776,7 @@ class __$CallModelCopyWithImpl<$Res>
 
 /// Create a copy of CallModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = freezed,Object? image = freezed,Object? members = freezed,Object? callTypeLabel = freezed,Object? duration = freezed,Object? timeAgo = freezed,Object? status = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = freezed,Object? image = freezed,Object? members = freezed,Object? callTypeLabel = freezed,Object? duration = freezed,Object? timeAgo = freezed,Object? status = freezed,Object? channelName = freezed,Object? mediaType = freezed,Object? callType = freezed,Object? startedAt = freezed,Object? callerId = freezed,Object? participantIds = freezed,}) {
   return _then(_CallModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -1452,11 +1786,29 @@ as List<MemberModel>?,callTypeLabel: freezed == callTypeLabel ? _self.callTypeLa
 as String?,duration: freezed == duration ? _self.duration : duration // ignore: cast_nullable_to_non_nullable
 as String?,timeAgo: freezed == timeAgo ? _self.timeAgo : timeAgo // ignore: cast_nullable_to_non_nullable
 as String?,status: freezed == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,channelName: freezed == channelName ? _self.channelName : channelName // ignore: cast_nullable_to_non_nullable
+as String?,mediaType: freezed == mediaType ? _self.mediaType : mediaType // ignore: cast_nullable_to_non_nullable
+as String?,callType: freezed == callType ? _self.callType : callType // ignore: cast_nullable_to_non_nullable
+as String?,startedAt: freezed == startedAt ? _self.startedAt : startedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,callerId: freezed == callerId ? _self.callerId : callerId // ignore: cast_nullable_to_non_nullable
+as CallUserInfo?,participantIds: freezed == participantIds ? _self._participantIds : participantIds // ignore: cast_nullable_to_non_nullable
+as List<CallUserInfo>?,
   ));
 }
 
+/// Create a copy of CallModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$CallUserInfoCopyWith<$Res>? get callerId {
+    if (_self.callerId == null) {
+    return null;
+  }
 
+  return $CallUserInfoCopyWith<$Res>(_self.callerId!, (value) {
+    return _then(_self.copyWith(callerId: value));
+  });
+}
 }
 
 

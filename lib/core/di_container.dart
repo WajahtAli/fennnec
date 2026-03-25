@@ -27,6 +27,10 @@ import 'package:fennac_app/pages/buy_poke/domain/usecase/purchase_pokes_usecase.
 import 'package:fennac_app/pages/buy_poke/domain/usecase/send_poke_usecase.dart';
 import 'package:fennac_app/pages/buy_poke/presentation/bloc/cubit/poke_cubit.dart';
 import 'package:fennac_app/pages/get_poked/presentation/bloc/cubit/get_poked_details_cubit.dart';
+import 'package:fennac_app/pages/call/data/datasource/call_datasource.dart';
+import 'package:fennac_app/pages/call/data/repository/call_repository_impl.dart';
+import 'package:fennac_app/pages/call/domain/repository/call_repository.dart';
+import 'package:fennac_app/pages/call/domain/usecase/call_usecase.repository.dart';
 import 'package:fennac_app/pages/call/presentation/bloc/cubit/call_cubit.dart';
 import 'package:fennac_app/pages/chats/presentation/bloc/cubit/chat_landing_cubit.dart';
 import 'package:fennac_app/pages/chats/presentation/bloc/cubit/message_cubit.dart';
@@ -171,6 +175,7 @@ class Di {
     sl.registerLazySingleton<LikedGroupsDataSource>(
       () => LikedGroupsDataSourceImpl(sl()),
     );
+    sl.registerLazySingleton<CallDataSource>(() => CallDataSourceImpl(sl()));
 
     // Repositories
     sl.registerLazySingleton<CreateAccountRepo>(
@@ -215,6 +220,7 @@ class Di {
     sl.registerLazySingleton<LikedGroupsRepository>(
       () => LikedGroupsRepositoryImpl(sl()),
     );
+    sl.registerLazySingleton<CallRepository>(() => CallRepositoryImpl(sl()));
 
     // sl.registerLazySingleton<ChatRepository>(() => ChatRepositoryImpl(sl()));
 
@@ -261,6 +267,7 @@ class Di {
     sl.registerLazySingleton<LikedGroupsUsecase>(
       () => LikedGroupsUsecase(sl()),
     );
+    sl.registerLazySingleton<CallUsecase>(() => CallUsecase(sl()));
 
     // Cubits
     sl.registerLazySingleton<AuthCubit>(() => AuthCubit());
@@ -287,7 +294,7 @@ class Di {
       () => WaveformCubit(sl<WaveformExtractionController>()),
     );
     sl.registerLazySingleton<MessageCubit>(() => MessageCubit(sl()));
-    sl.registerLazySingleton<CallCubit>(() => CallCubit());
+    sl.registerLazySingleton<CallCubit>(() => CallCubit(sl()));
     sl.registerLazySingleton<ProfileCubit>(() => ProfileCubit(sl()));
     sl.registerLazySingleton<PrivacyPermissionCubit>(
       () => PrivacyPermissionCubit(sl()),
