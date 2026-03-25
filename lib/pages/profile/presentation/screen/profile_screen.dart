@@ -117,7 +117,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     showDivider: false,
                                     title: 'People Who Liked You',
                                     onTap: () {
-                                      AutoRouter.of(context).push(HomeRoute());
+                                      AutoRouter.of(
+                                        context,
+                                      ).push(HomeRoute(isLikedGroups: true));
                                       // Navigator.of(context).push(
                                       //   MaterialPageRoute(
                                       //     builder: (context) =>

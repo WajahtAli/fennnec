@@ -1,7 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'reaction_model.freezed.dart';
-part 'reaction_model.g.dart';
 
 @freezed
 abstract class ReactionModel with _$ReactionModel {
@@ -13,9 +12,10 @@ abstract class ReactionModel with _$ReactionModel {
   }) = _ReactionModel;
 
   factory ReactionModel.fromJson(Map<String, dynamic> json) {
-    final userObj =
-        json['userId'] is Map ? json['userId'] as Map<String, dynamic> : null;
-    return _$ReactionModelFromJson({
+    final userObj = json['userId'] is Map
+        ? json['userId'] as Map<String, dynamic>
+        : null;
+    return ReactionModel.fromJson({
       ...json,
       'userId': userObj?['_id'] ?? json['userId'],
       'userName': userObj != null

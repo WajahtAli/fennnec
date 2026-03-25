@@ -11,7 +11,6 @@ part of 'reaction_model.dart';
 
 // dart format off
 T _$identity<T>(T value) => value;
-
 /// @nodoc
 mixin _$ReactionModel {
 
@@ -22,8 +21,6 @@ mixin _$ReactionModel {
 @pragma('vm:prefer-inline')
 $ReactionModelCopyWith<ReactionModel> get copyWith => _$ReactionModelCopyWithImpl<ReactionModel>(this as ReactionModel, _$identity);
 
-  /// Serializes this ReactionModel to a JSON map.
-  Map<String, dynamic> toJson();
 
 
 @override
@@ -31,7 +28,7 @@ bool operator ==(Object other) {
   return identical(this, other) || (other.runtimeType == runtimeType&&other is ReactionModel&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.userName, userName) || other.userName == userName)&&(identical(other.emoji, emoji) || other.emoji == emoji)&&(identical(other.reactedAt, reactedAt) || other.reactedAt == reactedAt));
 }
 
-@JsonKey(includeFromJson: false, includeToJson: false)
+
 @override
 int get hashCode => Object.hash(runtimeType,userId,userName,emoji,reactedAt);
 
@@ -209,11 +206,11 @@ return $default(_that.userId,_that.userName,_that.emoji,_that.reactedAt);case _:
 }
 
 /// @nodoc
-@JsonSerializable()
+
 
 class _ReactionModel implements ReactionModel {
   const _ReactionModel({required this.userId, required this.userName, required this.emoji, required this.reactedAt});
-  factory _ReactionModel.fromJson(Map<String, dynamic> json) => _$ReactionModelFromJson(json);
+  
 
 @override final  String userId;
 @override final  String userName;
@@ -226,17 +223,14 @@ class _ReactionModel implements ReactionModel {
 @pragma('vm:prefer-inline')
 _$ReactionModelCopyWith<_ReactionModel> get copyWith => __$ReactionModelCopyWithImpl<_ReactionModel>(this, _$identity);
 
-@override
-Map<String, dynamic> toJson() {
-  return _$ReactionModelToJson(this, );
-}
+
 
 @override
 bool operator ==(Object other) {
   return identical(this, other) || (other.runtimeType == runtimeType&&other is _ReactionModel&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.userName, userName) || other.userName == userName)&&(identical(other.emoji, emoji) || other.emoji == emoji)&&(identical(other.reactedAt, reactedAt) || other.reactedAt == reactedAt));
 }
 
-@JsonKey(includeFromJson: false, includeToJson: false)
+
 @override
 int get hashCode => Object.hash(runtimeType,userId,userName,emoji,reactedAt);
 

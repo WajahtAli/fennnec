@@ -11,7 +11,6 @@ part of 'message_model.dart';
 
 // dart format off
 T _$identity<T>(T value) => value;
-
 /// @nodoc
 mixin _$MessageModel {
 
@@ -22,8 +21,6 @@ mixin _$MessageModel {
 @pragma('vm:prefer-inline')
 $MessageModelCopyWith<MessageModel> get copyWith => _$MessageModelCopyWithImpl<MessageModel>(this as MessageModel, _$identity);
 
-  /// Serializes this MessageModel to a JSON map.
-  Map<String, dynamic> toJson();
 
 
 @override
@@ -31,7 +28,7 @@ bool operator ==(Object other) {
   return identical(this, other) || (other.runtimeType == runtimeType&&other is MessageModel&&(identical(other.id, id) || other.id == id)&&(identical(other.senderId, senderId) || other.senderId == senderId)&&(identical(other.senderName, senderName) || other.senderName == senderName)&&(identical(other.senderAvatar, senderAvatar) || other.senderAvatar == senderAvatar)&&(identical(other.content, content) || other.content == content)&&(identical(other.type, type) || other.type == type)&&(identical(other.mediaUrl, mediaUrl) || other.mediaUrl == mediaUrl)&&const DeepCollectionEquality().equals(other.imageUrls, imageUrls)&&const DeepCollectionEquality().equals(other.waveformData, waveformData)&&(identical(other.mediaDuration, mediaDuration) || other.mediaDuration == mediaDuration)&&(identical(other.mentionedUserId, mentionedUserId) || other.mentionedUserId == mentionedUserId)&&(identical(other.mentionedUserName, mentionedUserName) || other.mentionedUserName == mentionedUserName)&&(identical(other.sentAt, sentAt) || other.sentAt == sentAt)&&(identical(other.isMe, isMe) || other.isMe == isMe)&&(identical(other.isGroup, isGroup) || other.isGroup == isGroup)&&const DeepCollectionEquality().equals(other.reactions, reactions)&&(identical(other.isRead, isRead) || other.isRead == isRead)&&(identical(other.readAt, readAt) || other.readAt == readAt)&&(identical(other.isSending, isSending) || other.isSending == isSending)&&(identical(other.hasFailed, hasFailed) || other.hasFailed == hasFailed));
 }
 
-@JsonKey(includeFromJson: false, includeToJson: false)
+
 @override
 int get hashCode => Object.hashAll([runtimeType,id,senderId,senderName,senderAvatar,content,type,mediaUrl,const DeepCollectionEquality().hash(imageUrls),const DeepCollectionEquality().hash(waveformData),mediaDuration,mentionedUserId,mentionedUserName,sentAt,isMe,isGroup,const DeepCollectionEquality().hash(reactions),isRead,readAt,isSending,hasFailed]);
 
@@ -225,11 +222,11 @@ return $default(_that.id,_that.senderId,_that.senderName,_that.senderAvatar,_tha
 }
 
 /// @nodoc
-@JsonSerializable()
+
 
 class _MessageModel implements MessageModel {
   const _MessageModel({required this.id, required this.senderId, required this.senderName, this.senderAvatar, required this.content, required this.type, this.mediaUrl, final  List<String> imageUrls = const [], final  List<double> waveformData = const [], this.mediaDuration, this.mentionedUserId, this.mentionedUserName, required this.sentAt, required this.isMe, this.isGroup = false, final  List<ReactionModel> reactions = const [], this.isRead = false, this.readAt, this.isSending = false, this.hasFailed = false}): _imageUrls = imageUrls,_waveformData = waveformData,_reactions = reactions;
-  factory _MessageModel.fromJson(Map<String, dynamic> json) => _$MessageModelFromJson(json);
+  
 
 @override final  String id;
 @override final  String senderId;
@@ -276,17 +273,14 @@ class _MessageModel implements MessageModel {
 @pragma('vm:prefer-inline')
 _$MessageModelCopyWith<_MessageModel> get copyWith => __$MessageModelCopyWithImpl<_MessageModel>(this, _$identity);
 
-@override
-Map<String, dynamic> toJson() {
-  return _$MessageModelToJson(this, );
-}
+
 
 @override
 bool operator ==(Object other) {
   return identical(this, other) || (other.runtimeType == runtimeType&&other is _MessageModel&&(identical(other.id, id) || other.id == id)&&(identical(other.senderId, senderId) || other.senderId == senderId)&&(identical(other.senderName, senderName) || other.senderName == senderName)&&(identical(other.senderAvatar, senderAvatar) || other.senderAvatar == senderAvatar)&&(identical(other.content, content) || other.content == content)&&(identical(other.type, type) || other.type == type)&&(identical(other.mediaUrl, mediaUrl) || other.mediaUrl == mediaUrl)&&const DeepCollectionEquality().equals(other._imageUrls, _imageUrls)&&const DeepCollectionEquality().equals(other._waveformData, _waveformData)&&(identical(other.mediaDuration, mediaDuration) || other.mediaDuration == mediaDuration)&&(identical(other.mentionedUserId, mentionedUserId) || other.mentionedUserId == mentionedUserId)&&(identical(other.mentionedUserName, mentionedUserName) || other.mentionedUserName == mentionedUserName)&&(identical(other.sentAt, sentAt) || other.sentAt == sentAt)&&(identical(other.isMe, isMe) || other.isMe == isMe)&&(identical(other.isGroup, isGroup) || other.isGroup == isGroup)&&const DeepCollectionEquality().equals(other._reactions, _reactions)&&(identical(other.isRead, isRead) || other.isRead == isRead)&&(identical(other.readAt, readAt) || other.readAt == readAt)&&(identical(other.isSending, isSending) || other.isSending == isSending)&&(identical(other.hasFailed, hasFailed) || other.hasFailed == hasFailed));
 }
 
-@JsonKey(includeFromJson: false, includeToJson: false)
+
 @override
 int get hashCode => Object.hashAll([runtimeType,id,senderId,senderName,senderAvatar,content,type,mediaUrl,const DeepCollectionEquality().hash(_imageUrls),const DeepCollectionEquality().hash(_waveformData),mediaDuration,mentionedUserId,mentionedUserName,sentAt,isMe,isGroup,const DeepCollectionEquality().hash(_reactions),isRead,readAt,isSending,hasFailed]);
 

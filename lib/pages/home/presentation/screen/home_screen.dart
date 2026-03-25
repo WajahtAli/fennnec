@@ -31,7 +31,8 @@ import '../widgets/send_poke_bottomsheet.dart';
 
 @RoutePage()
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final bool isLikedGroups;
+  const HomeScreen({super.key, this.isLikedGroups = false});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -68,14 +69,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late SwipeController swipeController;
 
   Future<void> fetchGroups() async {
-    await _groupsCubit.fetchAllGroups();
+    await _groupsCubit.fetchAllGroups(isLikedGroups: widget.isLikedGroups);
   }
 
   @override
   void initState() {
     super.initState();
+    fetchGroups();
     homeCubit.selectedProfileType = SelectedProfile.group;
-    _groupsCubit.fetchAllGroups();
     swipeController = SwipeController(vsync: this);
 
     topCardController = AnimationController(

@@ -92,7 +92,7 @@ Map<String, dynamic> _$MemberModelToJson(_MemberModel instance) =>
 
 _CallUserInfo _$CallUserInfoFromJson(Map<String, dynamic> json) =>
     _CallUserInfo(
-      id: json['_id'] as String,
+      id: json['id'] as String,
       firstName: json['firstName'] as String,
       lastName: json['lastName'] as String?,
       bestShorts:
@@ -104,14 +104,14 @@ _CallUserInfo _$CallUserInfoFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$CallUserInfoToJson(_CallUserInfo instance) =>
     <String, dynamic>{
-      '_id': instance.id,
+      'id': instance.id,
       'firstName': instance.firstName,
       'lastName': instance.lastName,
       'bestShorts': instance.bestShorts,
     };
 
 _CallModel _$CallModelFromJson(Map<String, dynamic> json) => _CallModel(
-  id: json['_id'] as String,
+  id: json['id'] as String,
   name: json['name'] as String?,
   image: json['image'] as String?,
   members: (json['members'] as List<dynamic>?)
@@ -137,7 +137,7 @@ _CallModel _$CallModelFromJson(Map<String, dynamic> json) => _CallModel(
 
 Map<String, dynamic> _$CallModelToJson(_CallModel instance) =>
     <String, dynamic>{
-      '_id': instance.id,
+      'id': instance.id,
       'name': instance.name,
       'image': instance.image,
       'members': instance.members,
@@ -272,7 +272,7 @@ Map<String, dynamic> _$PokedTargetDetailToJson(_PokedTargetDetail instance) =>
 
 _PokedProfileDetail _$PokedProfileDetailFromJson(Map<String, dynamic> json) =>
     _PokedProfileDetail(
-      id: json['_id'] as String,
+      id: json['id'] as String,
       firstName: json['firstName'] as String,
       lastName: json['lastName'] as String?,
       bestShorts: (json['bestShorts'] as List<dynamic>)
@@ -286,7 +286,7 @@ _PokedProfileDetail _$PokedProfileDetailFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$PokedProfileDetailToJson(_PokedProfileDetail instance) =>
     <String, dynamic>{
-      '_id': instance.id,
+      'id': instance.id,
       'firstName': instance.firstName,
       'lastName': instance.lastName,
       'bestShorts': instance.bestShorts,

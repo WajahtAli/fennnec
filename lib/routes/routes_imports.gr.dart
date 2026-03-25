@@ -912,18 +912,51 @@ class HomeLandingRoute extends _i51.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i26.HomeScreen]
-class HomeRoute extends _i51.PageRouteInfo<void> {
-  const HomeRoute({List<_i51.PageRouteInfo>? children})
-    : super(HomeRoute.name, initialChildren: children);
+class HomeRoute extends _i51.PageRouteInfo<HomeRouteArgs> {
+  HomeRoute({
+    _i52.Key? key,
+    bool isLikedGroups = false,
+    List<_i51.PageRouteInfo>? children,
+  }) : super(
+         HomeRoute.name,
+         args: HomeRouteArgs(key: key, isLikedGroups: isLikedGroups),
+         initialChildren: children,
+       );
 
   static const String name = 'HomeRoute';
 
   static _i51.PageInfo page = _i51.PageInfo(
     name,
     builder: (data) {
-      return const _i26.HomeScreen();
+      final args = data.argsAs<HomeRouteArgs>(
+        orElse: () => const HomeRouteArgs(),
+      );
+      return _i26.HomeScreen(key: args.key, isLikedGroups: args.isLikedGroups);
     },
   );
+}
+
+class HomeRouteArgs {
+  const HomeRouteArgs({this.key, this.isLikedGroups = false});
+
+  final _i52.Key? key;
+
+  final bool isLikedGroups;
+
+  @override
+  String toString() {
+    return 'HomeRouteArgs{key: $key, isLikedGroups: $isLikedGroups}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! HomeRouteArgs) return false;
+    return key == other.key && isLikedGroups == other.isLikedGroups;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ isLikedGroups.hashCode;
 }
 
 /// generated route for

@@ -20,19 +20,25 @@ class GroupsCubit extends Cubit<GroupsState> {
     int page = 1,
     int limit = 10,
     Map<String, dynamic>? queryParameters,
+    final bool isLikedGroups = false,
   }) async {
     emit(GroupsLoading());
     try {
-      // final result = await _groupsUsecase.fetchAllGroups(
-      //   page: page,
-      //   limit: limit,
-      //   queryParameters: queryParameters,
-      // );
-      await Di().sl<LikedGroupsCubit>().fetchPeopleWhoLikedMe();
-      // groupsModel = result;
-      final groups =
-          Di().sl<LikedGroupsCubit>().groupsModel?.data?.groups ?? [];
-      Di().sl<HomeCubit>().updateGroups(groups);
+      if (isLikedGroups) {
+        await Di().sl<LikedGroupsCubit>().fetchPeopleWhoLikedMe();
+        final groups =
+            Di().sl<LikedGroupsCubit>().groupsModel?.data?.groups ?? [];
+        Di().sl<HomeCubit>().updateGroups(groups);
+      } else {
+        final result = await _groupsUsecase.fetchAllGroups(
+          page: page,
+          limit: limit,
+          queryParameters: queryParameters,
+        );
+        groupsModel = result;
+        final groups = groupsModel?.data?.groups ?? [];
+        Di().sl<HomeCubit>().updateGroups(groups);
+      }
       log('Fetched Groups: ${groupsModel?.data?.groups?.first.groupTag}');
       emit(GroupsSuccess());
     } catch (e) {

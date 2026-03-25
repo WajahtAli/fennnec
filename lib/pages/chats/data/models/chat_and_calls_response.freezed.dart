@@ -1182,7 +1182,7 @@ as String,
 /// @nodoc
 mixin _$CallUserInfo {
 
-@JsonKey(name: '_id') String get id; String get firstName; String? get lastName; List<String> get bestShorts;
+ String get id; String get firstName; String? get lastName; List<String> get bestShorts;
 /// Create a copy of CallUserInfo
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1215,7 +1215,7 @@ abstract mixin class $CallUserInfoCopyWith<$Res>  {
   factory $CallUserInfoCopyWith(CallUserInfo value, $Res Function(CallUserInfo) _then) = _$CallUserInfoCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(name: '_id') String id, String firstName, String? lastName, List<String> bestShorts
+ String id, String firstName, String? lastName, List<String> bestShorts
 });
 
 
@@ -1323,7 +1323,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: '_id')  String id,  String firstName,  String? lastName,  List<String> bestShorts)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String firstName,  String? lastName,  List<String> bestShorts)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CallUserInfo() when $default != null:
 return $default(_that.id,_that.firstName,_that.lastName,_that.bestShorts);case _:
@@ -1344,7 +1344,7 @@ return $default(_that.id,_that.firstName,_that.lastName,_that.bestShorts);case _
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: '_id')  String id,  String firstName,  String? lastName,  List<String> bestShorts)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String firstName,  String? lastName,  List<String> bestShorts)  $default,) {final _that = this;
 switch (_that) {
 case _CallUserInfo():
 return $default(_that.id,_that.firstName,_that.lastName,_that.bestShorts);case _:
@@ -1364,7 +1364,7 @@ return $default(_that.id,_that.firstName,_that.lastName,_that.bestShorts);case _
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: '_id')  String id,  String firstName,  String? lastName,  List<String> bestShorts)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String firstName,  String? lastName,  List<String> bestShorts)?  $default,) {final _that = this;
 switch (_that) {
 case _CallUserInfo() when $default != null:
 return $default(_that.id,_that.firstName,_that.lastName,_that.bestShorts);case _:
@@ -1379,10 +1379,10 @@ return $default(_that.id,_that.firstName,_that.lastName,_that.bestShorts);case _
 @JsonSerializable()
 
 class _CallUserInfo implements CallUserInfo {
-  const _CallUserInfo({@JsonKey(name: '_id') required this.id, required this.firstName, this.lastName, final  List<String> bestShorts = const []}): _bestShorts = bestShorts;
+  const _CallUserInfo({required this.id, required this.firstName, this.lastName, final  List<String> bestShorts = const []}): _bestShorts = bestShorts;
   factory _CallUserInfo.fromJson(Map<String, dynamic> json) => _$CallUserInfoFromJson(json);
 
-@override@JsonKey(name: '_id') final  String id;
+@override final  String id;
 @override final  String firstName;
 @override final  String? lastName;
  final  List<String> _bestShorts;
@@ -1426,7 +1426,7 @@ abstract mixin class _$CallUserInfoCopyWith<$Res> implements $CallUserInfoCopyWi
   factory _$CallUserInfoCopyWith(_CallUserInfo value, $Res Function(_CallUserInfo) _then) = __$CallUserInfoCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: '_id') String id, String firstName, String? lastName, List<String> bestShorts
+ String id, String firstName, String? lastName, List<String> bestShorts
 });
 
 
@@ -1460,8 +1460,7 @@ as List<String>,
 /// @nodoc
 mixin _$CallModel {
 
-@JsonKey(name: '_id') String get id;// fixed
- String? get name; String? get image; List<MemberModel>? get members; String? get callTypeLabel; String? get duration; String? get timeAgo; String? get status; String? get channelName;// added
+ String get id; String? get name; String? get image; List<MemberModel>? get members; String? get callTypeLabel; String? get duration; String? get timeAgo; String? get status; String? get channelName;// added
  String? get mediaType;// added
  String? get callType;// added
  DateTime? get startedAt;// added
@@ -1499,7 +1498,7 @@ abstract mixin class $CallModelCopyWith<$Res>  {
   factory $CallModelCopyWith(CallModel value, $Res Function(CallModel) _then) = _$CallModelCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(name: '_id') String id, String? name, String? image, List<MemberModel>? members, String? callTypeLabel, String? duration, String? timeAgo, String? status, String? channelName, String? mediaType, String? callType, DateTime? startedAt, CallUserInfo? callerId, List<CallUserInfo>? participantIds
+ String id, String? name, String? image, List<MemberModel>? members, String? callTypeLabel, String? duration, String? timeAgo, String? status, String? channelName, String? mediaType, String? callType, DateTime? startedAt, CallUserInfo? callerId, List<CallUserInfo>? participantIds
 });
 
 
@@ -1629,7 +1628,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: '_id')  String id,  String? name,  String? image,  List<MemberModel>? members,  String? callTypeLabel,  String? duration,  String? timeAgo,  String? status,  String? channelName,  String? mediaType,  String? callType,  DateTime? startedAt,  CallUserInfo? callerId,  List<CallUserInfo>? participantIds)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String? name,  String? image,  List<MemberModel>? members,  String? callTypeLabel,  String? duration,  String? timeAgo,  String? status,  String? channelName,  String? mediaType,  String? callType,  DateTime? startedAt,  CallUserInfo? callerId,  List<CallUserInfo>? participantIds)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CallModel() when $default != null:
 return $default(_that.id,_that.name,_that.image,_that.members,_that.callTypeLabel,_that.duration,_that.timeAgo,_that.status,_that.channelName,_that.mediaType,_that.callType,_that.startedAt,_that.callerId,_that.participantIds);case _:
@@ -1650,7 +1649,7 @@ return $default(_that.id,_that.name,_that.image,_that.members,_that.callTypeLabe
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: '_id')  String id,  String? name,  String? image,  List<MemberModel>? members,  String? callTypeLabel,  String? duration,  String? timeAgo,  String? status,  String? channelName,  String? mediaType,  String? callType,  DateTime? startedAt,  CallUserInfo? callerId,  List<CallUserInfo>? participantIds)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String? name,  String? image,  List<MemberModel>? members,  String? callTypeLabel,  String? duration,  String? timeAgo,  String? status,  String? channelName,  String? mediaType,  String? callType,  DateTime? startedAt,  CallUserInfo? callerId,  List<CallUserInfo>? participantIds)  $default,) {final _that = this;
 switch (_that) {
 case _CallModel():
 return $default(_that.id,_that.name,_that.image,_that.members,_that.callTypeLabel,_that.duration,_that.timeAgo,_that.status,_that.channelName,_that.mediaType,_that.callType,_that.startedAt,_that.callerId,_that.participantIds);case _:
@@ -1670,7 +1669,7 @@ return $default(_that.id,_that.name,_that.image,_that.members,_that.callTypeLabe
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: '_id')  String id,  String? name,  String? image,  List<MemberModel>? members,  String? callTypeLabel,  String? duration,  String? timeAgo,  String? status,  String? channelName,  String? mediaType,  String? callType,  DateTime? startedAt,  CallUserInfo? callerId,  List<CallUserInfo>? participantIds)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String? name,  String? image,  List<MemberModel>? members,  String? callTypeLabel,  String? duration,  String? timeAgo,  String? status,  String? channelName,  String? mediaType,  String? callType,  DateTime? startedAt,  CallUserInfo? callerId,  List<CallUserInfo>? participantIds)?  $default,) {final _that = this;
 switch (_that) {
 case _CallModel() when $default != null:
 return $default(_that.id,_that.name,_that.image,_that.members,_that.callTypeLabel,_that.duration,_that.timeAgo,_that.status,_that.channelName,_that.mediaType,_that.callType,_that.startedAt,_that.callerId,_that.participantIds);case _:
@@ -1685,11 +1684,10 @@ return $default(_that.id,_that.name,_that.image,_that.members,_that.callTypeLabe
 @JsonSerializable()
 
 class _CallModel implements CallModel {
-  const _CallModel({@JsonKey(name: '_id') required this.id, this.name, this.image, final  List<MemberModel>? members, this.callTypeLabel, this.duration, this.timeAgo, this.status, this.channelName, this.mediaType, this.callType, this.startedAt, this.callerId, final  List<CallUserInfo>? participantIds}): _members = members,_participantIds = participantIds;
+  const _CallModel({required this.id, this.name, this.image, final  List<MemberModel>? members, this.callTypeLabel, this.duration, this.timeAgo, this.status, this.channelName, this.mediaType, this.callType, this.startedAt, this.callerId, final  List<CallUserInfo>? participantIds}): _members = members,_participantIds = participantIds;
   factory _CallModel.fromJson(Map<String, dynamic> json) => _$CallModelFromJson(json);
 
-@override@JsonKey(name: '_id') final  String id;
-// fixed
+@override final  String id;
 @override final  String? name;
 @override final  String? image;
  final  List<MemberModel>? _members;
@@ -1759,7 +1757,7 @@ abstract mixin class _$CallModelCopyWith<$Res> implements $CallModelCopyWith<$Re
   factory _$CallModelCopyWith(_CallModel value, $Res Function(_CallModel) _then) = __$CallModelCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: '_id') String id, String? name, String? image, List<MemberModel>? members, String? callTypeLabel, String? duration, String? timeAgo, String? status, String? channelName, String? mediaType, String? callType, DateTime? startedAt, CallUserInfo? callerId, List<CallUserInfo>? participantIds
+ String id, String? name, String? image, List<MemberModel>? members, String? callTypeLabel, String? duration, String? timeAgo, String? status, String? channelName, String? mediaType, String? callType, DateTime? startedAt, CallUserInfo? callerId, List<CallUserInfo>? participantIds
 });
 
 
@@ -3609,7 +3607,7 @@ $PokedProfileDetailCopyWith<$Res>? get profile {
 /// @nodoc
 mixin _$PokedProfileDetail {
 
-@JsonKey(name: '_id') String get id; String get firstName; String? get lastName; List<String> get bestShorts; String? get shortBio; List<String>? get lifestyleLikes;
+ String get id; String get firstName; String? get lastName; List<String> get bestShorts; String? get shortBio; List<String>? get lifestyleLikes;
 /// Create a copy of PokedProfileDetail
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -3642,7 +3640,7 @@ abstract mixin class $PokedProfileDetailCopyWith<$Res>  {
   factory $PokedProfileDetailCopyWith(PokedProfileDetail value, $Res Function(PokedProfileDetail) _then) = _$PokedProfileDetailCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(name: '_id') String id, String firstName, String? lastName, List<String> bestShorts, String? shortBio, List<String>? lifestyleLikes
+ String id, String firstName, String? lastName, List<String> bestShorts, String? shortBio, List<String>? lifestyleLikes
 });
 
 
@@ -3752,7 +3750,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: '_id')  String id,  String firstName,  String? lastName,  List<String> bestShorts,  String? shortBio,  List<String>? lifestyleLikes)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String firstName,  String? lastName,  List<String> bestShorts,  String? shortBio,  List<String>? lifestyleLikes)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PokedProfileDetail() when $default != null:
 return $default(_that.id,_that.firstName,_that.lastName,_that.bestShorts,_that.shortBio,_that.lifestyleLikes);case _:
@@ -3773,7 +3771,7 @@ return $default(_that.id,_that.firstName,_that.lastName,_that.bestShorts,_that.s
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: '_id')  String id,  String firstName,  String? lastName,  List<String> bestShorts,  String? shortBio,  List<String>? lifestyleLikes)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String firstName,  String? lastName,  List<String> bestShorts,  String? shortBio,  List<String>? lifestyleLikes)  $default,) {final _that = this;
 switch (_that) {
 case _PokedProfileDetail():
 return $default(_that.id,_that.firstName,_that.lastName,_that.bestShorts,_that.shortBio,_that.lifestyleLikes);case _:
@@ -3793,7 +3791,7 @@ return $default(_that.id,_that.firstName,_that.lastName,_that.bestShorts,_that.s
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: '_id')  String id,  String firstName,  String? lastName,  List<String> bestShorts,  String? shortBio,  List<String>? lifestyleLikes)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String firstName,  String? lastName,  List<String> bestShorts,  String? shortBio,  List<String>? lifestyleLikes)?  $default,) {final _that = this;
 switch (_that) {
 case _PokedProfileDetail() when $default != null:
 return $default(_that.id,_that.firstName,_that.lastName,_that.bestShorts,_that.shortBio,_that.lifestyleLikes);case _:
@@ -3808,10 +3806,10 @@ return $default(_that.id,_that.firstName,_that.lastName,_that.bestShorts,_that.s
 @JsonSerializable()
 
 class _PokedProfileDetail implements PokedProfileDetail {
-  const _PokedProfileDetail({@JsonKey(name: '_id') required this.id, required this.firstName, this.lastName, required final  List<String> bestShorts, this.shortBio, final  List<String>? lifestyleLikes}): _bestShorts = bestShorts,_lifestyleLikes = lifestyleLikes;
+  const _PokedProfileDetail({required this.id, required this.firstName, this.lastName, required final  List<String> bestShorts, this.shortBio, final  List<String>? lifestyleLikes}): _bestShorts = bestShorts,_lifestyleLikes = lifestyleLikes;
   factory _PokedProfileDetail.fromJson(Map<String, dynamic> json) => _$PokedProfileDetailFromJson(json);
 
-@override@JsonKey(name: '_id') final  String id;
+@override final  String id;
 @override final  String firstName;
 @override final  String? lastName;
  final  List<String> _bestShorts;
@@ -3865,7 +3863,7 @@ abstract mixin class _$PokedProfileDetailCopyWith<$Res> implements $PokedProfile
   factory _$PokedProfileDetailCopyWith(_PokedProfileDetail value, $Res Function(_PokedProfileDetail) _then) = __$PokedProfileDetailCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: '_id') String id, String firstName, String? lastName, List<String> bestShorts, String? shortBio, List<String>? lifestyleLikes
+ String id, String firstName, String? lastName, List<String> bestShorts, String? shortBio, List<String>? lifestyleLikes
 });
 
 

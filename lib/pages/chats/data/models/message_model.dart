@@ -3,7 +3,6 @@ import 'package:fennac_app/pages/chats/data/models/reaction_model.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'message_model.freezed.dart';
-part 'message_model.g.dart';
 
 @freezed
 abstract class MessageModel with _$MessageModel {
@@ -31,14 +30,16 @@ abstract class MessageModel with _$MessageModel {
   }) = _MessageModel;
 
   factory MessageModel.fromJson(Map<String, dynamic> json) {
-    final senderObj = json['senderId'] is Map ? json['senderId'] as Map<String, dynamic> : null;
-    
-    return _$MessageModelFromJson({
+    final senderObj = json['senderId'] is Map
+        ? json['senderId'] as Map<String, dynamic>
+        : null;
+
+    return MessageModel.fromJson({
       ...json,
       'id': json['_id'] ?? json['id'],
       'senderId': senderObj?['_id'] ?? json['senderId'],
-      'senderName': senderObj != null 
-          ? '${senderObj['firstName']} ${senderObj['lastName']}'.trim() 
+      'senderName': senderObj != null
+          ? '${senderObj['firstName']} ${senderObj['lastName']}'.trim()
           : (json['senderName'] ?? ''),
       'isMe': json['isFromMe'] ?? json['isMe'] ?? false,
       'sentAt': json['createdAt'] ?? json['sentAt'],
