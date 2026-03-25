@@ -3,6 +3,7 @@ import 'package:fennac_app/core/network/api_helper.dart';
 import '../model/my_group_model.dart';
 
 abstract class MyGroupDatasource {
+  Future<dynamic> unMatchGroup(String groupId);
   Future<dynamic> setActiveGroup(String groupId);
   Future<MyGroupModel> fetchGroupById(String groupId);
   Future<MyGroupModel> updateGroupById(
@@ -67,6 +68,19 @@ abstract class MyGroupDatasource {
 }
 
 class MyGroupDatasourceImpl extends MyGroupDatasource {
+  @override
+  Future<dynamic> unMatchGroup(String groupId) async {
+    try {
+      final response = await apiHelper.post(
+        '${AppConstants.groupById}$groupId/leave',
+        requiresAuth: true,
+      );
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   @override
   Future<dynamic> setActiveGroup(String groupId) async {
     try {

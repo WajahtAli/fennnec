@@ -83,8 +83,14 @@ class InterleavedMediaSection extends StatelessWidget {
           final item = interleavedItems[index];
 
           if (item is String) {
+            final imageIndex = bestShorts.indexOf(item);
+
+            final displayImage = imageIndex == 0 && bestShorts.length > 1
+                ? bestShorts[1]
+                : item;
+
             return _ImageItem(
-              imagePath: item,
+              imagePath: displayImage,
               onEditTap: onImageEditTap,
               isNeedEdit: isNeedEdit,
             );

@@ -3,6 +3,8 @@ import 'package:auto_route/auto_route.dart';
 import 'package:fennac_app/app/constants/media_query_constants.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
+import 'package:fennac_app/pages/liked_groups/presentation/screen/liked_groups_screen.dart';
+import 'package:fennac_app/pages/my_group/presentation/bloc/cubit/my_group_cubit.dart';
 import 'package:fennac_app/pages/profile/presentation/screen/appearence_screen.dart';
 import 'package:fennac_app/pages/profile/presentation/widgets/poke_balance_tile.dart';
 import 'package:fennac_app/pages/profile/presentation/widgets/profile_header.dart';
@@ -32,6 +34,10 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   final ValueNotifier<bool> _blurNotifier = ValueNotifier<bool>(false);
 
+  Future<void> _fetchGroup() async {
+    await Di().sl<MyGroupCubit>().fetchGroupById('');
+  }
+
   @override
   void dispose() {
     _blurNotifier.dispose();
@@ -49,68 +55,104 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               MovableBackground(
                 backgroundType: MovableBackgroundType.dark,
-                child: SafeArea(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 20,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        ProfileHeader(),
-                        const CustomSizedBox(height: 20),
-                        BlocBuilder(
-                          bloc: Di().sl<LoginCubit>(),
-                          builder: (context, state) {
-                            return PokeBalanceTile(
-                              pokeCount: validateInt(
-                                Di()
-                                        .sl<LoginCubit>()
-                                        .userData
-                                        ?.user
-                                        ?.pokeBalance ??
-                                    0,
-                              ),
-                              onBuyMore: () {
-                                AutoRouter.of(
-                                  context,
-                                ).push(const BuyPokeRoute());
-                              },
-                            );
-                          },
-                        ),
-                        const CustomSizedBox(height: 24),
-
-                        Container(
-                          decoration: BoxDecoration(
-                            color: isLightTheme(context)
-                                ? ColorPalette.textGrey
-                                : ColorPalette.black.withValues(alpha: 0.25),
-
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Column(
-                            children: [
-                              ProfileListTile(
-                                isSwitchGroupTile: true,
-                                title: 'Switch Groups',
-                                onTap: () {
-                                  showSwitchGroupsBottomSheet(
+                child: RefreshIndicator(
+                  onRefresh: _fetchGroup,
+                  child: SafeArea(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 20,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          ProfileHeader(),
+                          const CustomSizedBox(height: 20),
+                          BlocBuilder(
+                            bloc: Di().sl<LoginCubit>(),
+                            builder: (context, state) {
+                              return PokeBalanceTile(
+                                pokeCount: validateInt(
+                                  Di()
+                                          .sl<LoginCubit>()
+                                          .userData
+                                          ?.user
+                                          ?.pokeBalance ??
+                                      0,
+                                ),
+                                onBuyMore: () {
+                                  AutoRouter.of(
                                     context,
-                                    blurNotifier: _blurNotifier,
-                                  );
+                                  ).push(const BuyPokeRoute());
                                 },
-                              ),
-                            ],
+                              );
+                            },
                           ),
-                        ),
-                        const CustomSizedBox(height: 32),
-                        _buildYourProfileSection(context),
-                        const CustomSizedBox(height: 32),
-                        _buildAccountSettingsSection(context),
-                        const CustomSizedBox(height: 100),
-                      ],
+                          const CustomSizedBox(height: 24),
+
+                          if (Di()
+                                  .sl<LoginCubit>()
+                                  .userData
+                                  ?.user
+                                  ?.accountStatus
+                                  ?.toLowerCase() ==
+                              'active'.toLowerCase()) ...[
+                            Container(
+                              decoration: BoxDecoration(
+                                color: isLightTheme(context)
+                                    ? ColorPalette.textGrey
+                                    : ColorPalette.black.withValues(
+                                        alpha: 0.25,
+                                      ),
+                                border: Border.all(
+                                  color: ColorPalette.grey,
+                                  width: 1,
+                                ),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Column(
+                                children: [
+                                  ProfileListTile(
+                                    isSwitchGroupTile: true,
+                                    showDivider: false,
+                                    title: 'People Who Liked You',
+                                    onTap: () {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const LikedGroupsScreen(),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                  Divider(
+                                    height: 1,
+                                    color: isLightTheme(context)
+                                        ? ColorPalette.grey
+                                        : ColorPalette.grey,
+                                  ),
+                                  ProfileListTile(
+                                    isSwitchGroupTile: true,
+                                    showDivider: false,
+                                    title: 'Switch Groups',
+                                    onTap: () {
+                                      showSwitchGroupsBottomSheet(
+                                        context,
+                                        blurNotifier: _blurNotifier,
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                          const CustomSizedBox(height: 32),
+                          _buildYourProfileSection(context),
+                          const CustomSizedBox(height: 32),
+                          _buildAccountSettingsSection(context),
+                          const CustomSizedBox(height: 100),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -151,27 +193,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 : ColorPalette.black.withValues(alpha: 0.25),
 
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: isLightTheme(context)
-                  ? Colors.transparent
-                  : ColorPalette.grey,
-              width: 1,
-            ),
+            border: Border.all(color: ColorPalette.grey, width: 1),
           ),
           child: Column(
             children: [
               ProfileListTile(
                 title: 'Edit Public Profile',
+                showDivider: false,
                 onTap: () {
                   AutoRouter.of(context).push(const EditPublicProfileRoute());
                 },
               ),
-              Container(
-                height: 1,
-                color: isLightTheme(context)
-                    ? Colors.transparent
-                    : ColorPalette.grey,
-              ),
+              Container(height: 1, color: ColorPalette.grey),
               ProfileListTile(
                 title: 'Your Groups',
                 onTap: () {
@@ -189,6 +222,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               ProfileListTile(
                 title: 'Find a Group with QR Code',
+                showDivider: false,
                 onTap: () {
                   AutoRouter.of(context).push(FindGroupRoute());
                 },
@@ -231,6 +265,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       'email') ...[
                     ProfileListTile(
                       title: 'Change Password',
+                      showDivider: false,
                       onTap: () {
                         AutoRouter.of(
                           context,

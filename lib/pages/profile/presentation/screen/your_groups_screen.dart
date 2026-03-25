@@ -65,45 +65,46 @@ class _YourGroupsScreenState extends State<YourGroupsScreen> {
         children: [
           MovableBackground(
             backgroundType: MovableBackgroundType.dark,
-            child: Column(
-              children: [
-                CustomAppBar(title: 'Your Groups'),
-                CustomSizedBox(height: 16),
-                if (Di()
-                        .sl<LoginCubit>()
-                        .userData
-                        ?.user
-                        ?.accountStatus
-                        ?.toLowerCase() ==
-                    'active'.toLowerCase())
-                  PremiumCard(isGradientTitle: true),
-                CustomSizedBox(height: 10),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: AppText(
-                      text: 'Your Groups',
-                      textAlign: TextAlign.left,
-                      style: AppTextStyles.subHeading(
-                        context,
-                      ).copyWith(fontWeight: FontWeight.bold),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  CustomAppBar(title: 'Your Groups'),
+                  CustomSizedBox(height: 16),
+                  if (Di()
+                          .sl<LoginCubit>()
+                          .userData
+                          ?.user
+                          ?.accountStatus
+                          ?.toLowerCase() ==
+                      'active'.toLowerCase())
+                    PremiumCard(isGradientTitle: true),
+                  CustomSizedBox(height: 10),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: AppText(
+                        text: 'Your Groups',
+                        textAlign: TextAlign.left,
+                        style: AppTextStyles.subHeading(
+                          context,
+                        ).copyWith(fontWeight: FontWeight.bold),
+                      ),
                     ),
                   ),
-                ),
-                BlocBuilder<MyGroupCubit, MyGroupState>(
-                  bloc: _myGroupCubit,
-                  builder: (context, state) {
-                    if (state is MyGroupLoading) {
-                      return GroupCardSkeleton();
-                    }
+                  BlocBuilder<MyGroupCubit, MyGroupState>(
+                    bloc: _myGroupCubit,
+                    builder: (context, state) {
+                      if (state is MyGroupLoading) {
+                        return GroupCardSkeleton();
+                      }
 
-                    var groupList = _myGroupCubit.myGroupList?.groupList;
+                      var groupList = _myGroupCubit.myGroupList?.groupList;
 
-                    return Expanded(
-                      child: ListView.builder(
+                      return ListView.builder(
                         itemCount: groupList?.length ?? 0,
                         padding: EdgeInsets.zero,
+                        physics: NeverScrollableScrollPhysics(),
                         shrinkWrap: true,
                         itemBuilder: (context, index) {
                           final group = groupList?[index];
@@ -147,11 +148,11 @@ class _YourGroupsScreenState extends State<YourGroupsScreen> {
                                 _showGroupOptions(group ?? MyGroupData()),
                           );
                         },
-                      ),
-                    );
-                  },
-                ),
-              ],
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
           ValueListenableBuilder<bool>(

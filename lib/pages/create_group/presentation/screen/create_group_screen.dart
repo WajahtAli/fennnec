@@ -7,6 +7,7 @@ import 'package:fennac_app/bloc/cubit/imagepicker_cubit.dart';
 import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:fennac_app/helpers/gradient_toast.dart';
+import 'package:fennac_app/pages/create_group/presentation/bloc/cubit/contact_list_cubit.dart';
 import 'package:fennac_app/pages/create_group/presentation/bloc/cubit/create_group_cubit.dart';
 import 'package:fennac_app/pages/create_group/presentation/bloc/state/create_group_state.dart';
 import 'package:fennac_app/pages/create_group/presentation/widgets/create_group_content.dart';
@@ -126,11 +127,28 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                           Di().sl<MyGroupCubit>().myGroupModel?.data?.id ?? '',
                     );
                   } else {
-                    // if () {
-                    // }
-                    AutoRouter.of(context).push(
-                      CreateGroupGalleryRoute(isEditMode: widget.isEditMode),
-                    );
+                    final contactListCubit = Di().sl<ContactListCubit>();
+                    final createGroupCubit = Di().sl<CreateGroupCubit>();
+
+                    if (contactListCubit.selectedMembers.length < 2) {
+                      VxToast.show(
+                        message:
+                            'Please select at least 2 members to create a group.',
+                      );
+                    } else if (createGroupCubit.groupTitle.trim().isEmpty) {
+                      VxToast.show(message: 'Group title is required');
+                    } else if (createGroupCubit.groupBio.trim().isEmpty) {
+                      VxToast.show(message: 'Short bio is required');
+                    } else if (createGroupCubit.selectedInterests.isEmpty ||
+                        createGroupCubit.fitsForGroup.trim().isEmpty) {
+                      VxToast.show(
+                        message: 'Please describe what fits your group well',
+                      );
+                    } else {
+                      AutoRouter.of(context).push(
+                        CreateGroupGalleryRoute(isEditMode: widget.isEditMode),
+                      );
+                    }
                   }
                 },
               ),

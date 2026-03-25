@@ -2,6 +2,10 @@ import '../../data/model/my_group_model.dart';
 import '../repository/my_group_repository.dart';
 
 class MyGroupUsecase {
+  Future<dynamic> unMatchGroup(String groupId) async {
+    return await _repository.unMatchGroup(groupId);
+  }
+
   Future<dynamic> setActiveGroup(String groupId) async {
     return await _repository.setActiveGroup(groupId);
   }

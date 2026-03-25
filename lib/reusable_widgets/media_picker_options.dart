@@ -105,6 +105,7 @@ class MediaPickerOptions extends StatelessWidget {
                 Navigator.pop(context);
                 _imagePickerCubit.pickImagesFromGallery(
                   containerIndex: containerIndex,
+                  context: context,
                 );
               },
             ),

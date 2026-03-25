@@ -5,7 +5,6 @@ import 'package:fennac_app/app/constants/media_query_constants.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/core/di_container.dart';
-import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:fennac_app/pages/homelanding/data/models/group_invitation_model.dart';
 import 'package:fennac_app/pages/homelanding/presentation/bloc/cubit/home_landing_cubit.dart';
 import 'package:fennac_app/pages/homelanding/presentation/bloc/state/home_landing_state.dart';
@@ -14,7 +13,6 @@ import 'package:fennac_app/widgets/custom_sized_box.dart';
 import 'package:fennac_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class HomeLandingBanner extends StatelessWidget {
   const HomeLandingBanner({super.key});
@@ -41,7 +39,7 @@ class HomeLandingBanner extends StatelessWidget {
                     .map((m) => m.firstName ?? '')
                     .where((name) => name.isNotEmpty)
                     .join(',\t')
-              : 'Group Members';
+              : _homeLandingCubit.defaultData?.groupTitle ?? 'Group';
           // Get inviter name
           final inviterName = inviter != null
               ? '${inviter.firstName ?? ''} ${inviter.lastName ?? ''}'.trim()
@@ -81,7 +79,8 @@ class HomeLandingBanner extends StatelessWidget {
                     AppText(
                       text: group != null
                           ? 'Group "${group.title ?? group.name}" created by $inviterName'
-                          : 'Group created by $inviterName',
+                          : _homeLandingCubit.defaultData?.groupDesc ??
+                                'a friend',
                       style: AppTextStyles.description(context).copyWith(
                         color: isDarkTheme(context)
                             ? ColorPalette.textSecondary
@@ -202,105 +201,107 @@ class HomeLandingBanner extends StatelessWidget {
   }
 
   Widget _buildGroupImage(BuildContext context, Group? group) {
-    if (group?.photosVideos != null && group!.photosVideos!.isNotEmpty) {
-      return CachedNetworkImage(
-        imageUrl: group.photosVideos?.first ?? '',
-        fit: BoxFit.cover,
+    final String? imageUrl = group?.photosVideos?.isNotEmpty == true
+        ? group!.photosVideos!.first
+        : _homeLandingCubit.defaultData?.coverImage;
 
-        errorWidget: (context, url, error) {
-          return _buildPlaceholderAvatar(Assets.icons.logoAnimation.path);
-        },
+    if (imageUrl != null && imageUrl.isNotEmpty) {
+      return CachedNetworkImage(
+        imageUrl: imageUrl,
+        fit: BoxFit.cover,
+        errorWidget: (context, url, error) => _buildCoverPlaceholder(),
       );
     }
-    return Image.asset(Assets.dummy.groupSelfie.path, fit: BoxFit.cover);
+    return _buildCoverPlaceholder();
   }
 
-  static const _dummyAvatars = [
-    'assets/dummy/a1.png',
-    'assets/dummy/b1.png',
-    'assets/dummy/c1.png',
-    'assets/dummy/d1.png',
-  ];
-
-  Widget _buildMemberAvatar(BuildContext context, Member? member, int index) {
-    final bool isDeclined =
-        _homeLandingCubit.invitationStatus == InvitationStatus.declined;
-
-    final double size = getWidth(context) > 370 ? 64 : 54;
-    final String dummyPath = _dummyAvatars[index % _dummyAvatars.length];
-
-    return SizedBox(
-      width: size,
-      height: size,
+  Widget _buildCoverPlaceholder() {
+    return Container(
+      color: ColorPalette.textGrey,
       child: Center(
-        child: Container(
-          width: size,
-          height: size,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(color: Colors.black, width: 2),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.2),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: ClipOval(
-            child: ColorFiltered(
-              colorFilter: isDeclined
-                  ? const ColorFilter.matrix(<double>[
-                      0.2126,
-                      0.7152,
-                      0.0722,
-                      0,
-                      0,
-                      0.2126,
-                      0.7152,
-                      0.0722,
-                      0,
-                      0,
-                      0.2126,
-                      0.7152,
-                      0.0722,
-                      0,
-                      0,
-                      0,
-                      0,
-                      0,
-                      1,
-                      0,
-                    ])
-                  : const ColorFilter.mode(Colors.transparent, BlendMode.dst),
-              child:
-                  member != null &&
-                      member.image != null &&
-                      member.image!.isNotEmpty
-                  ? Image.network(
-                      member.image!,
-                      fit: BoxFit.cover,
-                      alignment: Alignment.center,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Image.asset(dummyPath, fit: BoxFit.cover);
-                      },
-                    )
-                  : Image.asset(dummyPath, fit: BoxFit.cover),
-            ),
-          ),
-        ),
+        child: Icon(Icons.group, color: ColorPalette.primary, size: 64),
       ),
     );
   }
 
-  Widget _buildPlaceholderAvatar(String imagePath) {
-    return imagePath.isNotEmpty
-        ? SizedBox(
-            height: 60,
-            width: 60,
-            child: SvgPicture.asset(imagePath, color: ColorPalette.primary),
-          )
-        : Icon(Icons.account_circle, color: ColorPalette.primary, size: 64);
+  Widget _buildMemberAvatar(BuildContext context, Member? member, int index) {
+    final bool isDeclined =
+        _homeLandingCubit.invitationStatus == InvitationStatus.declined;
+    final double size = getWidth(context) > 370 ? 64 : 54;
+
+    final List<String> defaultAvatars =
+        _homeLandingCubit.defaultData?.membersImages ?? [];
+    final String? fallbackUrl = defaultAvatars.isNotEmpty
+        ? defaultAvatars[index % defaultAvatars.length]
+        : null;
+
+    final String? imageUrl =
+        (member?.image != null && member!.image!.isNotEmpty)
+        ? member.image
+        : fallbackUrl;
+
+    return SizedBox(
+      width: size,
+      height: size,
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(color: Colors.black, width: 2),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.2),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: ClipOval(
+          child: ColorFiltered(
+            colorFilter: isDeclined
+                ? const ColorFilter.matrix(<double>[
+                    0.2126,
+                    0.7152,
+                    0.0722,
+                    0,
+                    0,
+                    0.2126,
+                    0.7152,
+                    0.0722,
+                    0,
+                    0,
+                    0.2126,
+                    0.7152,
+                    0.0722,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                  ])
+                : const ColorFilter.mode(Colors.transparent, BlendMode.dst),
+            child: imageUrl != null && imageUrl.isNotEmpty
+                ? CachedNetworkImage(
+                    imageUrl: imageUrl,
+                    fit: BoxFit.cover,
+                    errorWidget: (context, url, error) => Icon(
+                      Icons.account_circle,
+                      color: ColorPalette.primary,
+                      size: size,
+                    ),
+                  )
+                : Icon(
+                    Icons.account_circle,
+                    color: ColorPalette.primary,
+                    size: size,
+                  ),
+          ),
+        ),
+      ),
+    );
   }
 }
 

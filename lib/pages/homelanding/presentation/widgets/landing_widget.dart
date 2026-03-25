@@ -24,8 +24,8 @@ class LandingWidget extends StatelessWidget {
         children: [
           Center(
             child: Assets.icons.groupUsersIcon4.svg(
-              width: getWidth(context) > 370 ? 72 : 62,
-              height: getWidth(context) > 370 ? 72 : 62,
+              width: getWidth(context) > 370 ? 52 : 42,
+              height: getWidth(context) > 370 ? 52 : 42,
               color: ColorPalette.primary,
             ),
           ),

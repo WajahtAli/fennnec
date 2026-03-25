@@ -1,4 +1,3 @@
-import 'package:fennac_app/app/constants/app_enums.dart';
 import 'package:fennac_app/app/constants/media_query_constants.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/app_emojis.dart';
@@ -192,7 +191,11 @@ class PremiumCard extends StatelessWidget {
                                   : const SizedBox.shrink(),
                               isLoading: pokeCubit.isSubscriptionPurchasing,
                               onTap: () {
-                                pokeCubit.purchaseSubscription('monthly');
+                                VxToast.show(
+                                  message: 'Upgrade feature coming soon!',
+                                );
+                                // todo
+                                // pokeCubit.purchaseSubscription('monthly');
                               },
                             ),
                             // const CustomSizedBox(height: 12),

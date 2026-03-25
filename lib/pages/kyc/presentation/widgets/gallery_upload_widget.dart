@@ -189,6 +189,7 @@ class GalleryUploadWidget extends StatelessWidget {
                   Navigator.pop(context);
                   cubit.pickImagesFromGallery(
                     containerIndex: containerIndex ?? -1,
+                    context: context,
                   );
                 },
               ),

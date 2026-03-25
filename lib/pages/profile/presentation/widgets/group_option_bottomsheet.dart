@@ -226,7 +226,7 @@ class GroupOptionsBottomSheet extends StatelessWidget {
                   onButtonPressed: () async {
                     final bool isUnmatched = await Di()
                         .sl<MyGroupCubit>()
-                        .unMatchGroupById(groupData.id ?? '');
+                        .unMatchGroup(groupData.id ?? '');
                     if (!context.mounted || !isUnmatched) {
                       return;
                     }
@@ -237,8 +237,8 @@ class GroupOptionsBottomSheet extends StatelessWidget {
                         icon: Assets.icons.checkGreen.path,
                         isPng: true,
                       ),
-                      title: 'Group Deleted',
-                      description: 'Your group has been successfully removed.',
+                      title: 'Group Left',
+                      description: 'Your group has been successfully left.',
                       descriptionStyle: AppTextStyles.h4(context),
                       description1:
                           "You can always create a new group or join an existing one whenever you’re ready to connect again.",

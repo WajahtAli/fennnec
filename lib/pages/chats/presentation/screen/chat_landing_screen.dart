@@ -46,20 +46,25 @@ class _ChatLandingScreenState extends State<ChatLandingScreen> {
           bloc: _chatLandingCubit,
           builder: (context, state) {
             return SafeArea(
-              child: Column(
-                children: [
-                  const CustomSizedBox(height: 16),
-                  ChatTabSelector(),
-                  const CustomSizedBox(height: 8),
-                  Expanded(
-                    child: state.selectedTab == 0
-                        ? _buildChatsContent(state)
-                        : _buildCallsContent(state),
-                  ),
-                  CustomSizedBox(
-                    height: MediaQuery.paddingOf(context).bottom + 30,
-                  ),
-                ],
+              child: RefreshIndicator(
+                color: ColorPalette.primary,
+                backgroundColor: Colors.white,
+                onRefresh: () => _chatLandingCubit.fetchChatsAndCalls(),
+                child: Column(
+                  children: [
+                    const CustomSizedBox(height: 16),
+                    ChatTabSelector(),
+                    const CustomSizedBox(height: 8),
+                    Expanded(
+                      child: state.selectedTab == 0
+                          ? _buildChatsContent(state)
+                          : _buildCallsContent(state),
+                    ),
+                    CustomSizedBox(
+                      height: MediaQuery.paddingOf(context).bottom + 30,
+                    ),
+                  ],
+                ),
               ),
             );
           },

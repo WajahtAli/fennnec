@@ -90,20 +90,12 @@ class ProfileListTile extends StatelessWidget {
                       .myGroupList
                       ?.groupList
                       ?.firstOrNull;
-                  // Keep empty strings for missing images so initials can be
-                  // rendered at the same member index.
+
                   final avatarPaths =
                       firstGroup?.members
                           ?.map((member) => member.image ?? '')
                           .toList() ??
-                      [
-                        Assets.dummy.a1.path,
-                        Assets.dummy.a2.path,
-                        Assets.dummy.a3.path,
-                        Assets.dummy.a4.path,
-                        Assets.dummy.a5.path,
-                      ];
-
+                      [];
                   return MemberAvatarWidget(
                     avatarSize: 32,
                     overlap: 24,

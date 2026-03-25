@@ -29,13 +29,27 @@ class NotificationSettingsDatasourceImpl
   Future<NotificationSettingsModel> updateNotificationSettings({
     required NotificationSettingsModel notificationSettingsModel,
   }) async {
+    // Ensure all fields are sent, even if missing from the model
+    final defaultSettings = {
+      'groupMatches': false,
+      'newLikes': false,
+      'newPokes': false,
+      'newMessages': false,
+      'callsAndMissedCalls': false,
+      'messageReactions': false,
+      'mentionsAndReplies': false,
+      'groupInvitesAndRequests': false,
+      'appAnnouncements': false,
+      'email': false,
+    };
+    final settings = {
+      ...defaultSettings,
+      ...(notificationSettingsModel.data?.notificationSettings ?? {}),
+    };
     final response = await apiHelper.put(
       AppConstants.notificationSettings,
       requiresAuth: true,
-      body: {
-        'notificationSettings':
-            notificationSettingsModel.data?.notificationSettings ?? {},
-      },
+      body: {'notificationSettings': settings},
     );
 
     return NotificationSettingsModel.fromJson(response);

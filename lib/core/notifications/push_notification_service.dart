@@ -25,11 +25,25 @@ class PushNotificationService {
       provisional: false,
     );
 
-    final String? token = await _firebaseMessaging.getToken();
-    debugPrint('FCM Token: $token');
+    // Wait for APNS token on iOS before calling getToken
+    String? token;
+    bool gotToken = false;
+    try {
+      token = await _firebaseMessaging.getToken();
+      gotToken = token != null && token.isNotEmpty;
+    } catch (e) {
+      debugPrint('FCM getToken error (may be APNS not ready yet): $e');
+    }
 
-    if (token != null) {
-      Di().sl<CreateAccountCubit>().updateProfile(fcmToken: token);
+    if (!gotToken) {
+      // Listen for token refresh (APNS registration)
+      _firebaseMessaging.onTokenRefresh.listen((newToken) {
+        debugPrint('FCM Token (onTokenRefresh): $newToken');
+        Di().sl<CreateAccountCubit>().updateProfile(fcmToken: newToken);
+      });
+    } else {
+      debugPrint('FCM Token: $token');
+      Di().sl<CreateAccountCubit>().updateProfile(fcmToken: token!);
     }
 
     FirebaseMessaging.onMessage.listen(_onForegroundMessage);

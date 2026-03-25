@@ -4,7 +4,6 @@ import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/app_emojis.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/core/di_container.dart';
-import 'package:fennac_app/pages/auth/presentation/bloc/cubit/login_cubit.dart';
 import 'package:fennac_app/pages/buy_poke/presentation/bloc/cubit/poke_cubit.dart';
 import 'package:fennac_app/pages/buy_poke/presentation/bloc/state/poke_state.dart';
 import 'package:fennac_app/pages/buy_poke/presentation/widgets/poke_pack_tile.dart';

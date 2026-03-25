@@ -12,6 +12,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class ContactListCubit extends Cubit<ContactListState> {
+  // Track invited phone/email for UI
+  final Set<String> invitedContacts = {};
   final CreateGroupUsecase _createGroupUsecase;
 
   ContactListCubit(this._createGroupUsecase) : super(ContactListInitial());
@@ -175,6 +177,10 @@ class ContactListCubit extends Cubit<ContactListState> {
       final message = response is Map<String, dynamic>
           ? response['message']?.toString()
           : null;
+      // Mark as invited for UI
+      if (phone != null && phone.isNotEmpty) invitedContacts.add(phone);
+      if (email != null && email.isNotEmpty) invitedContacts.add(email);
+      emit(ContactListLoaded());
       VxToast.show(
         message: message ?? 'Invite sent',
         icon: Assets.icons.checkGreen.path,

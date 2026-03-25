@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/widgets/custom_sized_box.dart';
 import 'package:fennac_app/widgets/movable_background.dart';

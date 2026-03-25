@@ -94,10 +94,13 @@ class _SwitchGroupsBottomSheetState extends State<SwitchGroupsBottomSheet> {
                 if (groupList == null || groupList.isEmpty) {
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 32),
-                    child: Center(
-                      child: Text(
-                        'No groups available',
-                        style: AppTextStyles.description(context),
+                    child: SizedBox(
+                      height: 120,
+                      child: Center(
+                        child: Text(
+                          'No groups available',
+                          style: AppTextStyles.description(context),
+                        ),
                       ),
                     ),
                   );

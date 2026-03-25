@@ -216,6 +216,30 @@ class _ProfileHeaderState extends State<ProfileHeader> {
                       context,
                     ).copyWith(fontWeight: FontWeight.w500),
                   ),
+                  if (_loginCubit.userData?.user?.accountStatus != null &&
+                      _loginCubit.userData!.user!.accountStatus!
+                              .toLowerCase() ==
+                          'active'.toLowerCase()) ...[
+                    const SizedBox(width: 8),
+                    Tooltip(
+                      message: 'Premium User',
+                      triggerMode: TooltipTriggerMode.longPress,
+                      decoration: BoxDecoration(
+                        color: ColorPalette.primary,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      textStyle: AppTextStyles.inputLabel(context).copyWith(
+                        color: ColorPalette.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      child: SvgPicture.asset(
+                        Assets.icons.diamondStone.path,
+                        width: getWidth(context) > 370 ? 24 : 20,
+                        height: getWidth(context) > 370 ? 24 : 20,
+                      ),
+                    ),
+                  ],
+
                   const SizedBox(width: 8),
                   if (_loginCubit.userData?.user?.isVerified == true)
                     SvgPicture.asset(

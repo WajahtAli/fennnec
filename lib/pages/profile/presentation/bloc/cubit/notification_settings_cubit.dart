@@ -1,6 +1,5 @@
 import 'dart:developer';
 
-import 'package:fennac_app/app/constants/dummy_constants.dart';
 import 'package:fennac_app/helpers/gradient_toast.dart';
 import 'package:fennac_app/models/dummy/notification_tile_model.dart';
 import 'package:fennac_app/pages/profile/data/models/notification_settings_model.dart';
@@ -19,6 +18,8 @@ class NotificationSettingsCubit extends Cubit<NotificationSettingsState> {
 
   static const List<String> _settingsKeys = [
     'groupMatches',
+    'newLikes',
+    'newPokes',
     'newMessages',
     'callsAndMissedCalls',
     'messageReactions',
@@ -28,10 +29,61 @@ class NotificationSettingsCubit extends Cubit<NotificationSettingsState> {
     'email',
   ];
 
-  final List<NotificationTileData> notificationItems = DummyConstants
-      .notificationItems
-      .map((e) => e.copyWith())
-      .toList();
+  final List<NotificationTileData> notificationItems = [
+    NotificationTileData(
+      title: 'Group Matches',
+      subtitle: 'Get notified when your group matches with another group.',
+      value: false,
+    ),
+    NotificationTileData(
+      title: 'New Likes',
+      subtitle: 'Get notified when someone likes your profile or content.',
+      value: false,
+    ),
+    NotificationTileData(
+      title: 'New Pokes',
+      subtitle: 'Get notified when someone pokes you.',
+      value: false,
+    ),
+    NotificationTileData(
+      title: 'New Messages',
+      subtitle: 'Alerts for incoming messages and media in your chats.',
+      value: false,
+    ),
+    NotificationTileData(
+      title: 'Calls & Missed Calls',
+      subtitle:
+          'Receive notifications for incoming and missed voice or video calls.',
+      value: false,
+    ),
+    NotificationTileData(
+      title: 'Message Reactions',
+      subtitle: 'Stay updated when someone reacts to your messages.',
+      value: false,
+    ),
+    NotificationTileData(
+      title: 'Mentions & Replies',
+      subtitle:
+          'Be notified when someone tags or replies to you in group chats.',
+      value: false,
+    ),
+    NotificationTileData(
+      title: 'Group Invites & Requests',
+      subtitle: 'Alerts for new group invitations and join requests.',
+      value: false,
+    ),
+    NotificationTileData(
+      title: 'App Announcements',
+      subtitle:
+          'Important updates, new features, and system messages from Fennec.',
+      value: false,
+    ),
+    NotificationTileData(
+      title: 'Email Notifications',
+      subtitle: 'Receive summaries and important alerts via email.',
+      value: false,
+    ),
+  ];
 
   Future<void> fetchNotificationSettings() async {
     emit(NotificationSettingsLoading());

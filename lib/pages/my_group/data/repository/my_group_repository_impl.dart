@@ -5,6 +5,11 @@ import '../model/my_group_model.dart';
 
 class MyGroupRepositoryImpl extends MyGroupRepository {
   @override
+  Future<dynamic> unMatchGroup(String groupId) async {
+    return await _datasource.unMatchGroup(groupId);
+  }
+
+  @override
   Future<dynamic> setActiveGroup(String groupId) async {
     return await _datasource.setActiveGroup(groupId);
   }

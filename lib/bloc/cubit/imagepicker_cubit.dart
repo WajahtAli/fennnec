@@ -1,3 +1,4 @@
+import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
@@ -51,12 +52,13 @@ class ImagePickerCubit extends Cubit<ImagePickerState> {
     emit(ImagePickerError(message, mediaList: _snapshotMediaList()));
   }
 
-
-
-  /// Pick single image from gallery and add to specific index
-  Future<void> pickImagesFromGallery({int? containerIndex}) async {
+  Future<void> pickImagesFromGallery({
+    required BuildContext context,
+    int? containerIndex,
+  }) async {
     final int remainingSlots = maxMediaItems - mediaList.length;
     containerIndex = remainingSlots > 1 ? null : containerIndex;
+
     log(
       'Container Index: $containerIndex, Remaining Slots: $remainingSlots mediaListLength: ${mediaList.length}',
     );
@@ -69,38 +71,43 @@ class ImagePickerCubit extends Cubit<ImagePickerState> {
     _emitLoading();
 
     try {
-      List<XFile> pickedFiles = [];
+      List<MediaItem> pickedItems = [];
 
-      if (containerIndex == null) {
-        // multi picker
-        final result = await _imagePicker.pickMultiImage(limit: remainingSlots);
+      final List<AssetEntity>? assets = await AssetPicker.pickAssets(
+        context,
+        pickerConfig: AssetPickerConfig(
+          requestType: RequestType.image,
+          maxAssets: containerIndex == null ? remainingSlots : 1,
+        ),
+      );
 
-        // ✅ enforce limit manually (IMPORTANT)
-        pickedFiles = result.take(remainingSlots).toList();
-      } else {
-        // single picker
-        final XFile? file = await _imagePicker.pickImage(
-          source: ImageSource.gallery,
+      if (assets != null && assets.isNotEmpty) {
+        final allowedAssets = assets.take(
+          containerIndex == null ? remainingSlots : 1,
         );
-        if (file != null) pickedFiles = [file];
+
+        for (final asset in allowedAssets) {
+          final file = await asset.file;
+          if (file == null) continue;
+
+          pickedItems.add(
+            MediaItem(
+              path: file.path,
+              type: MediaType.image,
+              id: DateTime.now().millisecondsSinceEpoch.toString(),
+            ),
+          );
+        }
       }
 
-      if (pickedFiles.isEmpty) {
+      if (pickedItems.isEmpty) {
         _emitLoaded();
         return;
       }
 
       int currentIndex = containerIndex ?? mediaList.length;
 
-      for (final file in pickedFiles) {
-        final croppedPath = file.path;
-
-        final newItem = MediaItem(
-          path: croppedPath,
-          type: MediaType.image,
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
-        );
-
+      for (final newItem in pickedItems) {
         if (containerIndex != null) {
           if (containerIndex == -1) {
             selectedImage = File(newItem.path);
@@ -115,15 +122,12 @@ class ImagePickerCubit extends Cubit<ImagePickerState> {
 
           currentIndex++;
         } else {
-          mediaList.add(newItem);
+          if (mediaList.length < maxMediaItems) {
+            mediaList.add(newItem);
+          }
         }
 
         if (mediaList.length >= maxMediaItems) break;
-      }
-
-      // optional warning
-      if (containerIndex == null && pickedFiles.length > remainingSlots) {
-        _emitError('Only $remainingSlots images allowed');
       }
 
       _emitLoaded();
@@ -380,8 +384,10 @@ class ImagePickerCubit extends Cubit<ImagePickerState> {
   /// Get remaining slots
   int get remainingSlots => maxMediaItems - mediaList.length;
 
-  Future<void> pickMultipleImagesFromGallery() async {
-    await pickImagesFromGallery();
+  Future<void> pickMultipleImagesFromGallery({
+    required BuildContext context,
+  }) async {
+    await pickImagesFromGallery(context: context);
   }
 
   /// Pick GIF from Giphy

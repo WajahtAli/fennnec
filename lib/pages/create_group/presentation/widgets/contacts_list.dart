@@ -55,16 +55,22 @@ class ContactsList extends StatelessWidget {
                 ? () {
                     cubit.addMember(item.toSelectedMember());
                   }
-                : null;
+                : () {};
 
+            final isInvited =
+                isInviteOnly &&
+                (cubit.invitedContacts.contains(item.phone) ||
+                    (item.email.isNotEmpty &&
+                        cubit.invitedContacts.contains(item.email)));
             return ContactListItem(
               name: item.name,
               email: item.email,
               phone: item.phone,
               isSelected: isSelected,
               isInviteOnly: isInviteOnly,
+              isInvited: isInvited,
               onAdd: addCallback,
-              onInvite: isInviteOnly
+              onInvite: isInviteOnly && !isInvited
                   ? () {
                       cubit.sendGroupInvite(
                         email: item.email,
@@ -237,6 +243,7 @@ class ContactListItem extends StatelessWidget {
   final bool isInviteOnly;
   final VoidCallback? onAdd;
   final VoidCallback? onInvite;
+  final bool isInvited;
 
   const ContactListItem({
     super.key,
@@ -247,6 +254,7 @@ class ContactListItem extends StatelessWidget {
     required this.isInviteOnly,
     required this.onAdd,
     required this.onInvite,
+    this.isInvited = false,
   });
 
   @override
@@ -308,28 +316,38 @@ class ContactListItem extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               GestureDetector(
-                onTap: isInviteOnly ? onInvite : (isSelected ? null : onAdd),
+                onTap: isInviteOnly && !isInvited
+                    ? onInvite
+                    : (isSelected ? null : onAdd),
                 child: Container(
                   height: 28,
                   width: 60,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color:
-                        isSelected &&
-                            Theme.of(context).brightness == Brightness.light
-                        ? ColorPalette.textGrey
-                        : ColorPalette.primary,
+                    color: isInviteOnly
+                        ? (isInvited
+                              ? ColorPalette.textGrey
+                              : ColorPalette.primary)
+                        : (isSelected &&
+                                  Theme.of(context).brightness ==
+                                      Brightness.light
+                              ? ColorPalette.textGrey
+                              : ColorPalette.primary),
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: Text(
-                    isInviteOnly ? 'Invite' : (isSelected ? 'Added' : 'Add'),
+                    isInviteOnly
+                        ? (isInvited ? 'Invited' : 'Invite')
+                        : (isSelected ? 'Added' : 'Add'),
                     style: AppTextStyles.chipLabel(context).copyWith(
                       fontWeight: FontWeight.bold,
-                      color:
-                          isSelected &&
-                              Theme.of(context).brightness == Brightness.light
-                          ? ColorPalette.primary
-                          : Colors.white,
+                      color: isInviteOnly
+                          ? (isInvited ? ColorPalette.primary : Colors.white)
+                          : (isSelected &&
+                                    Theme.of(context).brightness ==
+                                        Brightness.light
+                                ? ColorPalette.primary
+                                : Colors.white),
                     ),
                   ),
                 ),

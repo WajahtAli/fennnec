@@ -85,6 +85,40 @@ class MyGroupCubit extends Cubit<MyGroupState> {
     }
   }
 
+  Future<bool> unMatchGroup(String groupId) async {
+    emit(MyGroupLoading());
+    try {
+      final response = await _myGroupUsecase.unMatchGroup(groupId);
+      final String message = response is Map<String, dynamic>
+          ? (response['message']?.toString() ?? 'Left group successfully')
+          : 'Left group successfully';
+
+      if (myGroupModel?.data?.id == groupId) {
+        myGroupModel = null;
+      }
+
+      if (myGroupList?.groupList != null) {
+        final updatedGroupList = myGroupList!.groupList!
+            .where((group) => group.id != groupId)
+            .toList();
+        myGroupList = MyGroupModel(
+          success: myGroupList?.success,
+          message: myGroupList?.message,
+          groupList: updatedGroupList,
+        );
+      }
+
+      VxToast.show(message: message);
+      emit(MyGroupLoaded());
+      return true;
+    } catch (e) {
+      final String errorMessage = e.toString();
+      VxToast.show(message: errorMessage);
+      emit(MyGroupError(errorMessage));
+      return false;
+    }
+  }
+
   Future<bool> deleteGroupById(String groupId) async {
     emit(MyGroupLoading());
     try {

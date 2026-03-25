@@ -55,6 +55,11 @@ import 'package:fennac_app/pages/homelanding/presentation/bloc/cubit/home_landin
 import 'package:fennac_app/pages/create_group/presentation/bloc/cubit/create_group_cubit.dart';
 import 'package:fennac_app/pages/kyc/presentation/bloc/cubit/kyc_cubit.dart';
 import 'package:fennac_app/pages/kyc/presentation/bloc/cubit/kyc_prompt_cubit.dart';
+import 'package:fennac_app/pages/liked_groups/data/datasource/liked_groups_datasource.dart';
+import 'package:fennac_app/pages/liked_groups/data/repository/liked_groups_repository_impl.dart';
+import 'package:fennac_app/pages/liked_groups/domain/repository/liked_groups_repository.dart';
+import 'package:fennac_app/pages/liked_groups/domain/usecase/liked_groups_usecase.dart';
+import 'package:fennac_app/pages/liked_groups/presentation/bloc/cubit/liked_groups_cubit.dart';
 import 'package:fennac_app/pages/my_group/data/datasource/my_group_datasource.dart';
 import 'package:fennac_app/pages/my_group/data/repository/my_group_repository_impl.dart';
 import 'package:fennac_app/pages/my_group/domain/repository/my_group_repository.dart';
@@ -163,6 +168,9 @@ class Di {
       () => HomeLandingDatasourceImpl(sl()),
     );
     sl.registerLazySingleton<PokeDatasource>(() => PokeDatasourceImpl(sl()));
+    sl.registerLazySingleton<LikedGroupsDataSource>(
+      () => LikedGroupsDataSourceImpl(sl()),
+    );
 
     // Repositories
     sl.registerLazySingleton<CreateAccountRepo>(
@@ -204,6 +212,9 @@ class Di {
       () => HomeLandingRepositoryImpl(sl()),
     );
     sl.registerLazySingleton<PokeRepository>(() => PokeRepositoryImpl(sl()));
+    sl.registerLazySingleton<LikedGroupsRepository>(
+      () => LikedGroupsRepositoryImpl(sl()),
+    );
 
     // sl.registerLazySingleton<ChatRepository>(() => ChatRepositoryImpl(sl()));
 
@@ -246,6 +257,9 @@ class Di {
     sl.registerLazySingleton<SendPokeUseCase>(() => SendPokeUseCase(sl()));
     sl.registerLazySingleton<PurchasePokesUseCase>(
       () => PurchasePokesUseCase(sl()),
+    );
+    sl.registerLazySingleton<LikedGroupsUsecase>(
+      () => LikedGroupsUsecase(sl()),
     );
 
     // Cubits
@@ -299,6 +313,8 @@ class Di {
     sl.registerLazySingleton<GetPokedDetailsCubit>(
       () => GetPokedDetailsCubit(sl()),
     );
+
+    sl.registerLazySingleton<LikedGroupsCubit>(() => LikedGroupsCubit(sl()));
     sl.registerLazySingleton<ChatRepository>(() => ChatRepositoryImpl(sl()));
   }
 }

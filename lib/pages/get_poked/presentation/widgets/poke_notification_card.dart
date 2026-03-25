@@ -1,5 +1,6 @@
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
+import 'package:fennac_app/helpers/gradient_toast.dart';
 import 'package:fennac_app/widgets/custom_elevated_button.dart';
 import 'package:fennac_app/widgets/custom_outlined_button.dart';
 import 'package:fennac_app/widgets/custom_sized_box.dart';
@@ -68,7 +69,11 @@ class PokeNotificationCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       image: DecorationImage(
-                        image: NetworkImage(fromUser.bestShorts.isNotEmpty ? fromUser.bestShorts.first : ''),
+                        image: NetworkImage(
+                          fromUser.bestShorts.isNotEmpty
+                              ? fromUser.bestShorts.first
+                              : '',
+                        ),
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -92,7 +97,9 @@ class PokeNotificationCard extends StatelessWidget {
                   children: [
                     TextSpan(
                       text: '${fromUser.firstName} ${fromUser.lastName ?? ''}',
-                      style: AppTextStyles.body(context).copyWith(fontWeight: FontWeight.bold),
+                      style: AppTextStyles.body(
+                        context,
+                      ).copyWith(fontWeight: FontWeight.bold),
                     ),
                     TextSpan(
                       text:
@@ -104,7 +111,8 @@ class PokeNotificationCard extends StatelessWidget {
               ),
               const CustomSizedBox(height: 24),
               // Profile/Target Info Area
-              if (targetDetail.type == 'profile' && targetDetail.profile != null)
+              if (targetDetail.type == 'profile' &&
+                  targetDetail.profile != null)
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -113,9 +121,7 @@ class PokeNotificationCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: isLightTheme(context)
                         ? ColorPalette.textGrey
-                        : ColorPalette.primary.withValues(
-                            alpha: 0.5,
-                          ),
+                        : ColorPalette.primary.withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(24),
                   ),
                   child: Row(
@@ -125,7 +131,8 @@ class PokeNotificationCard extends StatelessWidget {
                         width: 130,
                         child: Stack(
                           children: List.generate(
-                            (targetDetail.profile!.bestShorts?.take(4).length ?? 0),
+                            (targetDetail.profile!.bestShorts.take(4).length ??
+                                0),
                             (index) {
                               return Positioned(
                                 left: index * 24.0,
@@ -140,7 +147,7 @@ class PokeNotificationCard extends StatelessWidget {
                                   child: CircleAvatar(
                                     radius: 20,
                                     backgroundImage: NetworkImage(
-                                      targetDetail.profile!.bestShorts![index],
+                                      targetDetail.profile!.bestShorts[index],
                                     ),
                                   ),
                                 ),
@@ -202,6 +209,9 @@ class PokeNotificationCard extends StatelessWidget {
               AppInkWell(
                 onTap: () {
                   // Report and Block
+                  VxToast.show(
+                    message: 'Report and block feature coming soon!',
+                  );
                 },
                 child: AppText(
                   text: 'Report and block',

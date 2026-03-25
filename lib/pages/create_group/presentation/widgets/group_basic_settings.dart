@@ -1,4 +1,5 @@
 import 'package:fennac_app/core/di_container.dart';
+import 'package:fennac_app/helpers/gradient_toast.dart';
 import 'package:fennac_app/pages/create_group/presentation/bloc/cubit/create_group_cubit.dart';
 import 'package:fennac_app/pages/create_group/presentation/bloc/state/create_group_state.dart';
 import 'package:fennac_app/reusable_widgets/group_settings_widget.dart';
@@ -25,6 +26,9 @@ class GroupBasicSettings extends StatelessWidget {
               value: cubit.canInviteMembers,
               onChanged: (value) {
                 if (!canManageSettings) {
+                  VxToast.show(
+                    message: 'Only group admins can change this setting',
+                  );
                   return;
                 }
                 cubit.updateCanInviteMembers(value);
@@ -35,6 +39,10 @@ class GroupBasicSettings extends StatelessWidget {
               value: cubit.canUpdatePhotosVideos,
               onChanged: (value) {
                 if (!canManageSettings) {
+                  VxToast.show(
+                    message: 'Only group admins can change this setting',
+                  );
+
                   return;
                 }
                 cubit.updateCanUpdatePhotosVideos(value);
@@ -45,6 +53,9 @@ class GroupBasicSettings extends StatelessWidget {
               value: cubit.canUpdatePrompts,
               onChanged: (value) {
                 if (!canManageSettings) {
+                  VxToast.show(
+                    message: 'Only group admins can change this setting',
+                  );
                   return;
                 }
                 cubit.updateCanUpdatePrompts(value);

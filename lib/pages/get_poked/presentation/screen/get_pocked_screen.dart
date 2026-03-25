@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:auto_route/auto_route.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
+import 'package:fennac_app/helpers/gradient_toast.dart';
 import 'package:fennac_app/pages/chats/data/models/chat_and_calls_response.dart';
 import 'package:fennac_app/pages/get_poked/presentation/bloc/cubit/get_poked_details_cubit.dart';
 import 'package:fennac_app/pages/get_poked/presentation/bloc/state/get_poked_details_state.dart';
@@ -127,9 +128,11 @@ class _GetPockedScreenState extends State<GetPockedScreen> {
                         targetDetail: target,
                         onIgnore: () => context.router.pop(),
                         onStartChat: () {
-                          Di().sl<GetPokedDetailsCubit>().startChat(
-                            detail.poke.id,
-                          );
+                          //todo due to pending status issue
+                          // Di().sl<GetPokedDetailsCubit>().startChat(
+                          //   detail.poke.id,
+                          // );
+                          VxToast.show(message: 'Chat feature coming soon!');
                         },
                       ),
                     ],

@@ -28,11 +28,17 @@ class GroupInvitationModel {
 
 class Data {
   List<Invitation>? invitations;
+  DefaultScreen? defaultScreen;
 
-  Data({this.invitations});
+  Data({this.invitations, this.defaultScreen});
 
-  Data copyWith({List<Invitation>? invitations}) =>
-      Data(invitations: invitations ?? this.invitations);
+  Data copyWith({
+    List<Invitation>? invitations,
+    DefaultScreen? defaultScreen,
+  }) => Data(
+    invitations: invitations ?? this.invitations,
+    defaultScreen: defaultScreen ?? this.defaultScreen,
+  );
 
   factory Data.fromJson(Map<String, dynamic> json) => Data(
     invitations: json["invitations"] == null
@@ -40,12 +46,72 @@ class Data {
         : List<Invitation>.from(
             json["invitations"]!.map((x) => Invitation.fromJson(x)),
           ),
+    defaultScreen: json["defaultScreen"] == null
+        ? null
+        : DefaultScreen.fromJson(json["defaultScreen"]),
   );
 
   Map<String, dynamic> toJson() => {
     "invitations": invitations == null
         ? []
         : List<dynamic>.from(invitations!.map((x) => x.toJson())),
+    "defaultScreen": defaultScreen?.toJson(),
+  };
+}
+
+class DefaultScreen {
+  String? coverImage;
+  List<String>? membersImages;
+  String? groupTitle;
+  String? groupDesc;
+  String? label;
+  String? detail;
+
+  DefaultScreen({
+    this.coverImage,
+    this.membersImages,
+    this.groupTitle,
+    this.groupDesc,
+    this.label,
+    this.detail,
+  });
+
+  DefaultScreen copyWith({
+    String? coverImage,
+    List<String>? membersImages,
+    String? groupTitle,
+    String? groupDesc,
+    String? label,
+    String? detail,
+  }) => DefaultScreen(
+    coverImage: coverImage ?? this.coverImage,
+    membersImages: membersImages ?? this.membersImages,
+    groupTitle: groupTitle ?? this.groupTitle,
+    groupDesc: groupDesc ?? this.groupDesc,
+    label: label ?? this.label,
+    detail: detail ?? this.detail,
+  );
+
+  factory DefaultScreen.fromJson(Map<String, dynamic> json) => DefaultScreen(
+    coverImage: json["coverImage"],
+    membersImages: json["membersImages"] == null
+        ? []
+        : List<String>.from(json["membersImages"]!.map((x) => x)),
+    groupTitle: json["groupTitle"],
+    groupDesc: json["groupDesc"],
+    label: json["label"],
+    detail: json["detail"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "coverImage": coverImage,
+    "membersImages": membersImages == null
+        ? []
+        : List<dynamic>.from(membersImages!.map((x) => x)),
+    "groupTitle": groupTitle,
+    "groupDesc": groupDesc,
+    "label": label,
+    "detail": detail,
   };
 }
 

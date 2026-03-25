@@ -17,6 +17,7 @@ class HomeLandingCubit extends Cubit<HomeLandingState> {
   ) : super(HomeLandingInitial());
 
   List<Invitation> invitations = [];
+  DefaultScreen? defaultData;
   final bool isGroupAudioAvailable = true;
   List<String> groupImages = [
     Assets.dummy.groupNight.path,
@@ -34,6 +35,7 @@ class HomeLandingCubit extends Cubit<HomeLandingState> {
       final response = await fetchGroupInvitationsUseCase();
       if (response.success == true && response.data != null) {
         invitations = response.data!.invitations ?? [];
+        defaultData = response.data!.defaultScreen;
         emit(HomeLandingLoaded());
       } else {
         emit(HomeLandingError());

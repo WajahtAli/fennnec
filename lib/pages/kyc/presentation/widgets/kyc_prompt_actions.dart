@@ -6,6 +6,7 @@ import 'package:fennac_app/pages/create_group/presentation/bloc/cubit/create_gro
 import 'package:fennac_app/pages/dashboard/presentation/bloc/cubit/dashboard_cubit.dart';
 import 'package:fennac_app/pages/home/presentation/screen/home_screen.dart';
 import 'package:fennac_app/pages/kyc/presentation/widgets/continue_button.dart';
+import 'package:fennac_app/pages/my_group/presentation/bloc/cubit/my_group_cubit.dart';
 import 'package:fennac_app/reusable_widgets/animated_background_container.dart';
 import 'package:fennac_app/routes/routes_imports.gr.dart';
 import 'package:fennac_app/widgets/custom_bottom_sheet.dart';
@@ -68,7 +69,8 @@ class KycPromptActions extends StatelessWidget {
                         description:
                             'You are all set - time to explore and connect.',
                         buttonText: 'Start Exploring',
-                        onButtonPressed: () {
+                        onButtonPressed: () async {
+                          await Di().sl<MyGroupCubit>().fetchGroupById('');
                           AutoRouter.of(context).push(const DashboardRoute());
 
                           Di().sl<DashboardCubit>().changePage(0, HomeScreen());
