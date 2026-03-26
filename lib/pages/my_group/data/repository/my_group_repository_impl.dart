@@ -82,6 +82,8 @@ class MyGroupRepositoryImpl extends MyGroupRepository {
     required String type,
     String? receiverGroupId,
     List<String>? attachments,
+    List<double>? wave,
+    String? duration,
     String? replyTo,
   }) async {
     await _datasource.sendGroupMessage(
@@ -90,6 +92,8 @@ class MyGroupRepositoryImpl extends MyGroupRepository {
       type: type,
       receiverGroupId: receiverGroupId,
       attachments: attachments,
+      wave: wave,
+      duration: duration,
       replyTo: replyTo,
     );
   }
@@ -100,12 +104,17 @@ class MyGroupRepositoryImpl extends MyGroupRepository {
     required String content,
     required String type,
     List<String>? attachments,
+    List<double>? wave,
+    String? duration,
     String? replyTo,
   }) async {
     await _datasource.sendDirectMessage(
       userId,
       content: content,
       type: type,
+      attachments: attachments,
+      wave: wave,
+      duration: duration,
       replyTo: replyTo,
     );
   }

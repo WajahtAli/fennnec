@@ -32,6 +32,8 @@ abstract class MyGroupRepository {
     required String type,
     String? receiverGroupId,
     List<String>? attachments,
+    List<double>? wave,
+    String? duration,
     String? replyTo,
   });
 
@@ -40,6 +42,8 @@ abstract class MyGroupRepository {
     required String content,
     required String type,
     List<String>? attachments,
+    List<double>? wave,
+    String? duration,
     String? replyTo,
   });
 

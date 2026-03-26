@@ -17,6 +17,7 @@ import 'package:fennac_app/widgets/custom_sized_box.dart';
 import 'package:fennac_app/widgets/movable_background.dart';
 import 'package:flutter/material.dart';
 import 'package:fennac_app/widgets/app_inkwell.dart';
+import 'package:fennac_app/pages/chats/data/models/chat_and_calls_response.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 @RoutePage()
@@ -101,26 +102,64 @@ class _ChatLandingScreenState extends State<ChatLandingScreen> {
             ),
           ),
           const CustomSizedBox(height: 8),
-          // Group list
-          ...DummyConstants.groupsChat.map((group) {
-            return AppInkWell(
-              onTap: () {
-                Di().sl<ChatLandingCubit>().updateSubscriptionStatus(
-                  SubscriptionStatus.subscribed,
-                );
-              },
-              child: GroupListItem(
-                names: List<String>.from(group['names']),
-                lastMessage: group['lastMessage'],
-                time: group['time'],
-                avatars: List<String>.from(group['avatars']),
-              ),
-            );
-          }),
+
+          if (state.chats.isNotEmpty)
+            _buildChatMemberItem(state.chats.first)
+          else
+            // Group list
+            ...DummyConstants.groupsChat.map((group) {
+              return AppInkWell(
+                onTap: () {
+                  Di().sl<ChatLandingCubit>().updateSubscriptionStatus(
+                        SubscriptionStatus.subscribed,
+                      );
+                },
+                child: GroupListItem(
+                  names: List<String>.from(group['names']),
+                  lastMessage: group['lastMessage'],
+                  time: group['time'],
+                  avatars: List<String>.from(group['avatars']),
+                ),
+              );
+            }),
           CustomSizedBox(height: MediaQuery.paddingOf(context).bottom),
         ],
       ),
     );
+  }
+
+  Widget _buildChatMemberItem(ChatModel chat) {
+    final isGroup = chat.type == 'group';
+    return AppInkWell(
+      onTap: () {
+        Di().sl<ChatLandingCubit>().updateSubscriptionStatus(
+              SubscriptionStatus.subscribed,
+            );
+      },
+      child: GroupListItem(
+        names: isGroup
+            ? (chat.members?.map((m) => m.name).toList() ?? [chat.name])
+            : [chat.name],
+        lastMessage: chat.lastMessage,
+        time: chat.lastMessageAt != null ? _getTimeAgo(chat.lastMessageAt!) : '',
+        avatars: isGroup
+            ? (chat.members?.map((m) => m.image).toList() ?? [chat.image])
+            : [chat.image],
+      ),
+    );
+  }
+
+  String _getTimeAgo(DateTime dateTime) {
+    final difference = DateTime.now().difference(dateTime);
+    if (difference.inDays > 0) {
+      return '${difference.inDays}d ago';
+    } else if (difference.inHours > 0) {
+      return '${difference.inHours}h ago';
+    } else if (difference.inMinutes > 0) {
+      return '${difference.inMinutes}m ago';
+    } else {
+      return 'just now';
+    }
   }
 
   Widget _buildCallsContent(ChatLandingState state) {

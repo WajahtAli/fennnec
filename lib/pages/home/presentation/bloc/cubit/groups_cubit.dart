@@ -46,6 +46,11 @@ class GroupsCubit extends Cubit<GroupsState> {
     }
   }
 
+  // reset groups
+  void resetGroups() {
+    Di().sl<HomeCubit>().updateGroups(groupsModel?.data?.groups ?? []);
+  }
+
   Future<void> likeDislikeGroup({
     required String groupId,
     required String type,

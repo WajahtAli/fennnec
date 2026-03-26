@@ -1,6 +1,8 @@
 import 'dart:developer';
-
 import 'package:equatable/equatable.dart';
+
+import 'package:fennac_app/core/di_container.dart';
+import 'package:fennac_app/pages/auth/presentation/bloc/cubit/create_account_cubit.dart';
 import 'package:fennac_app/pages/chats/data/models/message_model.dart';
 import 'package:fennac_app/pages/chats/data/models/message_type_enum.dart';
 import 'package:fennac_app/pages/chats/data/models/reaction_model.dart';
@@ -110,7 +112,7 @@ class MessageCubit extends Cubit<MessageState> {
       isLoading = false;
       hasError = true;
       errorMessage = e.toString();
-      log(e.toString());
+      log("error while getting messages ${e.toString()}");
       emit(MessageError(e.toString()));
     }
   }
@@ -224,22 +226,49 @@ class MessageCubit extends Cubit<MessageState> {
     final index = messages.indexWhere((m) => m.id == message.id);
     if (index != -1) {
       try {
+        final List<String> uploadedUrls = [];
+        final createAccountCubit = Di().sl<CreateAccountCubit>();
+
+        for (final path in mediaPath) {
+          if (path.startsWith('http')) {
+            uploadedUrls.add(path);
+          } else {
+            final url = await createAccountCubit.uploadMedia(filePath: path);
+            if (url.isNotEmpty) {
+              uploadedUrls.add(url);
+            } else {
+              throw Exception('Failed to upload media: $path');
+            }
+          }
+        }
+
+        final String effectiveContent =
+            (caption == null || caption.isEmpty) ? " " : caption;
+
         if (_isGroup) {
           await _myGroupRepository.sendGroupMessage(
             _groupId!,
-            content: caption ?? '',
+            content: effectiveContent,
             type: type.name,
-            attachments: mediaPath,
+            attachments: uploadedUrls,
+            wave: waveformData,
+            duration: duration,
           );
         } else {
           await _myGroupRepository.sendDirectMessage(
             _groupId!,
-            content: caption ?? '',
+            content: effectiveContent,
             type: type.name,
-            attachments: mediaPath,
+            attachments: uploadedUrls,
+            wave: waveformData,
+            duration: duration,
           );
         }
-        messages[index] = message.copyWith(isSending: false);
+        messages[index] = message.copyWith(
+          isSending: false,
+          imageUrls: uploadedUrls,
+          mediaUrl: uploadedUrls.length == 1 ? uploadedUrls.first : null,
+        );
         emit(MessageSuccess());
       } catch (e) {
         messages[index] = message.copyWith(isSending: false, hasFailed: true);

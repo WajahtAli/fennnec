@@ -12,16 +12,16 @@ abstract class ReactionModel with _$ReactionModel {
   }) = _ReactionModel;
 
   factory ReactionModel.fromJson(Map<String, dynamic> json) {
-    final userObj = json['userId'] is Map
-        ? json['userId'] as Map<String, dynamic>
-        : null;
-    return ReactionModel.fromJson({
-      ...json,
-      'userId': userObj?['_id'] ?? json['userId'],
-      'userName': userObj != null
+    final userObj =
+        json['userId'] is Map ? json['userId'] as Map<String, dynamic> : null;
+    return ReactionModel(
+      userId: userObj?['_id'] ?? json['userId'] ?? '',
+      userName: userObj != null
           ? '${userObj['firstName']} ${userObj['lastName']}'.trim()
           : (json['userName'] ?? ''),
-      'reactedAt': json['createdAt'] ?? json['reactedAt'],
-    });
+      emoji: json['emoji'] ?? '',
+      reactedAt: DateTime.tryParse(json['createdAt'] ?? json['reactedAt'] ?? '') ??
+          DateTime.now(),
+    );
   }
 }

@@ -33,6 +33,8 @@ abstract class MyGroupDatasource {
     required String type,
     String? receiverGroupId,
     List<String>? attachments,
+    List<double>? wave,
+    String? duration,
     String? replyTo,
   });
 
@@ -41,6 +43,8 @@ abstract class MyGroupDatasource {
     required String content,
     required String type,
     List<String>? attachments,
+    List<double>? wave,
+    String? duration,
     String? replyTo,
   });
 
@@ -222,6 +226,8 @@ class MyGroupDatasourceImpl extends MyGroupDatasource {
     required String type,
     String? receiverGroupId,
     List<String>? attachments,
+    List<double>? wave,
+    String? duration,
     String? replyTo,
   }) async {
     try {
@@ -230,6 +236,8 @@ class MyGroupDatasourceImpl extends MyGroupDatasource {
         'type': type,
         if (receiverGroupId != null) 'receiverGroupId': receiverGroupId,
         if (attachments != null) 'attachments': attachments,
+        if (wave != null) 'wave': wave,
+        if (duration != null) 'duration': duration,
         if (replyTo != null) 'replyTo': replyTo,
       };
 
@@ -250,6 +258,8 @@ class MyGroupDatasourceImpl extends MyGroupDatasource {
     required String content,
     required String type,
     List<String>? attachments,
+    List<double>? wave,
+    String? duration,
     String? replyTo,
   }) async {
     try {
@@ -257,6 +267,8 @@ class MyGroupDatasourceImpl extends MyGroupDatasource {
         'content': content,
         'type': type,
         if (attachments != null) 'attachments': attachments,
+        if (wave != null) 'wave': wave,
+        if (duration != null) 'duration': duration,
         if (replyTo != null) 'replyTo': replyTo,
       };
 

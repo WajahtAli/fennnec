@@ -30,22 +30,35 @@ abstract class MessageModel with _$MessageModel {
   }) = _MessageModel;
 
   factory MessageModel.fromJson(Map<String, dynamic> json) {
-    final senderObj = json['senderId'] is Map
-        ? json['senderId'] as Map<String, dynamic>
-        : null;
+    final senderObj =
+        json['senderId'] is Map ? json['senderId'] as Map<String, dynamic> : null;
 
-    return MessageModel.fromJson({
-      ...json,
-      'id': json['_id'] ?? json['id'],
-      'senderId': senderObj?['_id'] ?? json['senderId'],
-      'senderName': senderObj != null
+    return MessageModel(
+      id: json['_id'] ?? json['id'] ?? '',
+      senderId: senderObj?['_id'] ?? json['senderId'] ?? '',
+      senderName: senderObj != null
           ? '${senderObj['firstName']} ${senderObj['lastName']}'.trim()
           : (json['senderName'] ?? ''),
-      'isMe': json['isFromMe'] ?? json['isMe'] ?? false,
-      'sentAt': json['createdAt'] ?? json['sentAt'],
-      'imageUrls': json['attachments'] ?? json['imageUrls'] ?? [],
-      'waveformData': json['wave'] ?? json['waveformData'] ?? [],
-      'mediaDuration': json['duration'] ?? json['mediaDuration'],
-    });
+      senderAvatar: json['senderAvatar'],
+      content: json['content'] ?? '',
+      type: MessageTypeExtension.fromString(json['type'] ?? 'text'),
+      mediaUrl: (json['attachments'] as List?)?.firstOrNull,
+      imageUrls: (json['attachments'] as List?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          [],
+      waveformData: (json['wave'] as List?)
+              ?.map((e) => double.tryParse(e.toString()) ?? 0.0)
+              .toList() ??
+          [],
+      mediaDuration: json['duration'],
+      sentAt: DateTime.tryParse(json['createdAt'] ?? json['sentAt'] ?? '') ??
+          DateTime.now(),
+      isMe: json['isFromMe'] ?? json['isMe'] ?? false,
+      reactions: (json['reactions'] as List?)
+              ?.map((e) => ReactionModel.fromJson(e))
+              .toList() ??
+          [],
+    );
   }
 }

@@ -1,5 +1,7 @@
+import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/pages/chats/presentation/screen/chat_landing_screen.dart';
 import 'package:fennac_app/pages/dashboard/presentation/bloc/state/dashboard_state.dart';
+import 'package:fennac_app/pages/home/presentation/bloc/cubit/groups_cubit.dart';
 import 'package:fennac_app/pages/homelanding/presentation/screen/home_landing_screen.dart';
 import 'package:fennac_app/pages/profile/presentation/screen/profile_screen.dart';
 import 'package:flutter/material.dart';
@@ -33,6 +35,7 @@ class DashboardCubit extends Cubit<DashboardState> {
     //   Di().sl<HomeLandingCubit>().invitationStatus = InvitationStatus.declined;
     //   screens[0] = const HomeLandingScreen();
     // }
+    Di().sl<GroupsCubit>().resetGroups();
     emit(DashboardLoaded());
   }
 
