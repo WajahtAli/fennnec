@@ -13,9 +13,7 @@ class MediaHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: ColorPalette.black.withValues(alpha: 0.3),
-      ),
+      decoration: BoxDecoration(color: ColorPalette.secondary),
       child: SafeArea(
         bottom: false,
         child: Row(

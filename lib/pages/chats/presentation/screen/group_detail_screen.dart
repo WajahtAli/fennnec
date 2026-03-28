@@ -1,16 +1,21 @@
 import 'dart:ui';
 
 import 'package:auto_route/auto_route.dart';
-import 'package:fennac_app/app/constants/dummy_constants.dart';
 import 'package:fennac_app/app/constants/media_query_constants.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
+import 'package:fennac_app/pages/chats/data/models/chat_and_calls_response.dart';
+import 'package:fennac_app/pages/chats/data/models/message_model.dart';
+import 'package:fennac_app/pages/chats/data/models/message_type_enum.dart';
 import 'package:fennac_app/pages/chats/presentation/bloc/cubit/chat_landing_cubit.dart';
+import 'package:fennac_app/pages/chats/presentation/bloc/cubit/message_cubit.dart';
 import 'package:fennac_app/pages/chats/presentation/bloc/state/chat_landing_state.dart';
 import 'package:fennac_app/pages/chats/presentation/widgets/chat_tab_selector.dart';
 import 'package:fennac_app/pages/chats/presentation/widgets/group_detail_members_avatar.dart';
+import 'package:fennac_app/pages/my_group/data/model/my_group_model.dart';
+import 'package:fennac_app/pages/my_group/presentation/bloc/state/my_group_state.dart';
 import 'package:fennac_app/pages/dashboard/presentation/bloc/cubit/dashboard_cubit.dart';
 import 'package:fennac_app/pages/my_group/presentation/bloc/cubit/my_group_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -49,6 +54,19 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
   final TextEditingController _nameController = TextEditingController(
     text: 'Weekend Warriors',
   );
+
+  late final MyGroupCubit _myGroupCubit;
+  late final ChatLandingCubit _chatLandingCubit;
+
+  @override
+  void initState() {
+    super.initState();
+    _myGroupCubit = Di().sl<MyGroupCubit>();
+    _chatLandingCubit = Di().sl<ChatLandingCubit>();
+    if ((widget.contactName ?? '').isNotEmpty) {
+      _nameController.text = widget.contactName!;
+    }
+  }
 
   @override
   void dispose() {
@@ -94,6 +112,16 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
   }
 
   Widget _buildContent(BuildContext context) {
+    final currentChat = _resolveCurrentGroupChat();
+    final groupData = _resolveGroupData(currentChat);
+    final displayName =
+        groupData?.titleMembers ?? currentChat?.name ?? widget.contactName;
+    if ((displayName ?? '').isNotEmpty &&
+        (_nameController.text == 'Weekend Warriors' ||
+            _nameController.text.isEmpty)) {
+      _nameController.text = displayName!;
+    }
+
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Column(
@@ -101,7 +129,28 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
         children: [
           CustomAppBar(title: 'Group Details'),
           const CustomSizedBox(height: 16),
-          const GroupDetailMembersAvatar(),
+          BlocBuilder<MyGroupCubit, MyGroupState>(
+            bloc: _myGroupCubit,
+            builder: (context, _) {
+              final rawMembers = groupData?.members ?? [];
+              final members = rawMembers
+                  .map(
+                    (m) => MemberModel(
+                      id: m.id ?? '',
+                      name: [
+                        m.firstName ?? '',
+                        m.lastName ?? '',
+                      ].where((s) => s.isNotEmpty).join(' '),
+                      image: m.image ?? '',
+                    ),
+                  )
+                  .toList();
+              if (members.isEmpty && currentChat?.members != null) {
+                members.addAll(currentChat!.members!);
+              }
+              return GroupDetailMembersAvatar(members: members);
+            },
+          ),
           CustomLabelTextField(
             controller: _nameController,
             hintText: 'Enter group name',
@@ -127,12 +176,32 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
           ChatTabSelector(title1: 'About This Group', title2: 'Shared Media'),
           const CustomSizedBox(height: 20),
           BlocBuilder<ChatLandingCubit, ChatLandingState>(
-            bloc: Di().sl<ChatLandingCubit>(),
+            bloc: _chatLandingCubit,
             builder: (context, state) {
               final selectedTab = state.selectedTab;
               return selectedTab == 0
-                  ? _buildAboutThisGroupContent(context)
-                  : _buildSharedMediaContent(context);
+                  ? _buildAboutThisGroupContent(
+                      context,
+                      groupData: groupData,
+                      currentChat: currentChat,
+                    )
+                  : BlocBuilder<MessageCubit, MessageState>(
+                      bloc: Di().sl<MessageCubit>(),
+                      builder: (context, _) {
+                        final previewMessages = Di()
+                            .sl<MessageCubit>()
+                            .messages;
+                        final mediaUrls = _resolveMessageAttachmentMediaUrls(
+                          previewMessages,
+                        );
+
+                        return _buildSharedMediaContent(
+                          context,
+                          mediaUrls: mediaUrls,
+                          previewMessages: previewMessages,
+                        );
+                      },
+                    );
             },
           ),
           const CustomSizedBox(height: 32),
@@ -141,7 +210,12 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
     );
   }
 
-  Widget _buildMatchedCard(BuildContext context) {
+  Widget _buildMatchedCard(
+    BuildContext context, {
+    required int memberCount,
+    required int matchedMonthsAgo,
+    required List<String> interests,
+  }) {
     return Container(
       height: 273,
       width: double.infinity,
@@ -177,9 +251,9 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                         'Matched',
                         style: AppTextStyles.description(context),
                       ),
-                      Text('2', style: AppTextStyles.h1(context)),
+                      Text('$memberCount', style: AppTextStyles.h1(context)),
                       Text(
-                        'months ago',
+                        '$matchedMonthsAgo month${matchedMonthsAgo == 1 ? '' : 's'} ago',
                         style: AppTextStyles.description(context),
                       ),
                     ],
@@ -197,23 +271,51 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
           ),
           const CustomSizedBox(height: 8),
 
-          _buildInterests(context),
+          _buildInterests(context, interests),
         ],
       ),
     );
   }
 
-  Widget _buildAboutThisGroupContent(BuildContext context) {
+  Widget _buildAboutThisGroupContent(
+    BuildContext context, {
+    required MyGroupData? groupData,
+    required ChatModel? currentChat,
+  }) {
+    final memberCount =
+        groupData?.members?.length ?? currentChat?.members?.length ?? 0;
+    final matchedMonthsAgo = _calculateMatchedMonths(groupData?.createdAt);
+    final interests = _resolveInterests(groupData);
+
     return Column(
       children: [
-        _buildMatchedCard(context),
+        _buildMatchedCard(
+          context,
+          memberCount: memberCount,
+          matchedMonthsAgo: matchedMonthsAgo,
+          interests: interests,
+        ),
         const CustomSizedBox(height: 32),
-        _buildUnmatchButton(context),
+        _buildUnmatchButton(context, groupData: groupData),
       ],
     );
   }
 
-  Widget _buildSharedMediaContent(BuildContext context) {
+  Widget _buildSharedMediaContent(
+    BuildContext context, {
+    required List<String> mediaUrls,
+    required List<MessageModel> previewMessages,
+  }) {
+    if (mediaUrls.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.all(24),
+        child: Text(
+          'No shared media available',
+          style: AppTextStyles.description(context),
+        ),
+      );
+    }
+
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -223,23 +325,35 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
         mainAxisSpacing: 8,
         childAspectRatio: 1,
       ),
-      itemCount: DummyConstants.mediaItems.length,
+      itemCount: mediaUrls.length,
       itemBuilder: (context, index) {
-        final item = DummyConstants.mediaItems[index];
-        return _buildMediaItem(item);
+        return GestureDetector(
+          onTap: () {
+            AutoRouter.of(context).push(
+              MediaPreviewRoute(messages: previewMessages, initialIndex: index),
+            );
+          },
+          child: _buildMediaItem(mediaUrls[index]),
+        );
       },
     );
   }
 
-  Widget _buildMediaItem(Map<String, dynamic> item) {
+  Widget _buildMediaItem(String mediaUrl) {
+    final isVideo =
+        mediaUrl.toLowerCase().endsWith('.mp4') ||
+        mediaUrl.toLowerCase().endsWith('.mov') ||
+        mediaUrl.toLowerCase().endsWith('.mkv') ||
+        mediaUrl.toLowerCase().endsWith('.webm');
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(12),
       child: Stack(
         fit: StackFit.expand,
         children: [
           // Media thumbnail
-          Image.asset(
-            item['image'],
+          Image.network(
+            mediaUrl,
             fit: BoxFit.cover,
             errorBuilder: (context, error, stackTrace) {
               return Container(
@@ -249,7 +363,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
             },
           ),
           // Play button overlay for videos
-          if (item['type'] == 'video')
+          if (isVideo)
             Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -282,12 +396,19 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
     );
   }
 
-  Widget _buildInterests(BuildContext context) {
+  Widget _buildInterests(BuildContext context, List<String> interests) {
+    if (interests.isEmpty) {
+      return Text(
+        'No interests added yet',
+        style: AppTextStyles.description(context),
+      );
+    }
+
     return Wrap(
       spacing: 8,
       runSpacing: 8,
       alignment: WrapAlignment.center,
-      children: DummyConstants.interestsGroup.map((interest) {
+      children: interests.map((interest) {
         // Split emoji and text
         final parts = interest.split(' ');
         final emoji = parts.isNotEmpty ? parts[0] : '';
@@ -298,7 +419,6 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
             child: Container(
-              height: 24,
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
               decoration: BoxDecoration(
                 color: isLightTheme(context)
@@ -331,7 +451,83 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
     );
   }
 
-  Widget _buildUnmatchButton(BuildContext context) {
+  ChatModel? _resolveCurrentGroupChat() {
+    final chats = _chatLandingCubit.state.chats;
+    final contactName = (widget.contactName ?? '').trim();
+    final contactAvatar = (widget.contactAvatar ?? '').trim();
+
+    for (final chat in chats) {
+      if (chat.type != 'group') continue;
+      if (contactName.isNotEmpty && chat.name == contactName) return chat;
+      if (contactAvatar.isNotEmpty && chat.image == contactAvatar) return chat;
+    }
+
+    for (final chat in chats) {
+      if (chat.type == 'group') return chat;
+    }
+
+    return null;
+  }
+
+  MyGroupData? _resolveGroupData(ChatModel? currentChat) {
+    final groups =
+        _myGroupCubit.myGroupList?.groupList ?? const <MyGroupData>[];
+    final targetName = (currentChat?.name ?? widget.contactName ?? '').trim();
+
+    for (final group in groups) {
+      if ((group.titleMembers ?? '').trim() == targetName) {
+        return group;
+      }
+    }
+
+    return _myGroupCubit.myGroupModel?.data;
+  }
+
+  List<String> _resolveInterests(MyGroupData? groupData) {
+    final fits = (groupData?.fitsForGroup ?? '').trim();
+    if (fits.isEmpty) return const [];
+
+    return fits
+        .split(RegExp(r'[,|]'))
+        .map((value) => value.trim())
+        .where((value) => value.isNotEmpty)
+        .toList();
+  }
+
+  List<String> _resolveMessageAttachmentMediaUrls(
+    List<MessageModel> sourceMessages,
+  ) {
+    return sourceMessages
+        .where(
+          (message) =>
+              message.type == MessageType.image ||
+              message.type == MessageType.video,
+        )
+        .expand((message) {
+          if (message.imageUrls.isNotEmpty) {
+            return message.imageUrls;
+          }
+
+          final mediaUrl = message.mediaUrl;
+          if (mediaUrl != null && mediaUrl.trim().isNotEmpty) {
+            return [mediaUrl];
+          }
+
+          return const <String>[];
+        })
+        .map((url) => url.trim())
+        .where((url) => url.isNotEmpty)
+        .toList();
+  }
+
+  int _calculateMatchedMonths(DateTime? createdAt) {
+    if (createdAt == null) return 0;
+    final difference = DateTime.now().difference(createdAt);
+    final months = (difference.inDays / 30).floor();
+    return months < 0 ? 0 : months;
+  }
+
+  Widget _buildUnmatchButton(BuildContext context, {MyGroupData? groupData}) {
     return GestureDetector(
       onTap: () {
         CustomBottomSheet.show(
@@ -345,7 +541,11 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
           buttonText: 'Dismiss',
           secondaryButtonText: 'Unmatch',
           onButtonPressed: () {},
-          onSecondaryButtonPressed: () {
+          onSecondaryButtonPressed: () async {
+            final bool isUnmatched = await Di().sl<MyGroupCubit>().unMatchGroup(
+              groupData?.id ?? '',
+            );
+            if (!context.mounted || !isUnmatched) return;
             Navigator.of(context).pop();
             CustomBottomSheet.show(
               icon: AnimatedBackgroundContainer(
@@ -360,8 +560,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                   'We’ve closed your chat and removed this group from your matches. You can still find new connections.',
               buttonText: 'Explore Groups',
               dismissible: false,
-              onButtonPressed: () async {
-                await Di().sl<MyGroupCubit>().fetchGroupById('');
+              onButtonPressed: () {
                 AutoRouter.of(context).push(DashboardRoute());
                 Di().sl<DashboardCubit>().changeIndex(0);
               },

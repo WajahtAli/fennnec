@@ -32,7 +32,12 @@ import '../widgets/send_poke_bottomsheet.dart';
 @RoutePage()
 class HomeScreen extends StatefulWidget {
   final bool isLikedGroups;
-  const HomeScreen({super.key, this.isLikedGroups = false});
+  final int? idFromDeepLink;
+  const HomeScreen({
+    super.key,
+    this.isLikedGroups = false,
+    this.idFromDeepLink,
+  });
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -159,6 +164,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    fetchGroups();
 
     final size = MediaQuery.of(context).size;
     const widgetSize = 40.0;
@@ -261,17 +267,36 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     Column(
                       children: [
                         HomeTopBar(
+                          isLikedGroups: widget.isLikedGroups,
                           onSettingsPressed: () {
-                            AutoRouter.of(context).push(const FilterRoute());
+                            if (widget.isLikedGroups) {
+                              resetAnimations();
+                              homeCubit.restartFromBeginning();
+                              VxToast.show(
+                                message: 'Group list reset to start',
+                                icon: Assets.icons.checkGreen.path,
+                              );
+                              return;
+                            } else {
+                              AutoRouter.of(context).push(const FilterRoute());
+                            }
                           },
                           onBackPressed: () {
-                            // Jump back to the first group and clear end state visuals
-                            resetAnimations();
-                            homeCubit.restartFromBeginning();
-                            VxToast.show(
-                              message: 'Group list reset to start',
-                              icon: Assets.icons.checkGreen.path,
-                            );
+                            if (widget.isLikedGroups) {
+                              AutoRouter.of(context).pop();
+                              Di().sl<GroupsCubit>().fetchAllGroups(
+                                isLikedGroups: false,
+                              );
+                              return;
+                            } else {
+                              // Jump back to the first group and clear end state visuals
+                              resetAnimations();
+                              homeCubit.restartFromBeginning();
+                              VxToast.show(
+                                message: 'Group list reset to start',
+                                icon: Assets.icons.checkGreen.path,
+                              );
+                            }
                           },
                         ),
                         const CustomSizedBox(height: 20),
@@ -433,7 +458,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                           showButton: true,
                                           buttonText: 'Refresh',
                                           onButtonTap: () {
-                                            _groupsCubit.fetchAllGroups();
+                                            _groupsCubit.fetchAllGroups(
+                                              isLikedGroups:
+                                                  widget.isLikedGroups,
+                                            );
                                           },
                                         ),
                                       ),

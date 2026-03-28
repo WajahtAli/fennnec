@@ -1,27 +1,24 @@
-import 'package:fennac_app/app/constants/dummy_constants.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fennac_app/app/constants/media_query_constants.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
+import 'package:fennac_app/pages/chats/data/models/chat_and_calls_response.dart';
 import 'package:fennac_app/widgets/custom_sized_box.dart';
 import 'package:flutter/material.dart';
 
 class HorizontalAvatarList extends StatelessWidget {
-  final List<String>? avatars;
-  final List<String>? names;
+  final List<MemberModel> members;
   final double? height;
   final EdgeInsetsGeometry? padding;
-  final double? avatarRadius;
   final double? itemSpacing;
   final double? nameSpacing;
-  final VoidCallback? onAvatarTap;
+  final void Function(MemberModel member)? onAvatarTap;
 
   const HorizontalAvatarList({
     super.key,
-    this.avatars,
-    this.names,
+    required this.members,
     this.height,
     this.padding,
-    this.avatarRadius,
     this.itemSpacing,
     this.nameSpacing,
     this.onAvatarTap,
@@ -29,8 +26,6 @@ class HorizontalAvatarList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final displayAvatars = avatars ?? DummyConstants.groupImages;
-    final displayNames = names ?? ['Brenda', 'Jack', 'Nancy', 'Jeff', 'Anna'];
     final displayHeight = height ?? 120.0;
     final displayPadding =
         padding ?? const EdgeInsets.symmetric(horizontal: 16);
@@ -41,12 +36,13 @@ class HorizontalAvatarList extends StatelessWidget {
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: displayPadding,
-        itemCount: displayAvatars.length,
+        itemCount: members.length,
         itemBuilder: (context, index) {
+          final member = members[index];
           return Padding(
             padding: EdgeInsets.only(right: displayItemSpacing),
             child: GestureDetector(
-              onTap: onAvatarTap,
+              onTap: onAvatarTap != null ? () => onAvatarTap!(member) : null,
               child: Column(
                 children: [
                   Container(
@@ -57,14 +53,22 @@ class HorizontalAvatarList extends StatelessWidget {
                       border: Border.all(color: ColorPalette.black, width: 2),
                     ),
                     child: CircleAvatar(
-                      backgroundImage: AssetImage(displayAvatars[index]),
                       backgroundColor: Colors.transparent,
+                      child: ClipOval(
+                        child: CachedNetworkImage(
+                          imageUrl: member.image,
+                          width: 72,
+                          height: 72,
+                          fit: BoxFit.cover,
+                          errorWidget: (_, __, ___) =>
+                              const Icon(Icons.person_rounded, size: 36),
+                        ),
+                      ),
                     ),
                   ),
-
                   CustomSizedBox(height: nameSpacing ?? 8.0),
                   Text(
-                    displayNames[index % displayNames.length],
+                    member.name,
                     style: AppTextStyles.description(context).copyWith(
                       color: isDarkTheme(context)
                           ? ColorPalette.textPrimary

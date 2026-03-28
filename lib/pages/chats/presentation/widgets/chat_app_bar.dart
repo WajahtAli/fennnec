@@ -1,7 +1,6 @@
 import 'dart:ui';
 
 import 'package:auto_route/auto_route.dart';
-import 'package:fennac_app/app/constants/dummy_constants.dart';
 import 'package:fennac_app/app/constants/media_query_constants.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
@@ -11,10 +10,12 @@ import 'package:fennac_app/pages/auth/presentation/bloc/cubit/login_cubit.dart';
 import 'package:fennac_app/pages/call/presentation/bloc/cubit/call_cubit.dart';
 import 'package:fennac_app/pages/call/presentation/bloc/state/call_state.dart';
 import 'package:fennac_app/pages/chats/presentation/bloc/cubit/chat_landing_cubit.dart';
+import 'package:fennac_app/pages/home/data/models/groups_model.dart';
 import 'package:fennac_app/reusable_widgets/circle_icon_button.dart';
 import 'package:fennac_app/routes/routes_imports.gr.dart';
 import 'package:fennac_app/widgets/custom_back_button.dart';
 import 'package:fennac_app/widgets/custom_sized_box.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -44,6 +45,20 @@ class ChatAppBar extends StatelessWidget {
   }
 
   Widget _buildGroupHeader(BuildContext context) {
+    final currentChat = Di()
+        .sl<ChatLandingCubit>()
+        .state
+        .chats
+        .where((c) => c.id == chatId)
+        .firstOrNull;
+    final members = currentChat?.members ?? [];
+    final displayMembers = members.length > 9 ? members.sublist(0, 9) : members;
+    final group = Group(
+      id: currentChat?.id ?? chatId,
+      name: currentChat?.name,
+      coverImage: currentChat?.image,
+    );
+
     final topPadding = MediaQuery.of(context).padding.top;
     return ClipRRect(
       borderRadius: BorderRadius.zero,
@@ -98,7 +113,13 @@ class ChatAppBar extends StatelessWidget {
                 Expanded(
                   child: GestureDetector(
                     onTap: () {
-                      context.router.push(GroupDetailRoute());
+                      context.router.push(
+                        GroupDetailRoute(
+                          isGroup: true,
+                          contactName: currentChat?.name ?? contactName,
+                          contactAvatar: currentChat?.image ?? contactAvatar,
+                        ),
+                      );
                     },
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -109,33 +130,34 @@ class ChatAppBar extends StatelessWidget {
                           width: 210,
                           height: 24,
                           child: Stack(
-                            children: List.generate(
-                              DummyConstants.avatarPaths.length > 9
-                                  ? 9
-                                  : DummyConstants.avatarPaths.length,
-                              (index) {
-                                return Positioned(
-                                  left: index * 14.0,
-                                  child: Container(
-                                    width: 24,
-                                    height: 24,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                        color: ColorPalette.secondary,
-                                        width: 2,
-                                      ),
-                                      image: DecorationImage(
-                                        image: AssetImage(
-                                          DummyConstants.avatarPaths[index],
-                                        ),
-                                        fit: BoxFit.cover,
-                                      ),
+                            children: List.generate(displayMembers.length, (
+                              index,
+                            ) {
+                              final imageUrl = displayMembers[index].image;
+                              return Positioned(
+                                left: index * 14.0,
+                                child: Container(
+                                  width: 24,
+                                  height: 24,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: ColorPalette.secondary,
+                                      width: 2,
                                     ),
+                                    image: imageUrl.isNotEmpty
+                                        ? DecorationImage(
+                                            image: CachedNetworkImageProvider(
+                                              imageUrl,
+                                            ),
+                                            fit: BoxFit.cover,
+                                          )
+                                        : null,
+                                    color: Colors.black26,
                                   ),
-                                );
-                              },
-                            ),
+                                ),
+                              );
+                            }),
                           ),
                         ),
                         const CustomSizedBox(height: 4),
@@ -144,7 +166,7 @@ class ChatAppBar extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              '10 members',
+                              '${members.length} member${members.length == 1 ? '' : 's'}',
                               style: AppTextStyles.bodySmall(
                                 context,
                               ).copyWith(fontWeight: FontWeight.w400),
@@ -176,10 +198,7 @@ class ChatAppBar extends StatelessWidget {
                   ),
                   onTap: () {
                     AutoRouter.of(context).push(
-                      GroupAudioCallRoute(
-                        group: DummyConstants.groups[1],
-                        isVideoCall: false,
-                      ),
+                      GroupAudioCallRoute(group: group, isVideoCall: false),
                     );
                   },
                 ),
@@ -199,10 +218,7 @@ class ChatAppBar extends StatelessWidget {
                   ),
                   onTap: () {
                     AutoRouter.of(context).push(
-                      GroupAudioCallRoute(
-                        group: DummyConstants.groups[1],
-                        isVideoCall: true,
-                      ),
+                      GroupAudioCallRoute(group: group, isVideoCall: true),
                     );
                   },
                 ),

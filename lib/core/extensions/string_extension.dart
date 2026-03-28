@@ -9,6 +9,24 @@ extension StringExtension on String {
       contains(".AVI") ||
       contains(".mkv") ||
       contains(".MKV");
+  bool get isNetworkUrl {
+    var value = trim();
+
+    while (value.startsWith('/http') || value.startsWith('/https')) {
+      value = value.substring(1);
+    }
+
+    if (value.startsWith('http:/') && !value.startsWith('http://')) {
+      value = value.replaceFirst('http:/', 'http://');
+    }
+
+    if (value.startsWith('https:/') && !value.startsWith('https://')) {
+      value = value.replaceFirst('https:/', 'https://');
+    }
+
+    final uri = Uri.tryParse(value);
+    return uri != null && (uri.scheme == 'http' || uri.scheme == 'https');
+  }
 
   bool get isImage =>
       contains(".jpg") ||

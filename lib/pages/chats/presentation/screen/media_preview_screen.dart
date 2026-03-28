@@ -64,15 +64,16 @@ class _MediaPreviewScreenState extends State<MediaPreviewScreen> {
     }
     final currentMessage = media[_currentIndex];
 
-    final title = 'Shared by Jhon';
-
     return Scaffold(
       backgroundColor: ColorPalette.black,
       body: MovableBackground(
         backgroundType: MovableBackgroundType.dark,
         child: Column(
           children: [
-            MediaHeader(title: title),
+            MediaHeader(
+              title:
+                  'Shared by ${widget.messages.first.mentionedUserName ?? ''} ',
+            ),
             Expanded(
               child: Stack(
                 children: [

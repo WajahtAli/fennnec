@@ -9,6 +9,7 @@ class ChatLandingState extends Equatable {
   final String? errorMessage;
   final int selectedTab;
   final SubscriptionStatus subscriptionStatus;
+  final String searchQuery;
 
   const ChatLandingState({
     this.chats = const [],
@@ -17,6 +18,7 @@ class ChatLandingState extends Equatable {
     this.errorMessage,
     this.selectedTab = 0,
     this.subscriptionStatus = SubscriptionStatus.unsubscribed,
+    this.searchQuery = '',
   });
 
   ChatLandingState copyWith({
@@ -26,6 +28,7 @@ class ChatLandingState extends Equatable {
     String? errorMessage,
     int? selectedTab,
     SubscriptionStatus? subscriptionStatus,
+    String? searchQuery,
   }) {
     return ChatLandingState(
       chats: chats ?? this.chats,
@@ -34,30 +37,47 @@ class ChatLandingState extends Equatable {
       errorMessage: errorMessage ?? this.errorMessage,
       selectedTab: selectedTab ?? this.selectedTab,
       subscriptionStatus: subscriptionStatus ?? this.subscriptionStatus,
+      searchQuery: searchQuery ?? this.searchQuery,
     );
   }
 
   @override
   List<Object?> get props => [
-        chats,
-        calls,
-        isLoadingData,
-        errorMessage,
-        selectedTab,
-        subscriptionStatus,
-      ];
+    chats,
+    calls,
+    isLoadingData,
+    errorMessage,
+    selectedTab,
+    subscriptionStatus,
+    searchQuery,
+  ];
 }
 
 class ChatLandingInitial extends ChatLandingState {}
 
 class ChatLandingLoading extends ChatLandingState {
-  const ChatLandingLoading({super.chats, super.calls, super.selectedTab, super.isLoadingData});
+  const ChatLandingLoading({
+    super.chats,
+    super.calls,
+    super.selectedTab,
+    super.isLoadingData,
+  });
 }
 
 class ChatLandingLoaded extends ChatLandingState {
-  const ChatLandingLoaded({super.chats, super.calls, super.selectedTab, super.isLoadingData});
+  const ChatLandingLoaded({
+    super.chats,
+    super.calls,
+    super.selectedTab,
+    super.isLoadingData,
+  });
 }
 
 class ChatLandingError extends ChatLandingState {
-  const ChatLandingError({super.errorMessage, super.chats, super.calls, super.selectedTab});
+  const ChatLandingError({
+    super.errorMessage,
+    super.chats,
+    super.calls,
+    super.selectedTab,
+  });
 }

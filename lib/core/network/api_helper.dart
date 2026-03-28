@@ -47,8 +47,10 @@ class ApiHelper {
       return _handleResponse(response);
     } catch (e) {
       log('🔥 API ERROR: $e');
-      _handleException(e);
-      return null;
+      if (e is ApiException) {
+        rethrow;
+      }
+      throw ApiException(_handleException(e), 0);
     }
   }
 

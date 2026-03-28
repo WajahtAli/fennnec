@@ -11,6 +11,7 @@ import 'package:fennac_app/pages/chats/data/models/message_model.dart';
 import 'package:fennac_app/pages/chats/data/models/message_type_enum.dart';
 import 'package:fennac_app/pages/chats/presentation/bloc/cubit/message_cubit.dart';
 import 'package:fennac_app/widgets/prompt_audio_row.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:video_player/video_player.dart';
@@ -101,7 +102,7 @@ class TextMessageBubble extends StatelessWidget {
           decoration: BoxDecoration(
             color: isMineSide
                 ? isLightTheme(context)
-                      ? ColorPalette.primary.withValues(alpha: 0.8)
+                      ? ColorPalette.primary
                       : ColorPalette.primary
                 : (isLightTheme(context)
                       ? ColorPalette.textGrey
@@ -131,7 +132,7 @@ class ChatImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isNetwork = path.startsWith('http');
-    final isFile = path.startsWith('/');
+    final isFile = !isNetwork && File(path).existsSync();
 
     if (isNetwork) {
       return CachedImageHelper(
@@ -212,25 +213,92 @@ class VideoMessageBubble extends StatefulWidget {
 }
 
 class _VideoMessageBubbleState extends State<VideoMessageBubble> {
-  late VideoPlayerController _controller;
+  VideoPlayerController? _controller;
+  bool _isInitializing = false;
+
+  String _normalizeMediaPath(String value) {
+    var normalized = value.trim();
+
+    while (normalized.startsWith('/http') || normalized.startsWith('/https')) {
+      normalized = normalized.substring(1);
+    }
+
+    if (normalized.startsWith('http:/') && !normalized.startsWith('http://')) {
+      normalized = normalized.replaceFirst('http:/', 'http://');
+    }
+
+    if (normalized.startsWith('https:/') &&
+        !normalized.startsWith('https://')) {
+      normalized = normalized.replaceFirst('https:/', 'https://');
+    }
+
+    return normalized;
+  }
+
+  bool _isNetworkSource(String normalizedPath) {
+    final uri = Uri.tryParse(normalizedPath);
+    return uri != null && (uri.scheme == 'http' || uri.scheme == 'https');
+  }
+
+  Future<VideoPlayerController> _buildController(String rawMediaPath) async {
+    final normalizedPath = _normalizeMediaPath(rawMediaPath);
+    final isNetwork = _isNetworkSource(normalizedPath);
+
+    if (isNetwork) {
+      final cachedFile = await DefaultCacheManager().getSingleFile(
+        normalizedPath,
+      );
+      return VideoPlayerController.file(cachedFile);
+    }
+
+    return VideoPlayerController.file(File(normalizedPath));
+  }
+
+  Future<void> _initializeVideo() async {
+    if (!mounted) return;
+    setState(() {
+      _isInitializing = true;
+    });
+
+    try {
+      final controller = await _buildController(widget.message.mediaUrl ?? '');
+      await controller.initialize();
+      if (!mounted) {
+        controller.dispose();
+        return;
+      }
+
+      setState(() {
+        _controller = controller;
+      });
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isInitializing = false;
+        });
+      }
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.file(
-      File(widget.message.mediaUrl ?? ''),
-    )..initialize().then((_) => setState(() {}));
+    _initializeVideo();
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _controller?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (!_controller.value.isInitialized) {
+    final controller = _controller;
+
+    if (_isInitializing ||
+        controller == null ||
+        !controller.value.isInitialized) {
       return const SizedBox(
         height: 200,
         child: Center(child: CircularProgressIndicator()),
@@ -254,8 +322,8 @@ class _VideoMessageBubbleState extends State<VideoMessageBubble> {
             ClipRRect(
               borderRadius: BorderRadius.circular(16),
               child: AspectRatio(
-                aspectRatio: _controller.value.aspectRatio,
-                child: VideoPlayer(_controller),
+                aspectRatio: controller.value.aspectRatio,
+                child: VideoPlayer(controller),
               ),
             ),
             IconButton(
@@ -263,15 +331,15 @@ class _VideoMessageBubbleState extends State<VideoMessageBubble> {
                 backgroundColor: WidgetStateProperty.all(ColorPalette.primary),
               ),
               icon: Icon(
-                _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
+                controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
                 color: Colors.white,
                 size: 20,
               ),
               onPressed: () {
                 setState(() {
-                  _controller.value.isPlaying
-                      ? _controller.pause()
-                      : _controller.play();
+                  controller.value.isPlaying
+                      ? controller.pause()
+                      : controller.play();
                 });
               },
             ),

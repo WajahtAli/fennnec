@@ -48,6 +48,13 @@ class _PendingWidgetState extends State<PendingWidget> {
     return BlocBuilder<HomeLandingCubit, HomeLandingState>(
       bloc: _homeLandingCubit,
       builder: (context, state) {
+        final isAcceptLoading =
+            _homeLandingCubit.isLoading &&
+            _homeLandingCubit.activeInvitationAction == 'accept';
+        final isDeclineLoading =
+            _homeLandingCubit.isLoading &&
+            _homeLandingCubit.activeInvitationAction == 'decline';
+
         return Stack(
           children: [
             Column(
@@ -80,7 +87,7 @@ class _PendingWidgetState extends State<PendingWidget> {
                   child: Column(
                     children: [
                       CustomElevatedButton(
-                        icon: _homeLandingCubit.isLoading
+                        icon: isAcceptLoading
                             ? SizedBox(
                                 width: 16,
                                 height: 16,
@@ -89,14 +96,14 @@ class _PendingWidgetState extends State<PendingWidget> {
                                 ),
                               )
                             : const SizedBox.shrink(),
-                        text: _homeLandingCubit.isLoading ? '' : 'Join Group',
+                        text: isAcceptLoading ? '' : 'Join Group',
                         onTap: _homeLandingCubit.isLoading
                             ? () {}
                             : () => _handleAcceptDecline('accept'),
                       ),
                       const CustomSizedBox(height: 16),
                       CustomOutlinedButton(
-                        icon: _homeLandingCubit.isLoading
+                        icon: isDeclineLoading
                             ? SizedBox(
                                 width: 16,
                                 height: 16,
@@ -105,7 +112,7 @@ class _PendingWidgetState extends State<PendingWidget> {
                                 ),
                               )
                             : const SizedBox.shrink(),
-                        text: _homeLandingCubit.isLoading ? '' : 'Decline',
+                        text: isDeclineLoading ? '' : 'Decline',
                         onPressed: _homeLandingCubit.isLoading
                             ? () {}
                             : () => _handleAcceptDecline('decline'),

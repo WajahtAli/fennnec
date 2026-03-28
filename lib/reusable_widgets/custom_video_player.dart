@@ -43,18 +43,46 @@ class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
   bool _showControlsOverlay = true;
   bool _isMuted = false;
 
-  VideoSourceType get _effectiveSourceType {
-    if (widget.sourceType != null) {
-      return widget.sourceType!;
+  String get _normalizedVideoUrl {
+    var value = widget.videoUrl.trim();
+
+    while (value.startsWith('/http') || value.startsWith('/https')) {
+      value = value.substring(1);
     }
-    if (widget.videoUrl.startsWith('http://') ||
-        widget.videoUrl.startsWith('https://')) {
+
+    if (value.startsWith('http:/') && !value.startsWith('http://')) {
+      value = value.replaceFirst('http:/', 'http://');
+    }
+
+    if (value.startsWith('https:/') && !value.startsWith('https://')) {
+      value = value.replaceFirst('https:/', 'https://');
+    }
+
+    return value;
+  }
+
+  VideoSourceType _resolveSourceType(
+    String value,
+    VideoSourceType? explicitType,
+  ) {
+    if (explicitType != null) {
+      return explicitType;
+    }
+
+    final uri = Uri.tryParse(value);
+    if (uri != null && (uri.scheme == 'http' || uri.scheme == 'https')) {
       return VideoSourceType.network;
-    } else if (widget.videoUrl.startsWith('assets/')) {
-      return VideoSourceType.asset;
-    } else {
-      return VideoSourceType.file;
     }
+
+    if (value.startsWith('assets/')) {
+      return VideoSourceType.asset;
+    }
+
+    return VideoSourceType.file;
+  }
+
+  VideoSourceType get _effectiveSourceType {
+    return _resolveSourceType(_normalizedVideoUrl, widget.sourceType);
   }
 
   @override
@@ -73,14 +101,14 @@ class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
       switch (_effectiveSourceType) {
         case VideoSourceType.network:
           _controller = VideoPlayerController.networkUrl(
-            Uri.parse(widget.videoUrl),
+            Uri.parse(_normalizedVideoUrl),
           );
           break;
         case VideoSourceType.file:
-          _controller = VideoPlayerController.file(File(widget.videoUrl));
+          _controller = VideoPlayerController.file(File(_normalizedVideoUrl));
           break;
         case VideoSourceType.asset:
-          _controller = VideoPlayerController.asset(widget.videoUrl);
+          _controller = VideoPlayerController.asset(_normalizedVideoUrl);
           break;
       }
 
@@ -125,17 +153,24 @@ class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
   void didUpdateWidget(covariant CustomVideoPlayer oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    VideoSourceType oldEffectiveSourceType;
-    if (oldWidget.sourceType != null) {
-      oldEffectiveSourceType = oldWidget.sourceType!;
-    } else if (oldWidget.videoUrl.startsWith('http://') ||
-        oldWidget.videoUrl.startsWith('https://')) {
-      oldEffectiveSourceType = VideoSourceType.network;
-    } else if (oldWidget.videoUrl.startsWith('assets/')) {
-      oldEffectiveSourceType = VideoSourceType.asset;
-    } else {
-      oldEffectiveSourceType = VideoSourceType.file;
+    var oldNormalized = oldWidget.videoUrl.trim();
+    while (oldNormalized.startsWith('/http') ||
+        oldNormalized.startsWith('/https')) {
+      oldNormalized = oldNormalized.substring(1);
     }
+    if (oldNormalized.startsWith('http:/') &&
+        !oldNormalized.startsWith('http://')) {
+      oldNormalized = oldNormalized.replaceFirst('http:/', 'http://');
+    }
+    if (oldNormalized.startsWith('https:/') &&
+        !oldNormalized.startsWith('https://')) {
+      oldNormalized = oldNormalized.replaceFirst('https:/', 'https://');
+    }
+
+    final oldEffectiveSourceType = _resolveSourceType(
+      oldNormalized,
+      oldWidget.sourceType,
+    );
 
     if (oldWidget.videoUrl != widget.videoUrl ||
         oldEffectiveSourceType != _effectiveSourceType) {

@@ -28,6 +28,7 @@ class HomeLandingCubit extends Cubit<HomeLandingState> {
   InvitationStatus invitationStatus = InvitationStatus.pending;
 
   bool isLoading = false;
+  String? activeInvitationAction;
 
   Future<void> fetchGroupInvitations() async {
     emit(HomeLandingLoading());
@@ -50,6 +51,7 @@ class HomeLandingCubit extends Cubit<HomeLandingState> {
     required String type,
   }) async {
     isLoading = true;
+    activeInvitationAction = type;
     emit(AcceptDeclineInvitationLoading());
     try {
       final response = await acceptDeclineGroupInvitationUseCase(
@@ -58,6 +60,7 @@ class HomeLandingCubit extends Cubit<HomeLandingState> {
       );
       if (response.success == true) {
         isLoading = false;
+        activeInvitationAction = null;
         VxToast.show(
           message: response.message ?? 'Action completed successfully',
         );
@@ -70,6 +73,7 @@ class HomeLandingCubit extends Cubit<HomeLandingState> {
         await fetchGroupInvitations();
       } else {
         isLoading = false;
+        activeInvitationAction = null;
         VxToast.show(message: response.message ?? 'Failed to complete action');
         emit(
           AcceptDeclineInvitationError(
@@ -79,6 +83,7 @@ class HomeLandingCubit extends Cubit<HomeLandingState> {
       }
     } catch (e) {
       isLoading = false;
+      activeInvitationAction = null;
       VxToast.show(message: e.toString());
       emit(AcceptDeclineInvitationError(e.toString()));
     }

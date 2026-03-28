@@ -3,7 +3,8 @@ import 'package:auto_route/auto_route.dart';
 import 'package:fennac_app/app/constants/media_query_constants.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
-import 'package:fennac_app/pages/liked_groups/presentation/screen/liked_groups_screen.dart';
+import 'package:fennac_app/pages/home/presentation/bloc/cubit/groups_cubit.dart';
+import 'package:fennac_app/pages/liked_groups/presentation/bloc/cubit/liked_groups_cubit.dart';
 import 'package:fennac_app/pages/my_group/presentation/bloc/cubit/my_group_cubit.dart';
 import 'package:fennac_app/pages/profile/presentation/screen/appearence_screen.dart';
 import 'package:fennac_app/pages/profile/presentation/widgets/poke_balance_tile.dart';
@@ -36,6 +37,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _fetchGroup() async {
     await Di().sl<MyGroupCubit>().fetchGroupById('');
+    await Di().sl<LikedGroupsCubit>().fetchPeopleWhoLikedMe();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchGroup();
   }
 
   @override
@@ -113,19 +121,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               child: Column(
                                 children: [
                                   ProfileListTile(
-                                    isSwitchGroupTile: true,
+                                    isPeopleLikedYouTile: true,
                                     showDivider: false,
                                     title: 'People Who Liked You',
-                                    onTap: () {
+                                    onTap: () async {
+                                      await Di()
+                                          .sl<GroupsCubit>()
+                                          .fetchAllGroups(isLikedGroups: true);
                                       AutoRouter.of(
                                         context,
                                       ).push(HomeRoute(isLikedGroups: true));
-                                      // Navigator.of(context).push(
-                                      //   MaterialPageRoute(
-                                      //     builder: (context) =>
-                                      //         const LikedGroupsScreen(),
-                                      //   ),
-                                      // );
                                     },
                                   ),
                                   Divider(

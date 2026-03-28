@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'package:equatable/equatable.dart';
 
 import 'package:fennac_app/core/di_container.dart';
+import 'package:fennac_app/helpers/shared_pref_helper.dart';
 import 'package:fennac_app/pages/auth/presentation/bloc/cubit/create_account_cubit.dart';
 import 'package:fennac_app/pages/chats/data/models/message_model.dart';
 import 'package:fennac_app/pages/chats/data/models/message_type_enum.dart';
@@ -78,6 +79,8 @@ class MessageCubit extends Cubit<MessageState> {
   String? errorMessage;
   bool isSendingMessage = false;
   final _uuid = const Uuid();
+  final SharedPreferencesHelper _sharedPreferencesHelper = Di()
+      .sl<SharedPreferencesHelper>();
 
   // Current user ID (should be fetched from auth in real app)
   String currentUserId = '1';
@@ -103,6 +106,7 @@ class MessageCubit extends Cubit<MessageState> {
     emit(MessageLoading());
 
     try {
+      await _hydrateCurrentUser();
       await loadMoreMessages();
 
       isLoading = false;
@@ -140,13 +144,85 @@ class MessageCubit extends Cubit<MessageState> {
         _page++;
       }
 
-      messages.addAll(newMessages);
+      final normalizedMessages = newMessages
+          .map(_normalizeFetchedMessage)
+          .toList();
+      messages = _mergeAndSortMessages(messages, normalizedMessages);
       isFetchingMore = false;
       emit(MessageSuccess());
     } catch (e) {
       isFetchingMore = false;
       rethrow;
     }
+  }
+
+  Future<void> _hydrateCurrentUser() async {
+    final savedUserId = _sharedPreferencesHelper.getUserId();
+    if (savedUserId != null && savedUserId.isNotEmpty) {
+      currentUserId = savedUserId;
+    }
+
+    final loginModel = await _sharedPreferencesHelper.getUserData();
+    final user = loginModel?.data?.user;
+    if (user == null) return;
+
+    final userId = user.id;
+    if (userId != null && userId.isNotEmpty) {
+      currentUserId = userId;
+    }
+
+    final fullName = '${user.firstName ?? ''} ${user.lastName ?? ''}'.trim();
+    if (fullName.isNotEmpty) {
+      currentUserName = fullName;
+    }
+
+    if (user.userImage != null && user.userImage!.isNotEmpty) {
+      currentUserAvatar = user.userImage;
+    }
+  }
+
+  MessageModel _normalizeFetchedMessage(MessageModel message) {
+    final normalizedReactions = _normalizeReactions(message.reactions);
+    final resolvedIsMe =
+        message.isMe ||
+        (currentUserId.isNotEmpty && message.senderId == currentUserId);
+
+    return message.copyWith(isMe: resolvedIsMe, reactions: normalizedReactions);
+  }
+
+  List<ReactionModel> _normalizeReactions(List<ReactionModel> reactions) {
+    final Map<String, ReactionModel> latestByUser = {};
+
+    for (final reaction in reactions) {
+      final existing = latestByUser[reaction.userId];
+      if (existing == null || reaction.reactedAt.isAfter(existing.reactedAt)) {
+        latestByUser[reaction.userId] = reaction;
+      }
+    }
+
+    final normalized = latestByUser.values.toList();
+    normalized.sort((a, b) => a.reactedAt.compareTo(b.reactedAt));
+    return normalized;
+  }
+
+  List<MessageModel> _mergeAndSortMessages(
+    List<MessageModel> existing,
+    List<MessageModel> incoming,
+  ) {
+    final Map<String, MessageModel> byId = {
+      for (final message in existing) message.id: message,
+    };
+
+    for (final message in incoming) {
+      final current = byId[message.id];
+      if (current == null || message.sentAt.isAfter(current.sentAt)) {
+        byId[message.id] = message;
+      }
+    }
+
+    final merged = byId.values.toList();
+    merged.sort((a, b) => b.sentAt.compareTo(a.sentAt));
+    return merged;
   }
 
   /// Send a text message
@@ -242,8 +318,9 @@ class MessageCubit extends Cubit<MessageState> {
           }
         }
 
-        final String effectiveContent =
-            (caption == null || caption.isEmpty) ? " " : caption;
+        final String effectiveContent = (caption == null || caption.isEmpty)
+            ? " "
+            : caption;
 
         if (_isGroup) {
           await _myGroupRepository.sendGroupMessage(

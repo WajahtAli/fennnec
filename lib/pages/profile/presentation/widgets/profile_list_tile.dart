@@ -3,6 +3,8 @@ import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
+import 'package:fennac_app/pages/liked_groups/presentation/bloc/cubit/liked_groups_cubit.dart';
+import 'package:fennac_app/pages/liked_groups/presentation/bloc/state/like_groups_state.dart';
 import 'package:fennac_app/pages/my_group/presentation/bloc/cubit/my_group_cubit.dart';
 import 'package:fennac_app/reusable_widgets/member_avatar_widget.dart';
 import 'package:fennac_app/utils/validators.dart';
@@ -10,6 +12,7 @@ import 'package:fennac_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:lottie/lottie.dart';
 
 class ProfileListTile extends StatelessWidget {
   final String title;
@@ -17,6 +20,7 @@ class ProfileListTile extends StatelessWidget {
   final VoidCallback? onTap;
   final bool showDivider;
   final bool? isGroupTile;
+  final bool? isPeopleLikedYouTile;
   final bool? isSwitchGroupTile;
 
   const ProfileListTile({
@@ -26,6 +30,7 @@ class ProfileListTile extends StatelessWidget {
     this.onTap,
     this.showDivider = true,
     this.isGroupTile,
+    this.isPeopleLikedYouTile,
     this.isSwitchGroupTile,
   });
 
@@ -72,6 +77,37 @@ class ProfileListTile extends StatelessWidget {
                   return AppText(
                     text: validateString(
                       Di().sl<MyGroupCubit>().myGroupList?.groupList?.length ??
+                          '0',
+                    ),
+                    style: AppTextStyles.body(context),
+                  );
+                },
+              ),
+              const SizedBox(width: 8),
+            ],
+            if (isPeopleLikedYouTile == true) ...[
+              BlocBuilder<LikedGroupsCubit, LikedGroupsState>(
+                bloc: Di().sl<LikedGroupsCubit>(),
+                builder: (context, state) {
+                  if (state is LikedGroupsLoading) {
+                    return SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: Lottie.asset(
+                        Assets.animations.loadingSpinner,
+                        fit: BoxFit.cover,
+                      ),
+                    );
+                  }
+
+                  return AppText(
+                    text: validateString(
+                      Di()
+                              .sl<LikedGroupsCubit>()
+                              .groupsModel
+                              ?.data
+                              ?.groups
+                              ?.length ??
                           '0',
                     ),
                     style: AppTextStyles.body(context),

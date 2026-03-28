@@ -54,11 +54,17 @@ _ChatModel _$ChatModelFromJson(Map<String, dynamic> json) => _ChatModel(
   name: json['name'] as String,
   image: json['image'] as String? ?? '',
   lastMessage: json['lastMessage'] as String? ?? '',
-  lastMessageAt: json['lastMessageAt'] == null
-      ? null
-      : DateTime.parse(json['lastMessageAt'] as String),
+  lastMessageAt: _dateTimeFromJsonNullable(json['lastMessageAt']),
+  fromUserId: json['fromUserId'] as String?,
   unreadCount: (json['unreadCount'] as num).toInt(),
-  meta: json['meta'] as Map<String, dynamic>,
+  pokes:
+      (json['pokes'] as List<dynamic>?)
+          ?.map((e) => ChatPokeModel.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+      const [],
+  meta: json['meta'] == null
+      ? const ChatMetaModel()
+      : ChatMetaModel.fromJson(json['meta'] as Map<String, dynamic>),
   members: (json['members'] as List<dynamic>?)
       ?.map((e) => MemberModel.fromJson(e as Map<String, dynamic>))
       .toList(),
@@ -71,11 +77,277 @@ Map<String, dynamic> _$ChatModelToJson(_ChatModel instance) =>
       'name': instance.name,
       'image': instance.image,
       'lastMessage': instance.lastMessage,
-      'lastMessageAt': instance.lastMessageAt?.toIso8601String(),
+      'lastMessageAt': _dateTimeToJsonNullable(instance.lastMessageAt),
+      'fromUserId': instance.fromUserId,
       'unreadCount': instance.unreadCount,
+      'pokes': instance.pokes,
       'meta': instance.meta,
       'members': instance.members,
     };
+
+_ChatPokeModel _$ChatPokeModelFromJson(
+  Map<String, dynamic> json,
+) => _ChatPokeModel(
+  id: json['id'] as String,
+  fromUser: json['fromUser'] == null
+      ? null
+      : ChatPokeUserModel.fromJson(json['fromUser'] as Map<String, dynamic>),
+  toUserId: json['toUserId'] as String?,
+  message: json['message'] as String? ?? '',
+  createdAt: _dateTimeFromJsonNullable(json['createdAt']),
+  status: json['status'] as String?,
+  targetType: json['targetType'] as String?,
+  targetId: json['targetId'] as String?,
+  direction: json['direction'] as String?,
+  targetPhoto: json['targetPhoto'] == null
+      ? null
+      : PokePhotoDetail.fromJson(json['targetPhoto'] as Map<String, dynamic>),
+  targetPrompt: json['targetPrompt'] == null
+      ? null
+      : ChatPokePromptModel.fromJson(
+          json['targetPrompt'] as Map<String, dynamic>,
+        ),
+);
+
+Map<String, dynamic> _$ChatPokeModelToJson(_ChatPokeModel instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'fromUser': instance.fromUser,
+      'toUserId': instance.toUserId,
+      'message': instance.message,
+      'createdAt': _dateTimeToJsonNullable(instance.createdAt),
+      'status': instance.status,
+      'targetType': instance.targetType,
+      'targetId': instance.targetId,
+      'direction': instance.direction,
+      'targetPhoto': instance.targetPhoto,
+      'targetPrompt': instance.targetPrompt,
+    };
+
+_ChatPokeUserModel _$ChatPokeUserModelFromJson(Map<String, dynamic> json) =>
+    _ChatPokeUserModel(
+      id: json['id'] as String,
+      firstName: json['firstName'] as String?,
+      lastName: json['lastName'] as String?,
+      image: json['image'] as String?,
+    );
+
+Map<String, dynamic> _$ChatPokeUserModelToJson(_ChatPokeUserModel instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'firstName': instance.firstName,
+      'lastName': instance.lastName,
+      'image': instance.image,
+    };
+
+_ChatPokePromptModel _$ChatPokePromptModelFromJson(Map<String, dynamic> json) =>
+    _ChatPokePromptModel(
+      id: json['id'] as String,
+      promptTitle: json['promptTitle'] as String?,
+      type: json['type'] as String?,
+      promptAnswer: json['promptAnswer'] as String?,
+    );
+
+Map<String, dynamic> _$ChatPokePromptModelToJson(
+  _ChatPokePromptModel instance,
+) => <String, dynamic>{
+  'id': instance.id,
+  'promptTitle': instance.promptTitle,
+  'type': instance.type,
+  'promptAnswer': instance.promptAnswer,
+};
+
+_ChatMetaModel _$ChatMetaModelFromJson(Map<String, dynamic> json) =>
+    _ChatMetaModel(
+      peerUserId: json['peerUserId'] as String?,
+      totalPokes: (json['totalPokes'] as num?)?.toInt() ?? 0,
+      receivedCount: (json['receivedCount'] as num?)?.toInt() ?? 0,
+      sentCount: (json['sentCount'] as num?)?.toInt() ?? 0,
+      pendingCount: (json['pendingCount'] as num?)?.toInt() ?? 0,
+      latestPoke: json['latestPoke'] == null
+          ? null
+          : ChatLatestPokeModel.fromJson(
+              json['latestPoke'] as Map<String, dynamic>,
+            ),
+      hasStartedChat: json['hasStartedChat'] as bool? ?? false,
+      directChat: json['directChat'] == null
+          ? null
+          : ChatDirectChatMetaModel.fromJson(
+              json['directChat'] as Map<String, dynamic>,
+            ),
+      groupId: json['groupId'] as String?,
+      receiverGroupId: json['receiverGroupId'] as String?,
+      receiverGroupIds:
+          (json['receiverGroupIds'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
+      isMatchedGroup: json['isMatchedGroup'] as bool?,
+      matchCount: (json['matchCount'] as num?)?.toInt() ?? 0,
+      groupsDetails: json['groupsDetails'] == null
+          ? null
+          : ChatGroupsDetailsModel.fromJson(
+              json['groupsDetails'] as Map<String, dynamic>,
+            ),
+    );
+
+Map<String, dynamic> _$ChatMetaModelToJson(_ChatMetaModel instance) =>
+    <String, dynamic>{
+      'peerUserId': instance.peerUserId,
+      'totalPokes': instance.totalPokes,
+      'receivedCount': instance.receivedCount,
+      'sentCount': instance.sentCount,
+      'pendingCount': instance.pendingCount,
+      'latestPoke': instance.latestPoke,
+      'hasStartedChat': instance.hasStartedChat,
+      'directChat': instance.directChat,
+      'groupId': instance.groupId,
+      'receiverGroupId': instance.receiverGroupId,
+      'receiverGroupIds': instance.receiverGroupIds,
+      'isMatchedGroup': instance.isMatchedGroup,
+      'matchCount': instance.matchCount,
+      'groupsDetails': instance.groupsDetails,
+    };
+
+_ChatGroupsDetailsModel _$ChatGroupsDetailsModelFromJson(
+  Map<String, dynamic> json,
+) => _ChatGroupsDetailsModel(
+  userGroupMembers:
+      (json['userGroupMembers'] as List<dynamic>?)
+          ?.map(
+            (e) => ChatGroupMemberUserModel.fromJson(e as Map<String, dynamic>),
+          )
+          .toList() ??
+      const [],
+  matchedGroupMembers:
+      (json['matchedGroupMembers'] as List<dynamic>?)
+          ?.map(
+            (e) => MatchedGroupMembersModel.fromJson(e as Map<String, dynamic>),
+          )
+          .toList() ??
+      const [],
+  aboutThisGroup: json['aboutThisGroup'] == null
+      ? null
+      : ChatAboutGroupModel.fromJson(
+          json['aboutThisGroup'] as Map<String, dynamic>,
+        ),
+  sharedMedia:
+      (json['sharedMedia'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ??
+      const [],
+  commonInterests:
+      (json['commonInterests'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ??
+      const [],
+  isMatched: json['isMatched'] as bool?,
+);
+
+Map<String, dynamic> _$ChatGroupsDetailsModelToJson(
+  _ChatGroupsDetailsModel instance,
+) => <String, dynamic>{
+  'userGroupMembers': instance.userGroupMembers,
+  'matchedGroupMembers': instance.matchedGroupMembers,
+  'aboutThisGroup': instance.aboutThisGroup,
+  'sharedMedia': instance.sharedMedia,
+  'commonInterests': instance.commonInterests,
+  'isMatched': instance.isMatched,
+};
+
+_MatchedGroupMembersModel _$MatchedGroupMembersModelFromJson(
+  Map<String, dynamic> json,
+) => _MatchedGroupMembersModel(
+  groupId: json['groupId'] as String?,
+  members:
+      (json['members'] as List<dynamic>?)
+          ?.map(
+            (e) => ChatGroupMemberUserModel.fromJson(e as Map<String, dynamic>),
+          )
+          .toList() ??
+      const [],
+);
+
+Map<String, dynamic> _$MatchedGroupMembersModelToJson(
+  _MatchedGroupMembersModel instance,
+) => <String, dynamic>{
+  'groupId': instance.groupId,
+  'members': instance.members,
+};
+
+_ChatGroupMemberUserModel _$ChatGroupMemberUserModelFromJson(
+  Map<String, dynamic> json,
+) => _ChatGroupMemberUserModel(
+  id: json['id'] as String,
+  firstName: json['firstName'] as String?,
+  lastName: json['lastName'] as String?,
+  image: json['image'] as String?,
+);
+
+Map<String, dynamic> _$ChatGroupMemberUserModelToJson(
+  _ChatGroupMemberUserModel instance,
+) => <String, dynamic>{
+  'id': instance.id,
+  'firstName': instance.firstName,
+  'lastName': instance.lastName,
+  'image': instance.image,
+};
+
+_ChatAboutGroupModel _$ChatAboutGroupModelFromJson(Map<String, dynamic> json) =>
+    _ChatAboutGroupModel(
+      bio: json['bio'] as String?,
+      fitsForGroup: json['fitsForGroup'] as String?,
+    );
+
+Map<String, dynamic> _$ChatAboutGroupModelToJson(
+  _ChatAboutGroupModel instance,
+) => <String, dynamic>{
+  'bio': instance.bio,
+  'fitsForGroup': instance.fitsForGroup,
+};
+
+_ChatLatestPokeModel _$ChatLatestPokeModelFromJson(Map<String, dynamic> json) =>
+    _ChatLatestPokeModel(
+      id: json['id'] as String?,
+      pokeId: json['pokeId'] as String?,
+      fromUserId: json['fromUserId'] as String?,
+      toUserId: json['toUserId'] as String?,
+      peerUserId: json['peerUserId'] as String?,
+      direction: json['direction'] as String?,
+      status: json['status'] as String?,
+      targetType: json['targetType'] as String?,
+      targetId: json['targetId'] as String?,
+    );
+
+Map<String, dynamic> _$ChatLatestPokeModelToJson(
+  _ChatLatestPokeModel instance,
+) => <String, dynamic>{
+  'id': instance.id,
+  'pokeId': instance.pokeId,
+  'fromUserId': instance.fromUserId,
+  'toUserId': instance.toUserId,
+  'peerUserId': instance.peerUserId,
+  'direction': instance.direction,
+  'status': instance.status,
+  'targetType': instance.targetType,
+  'targetId': instance.targetId,
+};
+
+_ChatDirectChatMetaModel _$ChatDirectChatMetaModelFromJson(
+  Map<String, dynamic> json,
+) => _ChatDirectChatMetaModel(
+  otherUserId: json['otherUserId'] as String?,
+  unreadCount: (json['unreadCount'] as num?)?.toInt() ?? 0,
+  lastMessageAt: _dateTimeFromJsonNullable(json['lastMessageAt']),
+);
+
+Map<String, dynamic> _$ChatDirectChatMetaModelToJson(
+  _ChatDirectChatMetaModel instance,
+) => <String, dynamic>{
+  'otherUserId': instance.otherUserId,
+  'unreadCount': instance.unreadCount,
+  'lastMessageAt': _dateTimeToJsonNullable(instance.lastMessageAt),
+};
 
 _MemberModel _$MemberModelFromJson(Map<String, dynamic> json) => _MemberModel(
   id: json['id'] as String,
@@ -124,9 +396,7 @@ _CallModel _$CallModelFromJson(Map<String, dynamic> json) => _CallModel(
   channelName: json['channelName'] as String?,
   mediaType: json['mediaType'] as String?,
   callType: json['callType'] as String?,
-  startedAt: json['startedAt'] == null
-      ? null
-      : DateTime.parse(json['startedAt'] as String),
+  startedAt: _dateTimeFromJsonNullable(json['startedAt']),
   callerId: json['callerId'] == null
       ? null
       : CallUserInfo.fromJson(json['callerId'] as Map<String, dynamic>),
@@ -148,7 +418,7 @@ Map<String, dynamic> _$CallModelToJson(_CallModel instance) =>
       'channelName': instance.channelName,
       'mediaType': instance.mediaType,
       'callType': instance.callType,
-      'startedAt': instance.startedAt?.toIso8601String(),
+      'startedAt': _dateTimeToJsonNullable(instance.startedAt),
       'callerId': instance.callerId,
       'participantIds': instance.participantIds,
     };
@@ -209,8 +479,8 @@ _PokeModel _$PokeModelFromJson(Map<String, dynamic> json) => _PokeModel(
   targetId: json['targetId'] as String?,
   message: json['message'] as String,
   status: json['status'] as String,
-  createdAt: DateTime.parse(json['createdAt'] as String),
-  updatedAt: DateTime.parse(json['updatedAt'] as String),
+  createdAt: _dateTimeFromJson(json['createdAt']),
+  updatedAt: _dateTimeFromJson(json['updatedAt']),
 );
 
 Map<String, dynamic> _$PokeModelToJson(_PokeModel instance) =>
@@ -222,8 +492,8 @@ Map<String, dynamic> _$PokeModelToJson(_PokeModel instance) =>
       'targetId': instance.targetId,
       'message': instance.message,
       'status': instance.status,
-      'createdAt': instance.createdAt.toIso8601String(),
-      'updatedAt': instance.updatedAt.toIso8601String(),
+      'createdAt': _dateTimeToJson(instance.createdAt),
+      'updatedAt': _dateTimeToJson(instance.updatedAt),
     };
 
 _PokerFromUser _$PokerFromUserFromJson(Map<String, dynamic> json) =>

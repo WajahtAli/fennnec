@@ -612,7 +612,7 @@ $PaginationModelCopyWith<$Res> get pagination {
 /// @nodoc
 mixin _$ChatModel {
 
- String get type; String get id; String get name; String get image; String get lastMessage; DateTime? get lastMessageAt; int get unreadCount; Map<String, dynamic> get meta; List<MemberModel>? get members;
+ String get type; String get id; String get name; String get image; String get lastMessage;@JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable) DateTime? get lastMessageAt; String? get fromUserId; int get unreadCount; List<ChatPokeModel> get pokes; ChatMetaModel get meta; List<MemberModel>? get members;
 /// Create a copy of ChatModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -625,16 +625,16 @@ $ChatModelCopyWith<ChatModel> get copyWith => _$ChatModelCopyWithImpl<ChatModel>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChatModel&&(identical(other.type, type) || other.type == type)&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.image, image) || other.image == image)&&(identical(other.lastMessage, lastMessage) || other.lastMessage == lastMessage)&&(identical(other.lastMessageAt, lastMessageAt) || other.lastMessageAt == lastMessageAt)&&(identical(other.unreadCount, unreadCount) || other.unreadCount == unreadCount)&&const DeepCollectionEquality().equals(other.meta, meta)&&const DeepCollectionEquality().equals(other.members, members));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChatModel&&(identical(other.type, type) || other.type == type)&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.image, image) || other.image == image)&&(identical(other.lastMessage, lastMessage) || other.lastMessage == lastMessage)&&(identical(other.lastMessageAt, lastMessageAt) || other.lastMessageAt == lastMessageAt)&&(identical(other.fromUserId, fromUserId) || other.fromUserId == fromUserId)&&(identical(other.unreadCount, unreadCount) || other.unreadCount == unreadCount)&&const DeepCollectionEquality().equals(other.pokes, pokes)&&(identical(other.meta, meta) || other.meta == meta)&&const DeepCollectionEquality().equals(other.members, members));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,type,id,name,image,lastMessage,lastMessageAt,unreadCount,const DeepCollectionEquality().hash(meta),const DeepCollectionEquality().hash(members));
+int get hashCode => Object.hash(runtimeType,type,id,name,image,lastMessage,lastMessageAt,fromUserId,unreadCount,const DeepCollectionEquality().hash(pokes),meta,const DeepCollectionEquality().hash(members));
 
 @override
 String toString() {
-  return 'ChatModel(type: $type, id: $id, name: $name, image: $image, lastMessage: $lastMessage, lastMessageAt: $lastMessageAt, unreadCount: $unreadCount, meta: $meta, members: $members)';
+  return 'ChatModel(type: $type, id: $id, name: $name, image: $image, lastMessage: $lastMessage, lastMessageAt: $lastMessageAt, fromUserId: $fromUserId, unreadCount: $unreadCount, pokes: $pokes, meta: $meta, members: $members)';
 }
 
 
@@ -645,11 +645,11 @@ abstract mixin class $ChatModelCopyWith<$Res>  {
   factory $ChatModelCopyWith(ChatModel value, $Res Function(ChatModel) _then) = _$ChatModelCopyWithImpl;
 @useResult
 $Res call({
- String type, String id, String name, String image, String lastMessage, DateTime? lastMessageAt, int unreadCount, Map<String, dynamic> meta, List<MemberModel>? members
+ String type, String id, String name, String image, String lastMessage,@JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable) DateTime? lastMessageAt, String? fromUserId, int unreadCount, List<ChatPokeModel> pokes, ChatMetaModel meta, List<MemberModel>? members
 });
 
 
-
+$ChatMetaModelCopyWith<$Res> get meta;
 
 }
 /// @nodoc
@@ -662,7 +662,7 @@ class _$ChatModelCopyWithImpl<$Res>
 
 /// Create a copy of ChatModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? type = null,Object? id = null,Object? name = null,Object? image = null,Object? lastMessage = null,Object? lastMessageAt = freezed,Object? unreadCount = null,Object? meta = null,Object? members = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? type = null,Object? id = null,Object? name = null,Object? image = null,Object? lastMessage = null,Object? lastMessageAt = freezed,Object? fromUserId = freezed,Object? unreadCount = null,Object? pokes = null,Object? meta = null,Object? members = freezed,}) {
   return _then(_self.copyWith(
 type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
 as String,id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
@@ -670,13 +670,24 @@ as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non
 as String,image: null == image ? _self.image : image // ignore: cast_nullable_to_non_nullable
 as String,lastMessage: null == lastMessage ? _self.lastMessage : lastMessage // ignore: cast_nullable_to_non_nullable
 as String,lastMessageAt: freezed == lastMessageAt ? _self.lastMessageAt : lastMessageAt // ignore: cast_nullable_to_non_nullable
-as DateTime?,unreadCount: null == unreadCount ? _self.unreadCount : unreadCount // ignore: cast_nullable_to_non_nullable
-as int,meta: null == meta ? _self.meta : meta // ignore: cast_nullable_to_non_nullable
-as Map<String, dynamic>,members: freezed == members ? _self.members : members // ignore: cast_nullable_to_non_nullable
+as DateTime?,fromUserId: freezed == fromUserId ? _self.fromUserId : fromUserId // ignore: cast_nullable_to_non_nullable
+as String?,unreadCount: null == unreadCount ? _self.unreadCount : unreadCount // ignore: cast_nullable_to_non_nullable
+as int,pokes: null == pokes ? _self.pokes : pokes // ignore: cast_nullable_to_non_nullable
+as List<ChatPokeModel>,meta: null == meta ? _self.meta : meta // ignore: cast_nullable_to_non_nullable
+as ChatMetaModel,members: freezed == members ? _self.members : members // ignore: cast_nullable_to_non_nullable
 as List<MemberModel>?,
   ));
 }
-
+/// Create a copy of ChatModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ChatMetaModelCopyWith<$Res> get meta {
+  
+  return $ChatMetaModelCopyWith<$Res>(_self.meta, (value) {
+    return _then(_self.copyWith(meta: value));
+  });
+}
 }
 
 
@@ -758,10 +769,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String type,  String id,  String name,  String image,  String lastMessage,  DateTime? lastMessageAt,  int unreadCount,  Map<String, dynamic> meta,  List<MemberModel>? members)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String type,  String id,  String name,  String image,  String lastMessage, @JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable)  DateTime? lastMessageAt,  String? fromUserId,  int unreadCount,  List<ChatPokeModel> pokes,  ChatMetaModel meta,  List<MemberModel>? members)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ChatModel() when $default != null:
-return $default(_that.type,_that.id,_that.name,_that.image,_that.lastMessage,_that.lastMessageAt,_that.unreadCount,_that.meta,_that.members);case _:
+return $default(_that.type,_that.id,_that.name,_that.image,_that.lastMessage,_that.lastMessageAt,_that.fromUserId,_that.unreadCount,_that.pokes,_that.meta,_that.members);case _:
   return orElse();
 
 }
@@ -779,10 +790,10 @@ return $default(_that.type,_that.id,_that.name,_that.image,_that.lastMessage,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String type,  String id,  String name,  String image,  String lastMessage,  DateTime? lastMessageAt,  int unreadCount,  Map<String, dynamic> meta,  List<MemberModel>? members)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String type,  String id,  String name,  String image,  String lastMessage, @JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable)  DateTime? lastMessageAt,  String? fromUserId,  int unreadCount,  List<ChatPokeModel> pokes,  ChatMetaModel meta,  List<MemberModel>? members)  $default,) {final _that = this;
 switch (_that) {
 case _ChatModel():
-return $default(_that.type,_that.id,_that.name,_that.image,_that.lastMessage,_that.lastMessageAt,_that.unreadCount,_that.meta,_that.members);case _:
+return $default(_that.type,_that.id,_that.name,_that.image,_that.lastMessage,_that.lastMessageAt,_that.fromUserId,_that.unreadCount,_that.pokes,_that.meta,_that.members);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -799,10 +810,10 @@ return $default(_that.type,_that.id,_that.name,_that.image,_that.lastMessage,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String type,  String id,  String name,  String image,  String lastMessage,  DateTime? lastMessageAt,  int unreadCount,  Map<String, dynamic> meta,  List<MemberModel>? members)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String type,  String id,  String name,  String image,  String lastMessage, @JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable)  DateTime? lastMessageAt,  String? fromUserId,  int unreadCount,  List<ChatPokeModel> pokes,  ChatMetaModel meta,  List<MemberModel>? members)?  $default,) {final _that = this;
 switch (_that) {
 case _ChatModel() when $default != null:
-return $default(_that.type,_that.id,_that.name,_that.image,_that.lastMessage,_that.lastMessageAt,_that.unreadCount,_that.meta,_that.members);case _:
+return $default(_that.type,_that.id,_that.name,_that.image,_that.lastMessage,_that.lastMessageAt,_that.fromUserId,_that.unreadCount,_that.pokes,_that.meta,_that.members);case _:
   return null;
 
 }
@@ -814,7 +825,7 @@ return $default(_that.type,_that.id,_that.name,_that.image,_that.lastMessage,_th
 @JsonSerializable()
 
 class _ChatModel implements ChatModel {
-  const _ChatModel({required this.type, required this.id, required this.name, this.image = '', this.lastMessage = '', this.lastMessageAt, required this.unreadCount, required final  Map<String, dynamic> meta, final  List<MemberModel>? members}): _meta = meta,_members = members;
+  const _ChatModel({required this.type, required this.id, required this.name, this.image = '', this.lastMessage = '', @JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable) this.lastMessageAt, this.fromUserId, required this.unreadCount, final  List<ChatPokeModel> pokes = const [], this.meta = const ChatMetaModel(), final  List<MemberModel>? members}): _pokes = pokes,_members = members;
   factory _ChatModel.fromJson(Map<String, dynamic> json) => _$ChatModelFromJson(json);
 
 @override final  String type;
@@ -822,15 +833,17 @@ class _ChatModel implements ChatModel {
 @override final  String name;
 @override@JsonKey() final  String image;
 @override@JsonKey() final  String lastMessage;
-@override final  DateTime? lastMessageAt;
+@override@JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable) final  DateTime? lastMessageAt;
+@override final  String? fromUserId;
 @override final  int unreadCount;
- final  Map<String, dynamic> _meta;
-@override Map<String, dynamic> get meta {
-  if (_meta is EqualUnmodifiableMapView) return _meta;
+ final  List<ChatPokeModel> _pokes;
+@override@JsonKey() List<ChatPokeModel> get pokes {
+  if (_pokes is EqualUnmodifiableListView) return _pokes;
   // ignore: implicit_dynamic_type
-  return EqualUnmodifiableMapView(_meta);
+  return EqualUnmodifiableListView(_pokes);
 }
 
+@override@JsonKey() final  ChatMetaModel meta;
  final  List<MemberModel>? _members;
 @override List<MemberModel>? get members {
   final value = _members;
@@ -854,16 +867,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChatModel&&(identical(other.type, type) || other.type == type)&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.image, image) || other.image == image)&&(identical(other.lastMessage, lastMessage) || other.lastMessage == lastMessage)&&(identical(other.lastMessageAt, lastMessageAt) || other.lastMessageAt == lastMessageAt)&&(identical(other.unreadCount, unreadCount) || other.unreadCount == unreadCount)&&const DeepCollectionEquality().equals(other._meta, _meta)&&const DeepCollectionEquality().equals(other._members, _members));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChatModel&&(identical(other.type, type) || other.type == type)&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.image, image) || other.image == image)&&(identical(other.lastMessage, lastMessage) || other.lastMessage == lastMessage)&&(identical(other.lastMessageAt, lastMessageAt) || other.lastMessageAt == lastMessageAt)&&(identical(other.fromUserId, fromUserId) || other.fromUserId == fromUserId)&&(identical(other.unreadCount, unreadCount) || other.unreadCount == unreadCount)&&const DeepCollectionEquality().equals(other._pokes, _pokes)&&(identical(other.meta, meta) || other.meta == meta)&&const DeepCollectionEquality().equals(other._members, _members));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,type,id,name,image,lastMessage,lastMessageAt,unreadCount,const DeepCollectionEquality().hash(_meta),const DeepCollectionEquality().hash(_members));
+int get hashCode => Object.hash(runtimeType,type,id,name,image,lastMessage,lastMessageAt,fromUserId,unreadCount,const DeepCollectionEquality().hash(_pokes),meta,const DeepCollectionEquality().hash(_members));
 
 @override
 String toString() {
-  return 'ChatModel(type: $type, id: $id, name: $name, image: $image, lastMessage: $lastMessage, lastMessageAt: $lastMessageAt, unreadCount: $unreadCount, meta: $meta, members: $members)';
+  return 'ChatModel(type: $type, id: $id, name: $name, image: $image, lastMessage: $lastMessage, lastMessageAt: $lastMessageAt, fromUserId: $fromUserId, unreadCount: $unreadCount, pokes: $pokes, meta: $meta, members: $members)';
 }
 
 
@@ -874,11 +887,11 @@ abstract mixin class _$ChatModelCopyWith<$Res> implements $ChatModelCopyWith<$Re
   factory _$ChatModelCopyWith(_ChatModel value, $Res Function(_ChatModel) _then) = __$ChatModelCopyWithImpl;
 @override @useResult
 $Res call({
- String type, String id, String name, String image, String lastMessage, DateTime? lastMessageAt, int unreadCount, Map<String, dynamic> meta, List<MemberModel>? members
+ String type, String id, String name, String image, String lastMessage,@JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable) DateTime? lastMessageAt, String? fromUserId, int unreadCount, List<ChatPokeModel> pokes, ChatMetaModel meta, List<MemberModel>? members
 });
 
 
-
+@override $ChatMetaModelCopyWith<$Res> get meta;
 
 }
 /// @nodoc
@@ -891,7 +904,7 @@ class __$ChatModelCopyWithImpl<$Res>
 
 /// Create a copy of ChatModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? type = null,Object? id = null,Object? name = null,Object? image = null,Object? lastMessage = null,Object? lastMessageAt = freezed,Object? unreadCount = null,Object? meta = null,Object? members = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? type = null,Object? id = null,Object? name = null,Object? image = null,Object? lastMessage = null,Object? lastMessageAt = freezed,Object? fromUserId = freezed,Object? unreadCount = null,Object? pokes = null,Object? meta = null,Object? members = freezed,}) {
   return _then(_ChatModel(
 type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
 as String,id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
@@ -899,10 +912,3002 @@ as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non
 as String,image: null == image ? _self.image : image // ignore: cast_nullable_to_non_nullable
 as String,lastMessage: null == lastMessage ? _self.lastMessage : lastMessage // ignore: cast_nullable_to_non_nullable
 as String,lastMessageAt: freezed == lastMessageAt ? _self.lastMessageAt : lastMessageAt // ignore: cast_nullable_to_non_nullable
-as DateTime?,unreadCount: null == unreadCount ? _self.unreadCount : unreadCount // ignore: cast_nullable_to_non_nullable
-as int,meta: null == meta ? _self._meta : meta // ignore: cast_nullable_to_non_nullable
-as Map<String, dynamic>,members: freezed == members ? _self._members : members // ignore: cast_nullable_to_non_nullable
+as DateTime?,fromUserId: freezed == fromUserId ? _self.fromUserId : fromUserId // ignore: cast_nullable_to_non_nullable
+as String?,unreadCount: null == unreadCount ? _self.unreadCount : unreadCount // ignore: cast_nullable_to_non_nullable
+as int,pokes: null == pokes ? _self._pokes : pokes // ignore: cast_nullable_to_non_nullable
+as List<ChatPokeModel>,meta: null == meta ? _self.meta : meta // ignore: cast_nullable_to_non_nullable
+as ChatMetaModel,members: freezed == members ? _self._members : members // ignore: cast_nullable_to_non_nullable
 as List<MemberModel>?,
+  ));
+}
+
+/// Create a copy of ChatModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ChatMetaModelCopyWith<$Res> get meta {
+  
+  return $ChatMetaModelCopyWith<$Res>(_self.meta, (value) {
+    return _then(_self.copyWith(meta: value));
+  });
+}
+}
+
+
+/// @nodoc
+mixin _$ChatPokeModel {
+
+ String get id; ChatPokeUserModel? get fromUser; String? get toUserId; String get message;@JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable) DateTime? get createdAt; String? get status; String? get targetType; String? get targetId; String? get direction; PokePhotoDetail? get targetPhoto; ChatPokePromptModel? get targetPrompt;
+/// Create a copy of ChatPokeModel
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ChatPokeModelCopyWith<ChatPokeModel> get copyWith => _$ChatPokeModelCopyWithImpl<ChatPokeModel>(this as ChatPokeModel, _$identity);
+
+  /// Serializes this ChatPokeModel to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChatPokeModel&&(identical(other.id, id) || other.id == id)&&(identical(other.fromUser, fromUser) || other.fromUser == fromUser)&&(identical(other.toUserId, toUserId) || other.toUserId == toUserId)&&(identical(other.message, message) || other.message == message)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.status, status) || other.status == status)&&(identical(other.targetType, targetType) || other.targetType == targetType)&&(identical(other.targetId, targetId) || other.targetId == targetId)&&(identical(other.direction, direction) || other.direction == direction)&&(identical(other.targetPhoto, targetPhoto) || other.targetPhoto == targetPhoto)&&(identical(other.targetPrompt, targetPrompt) || other.targetPrompt == targetPrompt));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,fromUser,toUserId,message,createdAt,status,targetType,targetId,direction,targetPhoto,targetPrompt);
+
+@override
+String toString() {
+  return 'ChatPokeModel(id: $id, fromUser: $fromUser, toUserId: $toUserId, message: $message, createdAt: $createdAt, status: $status, targetType: $targetType, targetId: $targetId, direction: $direction, targetPhoto: $targetPhoto, targetPrompt: $targetPrompt)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $ChatPokeModelCopyWith<$Res>  {
+  factory $ChatPokeModelCopyWith(ChatPokeModel value, $Res Function(ChatPokeModel) _then) = _$ChatPokeModelCopyWithImpl;
+@useResult
+$Res call({
+ String id, ChatPokeUserModel? fromUser, String? toUserId, String message,@JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable) DateTime? createdAt, String? status, String? targetType, String? targetId, String? direction, PokePhotoDetail? targetPhoto, ChatPokePromptModel? targetPrompt
+});
+
+
+$ChatPokeUserModelCopyWith<$Res>? get fromUser;$PokePhotoDetailCopyWith<$Res>? get targetPhoto;$ChatPokePromptModelCopyWith<$Res>? get targetPrompt;
+
+}
+/// @nodoc
+class _$ChatPokeModelCopyWithImpl<$Res>
+    implements $ChatPokeModelCopyWith<$Res> {
+  _$ChatPokeModelCopyWithImpl(this._self, this._then);
+
+  final ChatPokeModel _self;
+  final $Res Function(ChatPokeModel) _then;
+
+/// Create a copy of ChatPokeModel
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? fromUser = freezed,Object? toUserId = freezed,Object? message = null,Object? createdAt = freezed,Object? status = freezed,Object? targetType = freezed,Object? targetId = freezed,Object? direction = freezed,Object? targetPhoto = freezed,Object? targetPrompt = freezed,}) {
+  return _then(_self.copyWith(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,fromUser: freezed == fromUser ? _self.fromUser : fromUser // ignore: cast_nullable_to_non_nullable
+as ChatPokeUserModel?,toUserId: freezed == toUserId ? _self.toUserId : toUserId // ignore: cast_nullable_to_non_nullable
+as String?,message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
+as String,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,status: freezed == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as String?,targetType: freezed == targetType ? _self.targetType : targetType // ignore: cast_nullable_to_non_nullable
+as String?,targetId: freezed == targetId ? _self.targetId : targetId // ignore: cast_nullable_to_non_nullable
+as String?,direction: freezed == direction ? _self.direction : direction // ignore: cast_nullable_to_non_nullable
+as String?,targetPhoto: freezed == targetPhoto ? _self.targetPhoto : targetPhoto // ignore: cast_nullable_to_non_nullable
+as PokePhotoDetail?,targetPrompt: freezed == targetPrompt ? _self.targetPrompt : targetPrompt // ignore: cast_nullable_to_non_nullable
+as ChatPokePromptModel?,
+  ));
+}
+/// Create a copy of ChatPokeModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ChatPokeUserModelCopyWith<$Res>? get fromUser {
+    if (_self.fromUser == null) {
+    return null;
+  }
+
+  return $ChatPokeUserModelCopyWith<$Res>(_self.fromUser!, (value) {
+    return _then(_self.copyWith(fromUser: value));
+  });
+}/// Create a copy of ChatPokeModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$PokePhotoDetailCopyWith<$Res>? get targetPhoto {
+    if (_self.targetPhoto == null) {
+    return null;
+  }
+
+  return $PokePhotoDetailCopyWith<$Res>(_self.targetPhoto!, (value) {
+    return _then(_self.copyWith(targetPhoto: value));
+  });
+}/// Create a copy of ChatPokeModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ChatPokePromptModelCopyWith<$Res>? get targetPrompt {
+    if (_self.targetPrompt == null) {
+    return null;
+  }
+
+  return $ChatPokePromptModelCopyWith<$Res>(_self.targetPrompt!, (value) {
+    return _then(_self.copyWith(targetPrompt: value));
+  });
+}
+}
+
+
+/// Adds pattern-matching-related methods to [ChatPokeModel].
+extension ChatPokeModelPatterns on ChatPokeModel {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _ChatPokeModel value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _ChatPokeModel() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _ChatPokeModel value)  $default,){
+final _that = this;
+switch (_that) {
+case _ChatPokeModel():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _ChatPokeModel value)?  $default,){
+final _that = this;
+switch (_that) {
+case _ChatPokeModel() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  ChatPokeUserModel? fromUser,  String? toUserId,  String message, @JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable)  DateTime? createdAt,  String? status,  String? targetType,  String? targetId,  String? direction,  PokePhotoDetail? targetPhoto,  ChatPokePromptModel? targetPrompt)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _ChatPokeModel() when $default != null:
+return $default(_that.id,_that.fromUser,_that.toUserId,_that.message,_that.createdAt,_that.status,_that.targetType,_that.targetId,_that.direction,_that.targetPhoto,_that.targetPrompt);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  ChatPokeUserModel? fromUser,  String? toUserId,  String message, @JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable)  DateTime? createdAt,  String? status,  String? targetType,  String? targetId,  String? direction,  PokePhotoDetail? targetPhoto,  ChatPokePromptModel? targetPrompt)  $default,) {final _that = this;
+switch (_that) {
+case _ChatPokeModel():
+return $default(_that.id,_that.fromUser,_that.toUserId,_that.message,_that.createdAt,_that.status,_that.targetType,_that.targetId,_that.direction,_that.targetPhoto,_that.targetPrompt);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  ChatPokeUserModel? fromUser,  String? toUserId,  String message, @JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable)  DateTime? createdAt,  String? status,  String? targetType,  String? targetId,  String? direction,  PokePhotoDetail? targetPhoto,  ChatPokePromptModel? targetPrompt)?  $default,) {final _that = this;
+switch (_that) {
+case _ChatPokeModel() when $default != null:
+return $default(_that.id,_that.fromUser,_that.toUserId,_that.message,_that.createdAt,_that.status,_that.targetType,_that.targetId,_that.direction,_that.targetPhoto,_that.targetPrompt);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _ChatPokeModel implements ChatPokeModel {
+  const _ChatPokeModel({required this.id, this.fromUser, this.toUserId, this.message = '', @JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable) this.createdAt, this.status, this.targetType, this.targetId, this.direction, this.targetPhoto, this.targetPrompt});
+  factory _ChatPokeModel.fromJson(Map<String, dynamic> json) => _$ChatPokeModelFromJson(json);
+
+@override final  String id;
+@override final  ChatPokeUserModel? fromUser;
+@override final  String? toUserId;
+@override@JsonKey() final  String message;
+@override@JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable) final  DateTime? createdAt;
+@override final  String? status;
+@override final  String? targetType;
+@override final  String? targetId;
+@override final  String? direction;
+@override final  PokePhotoDetail? targetPhoto;
+@override final  ChatPokePromptModel? targetPrompt;
+
+/// Create a copy of ChatPokeModel
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$ChatPokeModelCopyWith<_ChatPokeModel> get copyWith => __$ChatPokeModelCopyWithImpl<_ChatPokeModel>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$ChatPokeModelToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChatPokeModel&&(identical(other.id, id) || other.id == id)&&(identical(other.fromUser, fromUser) || other.fromUser == fromUser)&&(identical(other.toUserId, toUserId) || other.toUserId == toUserId)&&(identical(other.message, message) || other.message == message)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.status, status) || other.status == status)&&(identical(other.targetType, targetType) || other.targetType == targetType)&&(identical(other.targetId, targetId) || other.targetId == targetId)&&(identical(other.direction, direction) || other.direction == direction)&&(identical(other.targetPhoto, targetPhoto) || other.targetPhoto == targetPhoto)&&(identical(other.targetPrompt, targetPrompt) || other.targetPrompt == targetPrompt));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,fromUser,toUserId,message,createdAt,status,targetType,targetId,direction,targetPhoto,targetPrompt);
+
+@override
+String toString() {
+  return 'ChatPokeModel(id: $id, fromUser: $fromUser, toUserId: $toUserId, message: $message, createdAt: $createdAt, status: $status, targetType: $targetType, targetId: $targetId, direction: $direction, targetPhoto: $targetPhoto, targetPrompt: $targetPrompt)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$ChatPokeModelCopyWith<$Res> implements $ChatPokeModelCopyWith<$Res> {
+  factory _$ChatPokeModelCopyWith(_ChatPokeModel value, $Res Function(_ChatPokeModel) _then) = __$ChatPokeModelCopyWithImpl;
+@override @useResult
+$Res call({
+ String id, ChatPokeUserModel? fromUser, String? toUserId, String message,@JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable) DateTime? createdAt, String? status, String? targetType, String? targetId, String? direction, PokePhotoDetail? targetPhoto, ChatPokePromptModel? targetPrompt
+});
+
+
+@override $ChatPokeUserModelCopyWith<$Res>? get fromUser;@override $PokePhotoDetailCopyWith<$Res>? get targetPhoto;@override $ChatPokePromptModelCopyWith<$Res>? get targetPrompt;
+
+}
+/// @nodoc
+class __$ChatPokeModelCopyWithImpl<$Res>
+    implements _$ChatPokeModelCopyWith<$Res> {
+  __$ChatPokeModelCopyWithImpl(this._self, this._then);
+
+  final _ChatPokeModel _self;
+  final $Res Function(_ChatPokeModel) _then;
+
+/// Create a copy of ChatPokeModel
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? fromUser = freezed,Object? toUserId = freezed,Object? message = null,Object? createdAt = freezed,Object? status = freezed,Object? targetType = freezed,Object? targetId = freezed,Object? direction = freezed,Object? targetPhoto = freezed,Object? targetPrompt = freezed,}) {
+  return _then(_ChatPokeModel(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,fromUser: freezed == fromUser ? _self.fromUser : fromUser // ignore: cast_nullable_to_non_nullable
+as ChatPokeUserModel?,toUserId: freezed == toUserId ? _self.toUserId : toUserId // ignore: cast_nullable_to_non_nullable
+as String?,message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
+as String,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,status: freezed == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as String?,targetType: freezed == targetType ? _self.targetType : targetType // ignore: cast_nullable_to_non_nullable
+as String?,targetId: freezed == targetId ? _self.targetId : targetId // ignore: cast_nullable_to_non_nullable
+as String?,direction: freezed == direction ? _self.direction : direction // ignore: cast_nullable_to_non_nullable
+as String?,targetPhoto: freezed == targetPhoto ? _self.targetPhoto : targetPhoto // ignore: cast_nullable_to_non_nullable
+as PokePhotoDetail?,targetPrompt: freezed == targetPrompt ? _self.targetPrompt : targetPrompt // ignore: cast_nullable_to_non_nullable
+as ChatPokePromptModel?,
+  ));
+}
+
+/// Create a copy of ChatPokeModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ChatPokeUserModelCopyWith<$Res>? get fromUser {
+    if (_self.fromUser == null) {
+    return null;
+  }
+
+  return $ChatPokeUserModelCopyWith<$Res>(_self.fromUser!, (value) {
+    return _then(_self.copyWith(fromUser: value));
+  });
+}/// Create a copy of ChatPokeModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$PokePhotoDetailCopyWith<$Res>? get targetPhoto {
+    if (_self.targetPhoto == null) {
+    return null;
+  }
+
+  return $PokePhotoDetailCopyWith<$Res>(_self.targetPhoto!, (value) {
+    return _then(_self.copyWith(targetPhoto: value));
+  });
+}/// Create a copy of ChatPokeModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ChatPokePromptModelCopyWith<$Res>? get targetPrompt {
+    if (_self.targetPrompt == null) {
+    return null;
+  }
+
+  return $ChatPokePromptModelCopyWith<$Res>(_self.targetPrompt!, (value) {
+    return _then(_self.copyWith(targetPrompt: value));
+  });
+}
+}
+
+
+/// @nodoc
+mixin _$ChatPokeUserModel {
+
+ String get id; String? get firstName; String? get lastName; String? get image;
+/// Create a copy of ChatPokeUserModel
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ChatPokeUserModelCopyWith<ChatPokeUserModel> get copyWith => _$ChatPokeUserModelCopyWithImpl<ChatPokeUserModel>(this as ChatPokeUserModel, _$identity);
+
+  /// Serializes this ChatPokeUserModel to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChatPokeUserModel&&(identical(other.id, id) || other.id == id)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.image, image) || other.image == image));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,firstName,lastName,image);
+
+@override
+String toString() {
+  return 'ChatPokeUserModel(id: $id, firstName: $firstName, lastName: $lastName, image: $image)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $ChatPokeUserModelCopyWith<$Res>  {
+  factory $ChatPokeUserModelCopyWith(ChatPokeUserModel value, $Res Function(ChatPokeUserModel) _then) = _$ChatPokeUserModelCopyWithImpl;
+@useResult
+$Res call({
+ String id, String? firstName, String? lastName, String? image
+});
+
+
+
+
+}
+/// @nodoc
+class _$ChatPokeUserModelCopyWithImpl<$Res>
+    implements $ChatPokeUserModelCopyWith<$Res> {
+  _$ChatPokeUserModelCopyWithImpl(this._self, this._then);
+
+  final ChatPokeUserModel _self;
+  final $Res Function(ChatPokeUserModel) _then;
+
+/// Create a copy of ChatPokeUserModel
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? firstName = freezed,Object? lastName = freezed,Object? image = freezed,}) {
+  return _then(_self.copyWith(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,firstName: freezed == firstName ? _self.firstName : firstName // ignore: cast_nullable_to_non_nullable
+as String?,lastName: freezed == lastName ? _self.lastName : lastName // ignore: cast_nullable_to_non_nullable
+as String?,image: freezed == image ? _self.image : image // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [ChatPokeUserModel].
+extension ChatPokeUserModelPatterns on ChatPokeUserModel {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _ChatPokeUserModel value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _ChatPokeUserModel() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _ChatPokeUserModel value)  $default,){
+final _that = this;
+switch (_that) {
+case _ChatPokeUserModel():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _ChatPokeUserModel value)?  $default,){
+final _that = this;
+switch (_that) {
+case _ChatPokeUserModel() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String? firstName,  String? lastName,  String? image)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _ChatPokeUserModel() when $default != null:
+return $default(_that.id,_that.firstName,_that.lastName,_that.image);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String? firstName,  String? lastName,  String? image)  $default,) {final _that = this;
+switch (_that) {
+case _ChatPokeUserModel():
+return $default(_that.id,_that.firstName,_that.lastName,_that.image);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String? firstName,  String? lastName,  String? image)?  $default,) {final _that = this;
+switch (_that) {
+case _ChatPokeUserModel() when $default != null:
+return $default(_that.id,_that.firstName,_that.lastName,_that.image);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _ChatPokeUserModel implements ChatPokeUserModel {
+  const _ChatPokeUserModel({required this.id, this.firstName, this.lastName, this.image});
+  factory _ChatPokeUserModel.fromJson(Map<String, dynamic> json) => _$ChatPokeUserModelFromJson(json);
+
+@override final  String id;
+@override final  String? firstName;
+@override final  String? lastName;
+@override final  String? image;
+
+/// Create a copy of ChatPokeUserModel
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$ChatPokeUserModelCopyWith<_ChatPokeUserModel> get copyWith => __$ChatPokeUserModelCopyWithImpl<_ChatPokeUserModel>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$ChatPokeUserModelToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChatPokeUserModel&&(identical(other.id, id) || other.id == id)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.image, image) || other.image == image));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,firstName,lastName,image);
+
+@override
+String toString() {
+  return 'ChatPokeUserModel(id: $id, firstName: $firstName, lastName: $lastName, image: $image)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$ChatPokeUserModelCopyWith<$Res> implements $ChatPokeUserModelCopyWith<$Res> {
+  factory _$ChatPokeUserModelCopyWith(_ChatPokeUserModel value, $Res Function(_ChatPokeUserModel) _then) = __$ChatPokeUserModelCopyWithImpl;
+@override @useResult
+$Res call({
+ String id, String? firstName, String? lastName, String? image
+});
+
+
+
+
+}
+/// @nodoc
+class __$ChatPokeUserModelCopyWithImpl<$Res>
+    implements _$ChatPokeUserModelCopyWith<$Res> {
+  __$ChatPokeUserModelCopyWithImpl(this._self, this._then);
+
+  final _ChatPokeUserModel _self;
+  final $Res Function(_ChatPokeUserModel) _then;
+
+/// Create a copy of ChatPokeUserModel
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? firstName = freezed,Object? lastName = freezed,Object? image = freezed,}) {
+  return _then(_ChatPokeUserModel(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,firstName: freezed == firstName ? _self.firstName : firstName // ignore: cast_nullable_to_non_nullable
+as String?,lastName: freezed == lastName ? _self.lastName : lastName // ignore: cast_nullable_to_non_nullable
+as String?,image: freezed == image ? _self.image : image // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$ChatPokePromptModel {
+
+ String get id; String? get promptTitle; String? get type; String? get promptAnswer;
+/// Create a copy of ChatPokePromptModel
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ChatPokePromptModelCopyWith<ChatPokePromptModel> get copyWith => _$ChatPokePromptModelCopyWithImpl<ChatPokePromptModel>(this as ChatPokePromptModel, _$identity);
+
+  /// Serializes this ChatPokePromptModel to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChatPokePromptModel&&(identical(other.id, id) || other.id == id)&&(identical(other.promptTitle, promptTitle) || other.promptTitle == promptTitle)&&(identical(other.type, type) || other.type == type)&&(identical(other.promptAnswer, promptAnswer) || other.promptAnswer == promptAnswer));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,promptTitle,type,promptAnswer);
+
+@override
+String toString() {
+  return 'ChatPokePromptModel(id: $id, promptTitle: $promptTitle, type: $type, promptAnswer: $promptAnswer)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $ChatPokePromptModelCopyWith<$Res>  {
+  factory $ChatPokePromptModelCopyWith(ChatPokePromptModel value, $Res Function(ChatPokePromptModel) _then) = _$ChatPokePromptModelCopyWithImpl;
+@useResult
+$Res call({
+ String id, String? promptTitle, String? type, String? promptAnswer
+});
+
+
+
+
+}
+/// @nodoc
+class _$ChatPokePromptModelCopyWithImpl<$Res>
+    implements $ChatPokePromptModelCopyWith<$Res> {
+  _$ChatPokePromptModelCopyWithImpl(this._self, this._then);
+
+  final ChatPokePromptModel _self;
+  final $Res Function(ChatPokePromptModel) _then;
+
+/// Create a copy of ChatPokePromptModel
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? promptTitle = freezed,Object? type = freezed,Object? promptAnswer = freezed,}) {
+  return _then(_self.copyWith(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,promptTitle: freezed == promptTitle ? _self.promptTitle : promptTitle // ignore: cast_nullable_to_non_nullable
+as String?,type: freezed == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
+as String?,promptAnswer: freezed == promptAnswer ? _self.promptAnswer : promptAnswer // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [ChatPokePromptModel].
+extension ChatPokePromptModelPatterns on ChatPokePromptModel {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _ChatPokePromptModel value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _ChatPokePromptModel() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _ChatPokePromptModel value)  $default,){
+final _that = this;
+switch (_that) {
+case _ChatPokePromptModel():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _ChatPokePromptModel value)?  $default,){
+final _that = this;
+switch (_that) {
+case _ChatPokePromptModel() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String? promptTitle,  String? type,  String? promptAnswer)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _ChatPokePromptModel() when $default != null:
+return $default(_that.id,_that.promptTitle,_that.type,_that.promptAnswer);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String? promptTitle,  String? type,  String? promptAnswer)  $default,) {final _that = this;
+switch (_that) {
+case _ChatPokePromptModel():
+return $default(_that.id,_that.promptTitle,_that.type,_that.promptAnswer);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String? promptTitle,  String? type,  String? promptAnswer)?  $default,) {final _that = this;
+switch (_that) {
+case _ChatPokePromptModel() when $default != null:
+return $default(_that.id,_that.promptTitle,_that.type,_that.promptAnswer);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _ChatPokePromptModel implements ChatPokePromptModel {
+  const _ChatPokePromptModel({required this.id, this.promptTitle, this.type, this.promptAnswer});
+  factory _ChatPokePromptModel.fromJson(Map<String, dynamic> json) => _$ChatPokePromptModelFromJson(json);
+
+@override final  String id;
+@override final  String? promptTitle;
+@override final  String? type;
+@override final  String? promptAnswer;
+
+/// Create a copy of ChatPokePromptModel
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$ChatPokePromptModelCopyWith<_ChatPokePromptModel> get copyWith => __$ChatPokePromptModelCopyWithImpl<_ChatPokePromptModel>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$ChatPokePromptModelToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChatPokePromptModel&&(identical(other.id, id) || other.id == id)&&(identical(other.promptTitle, promptTitle) || other.promptTitle == promptTitle)&&(identical(other.type, type) || other.type == type)&&(identical(other.promptAnswer, promptAnswer) || other.promptAnswer == promptAnswer));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,promptTitle,type,promptAnswer);
+
+@override
+String toString() {
+  return 'ChatPokePromptModel(id: $id, promptTitle: $promptTitle, type: $type, promptAnswer: $promptAnswer)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$ChatPokePromptModelCopyWith<$Res> implements $ChatPokePromptModelCopyWith<$Res> {
+  factory _$ChatPokePromptModelCopyWith(_ChatPokePromptModel value, $Res Function(_ChatPokePromptModel) _then) = __$ChatPokePromptModelCopyWithImpl;
+@override @useResult
+$Res call({
+ String id, String? promptTitle, String? type, String? promptAnswer
+});
+
+
+
+
+}
+/// @nodoc
+class __$ChatPokePromptModelCopyWithImpl<$Res>
+    implements _$ChatPokePromptModelCopyWith<$Res> {
+  __$ChatPokePromptModelCopyWithImpl(this._self, this._then);
+
+  final _ChatPokePromptModel _self;
+  final $Res Function(_ChatPokePromptModel) _then;
+
+/// Create a copy of ChatPokePromptModel
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? promptTitle = freezed,Object? type = freezed,Object? promptAnswer = freezed,}) {
+  return _then(_ChatPokePromptModel(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,promptTitle: freezed == promptTitle ? _self.promptTitle : promptTitle // ignore: cast_nullable_to_non_nullable
+as String?,type: freezed == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
+as String?,promptAnswer: freezed == promptAnswer ? _self.promptAnswer : promptAnswer // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$ChatMetaModel {
+
+ String? get peerUserId; int get totalPokes; int get receivedCount; int get sentCount; int get pendingCount; ChatLatestPokeModel? get latestPoke; bool get hasStartedChat; ChatDirectChatMetaModel? get directChat; String? get groupId; String? get receiverGroupId; List<String> get receiverGroupIds; bool? get isMatchedGroup; int get matchCount; ChatGroupsDetailsModel? get groupsDetails;
+/// Create a copy of ChatMetaModel
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ChatMetaModelCopyWith<ChatMetaModel> get copyWith => _$ChatMetaModelCopyWithImpl<ChatMetaModel>(this as ChatMetaModel, _$identity);
+
+  /// Serializes this ChatMetaModel to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChatMetaModel&&(identical(other.peerUserId, peerUserId) || other.peerUserId == peerUserId)&&(identical(other.totalPokes, totalPokes) || other.totalPokes == totalPokes)&&(identical(other.receivedCount, receivedCount) || other.receivedCount == receivedCount)&&(identical(other.sentCount, sentCount) || other.sentCount == sentCount)&&(identical(other.pendingCount, pendingCount) || other.pendingCount == pendingCount)&&(identical(other.latestPoke, latestPoke) || other.latestPoke == latestPoke)&&(identical(other.hasStartedChat, hasStartedChat) || other.hasStartedChat == hasStartedChat)&&(identical(other.directChat, directChat) || other.directChat == directChat)&&(identical(other.groupId, groupId) || other.groupId == groupId)&&(identical(other.receiverGroupId, receiverGroupId) || other.receiverGroupId == receiverGroupId)&&const DeepCollectionEquality().equals(other.receiverGroupIds, receiverGroupIds)&&(identical(other.isMatchedGroup, isMatchedGroup) || other.isMatchedGroup == isMatchedGroup)&&(identical(other.matchCount, matchCount) || other.matchCount == matchCount)&&(identical(other.groupsDetails, groupsDetails) || other.groupsDetails == groupsDetails));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,peerUserId,totalPokes,receivedCount,sentCount,pendingCount,latestPoke,hasStartedChat,directChat,groupId,receiverGroupId,const DeepCollectionEquality().hash(receiverGroupIds),isMatchedGroup,matchCount,groupsDetails);
+
+@override
+String toString() {
+  return 'ChatMetaModel(peerUserId: $peerUserId, totalPokes: $totalPokes, receivedCount: $receivedCount, sentCount: $sentCount, pendingCount: $pendingCount, latestPoke: $latestPoke, hasStartedChat: $hasStartedChat, directChat: $directChat, groupId: $groupId, receiverGroupId: $receiverGroupId, receiverGroupIds: $receiverGroupIds, isMatchedGroup: $isMatchedGroup, matchCount: $matchCount, groupsDetails: $groupsDetails)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $ChatMetaModelCopyWith<$Res>  {
+  factory $ChatMetaModelCopyWith(ChatMetaModel value, $Res Function(ChatMetaModel) _then) = _$ChatMetaModelCopyWithImpl;
+@useResult
+$Res call({
+ String? peerUserId, int totalPokes, int receivedCount, int sentCount, int pendingCount, ChatLatestPokeModel? latestPoke, bool hasStartedChat, ChatDirectChatMetaModel? directChat, String? groupId, String? receiverGroupId, List<String> receiverGroupIds, bool? isMatchedGroup, int matchCount, ChatGroupsDetailsModel? groupsDetails
+});
+
+
+$ChatLatestPokeModelCopyWith<$Res>? get latestPoke;$ChatDirectChatMetaModelCopyWith<$Res>? get directChat;$ChatGroupsDetailsModelCopyWith<$Res>? get groupsDetails;
+
+}
+/// @nodoc
+class _$ChatMetaModelCopyWithImpl<$Res>
+    implements $ChatMetaModelCopyWith<$Res> {
+  _$ChatMetaModelCopyWithImpl(this._self, this._then);
+
+  final ChatMetaModel _self;
+  final $Res Function(ChatMetaModel) _then;
+
+/// Create a copy of ChatMetaModel
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? peerUserId = freezed,Object? totalPokes = null,Object? receivedCount = null,Object? sentCount = null,Object? pendingCount = null,Object? latestPoke = freezed,Object? hasStartedChat = null,Object? directChat = freezed,Object? groupId = freezed,Object? receiverGroupId = freezed,Object? receiverGroupIds = null,Object? isMatchedGroup = freezed,Object? matchCount = null,Object? groupsDetails = freezed,}) {
+  return _then(_self.copyWith(
+peerUserId: freezed == peerUserId ? _self.peerUserId : peerUserId // ignore: cast_nullable_to_non_nullable
+as String?,totalPokes: null == totalPokes ? _self.totalPokes : totalPokes // ignore: cast_nullable_to_non_nullable
+as int,receivedCount: null == receivedCount ? _self.receivedCount : receivedCount // ignore: cast_nullable_to_non_nullable
+as int,sentCount: null == sentCount ? _self.sentCount : sentCount // ignore: cast_nullable_to_non_nullable
+as int,pendingCount: null == pendingCount ? _self.pendingCount : pendingCount // ignore: cast_nullable_to_non_nullable
+as int,latestPoke: freezed == latestPoke ? _self.latestPoke : latestPoke // ignore: cast_nullable_to_non_nullable
+as ChatLatestPokeModel?,hasStartedChat: null == hasStartedChat ? _self.hasStartedChat : hasStartedChat // ignore: cast_nullable_to_non_nullable
+as bool,directChat: freezed == directChat ? _self.directChat : directChat // ignore: cast_nullable_to_non_nullable
+as ChatDirectChatMetaModel?,groupId: freezed == groupId ? _self.groupId : groupId // ignore: cast_nullable_to_non_nullable
+as String?,receiverGroupId: freezed == receiverGroupId ? _self.receiverGroupId : receiverGroupId // ignore: cast_nullable_to_non_nullable
+as String?,receiverGroupIds: null == receiverGroupIds ? _self.receiverGroupIds : receiverGroupIds // ignore: cast_nullable_to_non_nullable
+as List<String>,isMatchedGroup: freezed == isMatchedGroup ? _self.isMatchedGroup : isMatchedGroup // ignore: cast_nullable_to_non_nullable
+as bool?,matchCount: null == matchCount ? _self.matchCount : matchCount // ignore: cast_nullable_to_non_nullable
+as int,groupsDetails: freezed == groupsDetails ? _self.groupsDetails : groupsDetails // ignore: cast_nullable_to_non_nullable
+as ChatGroupsDetailsModel?,
+  ));
+}
+/// Create a copy of ChatMetaModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ChatLatestPokeModelCopyWith<$Res>? get latestPoke {
+    if (_self.latestPoke == null) {
+    return null;
+  }
+
+  return $ChatLatestPokeModelCopyWith<$Res>(_self.latestPoke!, (value) {
+    return _then(_self.copyWith(latestPoke: value));
+  });
+}/// Create a copy of ChatMetaModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ChatDirectChatMetaModelCopyWith<$Res>? get directChat {
+    if (_self.directChat == null) {
+    return null;
+  }
+
+  return $ChatDirectChatMetaModelCopyWith<$Res>(_self.directChat!, (value) {
+    return _then(_self.copyWith(directChat: value));
+  });
+}/// Create a copy of ChatMetaModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ChatGroupsDetailsModelCopyWith<$Res>? get groupsDetails {
+    if (_self.groupsDetails == null) {
+    return null;
+  }
+
+  return $ChatGroupsDetailsModelCopyWith<$Res>(_self.groupsDetails!, (value) {
+    return _then(_self.copyWith(groupsDetails: value));
+  });
+}
+}
+
+
+/// Adds pattern-matching-related methods to [ChatMetaModel].
+extension ChatMetaModelPatterns on ChatMetaModel {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _ChatMetaModel value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _ChatMetaModel() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _ChatMetaModel value)  $default,){
+final _that = this;
+switch (_that) {
+case _ChatMetaModel():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _ChatMetaModel value)?  $default,){
+final _that = this;
+switch (_that) {
+case _ChatMetaModel() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? peerUserId,  int totalPokes,  int receivedCount,  int sentCount,  int pendingCount,  ChatLatestPokeModel? latestPoke,  bool hasStartedChat,  ChatDirectChatMetaModel? directChat,  String? groupId,  String? receiverGroupId,  List<String> receiverGroupIds,  bool? isMatchedGroup,  int matchCount,  ChatGroupsDetailsModel? groupsDetails)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _ChatMetaModel() when $default != null:
+return $default(_that.peerUserId,_that.totalPokes,_that.receivedCount,_that.sentCount,_that.pendingCount,_that.latestPoke,_that.hasStartedChat,_that.directChat,_that.groupId,_that.receiverGroupId,_that.receiverGroupIds,_that.isMatchedGroup,_that.matchCount,_that.groupsDetails);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? peerUserId,  int totalPokes,  int receivedCount,  int sentCount,  int pendingCount,  ChatLatestPokeModel? latestPoke,  bool hasStartedChat,  ChatDirectChatMetaModel? directChat,  String? groupId,  String? receiverGroupId,  List<String> receiverGroupIds,  bool? isMatchedGroup,  int matchCount,  ChatGroupsDetailsModel? groupsDetails)  $default,) {final _that = this;
+switch (_that) {
+case _ChatMetaModel():
+return $default(_that.peerUserId,_that.totalPokes,_that.receivedCount,_that.sentCount,_that.pendingCount,_that.latestPoke,_that.hasStartedChat,_that.directChat,_that.groupId,_that.receiverGroupId,_that.receiverGroupIds,_that.isMatchedGroup,_that.matchCount,_that.groupsDetails);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? peerUserId,  int totalPokes,  int receivedCount,  int sentCount,  int pendingCount,  ChatLatestPokeModel? latestPoke,  bool hasStartedChat,  ChatDirectChatMetaModel? directChat,  String? groupId,  String? receiverGroupId,  List<String> receiverGroupIds,  bool? isMatchedGroup,  int matchCount,  ChatGroupsDetailsModel? groupsDetails)?  $default,) {final _that = this;
+switch (_that) {
+case _ChatMetaModel() when $default != null:
+return $default(_that.peerUserId,_that.totalPokes,_that.receivedCount,_that.sentCount,_that.pendingCount,_that.latestPoke,_that.hasStartedChat,_that.directChat,_that.groupId,_that.receiverGroupId,_that.receiverGroupIds,_that.isMatchedGroup,_that.matchCount,_that.groupsDetails);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _ChatMetaModel implements ChatMetaModel {
+  const _ChatMetaModel({this.peerUserId, this.totalPokes = 0, this.receivedCount = 0, this.sentCount = 0, this.pendingCount = 0, this.latestPoke, this.hasStartedChat = false, this.directChat, this.groupId, this.receiverGroupId, final  List<String> receiverGroupIds = const [], this.isMatchedGroup, this.matchCount = 0, this.groupsDetails}): _receiverGroupIds = receiverGroupIds;
+  factory _ChatMetaModel.fromJson(Map<String, dynamic> json) => _$ChatMetaModelFromJson(json);
+
+@override final  String? peerUserId;
+@override@JsonKey() final  int totalPokes;
+@override@JsonKey() final  int receivedCount;
+@override@JsonKey() final  int sentCount;
+@override@JsonKey() final  int pendingCount;
+@override final  ChatLatestPokeModel? latestPoke;
+@override@JsonKey() final  bool hasStartedChat;
+@override final  ChatDirectChatMetaModel? directChat;
+@override final  String? groupId;
+@override final  String? receiverGroupId;
+ final  List<String> _receiverGroupIds;
+@override@JsonKey() List<String> get receiverGroupIds {
+  if (_receiverGroupIds is EqualUnmodifiableListView) return _receiverGroupIds;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_receiverGroupIds);
+}
+
+@override final  bool? isMatchedGroup;
+@override@JsonKey() final  int matchCount;
+@override final  ChatGroupsDetailsModel? groupsDetails;
+
+/// Create a copy of ChatMetaModel
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$ChatMetaModelCopyWith<_ChatMetaModel> get copyWith => __$ChatMetaModelCopyWithImpl<_ChatMetaModel>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$ChatMetaModelToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChatMetaModel&&(identical(other.peerUserId, peerUserId) || other.peerUserId == peerUserId)&&(identical(other.totalPokes, totalPokes) || other.totalPokes == totalPokes)&&(identical(other.receivedCount, receivedCount) || other.receivedCount == receivedCount)&&(identical(other.sentCount, sentCount) || other.sentCount == sentCount)&&(identical(other.pendingCount, pendingCount) || other.pendingCount == pendingCount)&&(identical(other.latestPoke, latestPoke) || other.latestPoke == latestPoke)&&(identical(other.hasStartedChat, hasStartedChat) || other.hasStartedChat == hasStartedChat)&&(identical(other.directChat, directChat) || other.directChat == directChat)&&(identical(other.groupId, groupId) || other.groupId == groupId)&&(identical(other.receiverGroupId, receiverGroupId) || other.receiverGroupId == receiverGroupId)&&const DeepCollectionEquality().equals(other._receiverGroupIds, _receiverGroupIds)&&(identical(other.isMatchedGroup, isMatchedGroup) || other.isMatchedGroup == isMatchedGroup)&&(identical(other.matchCount, matchCount) || other.matchCount == matchCount)&&(identical(other.groupsDetails, groupsDetails) || other.groupsDetails == groupsDetails));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,peerUserId,totalPokes,receivedCount,sentCount,pendingCount,latestPoke,hasStartedChat,directChat,groupId,receiverGroupId,const DeepCollectionEquality().hash(_receiverGroupIds),isMatchedGroup,matchCount,groupsDetails);
+
+@override
+String toString() {
+  return 'ChatMetaModel(peerUserId: $peerUserId, totalPokes: $totalPokes, receivedCount: $receivedCount, sentCount: $sentCount, pendingCount: $pendingCount, latestPoke: $latestPoke, hasStartedChat: $hasStartedChat, directChat: $directChat, groupId: $groupId, receiverGroupId: $receiverGroupId, receiverGroupIds: $receiverGroupIds, isMatchedGroup: $isMatchedGroup, matchCount: $matchCount, groupsDetails: $groupsDetails)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$ChatMetaModelCopyWith<$Res> implements $ChatMetaModelCopyWith<$Res> {
+  factory _$ChatMetaModelCopyWith(_ChatMetaModel value, $Res Function(_ChatMetaModel) _then) = __$ChatMetaModelCopyWithImpl;
+@override @useResult
+$Res call({
+ String? peerUserId, int totalPokes, int receivedCount, int sentCount, int pendingCount, ChatLatestPokeModel? latestPoke, bool hasStartedChat, ChatDirectChatMetaModel? directChat, String? groupId, String? receiverGroupId, List<String> receiverGroupIds, bool? isMatchedGroup, int matchCount, ChatGroupsDetailsModel? groupsDetails
+});
+
+
+@override $ChatLatestPokeModelCopyWith<$Res>? get latestPoke;@override $ChatDirectChatMetaModelCopyWith<$Res>? get directChat;@override $ChatGroupsDetailsModelCopyWith<$Res>? get groupsDetails;
+
+}
+/// @nodoc
+class __$ChatMetaModelCopyWithImpl<$Res>
+    implements _$ChatMetaModelCopyWith<$Res> {
+  __$ChatMetaModelCopyWithImpl(this._self, this._then);
+
+  final _ChatMetaModel _self;
+  final $Res Function(_ChatMetaModel) _then;
+
+/// Create a copy of ChatMetaModel
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? peerUserId = freezed,Object? totalPokes = null,Object? receivedCount = null,Object? sentCount = null,Object? pendingCount = null,Object? latestPoke = freezed,Object? hasStartedChat = null,Object? directChat = freezed,Object? groupId = freezed,Object? receiverGroupId = freezed,Object? receiverGroupIds = null,Object? isMatchedGroup = freezed,Object? matchCount = null,Object? groupsDetails = freezed,}) {
+  return _then(_ChatMetaModel(
+peerUserId: freezed == peerUserId ? _self.peerUserId : peerUserId // ignore: cast_nullable_to_non_nullable
+as String?,totalPokes: null == totalPokes ? _self.totalPokes : totalPokes // ignore: cast_nullable_to_non_nullable
+as int,receivedCount: null == receivedCount ? _self.receivedCount : receivedCount // ignore: cast_nullable_to_non_nullable
+as int,sentCount: null == sentCount ? _self.sentCount : sentCount // ignore: cast_nullable_to_non_nullable
+as int,pendingCount: null == pendingCount ? _self.pendingCount : pendingCount // ignore: cast_nullable_to_non_nullable
+as int,latestPoke: freezed == latestPoke ? _self.latestPoke : latestPoke // ignore: cast_nullable_to_non_nullable
+as ChatLatestPokeModel?,hasStartedChat: null == hasStartedChat ? _self.hasStartedChat : hasStartedChat // ignore: cast_nullable_to_non_nullable
+as bool,directChat: freezed == directChat ? _self.directChat : directChat // ignore: cast_nullable_to_non_nullable
+as ChatDirectChatMetaModel?,groupId: freezed == groupId ? _self.groupId : groupId // ignore: cast_nullable_to_non_nullable
+as String?,receiverGroupId: freezed == receiverGroupId ? _self.receiverGroupId : receiverGroupId // ignore: cast_nullable_to_non_nullable
+as String?,receiverGroupIds: null == receiverGroupIds ? _self._receiverGroupIds : receiverGroupIds // ignore: cast_nullable_to_non_nullable
+as List<String>,isMatchedGroup: freezed == isMatchedGroup ? _self.isMatchedGroup : isMatchedGroup // ignore: cast_nullable_to_non_nullable
+as bool?,matchCount: null == matchCount ? _self.matchCount : matchCount // ignore: cast_nullable_to_non_nullable
+as int,groupsDetails: freezed == groupsDetails ? _self.groupsDetails : groupsDetails // ignore: cast_nullable_to_non_nullable
+as ChatGroupsDetailsModel?,
+  ));
+}
+
+/// Create a copy of ChatMetaModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ChatLatestPokeModelCopyWith<$Res>? get latestPoke {
+    if (_self.latestPoke == null) {
+    return null;
+  }
+
+  return $ChatLatestPokeModelCopyWith<$Res>(_self.latestPoke!, (value) {
+    return _then(_self.copyWith(latestPoke: value));
+  });
+}/// Create a copy of ChatMetaModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ChatDirectChatMetaModelCopyWith<$Res>? get directChat {
+    if (_self.directChat == null) {
+    return null;
+  }
+
+  return $ChatDirectChatMetaModelCopyWith<$Res>(_self.directChat!, (value) {
+    return _then(_self.copyWith(directChat: value));
+  });
+}/// Create a copy of ChatMetaModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ChatGroupsDetailsModelCopyWith<$Res>? get groupsDetails {
+    if (_self.groupsDetails == null) {
+    return null;
+  }
+
+  return $ChatGroupsDetailsModelCopyWith<$Res>(_self.groupsDetails!, (value) {
+    return _then(_self.copyWith(groupsDetails: value));
+  });
+}
+}
+
+
+/// @nodoc
+mixin _$ChatGroupsDetailsModel {
+
+ List<ChatGroupMemberUserModel> get userGroupMembers; List<MatchedGroupMembersModel> get matchedGroupMembers; ChatAboutGroupModel? get aboutThisGroup; List<String> get sharedMedia; List<String> get commonInterests; bool? get isMatched;
+/// Create a copy of ChatGroupsDetailsModel
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ChatGroupsDetailsModelCopyWith<ChatGroupsDetailsModel> get copyWith => _$ChatGroupsDetailsModelCopyWithImpl<ChatGroupsDetailsModel>(this as ChatGroupsDetailsModel, _$identity);
+
+  /// Serializes this ChatGroupsDetailsModel to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChatGroupsDetailsModel&&const DeepCollectionEquality().equals(other.userGroupMembers, userGroupMembers)&&const DeepCollectionEquality().equals(other.matchedGroupMembers, matchedGroupMembers)&&(identical(other.aboutThisGroup, aboutThisGroup) || other.aboutThisGroup == aboutThisGroup)&&const DeepCollectionEquality().equals(other.sharedMedia, sharedMedia)&&const DeepCollectionEquality().equals(other.commonInterests, commonInterests)&&(identical(other.isMatched, isMatched) || other.isMatched == isMatched));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(userGroupMembers),const DeepCollectionEquality().hash(matchedGroupMembers),aboutThisGroup,const DeepCollectionEquality().hash(sharedMedia),const DeepCollectionEquality().hash(commonInterests),isMatched);
+
+@override
+String toString() {
+  return 'ChatGroupsDetailsModel(userGroupMembers: $userGroupMembers, matchedGroupMembers: $matchedGroupMembers, aboutThisGroup: $aboutThisGroup, sharedMedia: $sharedMedia, commonInterests: $commonInterests, isMatched: $isMatched)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $ChatGroupsDetailsModelCopyWith<$Res>  {
+  factory $ChatGroupsDetailsModelCopyWith(ChatGroupsDetailsModel value, $Res Function(ChatGroupsDetailsModel) _then) = _$ChatGroupsDetailsModelCopyWithImpl;
+@useResult
+$Res call({
+ List<ChatGroupMemberUserModel> userGroupMembers, List<MatchedGroupMembersModel> matchedGroupMembers, ChatAboutGroupModel? aboutThisGroup, List<String> sharedMedia, List<String> commonInterests, bool? isMatched
+});
+
+
+$ChatAboutGroupModelCopyWith<$Res>? get aboutThisGroup;
+
+}
+/// @nodoc
+class _$ChatGroupsDetailsModelCopyWithImpl<$Res>
+    implements $ChatGroupsDetailsModelCopyWith<$Res> {
+  _$ChatGroupsDetailsModelCopyWithImpl(this._self, this._then);
+
+  final ChatGroupsDetailsModel _self;
+  final $Res Function(ChatGroupsDetailsModel) _then;
+
+/// Create a copy of ChatGroupsDetailsModel
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? userGroupMembers = null,Object? matchedGroupMembers = null,Object? aboutThisGroup = freezed,Object? sharedMedia = null,Object? commonInterests = null,Object? isMatched = freezed,}) {
+  return _then(_self.copyWith(
+userGroupMembers: null == userGroupMembers ? _self.userGroupMembers : userGroupMembers // ignore: cast_nullable_to_non_nullable
+as List<ChatGroupMemberUserModel>,matchedGroupMembers: null == matchedGroupMembers ? _self.matchedGroupMembers : matchedGroupMembers // ignore: cast_nullable_to_non_nullable
+as List<MatchedGroupMembersModel>,aboutThisGroup: freezed == aboutThisGroup ? _self.aboutThisGroup : aboutThisGroup // ignore: cast_nullable_to_non_nullable
+as ChatAboutGroupModel?,sharedMedia: null == sharedMedia ? _self.sharedMedia : sharedMedia // ignore: cast_nullable_to_non_nullable
+as List<String>,commonInterests: null == commonInterests ? _self.commonInterests : commonInterests // ignore: cast_nullable_to_non_nullable
+as List<String>,isMatched: freezed == isMatched ? _self.isMatched : isMatched // ignore: cast_nullable_to_non_nullable
+as bool?,
+  ));
+}
+/// Create a copy of ChatGroupsDetailsModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ChatAboutGroupModelCopyWith<$Res>? get aboutThisGroup {
+    if (_self.aboutThisGroup == null) {
+    return null;
+  }
+
+  return $ChatAboutGroupModelCopyWith<$Res>(_self.aboutThisGroup!, (value) {
+    return _then(_self.copyWith(aboutThisGroup: value));
+  });
+}
+}
+
+
+/// Adds pattern-matching-related methods to [ChatGroupsDetailsModel].
+extension ChatGroupsDetailsModelPatterns on ChatGroupsDetailsModel {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _ChatGroupsDetailsModel value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _ChatGroupsDetailsModel() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _ChatGroupsDetailsModel value)  $default,){
+final _that = this;
+switch (_that) {
+case _ChatGroupsDetailsModel():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _ChatGroupsDetailsModel value)?  $default,){
+final _that = this;
+switch (_that) {
+case _ChatGroupsDetailsModel() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<ChatGroupMemberUserModel> userGroupMembers,  List<MatchedGroupMembersModel> matchedGroupMembers,  ChatAboutGroupModel? aboutThisGroup,  List<String> sharedMedia,  List<String> commonInterests,  bool? isMatched)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _ChatGroupsDetailsModel() when $default != null:
+return $default(_that.userGroupMembers,_that.matchedGroupMembers,_that.aboutThisGroup,_that.sharedMedia,_that.commonInterests,_that.isMatched);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<ChatGroupMemberUserModel> userGroupMembers,  List<MatchedGroupMembersModel> matchedGroupMembers,  ChatAboutGroupModel? aboutThisGroup,  List<String> sharedMedia,  List<String> commonInterests,  bool? isMatched)  $default,) {final _that = this;
+switch (_that) {
+case _ChatGroupsDetailsModel():
+return $default(_that.userGroupMembers,_that.matchedGroupMembers,_that.aboutThisGroup,_that.sharedMedia,_that.commonInterests,_that.isMatched);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<ChatGroupMemberUserModel> userGroupMembers,  List<MatchedGroupMembersModel> matchedGroupMembers,  ChatAboutGroupModel? aboutThisGroup,  List<String> sharedMedia,  List<String> commonInterests,  bool? isMatched)?  $default,) {final _that = this;
+switch (_that) {
+case _ChatGroupsDetailsModel() when $default != null:
+return $default(_that.userGroupMembers,_that.matchedGroupMembers,_that.aboutThisGroup,_that.sharedMedia,_that.commonInterests,_that.isMatched);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _ChatGroupsDetailsModel implements ChatGroupsDetailsModel {
+  const _ChatGroupsDetailsModel({final  List<ChatGroupMemberUserModel> userGroupMembers = const [], final  List<MatchedGroupMembersModel> matchedGroupMembers = const [], this.aboutThisGroup, final  List<String> sharedMedia = const [], final  List<String> commonInterests = const [], this.isMatched}): _userGroupMembers = userGroupMembers,_matchedGroupMembers = matchedGroupMembers,_sharedMedia = sharedMedia,_commonInterests = commonInterests;
+  factory _ChatGroupsDetailsModel.fromJson(Map<String, dynamic> json) => _$ChatGroupsDetailsModelFromJson(json);
+
+ final  List<ChatGroupMemberUserModel> _userGroupMembers;
+@override@JsonKey() List<ChatGroupMemberUserModel> get userGroupMembers {
+  if (_userGroupMembers is EqualUnmodifiableListView) return _userGroupMembers;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_userGroupMembers);
+}
+
+ final  List<MatchedGroupMembersModel> _matchedGroupMembers;
+@override@JsonKey() List<MatchedGroupMembersModel> get matchedGroupMembers {
+  if (_matchedGroupMembers is EqualUnmodifiableListView) return _matchedGroupMembers;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_matchedGroupMembers);
+}
+
+@override final  ChatAboutGroupModel? aboutThisGroup;
+ final  List<String> _sharedMedia;
+@override@JsonKey() List<String> get sharedMedia {
+  if (_sharedMedia is EqualUnmodifiableListView) return _sharedMedia;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_sharedMedia);
+}
+
+ final  List<String> _commonInterests;
+@override@JsonKey() List<String> get commonInterests {
+  if (_commonInterests is EqualUnmodifiableListView) return _commonInterests;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_commonInterests);
+}
+
+@override final  bool? isMatched;
+
+/// Create a copy of ChatGroupsDetailsModel
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$ChatGroupsDetailsModelCopyWith<_ChatGroupsDetailsModel> get copyWith => __$ChatGroupsDetailsModelCopyWithImpl<_ChatGroupsDetailsModel>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$ChatGroupsDetailsModelToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChatGroupsDetailsModel&&const DeepCollectionEquality().equals(other._userGroupMembers, _userGroupMembers)&&const DeepCollectionEquality().equals(other._matchedGroupMembers, _matchedGroupMembers)&&(identical(other.aboutThisGroup, aboutThisGroup) || other.aboutThisGroup == aboutThisGroup)&&const DeepCollectionEquality().equals(other._sharedMedia, _sharedMedia)&&const DeepCollectionEquality().equals(other._commonInterests, _commonInterests)&&(identical(other.isMatched, isMatched) || other.isMatched == isMatched));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_userGroupMembers),const DeepCollectionEquality().hash(_matchedGroupMembers),aboutThisGroup,const DeepCollectionEquality().hash(_sharedMedia),const DeepCollectionEquality().hash(_commonInterests),isMatched);
+
+@override
+String toString() {
+  return 'ChatGroupsDetailsModel(userGroupMembers: $userGroupMembers, matchedGroupMembers: $matchedGroupMembers, aboutThisGroup: $aboutThisGroup, sharedMedia: $sharedMedia, commonInterests: $commonInterests, isMatched: $isMatched)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$ChatGroupsDetailsModelCopyWith<$Res> implements $ChatGroupsDetailsModelCopyWith<$Res> {
+  factory _$ChatGroupsDetailsModelCopyWith(_ChatGroupsDetailsModel value, $Res Function(_ChatGroupsDetailsModel) _then) = __$ChatGroupsDetailsModelCopyWithImpl;
+@override @useResult
+$Res call({
+ List<ChatGroupMemberUserModel> userGroupMembers, List<MatchedGroupMembersModel> matchedGroupMembers, ChatAboutGroupModel? aboutThisGroup, List<String> sharedMedia, List<String> commonInterests, bool? isMatched
+});
+
+
+@override $ChatAboutGroupModelCopyWith<$Res>? get aboutThisGroup;
+
+}
+/// @nodoc
+class __$ChatGroupsDetailsModelCopyWithImpl<$Res>
+    implements _$ChatGroupsDetailsModelCopyWith<$Res> {
+  __$ChatGroupsDetailsModelCopyWithImpl(this._self, this._then);
+
+  final _ChatGroupsDetailsModel _self;
+  final $Res Function(_ChatGroupsDetailsModel) _then;
+
+/// Create a copy of ChatGroupsDetailsModel
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? userGroupMembers = null,Object? matchedGroupMembers = null,Object? aboutThisGroup = freezed,Object? sharedMedia = null,Object? commonInterests = null,Object? isMatched = freezed,}) {
+  return _then(_ChatGroupsDetailsModel(
+userGroupMembers: null == userGroupMembers ? _self._userGroupMembers : userGroupMembers // ignore: cast_nullable_to_non_nullable
+as List<ChatGroupMemberUserModel>,matchedGroupMembers: null == matchedGroupMembers ? _self._matchedGroupMembers : matchedGroupMembers // ignore: cast_nullable_to_non_nullable
+as List<MatchedGroupMembersModel>,aboutThisGroup: freezed == aboutThisGroup ? _self.aboutThisGroup : aboutThisGroup // ignore: cast_nullable_to_non_nullable
+as ChatAboutGroupModel?,sharedMedia: null == sharedMedia ? _self._sharedMedia : sharedMedia // ignore: cast_nullable_to_non_nullable
+as List<String>,commonInterests: null == commonInterests ? _self._commonInterests : commonInterests // ignore: cast_nullable_to_non_nullable
+as List<String>,isMatched: freezed == isMatched ? _self.isMatched : isMatched // ignore: cast_nullable_to_non_nullable
+as bool?,
+  ));
+}
+
+/// Create a copy of ChatGroupsDetailsModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ChatAboutGroupModelCopyWith<$Res>? get aboutThisGroup {
+    if (_self.aboutThisGroup == null) {
+    return null;
+  }
+
+  return $ChatAboutGroupModelCopyWith<$Res>(_self.aboutThisGroup!, (value) {
+    return _then(_self.copyWith(aboutThisGroup: value));
+  });
+}
+}
+
+
+/// @nodoc
+mixin _$MatchedGroupMembersModel {
+
+ String? get groupId; List<ChatGroupMemberUserModel> get members;
+/// Create a copy of MatchedGroupMembersModel
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$MatchedGroupMembersModelCopyWith<MatchedGroupMembersModel> get copyWith => _$MatchedGroupMembersModelCopyWithImpl<MatchedGroupMembersModel>(this as MatchedGroupMembersModel, _$identity);
+
+  /// Serializes this MatchedGroupMembersModel to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MatchedGroupMembersModel&&(identical(other.groupId, groupId) || other.groupId == groupId)&&const DeepCollectionEquality().equals(other.members, members));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,groupId,const DeepCollectionEquality().hash(members));
+
+@override
+String toString() {
+  return 'MatchedGroupMembersModel(groupId: $groupId, members: $members)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $MatchedGroupMembersModelCopyWith<$Res>  {
+  factory $MatchedGroupMembersModelCopyWith(MatchedGroupMembersModel value, $Res Function(MatchedGroupMembersModel) _then) = _$MatchedGroupMembersModelCopyWithImpl;
+@useResult
+$Res call({
+ String? groupId, List<ChatGroupMemberUserModel> members
+});
+
+
+
+
+}
+/// @nodoc
+class _$MatchedGroupMembersModelCopyWithImpl<$Res>
+    implements $MatchedGroupMembersModelCopyWith<$Res> {
+  _$MatchedGroupMembersModelCopyWithImpl(this._self, this._then);
+
+  final MatchedGroupMembersModel _self;
+  final $Res Function(MatchedGroupMembersModel) _then;
+
+/// Create a copy of MatchedGroupMembersModel
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? groupId = freezed,Object? members = null,}) {
+  return _then(_self.copyWith(
+groupId: freezed == groupId ? _self.groupId : groupId // ignore: cast_nullable_to_non_nullable
+as String?,members: null == members ? _self.members : members // ignore: cast_nullable_to_non_nullable
+as List<ChatGroupMemberUserModel>,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [MatchedGroupMembersModel].
+extension MatchedGroupMembersModelPatterns on MatchedGroupMembersModel {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _MatchedGroupMembersModel value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _MatchedGroupMembersModel() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _MatchedGroupMembersModel value)  $default,){
+final _that = this;
+switch (_that) {
+case _MatchedGroupMembersModel():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _MatchedGroupMembersModel value)?  $default,){
+final _that = this;
+switch (_that) {
+case _MatchedGroupMembersModel() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? groupId,  List<ChatGroupMemberUserModel> members)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _MatchedGroupMembersModel() when $default != null:
+return $default(_that.groupId,_that.members);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? groupId,  List<ChatGroupMemberUserModel> members)  $default,) {final _that = this;
+switch (_that) {
+case _MatchedGroupMembersModel():
+return $default(_that.groupId,_that.members);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? groupId,  List<ChatGroupMemberUserModel> members)?  $default,) {final _that = this;
+switch (_that) {
+case _MatchedGroupMembersModel() when $default != null:
+return $default(_that.groupId,_that.members);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _MatchedGroupMembersModel implements MatchedGroupMembersModel {
+  const _MatchedGroupMembersModel({this.groupId, final  List<ChatGroupMemberUserModel> members = const []}): _members = members;
+  factory _MatchedGroupMembersModel.fromJson(Map<String, dynamic> json) => _$MatchedGroupMembersModelFromJson(json);
+
+@override final  String? groupId;
+ final  List<ChatGroupMemberUserModel> _members;
+@override@JsonKey() List<ChatGroupMemberUserModel> get members {
+  if (_members is EqualUnmodifiableListView) return _members;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_members);
+}
+
+
+/// Create a copy of MatchedGroupMembersModel
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$MatchedGroupMembersModelCopyWith<_MatchedGroupMembersModel> get copyWith => __$MatchedGroupMembersModelCopyWithImpl<_MatchedGroupMembersModel>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$MatchedGroupMembersModelToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MatchedGroupMembersModel&&(identical(other.groupId, groupId) || other.groupId == groupId)&&const DeepCollectionEquality().equals(other._members, _members));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,groupId,const DeepCollectionEquality().hash(_members));
+
+@override
+String toString() {
+  return 'MatchedGroupMembersModel(groupId: $groupId, members: $members)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$MatchedGroupMembersModelCopyWith<$Res> implements $MatchedGroupMembersModelCopyWith<$Res> {
+  factory _$MatchedGroupMembersModelCopyWith(_MatchedGroupMembersModel value, $Res Function(_MatchedGroupMembersModel) _then) = __$MatchedGroupMembersModelCopyWithImpl;
+@override @useResult
+$Res call({
+ String? groupId, List<ChatGroupMemberUserModel> members
+});
+
+
+
+
+}
+/// @nodoc
+class __$MatchedGroupMembersModelCopyWithImpl<$Res>
+    implements _$MatchedGroupMembersModelCopyWith<$Res> {
+  __$MatchedGroupMembersModelCopyWithImpl(this._self, this._then);
+
+  final _MatchedGroupMembersModel _self;
+  final $Res Function(_MatchedGroupMembersModel) _then;
+
+/// Create a copy of MatchedGroupMembersModel
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? groupId = freezed,Object? members = null,}) {
+  return _then(_MatchedGroupMembersModel(
+groupId: freezed == groupId ? _self.groupId : groupId // ignore: cast_nullable_to_non_nullable
+as String?,members: null == members ? _self._members : members // ignore: cast_nullable_to_non_nullable
+as List<ChatGroupMemberUserModel>,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$ChatGroupMemberUserModel {
+
+ String get id; String? get firstName; String? get lastName; String? get image;
+/// Create a copy of ChatGroupMemberUserModel
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ChatGroupMemberUserModelCopyWith<ChatGroupMemberUserModel> get copyWith => _$ChatGroupMemberUserModelCopyWithImpl<ChatGroupMemberUserModel>(this as ChatGroupMemberUserModel, _$identity);
+
+  /// Serializes this ChatGroupMemberUserModel to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChatGroupMemberUserModel&&(identical(other.id, id) || other.id == id)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.image, image) || other.image == image));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,firstName,lastName,image);
+
+@override
+String toString() {
+  return 'ChatGroupMemberUserModel(id: $id, firstName: $firstName, lastName: $lastName, image: $image)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $ChatGroupMemberUserModelCopyWith<$Res>  {
+  factory $ChatGroupMemberUserModelCopyWith(ChatGroupMemberUserModel value, $Res Function(ChatGroupMemberUserModel) _then) = _$ChatGroupMemberUserModelCopyWithImpl;
+@useResult
+$Res call({
+ String id, String? firstName, String? lastName, String? image
+});
+
+
+
+
+}
+/// @nodoc
+class _$ChatGroupMemberUserModelCopyWithImpl<$Res>
+    implements $ChatGroupMemberUserModelCopyWith<$Res> {
+  _$ChatGroupMemberUserModelCopyWithImpl(this._self, this._then);
+
+  final ChatGroupMemberUserModel _self;
+  final $Res Function(ChatGroupMemberUserModel) _then;
+
+/// Create a copy of ChatGroupMemberUserModel
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? firstName = freezed,Object? lastName = freezed,Object? image = freezed,}) {
+  return _then(_self.copyWith(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,firstName: freezed == firstName ? _self.firstName : firstName // ignore: cast_nullable_to_non_nullable
+as String?,lastName: freezed == lastName ? _self.lastName : lastName // ignore: cast_nullable_to_non_nullable
+as String?,image: freezed == image ? _self.image : image // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [ChatGroupMemberUserModel].
+extension ChatGroupMemberUserModelPatterns on ChatGroupMemberUserModel {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _ChatGroupMemberUserModel value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _ChatGroupMemberUserModel() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _ChatGroupMemberUserModel value)  $default,){
+final _that = this;
+switch (_that) {
+case _ChatGroupMemberUserModel():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _ChatGroupMemberUserModel value)?  $default,){
+final _that = this;
+switch (_that) {
+case _ChatGroupMemberUserModel() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String? firstName,  String? lastName,  String? image)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _ChatGroupMemberUserModel() when $default != null:
+return $default(_that.id,_that.firstName,_that.lastName,_that.image);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String? firstName,  String? lastName,  String? image)  $default,) {final _that = this;
+switch (_that) {
+case _ChatGroupMemberUserModel():
+return $default(_that.id,_that.firstName,_that.lastName,_that.image);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String? firstName,  String? lastName,  String? image)?  $default,) {final _that = this;
+switch (_that) {
+case _ChatGroupMemberUserModel() when $default != null:
+return $default(_that.id,_that.firstName,_that.lastName,_that.image);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _ChatGroupMemberUserModel implements ChatGroupMemberUserModel {
+  const _ChatGroupMemberUserModel({required this.id, this.firstName, this.lastName, this.image});
+  factory _ChatGroupMemberUserModel.fromJson(Map<String, dynamic> json) => _$ChatGroupMemberUserModelFromJson(json);
+
+@override final  String id;
+@override final  String? firstName;
+@override final  String? lastName;
+@override final  String? image;
+
+/// Create a copy of ChatGroupMemberUserModel
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$ChatGroupMemberUserModelCopyWith<_ChatGroupMemberUserModel> get copyWith => __$ChatGroupMemberUserModelCopyWithImpl<_ChatGroupMemberUserModel>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$ChatGroupMemberUserModelToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChatGroupMemberUserModel&&(identical(other.id, id) || other.id == id)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.image, image) || other.image == image));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,firstName,lastName,image);
+
+@override
+String toString() {
+  return 'ChatGroupMemberUserModel(id: $id, firstName: $firstName, lastName: $lastName, image: $image)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$ChatGroupMemberUserModelCopyWith<$Res> implements $ChatGroupMemberUserModelCopyWith<$Res> {
+  factory _$ChatGroupMemberUserModelCopyWith(_ChatGroupMemberUserModel value, $Res Function(_ChatGroupMemberUserModel) _then) = __$ChatGroupMemberUserModelCopyWithImpl;
+@override @useResult
+$Res call({
+ String id, String? firstName, String? lastName, String? image
+});
+
+
+
+
+}
+/// @nodoc
+class __$ChatGroupMemberUserModelCopyWithImpl<$Res>
+    implements _$ChatGroupMemberUserModelCopyWith<$Res> {
+  __$ChatGroupMemberUserModelCopyWithImpl(this._self, this._then);
+
+  final _ChatGroupMemberUserModel _self;
+  final $Res Function(_ChatGroupMemberUserModel) _then;
+
+/// Create a copy of ChatGroupMemberUserModel
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? firstName = freezed,Object? lastName = freezed,Object? image = freezed,}) {
+  return _then(_ChatGroupMemberUserModel(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,firstName: freezed == firstName ? _self.firstName : firstName // ignore: cast_nullable_to_non_nullable
+as String?,lastName: freezed == lastName ? _self.lastName : lastName // ignore: cast_nullable_to_non_nullable
+as String?,image: freezed == image ? _self.image : image // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$ChatAboutGroupModel {
+
+ String? get bio; String? get fitsForGroup;
+/// Create a copy of ChatAboutGroupModel
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ChatAboutGroupModelCopyWith<ChatAboutGroupModel> get copyWith => _$ChatAboutGroupModelCopyWithImpl<ChatAboutGroupModel>(this as ChatAboutGroupModel, _$identity);
+
+  /// Serializes this ChatAboutGroupModel to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChatAboutGroupModel&&(identical(other.bio, bio) || other.bio == bio)&&(identical(other.fitsForGroup, fitsForGroup) || other.fitsForGroup == fitsForGroup));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,bio,fitsForGroup);
+
+@override
+String toString() {
+  return 'ChatAboutGroupModel(bio: $bio, fitsForGroup: $fitsForGroup)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $ChatAboutGroupModelCopyWith<$Res>  {
+  factory $ChatAboutGroupModelCopyWith(ChatAboutGroupModel value, $Res Function(ChatAboutGroupModel) _then) = _$ChatAboutGroupModelCopyWithImpl;
+@useResult
+$Res call({
+ String? bio, String? fitsForGroup
+});
+
+
+
+
+}
+/// @nodoc
+class _$ChatAboutGroupModelCopyWithImpl<$Res>
+    implements $ChatAboutGroupModelCopyWith<$Res> {
+  _$ChatAboutGroupModelCopyWithImpl(this._self, this._then);
+
+  final ChatAboutGroupModel _self;
+  final $Res Function(ChatAboutGroupModel) _then;
+
+/// Create a copy of ChatAboutGroupModel
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? bio = freezed,Object? fitsForGroup = freezed,}) {
+  return _then(_self.copyWith(
+bio: freezed == bio ? _self.bio : bio // ignore: cast_nullable_to_non_nullable
+as String?,fitsForGroup: freezed == fitsForGroup ? _self.fitsForGroup : fitsForGroup // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [ChatAboutGroupModel].
+extension ChatAboutGroupModelPatterns on ChatAboutGroupModel {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _ChatAboutGroupModel value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _ChatAboutGroupModel() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _ChatAboutGroupModel value)  $default,){
+final _that = this;
+switch (_that) {
+case _ChatAboutGroupModel():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _ChatAboutGroupModel value)?  $default,){
+final _that = this;
+switch (_that) {
+case _ChatAboutGroupModel() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? bio,  String? fitsForGroup)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _ChatAboutGroupModel() when $default != null:
+return $default(_that.bio,_that.fitsForGroup);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? bio,  String? fitsForGroup)  $default,) {final _that = this;
+switch (_that) {
+case _ChatAboutGroupModel():
+return $default(_that.bio,_that.fitsForGroup);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? bio,  String? fitsForGroup)?  $default,) {final _that = this;
+switch (_that) {
+case _ChatAboutGroupModel() when $default != null:
+return $default(_that.bio,_that.fitsForGroup);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _ChatAboutGroupModel implements ChatAboutGroupModel {
+  const _ChatAboutGroupModel({this.bio, this.fitsForGroup});
+  factory _ChatAboutGroupModel.fromJson(Map<String, dynamic> json) => _$ChatAboutGroupModelFromJson(json);
+
+@override final  String? bio;
+@override final  String? fitsForGroup;
+
+/// Create a copy of ChatAboutGroupModel
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$ChatAboutGroupModelCopyWith<_ChatAboutGroupModel> get copyWith => __$ChatAboutGroupModelCopyWithImpl<_ChatAboutGroupModel>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$ChatAboutGroupModelToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChatAboutGroupModel&&(identical(other.bio, bio) || other.bio == bio)&&(identical(other.fitsForGroup, fitsForGroup) || other.fitsForGroup == fitsForGroup));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,bio,fitsForGroup);
+
+@override
+String toString() {
+  return 'ChatAboutGroupModel(bio: $bio, fitsForGroup: $fitsForGroup)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$ChatAboutGroupModelCopyWith<$Res> implements $ChatAboutGroupModelCopyWith<$Res> {
+  factory _$ChatAboutGroupModelCopyWith(_ChatAboutGroupModel value, $Res Function(_ChatAboutGroupModel) _then) = __$ChatAboutGroupModelCopyWithImpl;
+@override @useResult
+$Res call({
+ String? bio, String? fitsForGroup
+});
+
+
+
+
+}
+/// @nodoc
+class __$ChatAboutGroupModelCopyWithImpl<$Res>
+    implements _$ChatAboutGroupModelCopyWith<$Res> {
+  __$ChatAboutGroupModelCopyWithImpl(this._self, this._then);
+
+  final _ChatAboutGroupModel _self;
+  final $Res Function(_ChatAboutGroupModel) _then;
+
+/// Create a copy of ChatAboutGroupModel
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? bio = freezed,Object? fitsForGroup = freezed,}) {
+  return _then(_ChatAboutGroupModel(
+bio: freezed == bio ? _self.bio : bio // ignore: cast_nullable_to_non_nullable
+as String?,fitsForGroup: freezed == fitsForGroup ? _self.fitsForGroup : fitsForGroup // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$ChatLatestPokeModel {
+
+ String? get id; String? get pokeId; String? get fromUserId; String? get toUserId; String? get peerUserId; String? get direction; String? get status; String? get targetType; String? get targetId;
+/// Create a copy of ChatLatestPokeModel
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ChatLatestPokeModelCopyWith<ChatLatestPokeModel> get copyWith => _$ChatLatestPokeModelCopyWithImpl<ChatLatestPokeModel>(this as ChatLatestPokeModel, _$identity);
+
+  /// Serializes this ChatLatestPokeModel to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChatLatestPokeModel&&(identical(other.id, id) || other.id == id)&&(identical(other.pokeId, pokeId) || other.pokeId == pokeId)&&(identical(other.fromUserId, fromUserId) || other.fromUserId == fromUserId)&&(identical(other.toUserId, toUserId) || other.toUserId == toUserId)&&(identical(other.peerUserId, peerUserId) || other.peerUserId == peerUserId)&&(identical(other.direction, direction) || other.direction == direction)&&(identical(other.status, status) || other.status == status)&&(identical(other.targetType, targetType) || other.targetType == targetType)&&(identical(other.targetId, targetId) || other.targetId == targetId));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,pokeId,fromUserId,toUserId,peerUserId,direction,status,targetType,targetId);
+
+@override
+String toString() {
+  return 'ChatLatestPokeModel(id: $id, pokeId: $pokeId, fromUserId: $fromUserId, toUserId: $toUserId, peerUserId: $peerUserId, direction: $direction, status: $status, targetType: $targetType, targetId: $targetId)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $ChatLatestPokeModelCopyWith<$Res>  {
+  factory $ChatLatestPokeModelCopyWith(ChatLatestPokeModel value, $Res Function(ChatLatestPokeModel) _then) = _$ChatLatestPokeModelCopyWithImpl;
+@useResult
+$Res call({
+ String? id, String? pokeId, String? fromUserId, String? toUserId, String? peerUserId, String? direction, String? status, String? targetType, String? targetId
+});
+
+
+
+
+}
+/// @nodoc
+class _$ChatLatestPokeModelCopyWithImpl<$Res>
+    implements $ChatLatestPokeModelCopyWith<$Res> {
+  _$ChatLatestPokeModelCopyWithImpl(this._self, this._then);
+
+  final ChatLatestPokeModel _self;
+  final $Res Function(ChatLatestPokeModel) _then;
+
+/// Create a copy of ChatLatestPokeModel
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? pokeId = freezed,Object? fromUserId = freezed,Object? toUserId = freezed,Object? peerUserId = freezed,Object? direction = freezed,Object? status = freezed,Object? targetType = freezed,Object? targetId = freezed,}) {
+  return _then(_self.copyWith(
+id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String?,pokeId: freezed == pokeId ? _self.pokeId : pokeId // ignore: cast_nullable_to_non_nullable
+as String?,fromUserId: freezed == fromUserId ? _self.fromUserId : fromUserId // ignore: cast_nullable_to_non_nullable
+as String?,toUserId: freezed == toUserId ? _self.toUserId : toUserId // ignore: cast_nullable_to_non_nullable
+as String?,peerUserId: freezed == peerUserId ? _self.peerUserId : peerUserId // ignore: cast_nullable_to_non_nullable
+as String?,direction: freezed == direction ? _self.direction : direction // ignore: cast_nullable_to_non_nullable
+as String?,status: freezed == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as String?,targetType: freezed == targetType ? _self.targetType : targetType // ignore: cast_nullable_to_non_nullable
+as String?,targetId: freezed == targetId ? _self.targetId : targetId // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [ChatLatestPokeModel].
+extension ChatLatestPokeModelPatterns on ChatLatestPokeModel {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _ChatLatestPokeModel value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _ChatLatestPokeModel() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _ChatLatestPokeModel value)  $default,){
+final _that = this;
+switch (_that) {
+case _ChatLatestPokeModel():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _ChatLatestPokeModel value)?  $default,){
+final _that = this;
+switch (_that) {
+case _ChatLatestPokeModel() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String? pokeId,  String? fromUserId,  String? toUserId,  String? peerUserId,  String? direction,  String? status,  String? targetType,  String? targetId)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _ChatLatestPokeModel() when $default != null:
+return $default(_that.id,_that.pokeId,_that.fromUserId,_that.toUserId,_that.peerUserId,_that.direction,_that.status,_that.targetType,_that.targetId);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String? pokeId,  String? fromUserId,  String? toUserId,  String? peerUserId,  String? direction,  String? status,  String? targetType,  String? targetId)  $default,) {final _that = this;
+switch (_that) {
+case _ChatLatestPokeModel():
+return $default(_that.id,_that.pokeId,_that.fromUserId,_that.toUserId,_that.peerUserId,_that.direction,_that.status,_that.targetType,_that.targetId);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String? pokeId,  String? fromUserId,  String? toUserId,  String? peerUserId,  String? direction,  String? status,  String? targetType,  String? targetId)?  $default,) {final _that = this;
+switch (_that) {
+case _ChatLatestPokeModel() when $default != null:
+return $default(_that.id,_that.pokeId,_that.fromUserId,_that.toUserId,_that.peerUserId,_that.direction,_that.status,_that.targetType,_that.targetId);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _ChatLatestPokeModel implements ChatLatestPokeModel {
+  const _ChatLatestPokeModel({this.id, this.pokeId, this.fromUserId, this.toUserId, this.peerUserId, this.direction, this.status, this.targetType, this.targetId});
+  factory _ChatLatestPokeModel.fromJson(Map<String, dynamic> json) => _$ChatLatestPokeModelFromJson(json);
+
+@override final  String? id;
+@override final  String? pokeId;
+@override final  String? fromUserId;
+@override final  String? toUserId;
+@override final  String? peerUserId;
+@override final  String? direction;
+@override final  String? status;
+@override final  String? targetType;
+@override final  String? targetId;
+
+/// Create a copy of ChatLatestPokeModel
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$ChatLatestPokeModelCopyWith<_ChatLatestPokeModel> get copyWith => __$ChatLatestPokeModelCopyWithImpl<_ChatLatestPokeModel>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$ChatLatestPokeModelToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChatLatestPokeModel&&(identical(other.id, id) || other.id == id)&&(identical(other.pokeId, pokeId) || other.pokeId == pokeId)&&(identical(other.fromUserId, fromUserId) || other.fromUserId == fromUserId)&&(identical(other.toUserId, toUserId) || other.toUserId == toUserId)&&(identical(other.peerUserId, peerUserId) || other.peerUserId == peerUserId)&&(identical(other.direction, direction) || other.direction == direction)&&(identical(other.status, status) || other.status == status)&&(identical(other.targetType, targetType) || other.targetType == targetType)&&(identical(other.targetId, targetId) || other.targetId == targetId));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,pokeId,fromUserId,toUserId,peerUserId,direction,status,targetType,targetId);
+
+@override
+String toString() {
+  return 'ChatLatestPokeModel(id: $id, pokeId: $pokeId, fromUserId: $fromUserId, toUserId: $toUserId, peerUserId: $peerUserId, direction: $direction, status: $status, targetType: $targetType, targetId: $targetId)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$ChatLatestPokeModelCopyWith<$Res> implements $ChatLatestPokeModelCopyWith<$Res> {
+  factory _$ChatLatestPokeModelCopyWith(_ChatLatestPokeModel value, $Res Function(_ChatLatestPokeModel) _then) = __$ChatLatestPokeModelCopyWithImpl;
+@override @useResult
+$Res call({
+ String? id, String? pokeId, String? fromUserId, String? toUserId, String? peerUserId, String? direction, String? status, String? targetType, String? targetId
+});
+
+
+
+
+}
+/// @nodoc
+class __$ChatLatestPokeModelCopyWithImpl<$Res>
+    implements _$ChatLatestPokeModelCopyWith<$Res> {
+  __$ChatLatestPokeModelCopyWithImpl(this._self, this._then);
+
+  final _ChatLatestPokeModel _self;
+  final $Res Function(_ChatLatestPokeModel) _then;
+
+/// Create a copy of ChatLatestPokeModel
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? pokeId = freezed,Object? fromUserId = freezed,Object? toUserId = freezed,Object? peerUserId = freezed,Object? direction = freezed,Object? status = freezed,Object? targetType = freezed,Object? targetId = freezed,}) {
+  return _then(_ChatLatestPokeModel(
+id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String?,pokeId: freezed == pokeId ? _self.pokeId : pokeId // ignore: cast_nullable_to_non_nullable
+as String?,fromUserId: freezed == fromUserId ? _self.fromUserId : fromUserId // ignore: cast_nullable_to_non_nullable
+as String?,toUserId: freezed == toUserId ? _self.toUserId : toUserId // ignore: cast_nullable_to_non_nullable
+as String?,peerUserId: freezed == peerUserId ? _self.peerUserId : peerUserId // ignore: cast_nullable_to_non_nullable
+as String?,direction: freezed == direction ? _self.direction : direction // ignore: cast_nullable_to_non_nullable
+as String?,status: freezed == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as String?,targetType: freezed == targetType ? _self.targetType : targetType // ignore: cast_nullable_to_non_nullable
+as String?,targetId: freezed == targetId ? _self.targetId : targetId // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$ChatDirectChatMetaModel {
+
+ String? get otherUserId; int get unreadCount;@JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable) DateTime? get lastMessageAt;
+/// Create a copy of ChatDirectChatMetaModel
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ChatDirectChatMetaModelCopyWith<ChatDirectChatMetaModel> get copyWith => _$ChatDirectChatMetaModelCopyWithImpl<ChatDirectChatMetaModel>(this as ChatDirectChatMetaModel, _$identity);
+
+  /// Serializes this ChatDirectChatMetaModel to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChatDirectChatMetaModel&&(identical(other.otherUserId, otherUserId) || other.otherUserId == otherUserId)&&(identical(other.unreadCount, unreadCount) || other.unreadCount == unreadCount)&&(identical(other.lastMessageAt, lastMessageAt) || other.lastMessageAt == lastMessageAt));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,otherUserId,unreadCount,lastMessageAt);
+
+@override
+String toString() {
+  return 'ChatDirectChatMetaModel(otherUserId: $otherUserId, unreadCount: $unreadCount, lastMessageAt: $lastMessageAt)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $ChatDirectChatMetaModelCopyWith<$Res>  {
+  factory $ChatDirectChatMetaModelCopyWith(ChatDirectChatMetaModel value, $Res Function(ChatDirectChatMetaModel) _then) = _$ChatDirectChatMetaModelCopyWithImpl;
+@useResult
+$Res call({
+ String? otherUserId, int unreadCount,@JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable) DateTime? lastMessageAt
+});
+
+
+
+
+}
+/// @nodoc
+class _$ChatDirectChatMetaModelCopyWithImpl<$Res>
+    implements $ChatDirectChatMetaModelCopyWith<$Res> {
+  _$ChatDirectChatMetaModelCopyWithImpl(this._self, this._then);
+
+  final ChatDirectChatMetaModel _self;
+  final $Res Function(ChatDirectChatMetaModel) _then;
+
+/// Create a copy of ChatDirectChatMetaModel
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? otherUserId = freezed,Object? unreadCount = null,Object? lastMessageAt = freezed,}) {
+  return _then(_self.copyWith(
+otherUserId: freezed == otherUserId ? _self.otherUserId : otherUserId // ignore: cast_nullable_to_non_nullable
+as String?,unreadCount: null == unreadCount ? _self.unreadCount : unreadCount // ignore: cast_nullable_to_non_nullable
+as int,lastMessageAt: freezed == lastMessageAt ? _self.lastMessageAt : lastMessageAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [ChatDirectChatMetaModel].
+extension ChatDirectChatMetaModelPatterns on ChatDirectChatMetaModel {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _ChatDirectChatMetaModel value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _ChatDirectChatMetaModel() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _ChatDirectChatMetaModel value)  $default,){
+final _that = this;
+switch (_that) {
+case _ChatDirectChatMetaModel():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _ChatDirectChatMetaModel value)?  $default,){
+final _that = this;
+switch (_that) {
+case _ChatDirectChatMetaModel() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? otherUserId,  int unreadCount, @JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable)  DateTime? lastMessageAt)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _ChatDirectChatMetaModel() when $default != null:
+return $default(_that.otherUserId,_that.unreadCount,_that.lastMessageAt);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? otherUserId,  int unreadCount, @JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable)  DateTime? lastMessageAt)  $default,) {final _that = this;
+switch (_that) {
+case _ChatDirectChatMetaModel():
+return $default(_that.otherUserId,_that.unreadCount,_that.lastMessageAt);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? otherUserId,  int unreadCount, @JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable)  DateTime? lastMessageAt)?  $default,) {final _that = this;
+switch (_that) {
+case _ChatDirectChatMetaModel() when $default != null:
+return $default(_that.otherUserId,_that.unreadCount,_that.lastMessageAt);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _ChatDirectChatMetaModel implements ChatDirectChatMetaModel {
+  const _ChatDirectChatMetaModel({this.otherUserId, this.unreadCount = 0, @JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable) this.lastMessageAt});
+  factory _ChatDirectChatMetaModel.fromJson(Map<String, dynamic> json) => _$ChatDirectChatMetaModelFromJson(json);
+
+@override final  String? otherUserId;
+@override@JsonKey() final  int unreadCount;
+@override@JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable) final  DateTime? lastMessageAt;
+
+/// Create a copy of ChatDirectChatMetaModel
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$ChatDirectChatMetaModelCopyWith<_ChatDirectChatMetaModel> get copyWith => __$ChatDirectChatMetaModelCopyWithImpl<_ChatDirectChatMetaModel>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$ChatDirectChatMetaModelToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChatDirectChatMetaModel&&(identical(other.otherUserId, otherUserId) || other.otherUserId == otherUserId)&&(identical(other.unreadCount, unreadCount) || other.unreadCount == unreadCount)&&(identical(other.lastMessageAt, lastMessageAt) || other.lastMessageAt == lastMessageAt));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,otherUserId,unreadCount,lastMessageAt);
+
+@override
+String toString() {
+  return 'ChatDirectChatMetaModel(otherUserId: $otherUserId, unreadCount: $unreadCount, lastMessageAt: $lastMessageAt)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$ChatDirectChatMetaModelCopyWith<$Res> implements $ChatDirectChatMetaModelCopyWith<$Res> {
+  factory _$ChatDirectChatMetaModelCopyWith(_ChatDirectChatMetaModel value, $Res Function(_ChatDirectChatMetaModel) _then) = __$ChatDirectChatMetaModelCopyWithImpl;
+@override @useResult
+$Res call({
+ String? otherUserId, int unreadCount,@JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable) DateTime? lastMessageAt
+});
+
+
+
+
+}
+/// @nodoc
+class __$ChatDirectChatMetaModelCopyWithImpl<$Res>
+    implements _$ChatDirectChatMetaModelCopyWith<$Res> {
+  __$ChatDirectChatMetaModelCopyWithImpl(this._self, this._then);
+
+  final _ChatDirectChatMetaModel _self;
+  final $Res Function(_ChatDirectChatMetaModel) _then;
+
+/// Create a copy of ChatDirectChatMetaModel
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? otherUserId = freezed,Object? unreadCount = null,Object? lastMessageAt = freezed,}) {
+  return _then(_ChatDirectChatMetaModel(
+otherUserId: freezed == otherUserId ? _self.otherUserId : otherUserId // ignore: cast_nullable_to_non_nullable
+as String?,unreadCount: null == unreadCount ? _self.unreadCount : unreadCount // ignore: cast_nullable_to_non_nullable
+as int,lastMessageAt: freezed == lastMessageAt ? _self.lastMessageAt : lastMessageAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,
   ));
 }
 
@@ -1463,7 +4468,7 @@ mixin _$CallModel {
  String get id; String? get name; String? get image; List<MemberModel>? get members; String? get callTypeLabel; String? get duration; String? get timeAgo; String? get status; String? get channelName;// added
  String? get mediaType;// added
  String? get callType;// added
- DateTime? get startedAt;// added
+@JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable) DateTime? get startedAt;// added
  CallUserInfo? get callerId;// added
  List<CallUserInfo>? get participantIds;
 /// Create a copy of CallModel
@@ -1498,7 +4503,7 @@ abstract mixin class $CallModelCopyWith<$Res>  {
   factory $CallModelCopyWith(CallModel value, $Res Function(CallModel) _then) = _$CallModelCopyWithImpl;
 @useResult
 $Res call({
- String id, String? name, String? image, List<MemberModel>? members, String? callTypeLabel, String? duration, String? timeAgo, String? status, String? channelName, String? mediaType, String? callType, DateTime? startedAt, CallUserInfo? callerId, List<CallUserInfo>? participantIds
+ String id, String? name, String? image, List<MemberModel>? members, String? callTypeLabel, String? duration, String? timeAgo, String? status, String? channelName, String? mediaType, String? callType,@JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable) DateTime? startedAt, CallUserInfo? callerId, List<CallUserInfo>? participantIds
 });
 
 
@@ -1628,7 +4633,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String? name,  String? image,  List<MemberModel>? members,  String? callTypeLabel,  String? duration,  String? timeAgo,  String? status,  String? channelName,  String? mediaType,  String? callType,  DateTime? startedAt,  CallUserInfo? callerId,  List<CallUserInfo>? participantIds)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String? name,  String? image,  List<MemberModel>? members,  String? callTypeLabel,  String? duration,  String? timeAgo,  String? status,  String? channelName,  String? mediaType,  String? callType, @JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable)  DateTime? startedAt,  CallUserInfo? callerId,  List<CallUserInfo>? participantIds)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CallModel() when $default != null:
 return $default(_that.id,_that.name,_that.image,_that.members,_that.callTypeLabel,_that.duration,_that.timeAgo,_that.status,_that.channelName,_that.mediaType,_that.callType,_that.startedAt,_that.callerId,_that.participantIds);case _:
@@ -1649,7 +4654,7 @@ return $default(_that.id,_that.name,_that.image,_that.members,_that.callTypeLabe
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String? name,  String? image,  List<MemberModel>? members,  String? callTypeLabel,  String? duration,  String? timeAgo,  String? status,  String? channelName,  String? mediaType,  String? callType,  DateTime? startedAt,  CallUserInfo? callerId,  List<CallUserInfo>? participantIds)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String? name,  String? image,  List<MemberModel>? members,  String? callTypeLabel,  String? duration,  String? timeAgo,  String? status,  String? channelName,  String? mediaType,  String? callType, @JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable)  DateTime? startedAt,  CallUserInfo? callerId,  List<CallUserInfo>? participantIds)  $default,) {final _that = this;
 switch (_that) {
 case _CallModel():
 return $default(_that.id,_that.name,_that.image,_that.members,_that.callTypeLabel,_that.duration,_that.timeAgo,_that.status,_that.channelName,_that.mediaType,_that.callType,_that.startedAt,_that.callerId,_that.participantIds);case _:
@@ -1669,7 +4674,7 @@ return $default(_that.id,_that.name,_that.image,_that.members,_that.callTypeLabe
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String? name,  String? image,  List<MemberModel>? members,  String? callTypeLabel,  String? duration,  String? timeAgo,  String? status,  String? channelName,  String? mediaType,  String? callType,  DateTime? startedAt,  CallUserInfo? callerId,  List<CallUserInfo>? participantIds)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String? name,  String? image,  List<MemberModel>? members,  String? callTypeLabel,  String? duration,  String? timeAgo,  String? status,  String? channelName,  String? mediaType,  String? callType, @JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable)  DateTime? startedAt,  CallUserInfo? callerId,  List<CallUserInfo>? participantIds)?  $default,) {final _that = this;
 switch (_that) {
 case _CallModel() when $default != null:
 return $default(_that.id,_that.name,_that.image,_that.members,_that.callTypeLabel,_that.duration,_that.timeAgo,_that.status,_that.channelName,_that.mediaType,_that.callType,_that.startedAt,_that.callerId,_that.participantIds);case _:
@@ -1684,7 +4689,7 @@ return $default(_that.id,_that.name,_that.image,_that.members,_that.callTypeLabe
 @JsonSerializable()
 
 class _CallModel implements CallModel {
-  const _CallModel({required this.id, this.name, this.image, final  List<MemberModel>? members, this.callTypeLabel, this.duration, this.timeAgo, this.status, this.channelName, this.mediaType, this.callType, this.startedAt, this.callerId, final  List<CallUserInfo>? participantIds}): _members = members,_participantIds = participantIds;
+  const _CallModel({required this.id, this.name, this.image, final  List<MemberModel>? members, this.callTypeLabel, this.duration, this.timeAgo, this.status, this.channelName, this.mediaType, this.callType, @JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable) this.startedAt, this.callerId, final  List<CallUserInfo>? participantIds}): _members = members,_participantIds = participantIds;
   factory _CallModel.fromJson(Map<String, dynamic> json) => _$CallModelFromJson(json);
 
 @override final  String id;
@@ -1709,7 +4714,7 @@ class _CallModel implements CallModel {
 // added
 @override final  String? callType;
 // added
-@override final  DateTime? startedAt;
+@override@JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable) final  DateTime? startedAt;
 // added
 @override final  CallUserInfo? callerId;
 // added
@@ -1757,7 +4762,7 @@ abstract mixin class _$CallModelCopyWith<$Res> implements $CallModelCopyWith<$Re
   factory _$CallModelCopyWith(_CallModel value, $Res Function(_CallModel) _then) = __$CallModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String? name, String? image, List<MemberModel>? members, String? callTypeLabel, String? duration, String? timeAgo, String? status, String? channelName, String? mediaType, String? callType, DateTime? startedAt, CallUserInfo? callerId, List<CallUserInfo>? participantIds
+ String id, String? name, String? image, List<MemberModel>? members, String? callTypeLabel, String? duration, String? timeAgo, String? status, String? channelName, String? mediaType, String? callType,@JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable) DateTime? startedAt, CallUserInfo? callerId, List<CallUserInfo>? participantIds
 });
 
 
@@ -2695,7 +5700,7 @@ $PokedTargetDetailCopyWith<$Res> get pokedTargetDetail {
 /// @nodoc
 mixin _$PokeModel {
 
- String get id; String get fromUserId; String get toUserId; String get targetType; String? get targetId; String get message; String get status; DateTime get createdAt; DateTime get updatedAt;
+ String get id; String get fromUserId; String get toUserId; String get targetType; String? get targetId; String get message; String get status;@JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson) DateTime get createdAt;@JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson) DateTime get updatedAt;
 /// Create a copy of PokeModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -2728,7 +5733,7 @@ abstract mixin class $PokeModelCopyWith<$Res>  {
   factory $PokeModelCopyWith(PokeModel value, $Res Function(PokeModel) _then) = _$PokeModelCopyWithImpl;
 @useResult
 $Res call({
- String id, String fromUserId, String toUserId, String targetType, String? targetId, String message, String status, DateTime createdAt, DateTime updatedAt
+ String id, String fromUserId, String toUserId, String targetType, String? targetId, String message, String status,@JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson) DateTime createdAt,@JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson) DateTime updatedAt
 });
 
 
@@ -2841,7 +5846,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String fromUserId,  String toUserId,  String targetType,  String? targetId,  String message,  String status,  DateTime createdAt,  DateTime updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String fromUserId,  String toUserId,  String targetType,  String? targetId,  String message,  String status, @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson)  DateTime createdAt, @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson)  DateTime updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PokeModel() when $default != null:
 return $default(_that.id,_that.fromUserId,_that.toUserId,_that.targetType,_that.targetId,_that.message,_that.status,_that.createdAt,_that.updatedAt);case _:
@@ -2862,7 +5867,7 @@ return $default(_that.id,_that.fromUserId,_that.toUserId,_that.targetType,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String fromUserId,  String toUserId,  String targetType,  String? targetId,  String message,  String status,  DateTime createdAt,  DateTime updatedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String fromUserId,  String toUserId,  String targetType,  String? targetId,  String message,  String status, @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson)  DateTime createdAt, @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson)  DateTime updatedAt)  $default,) {final _that = this;
 switch (_that) {
 case _PokeModel():
 return $default(_that.id,_that.fromUserId,_that.toUserId,_that.targetType,_that.targetId,_that.message,_that.status,_that.createdAt,_that.updatedAt);case _:
@@ -2882,7 +5887,7 @@ return $default(_that.id,_that.fromUserId,_that.toUserId,_that.targetType,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String fromUserId,  String toUserId,  String targetType,  String? targetId,  String message,  String status,  DateTime createdAt,  DateTime updatedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String fromUserId,  String toUserId,  String targetType,  String? targetId,  String message,  String status, @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson)  DateTime createdAt, @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson)  DateTime updatedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _PokeModel() when $default != null:
 return $default(_that.id,_that.fromUserId,_that.toUserId,_that.targetType,_that.targetId,_that.message,_that.status,_that.createdAt,_that.updatedAt);case _:
@@ -2897,7 +5902,7 @@ return $default(_that.id,_that.fromUserId,_that.toUserId,_that.targetType,_that.
 @JsonSerializable()
 
 class _PokeModel implements PokeModel {
-  const _PokeModel({required this.id, required this.fromUserId, required this.toUserId, required this.targetType, this.targetId, required this.message, required this.status, required this.createdAt, required this.updatedAt});
+  const _PokeModel({required this.id, required this.fromUserId, required this.toUserId, required this.targetType, this.targetId, required this.message, required this.status, @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson) required this.createdAt, @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson) required this.updatedAt});
   factory _PokeModel.fromJson(Map<String, dynamic> json) => _$PokeModelFromJson(json);
 
 @override final  String id;
@@ -2907,8 +5912,8 @@ class _PokeModel implements PokeModel {
 @override final  String? targetId;
 @override final  String message;
 @override final  String status;
-@override final  DateTime createdAt;
-@override final  DateTime updatedAt;
+@override@JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson) final  DateTime createdAt;
+@override@JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson) final  DateTime updatedAt;
 
 /// Create a copy of PokeModel
 /// with the given fields replaced by the non-null parameter values.
@@ -2943,7 +5948,7 @@ abstract mixin class _$PokeModelCopyWith<$Res> implements $PokeModelCopyWith<$Re
   factory _$PokeModelCopyWith(_PokeModel value, $Res Function(_PokeModel) _then) = __$PokeModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String fromUserId, String toUserId, String targetType, String? targetId, String message, String status, DateTime createdAt, DateTime updatedAt
+ String id, String fromUserId, String toUserId, String targetType, String? targetId, String message, String status,@JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson) DateTime createdAt,@JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson) DateTime updatedAt
 });
 
 
