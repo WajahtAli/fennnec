@@ -18,6 +18,9 @@ class ColorPalette {
   static Color textPrimary = HexColor("#FFFFFF");
   static Color grey = HexColor("#44444480");
   static Color border = HexColor("#888888");
+  static Color lightBorder = HexColor("#D6D6D6");
+  static Color lightSurface = HexColor("#F1F1F1");
+  static Color lightDivider = HexColor("#E0E0E0");
 }
 
 class ColorPaletteDark {
@@ -35,6 +38,9 @@ class ColorPaletteDark {
   static Color textPrimary = ColorPalette.textPrimary;
   static Color grey = ColorPalette.grey;
   static Color border = ColorPalette.border;
+  static Color lightBorder = ColorPalette.lightBorder;
+  static Color lightSurface = ColorPalette.lightSurface;
+  static Color lightDivider = ColorPalette.lightDivider;
 }
 
 ThemeData lightTheme(BuildContext context) {

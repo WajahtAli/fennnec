@@ -1,6 +1,8 @@
 import 'package:fennac_app/app/constants/media_query_constants.dart';
+import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:fennac_app/pages/chats/presentation/bloc/cubit/message_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fennac_app/widgets/app_inkwell.dart';
 
 import '../../../../app/theme/app_colors.dart';
@@ -23,51 +25,63 @@ class _AttachmentPanelBelow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isLight = isLightTheme(context);
     final options = <_AttachmentOption>[
       _AttachmentOption(
-        icon: Icons.photo_outlined,
+        iconPath: Assets.icons.gallery.path,
         label: 'Photos',
         type: 'image',
       ),
       _AttachmentOption(
-        icon: Icons.videocam_outlined,
+        iconPath: Assets.icons.video.path,
         label: 'Videos',
         type: 'video',
       ),
       _AttachmentOption(
-        icon: Icons.camera_alt_outlined,
+        iconPath: Assets.icons.camera.path,
         label: 'Camera',
         type: 'image',
       ),
-      _AttachmentOption(icon: Icons.gif, label: 'GIFs', type: 'image'),
+      _AttachmentOption(
+        iconPath: Assets.icons.gif.path,
+        label: 'GIFs',
+        type: 'image',
+      ),
     ];
 
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            ColorPalette.secondary.withValues(alpha: 0.25),
-            ColorPalette.secondary.withValues(alpha: 0.9),
-          ],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        ),
-        border: Border.all(
-          color: ColorPalette.white.withValues(alpha: 0.06),
-          width: 1,
+        color: isLight ? Colors.white : null,
+        gradient: isLight
+            ? null
+            : LinearGradient(
+                colors: [
+                  ColorPalette.secondary.withValues(alpha: 0.25),
+                  ColorPalette.secondary.withValues(alpha: 0.9),
+                ],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+        border: Border(
+          top: BorderSide(
+            color: isLight
+                ? ColorPalette.lightDivider
+                : ColorPalette.white.withValues(alpha: 0.06),
+            width: 1,
+          ),
         ),
       ),
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.fromLTRB(24, 0, 24, isLight ? 64 : 16),
       child: GridView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         itemCount: options.length,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
-          childAspectRatio: 1.3,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 32,
+          mainAxisExtent: 108,
         ),
         itemBuilder: (context, index) {
           final option = options[index];
@@ -95,12 +109,12 @@ class _AttachmentPanelBelow extends StatelessWidget {
 
 class _AttachmentOption {
   const _AttachmentOption({
-    required this.icon,
+    required this.iconPath,
     required this.label,
     required this.type,
   });
 
-  final IconData icon;
+  final String iconPath;
   final String label;
   final String type;
 }
@@ -112,45 +126,40 @@ class _AttachmentTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isLight = isLightTheme(context);
     return Container(
       decoration: BoxDecoration(
-        color: isLightTheme(context)
-            ? ColorPalette.textGrey.withValues(alpha: 0.3)
+        color: isLight
+            ? ColorPalette.lightSurface
             : ColorPalette.primary.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: ColorPalette.white.withValues(alpha: 0.06),
+          color: isLight
+              ? ColorPalette.lightBorder
+              : ColorPalette.white.withValues(alpha: 0.06),
           width: 1,
         ),
       ),
+      padding: const EdgeInsets.all(16),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Container(
-            width: 52,
-            height: 52,
-            decoration: BoxDecoration(
-              color: ColorPalette.white.withValues(alpha: 0.08),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              option.icon,
-              color: isLightTheme(context)
-                  ? ColorPalette.black
-                  : ColorPalette.white,
-              size: 26,
+          SvgPicture.asset(
+            option.iconPath,
+            width: 36,
+            height: 36,
+            colorFilter: ColorFilter.mode(
+              isLight ? ColorPalette.black : ColorPalette.white,
+              BlendMode.srcIn,
             ),
           ),
           const CustomSizedBox(height: 12),
           Text(
             option.label,
             style: AppTextStyles.body(context).copyWith(
-              fontWeight: FontWeight.w600,
-              color: isLightTheme(context)
-                  ? ColorPalette.black
-                  : ColorPalette.white,
-              fontSize: 15,
+              fontWeight: FontWeight.w500,
+              color: isLight ? ColorPalette.black : ColorPalette.white,
             ),
           ),
         ],

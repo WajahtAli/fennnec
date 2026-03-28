@@ -68,7 +68,12 @@ class _MessageInputFieldState extends State<MessageInputField> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          padding: EdgeInsets.fromLTRB(
+                            isLightTheme(context) ? 24 : 16,
+                            12,
+                            isLightTheme(context) ? 24 : 16,
+                            12,
+                          ),
                           child: Row(
                             children: [
                               GestureDetector(
@@ -81,26 +86,15 @@ class _MessageInputFieldState extends State<MessageInputField> {
                                   height: 44,
                                   alignment: Alignment.center,
                                   decoration: BoxDecoration(
-                                    gradient: LinearGradient(
+                                    gradient: const LinearGradient(
                                       colors: [
-                                        ColorPalette.primary,
-                                        ColorPalette.primary.withValues(
-                                          alpha: 0.6,
-                                        ),
+                                        Color(0xFF6200EE),
+                                        Color(0xFF4A00D9),
                                       ],
                                       begin: Alignment.topLeft,
                                       end: Alignment.bottomRight,
                                     ),
                                     shape: BoxShape.circle,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: ColorPalette.primary.withValues(
-                                          alpha: 0.35,
-                                        ),
-                                        blurRadius: 12,
-                                        offset: const Offset(0, 6),
-                                      ),
-                                    ],
                                   ),
                                   child: SvgPicture.asset(
                                     _messageCubit.showAttachmentPanel
@@ -112,18 +106,21 @@ class _MessageInputFieldState extends State<MessageInputField> {
                               const CustomSizedBox(width: 12),
                               Expanded(
                                 child: Container(
+                                  height: 48,
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 16,
                                   ),
                                   decoration: BoxDecoration(
                                     color: isLightTheme(context)
-                                        ? Colors.white.withValues(alpha: 0.15)
+                                        ? Colors.white
                                         : Colors.black.withValues(alpha: 0.35),
-                                    borderRadius: BorderRadius.circular(22),
+                                    borderRadius: BorderRadius.circular(24),
                                     border: Border.all(
-                                      color: ColorPalette.white.withValues(
-                                        alpha: 0.06,
-                                      ),
+                                      color: isLightTheme(context)
+                                          ? const Color(0xFFBDBDBD)
+                                          : ColorPalette.white.withValues(
+                                              alpha: 0.06,
+                                            ),
                                       width: 1,
                                     ),
                                   ),
@@ -150,7 +147,7 @@ class _MessageInputFieldState extends State<MessageInputField> {
                                       hintStyle: AppTextStyles.body(context)
                                           .copyWith(
                                             color: isLightTheme(context)
-                                                ? ColorPalette.black
+                                                ? ColorPalette.textSecondary
                                                 : ColorPalette.white.withValues(
                                                     alpha: 0.5,
                                                   ),
@@ -177,17 +174,27 @@ class _MessageInputFieldState extends State<MessageInputField> {
                                   height: 44,
                                   alignment: Alignment.center,
                                   decoration: BoxDecoration(
-                                    color: !_messageCubit.isTextInputEmpty()
-                                        ? ColorPalette.primary
-                                        : Colors.black.withValues(alpha: 0.3),
+                                    color: isLightTheme(context)
+                                        ? Colors.transparent
+                                        : (!_messageCubit.isTextInputEmpty()
+                                              ? ColorPalette.primary
+                                              : Colors.black.withValues(
+                                                  alpha: 0.3,
+                                                )),
                                     shape: BoxShape.circle,
                                   ),
                                   child: SvgPicture.asset(
                                     _messageCubit.isTextInputEmpty()
                                         ? Assets.icons.mic.path
                                         : Assets.icons.send.path,
-                                    height: 18,
-                                    width: 18,
+                                    colorFilter: ColorFilter.mode(
+                                      isLightTheme(context)
+                                          ? ColorPalette.black
+                                          : ColorPalette.white,
+                                      BlendMode.srcIn,
+                                    ),
+                                    height: 24,
+                                    width: 24,
                                   ),
                                 ),
                               ),
@@ -199,12 +206,19 @@ class _MessageInputFieldState extends State<MessageInputField> {
                           switchInCurve: Curves.easeOut,
                           switchOutCurve: Curves.easeIn,
                           child: _messageCubit.showAttachmentPanel == true
-                              ? const Column(
-                                  key: ValueKey('inline-attachment-panel'),
-                                  children: [
-                                    CustomSizedBox(height: 12),
-                                    AttachmentWidget(),
-                                  ],
+                              ? Container(
+                                  key: const ValueKey(
+                                    'inline-attachment-panel',
+                                  ),
+                                  color: isLightTheme(context)
+                                      ? Colors.white
+                                      : Colors.transparent,
+                                  child: const Column(
+                                    children: [
+                                      CustomSizedBox(height: 12),
+                                      AttachmentWidget(),
+                                    ],
+                                  ),
                                 )
                               : const SizedBox.shrink(),
                         ),

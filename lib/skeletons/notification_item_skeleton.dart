@@ -22,7 +22,7 @@ class NotificationItemSkeleton extends StatelessWidget {
         : const Color(0xFFF0F0F0);
     final shimmerHighlight = isDark
         ? const Color(0xFF333333)
-        : const Color(0xFFE0E0E0);
+        : ColorPalette.lightDivider;
 
     return Shimmer.fromColors(
       baseColor: shimmerBase,

@@ -10,9 +10,15 @@ class GetPockedSkeleton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final backgroundColor = isDark ? ColorPalette.cardBlack : ColorPalette.white;
-    final shimmerBase = isDark ? ColorPalette.cardBlack : const Color(0xFFF0F0F0);
-    final shimmerHighlight = isDark ? const Color(0xFF333333) : const Color(0xFFE0E0E0);
+    final backgroundColor = isDark
+        ? ColorPalette.cardBlack
+        : ColorPalette.white;
+    final shimmerBase = isDark
+        ? ColorPalette.cardBlack
+        : const Color(0xFFF0F0F0);
+    final shimmerHighlight = isDark
+        ? const Color(0xFF333333)
+        : ColorPalette.lightDivider;
 
     return Scaffold(
       backgroundColor: ColorPalette.black,

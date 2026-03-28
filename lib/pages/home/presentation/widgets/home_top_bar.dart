@@ -1,6 +1,9 @@
+import 'package:fennac_app/app/constants/media_query_constants.dart';
+import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class HomeTopBar extends StatelessWidget {
   final VoidCallback? onBackPressed;
@@ -41,7 +44,22 @@ class HomeTopBar extends StatelessWidget {
               ),
             ),
           ),
-          SvgPicture.asset(Assets.icons.fennecLogoText.path, height: 18),
+
+          // SvgPicture.asset(Assets.icons.fennecLogoText.path, height: 18),
+          Text(
+            'Fennec',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.shrikhand(
+              fontSize: 32,
+              fontWeight: FontWeight.w400,
+              fontStyle: FontStyle.italic,
+              height: 1.0,
+              letterSpacing: 0,
+              color: isLightTheme(context)
+                  ? ColorPalette.primary
+                  : Colors.white,
+            ),
+          ),
           GestureDetector(
             behavior: HitTestBehavior.translucent,
             onTap: onSettingsPressed,
