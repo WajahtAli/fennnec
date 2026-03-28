@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:fennac_app/helpers/gradient_toast.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fennac_app/pages/find_group/domain/usecase/find_group_usecase.dart';
@@ -51,7 +52,7 @@ class FindGroupCubit extends Cubit<FindGroupState> {
     try {
       final response = await _findGroupUsecase.joinGroupByQr(qrCode);
       final message = response['message'] ?? 'Successfully joined the group';
-      VxToast.show(message: message);
+      VxToast.show(message: message, icon: Assets.icons.checkGreen.path);
       isJoining = false;
       emit(FindGroupLoaded());
       return true;

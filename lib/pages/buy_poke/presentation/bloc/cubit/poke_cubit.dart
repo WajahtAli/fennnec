@@ -1,4 +1,8 @@
+import 'dart:math';
+
+import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
+import 'package:fennac_app/pages/auth/presentation/bloc/cubit/create_account_cubit.dart';
 import 'package:fennac_app/pages/buy_poke/data/model/poke_model.dart';
 import 'package:fennac_app/pages/buy_poke/domain/usecase/fetch_pokes_usecase.dart';
 import 'package:fennac_app/pages/buy_poke/domain/usecase/purchase_pokes_usecase.dart';
@@ -66,10 +70,11 @@ class PokeCubit extends Cubit<PokeState> {
       final isSuccess = await IAPService.restorePurchases();
       if (isSuccess) {
         // Assume restoring also gives premium monthly for now.
-        await purchaseSubscriptionUseCase?.call(
-          productId: 'monthly',
+        await purchaseSubscriptionUseCase?.call(productId: 'monthly');
+        VxToast.show(
+          message: 'Purchases restored successfully',
+          icon: Assets.icons.checkGreen.path,
         );
-        VxToast.show(message: 'Purchases restored successfully', icon: Assets.icons.checkGreen.path);
         emit(PokeLoaded());
       } else {
         VxToast.show(message: 'No active subscriptions found');
@@ -89,9 +94,10 @@ class PokeCubit extends Cubit<PokeState> {
     try {
       final response = await purchasePokesUseCase(productId: productId);
       final message = response['message'] ?? 'Purchase completed';
-      VxToast.show(message: message);
-      // Optionally refresh pokes after purchase
+      await Di().sl<CreateAccountCubit>().updateProfile();
       await fetchPokes();
+      VxToast.show(message: message, icon: Assets.icons.checkGreen.path);
+      emit(PokeLoaded());
     } catch (e) {
       VxToast.show(message: 'Purchase failed: \${e.toString()}');
       emit(PokeError(e.toString()));

@@ -216,10 +216,9 @@ class _ProfileHeaderState extends State<ProfileHeader> {
                       context,
                     ).copyWith(fontWeight: FontWeight.w500),
                   ),
-                  if (_loginCubit.userData?.user?.accountStatus != null &&
-                      _loginCubit.userData!.user!.accountStatus!
-                              .toLowerCase() ==
-                          'active'.toLowerCase()) ...[
+                  if (_loginCubit.userData?.user?.subscriptionActive != null &&
+                      _loginCubit.userData!.user!.subscriptionActive ==
+                          true) ...[
                     const SizedBox(width: 8),
                     Tooltip(
                       message: 'Premium User',

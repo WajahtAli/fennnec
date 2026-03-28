@@ -3,6 +3,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:fennac_app/app/constants/media_query_constants.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
+import 'package:fennac_app/pages/auth/presentation/bloc/cubit/create_account_cubit.dart';
 import 'package:fennac_app/pages/home/presentation/bloc/cubit/groups_cubit.dart';
 import 'package:fennac_app/pages/liked_groups/presentation/bloc/cubit/liked_groups_cubit.dart';
 import 'package:fennac_app/pages/my_group/presentation/bloc/cubit/my_group_cubit.dart';
@@ -37,7 +38,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _fetchGroup() async {
     await Di().sl<MyGroupCubit>().fetchGroupById('');
-    await Di().sl<LikedGroupsCubit>().fetchPeopleWhoLikedMe();
   }
 
   @override
@@ -98,41 +98,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                           const CustomSizedBox(height: 24),
 
-                          if (Di()
-                                  .sl<LoginCubit>()
-                                  .userData
-                                  ?.user
-                                  ?.accountStatus
-                                  ?.toLowerCase() ==
-                              'active'.toLowerCase()) ...[
-                            Container(
-                              decoration: BoxDecoration(
-                                color: isLightTheme(context)
-                                    ? ColorPalette.textGrey
-                                    : ColorPalette.black.withValues(
-                                        alpha: 0.25,
-                                      ),
-                                border: Border.all(
-                                  color: ColorPalette.grey,
-                                  width: 1,
-                                ),
-                                borderRadius: BorderRadius.circular(16),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: isLightTheme(context)
+                                  ? ColorPalette.textGrey
+                                  : ColorPalette.black.withValues(alpha: 0.25),
+                              border: Border.all(
+                                color: ColorPalette.grey,
+                                width: 1,
                               ),
-                              child: Column(
-                                children: [
-                                  ProfileListTile(
-                                    isPeopleLikedYouTile: true,
-                                    showDivider: false,
-                                    title: 'People Who Liked You',
-                                    onTap: () async {
-                                      await Di()
-                                          .sl<GroupsCubit>()
-                                          .fetchAllGroups(isLikedGroups: true);
-                                      AutoRouter.of(
-                                        context,
-                                      ).push(HomeRoute(isLikedGroups: true));
-                                    },
-                                  ),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Column(
+                              children: [
+                                ProfileListTile(
+                                  isPeopleLikedYouTile: true,
+                                  showDivider: false,
+                                  title: 'People Who Liked You',
+                                  onTap: () async {
+                                    await Di().sl<GroupsCubit>().fetchAllGroups(
+                                      isLikedGroups: true,
+                                    );
+                                    AutoRouter.of(
+                                      context,
+                                    ).push(HomeRoute(isLikedGroups: true));
+                                  },
+                                ),
+
+                                if (Di()
+                                        .sl<LoginCubit>()
+                                        .userData
+                                        ?.user
+                                        ?.subscriptionActive ==
+                                    true) ...[
                                   Divider(
                                     height: 1,
                                     color: isLightTheme(context)
@@ -151,9 +149,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     },
                                   ),
                                 ],
-                              ),
+                              ],
                             ),
-                          ],
+                          ),
+
                           const CustomSizedBox(height: 32),
                           _buildYourProfileSection(context),
                           const CustomSizedBox(height: 32),

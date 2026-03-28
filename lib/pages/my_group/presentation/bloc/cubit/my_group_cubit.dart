@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:fennac_app/helpers/gradient_toast.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -14,7 +15,7 @@ class MyGroupCubit extends Cubit<MyGroupState> {
       final String message = response is Map<String, dynamic>
           ? (response['message']?.toString() ?? 'Group activated successfully')
           : 'Group activated successfully';
-      VxToast.show(message: message);
+      VxToast.show(message: message, icon: Assets.icons.checkGreen.path);
       emit(MyGroupLoaded());
     } catch (e) {
       VxToast.show(message: 'Failed to activate group: \\${e.toString()}');
@@ -108,7 +109,7 @@ class MyGroupCubit extends Cubit<MyGroupState> {
         );
       }
 
-      VxToast.show(message: message);
+      VxToast.show(message: message, icon: Assets.icons.checkGreen.path);
       emit(MyGroupLoaded());
       return true;
     } catch (e) {
@@ -142,7 +143,7 @@ class MyGroupCubit extends Cubit<MyGroupState> {
         );
       }
 
-      VxToast.show(message: message);
+      VxToast.show(message: message, icon: Assets.icons.checkGreen.path);
       emit(MyGroupLoaded());
       return true;
     } catch (e) {
@@ -176,7 +177,7 @@ class MyGroupCubit extends Cubit<MyGroupState> {
         );
       }
 
-      VxToast.show(message: message);
+      VxToast.show(message: message, icon: Assets.icons.checkGreen.path);
       emit(MyGroupLoaded());
       return true;
     } catch (e) {
