@@ -55,7 +55,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
           final showRemoteView = remoteUid != null;
           final showLocalMainView = remoteUid == null && !_callCubit.cameraOff;
 
-          if (state is CallLoading) {
+          if (_callCubit.loading) {
             return SizedBox();
           }
 

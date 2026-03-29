@@ -1,3 +1,5 @@
+import 'package:auto_route/auto_route.dart';
+import 'package:fennac_app/app/app.dart';
 import 'package:fennac_app/app/constants/app_constants.dart';
 import 'package:fennac_app/app/constants/app_enums.dart';
 import 'package:fennac_app/pages/call/domain/usecase/call_usecase.repository.dart';
@@ -22,7 +24,7 @@ class CallCubit extends Cubit<CallState> {
   bool loading = true;
   bool isStartingCall = false;
   CallType callType = CallType.audio;
-  ClientRoleType role = ClientRoleType.clientRoleBroadcaster;
+  ClientRoleType role = ClientRoleType.clientRoleAudience;
   String? _token;
   String? channelName;
   String? callId;
@@ -150,6 +152,7 @@ class CallCubit extends Cubit<CallState> {
   }
 
   Future<void> toggleMute() async {
+    emit(CallLoading());
     muted = !muted;
     if (_isEngineReady) {
       await engine.muteLocalAudioStream(muted);
@@ -158,6 +161,7 @@ class CallCubit extends Cubit<CallState> {
   }
 
   Future<void> toggleSpeaker() async {
+    emit(CallLoading());
     speaker = !speaker;
     if (_isEngineReady) {
       await engine.setEnableSpeakerphone(speaker);
@@ -166,6 +170,7 @@ class CallCubit extends Cubit<CallState> {
   }
 
   Future<void> toggleCamera() async {
+    emit(CallLoading());
     cameraOff = !cameraOff;
     if (_isEngineReady) {
       await engine.muteLocalVideoStream(cameraOff);
@@ -182,6 +187,7 @@ class CallCubit extends Cubit<CallState> {
   }
 
   Future<void> endCall() async {
+    emit(CallLoading());
     if (_isEngineReady) {
       await engine.leaveChannel();
       await engine.release();
@@ -199,25 +205,33 @@ class CallCubit extends Cubit<CallState> {
     engine.registerEventHandler(
       RtcEngineEventHandler(
         onJoinChannelSuccess: (RtcConnection conn, int elapsed) {
+          emit(CallLoading());
           debugPrint("joined ${conn.channelId}.");
           joined = true;
           loading = false;
           emit(CallLoaded());
         },
         onUserJoined: (RtcConnection conn, int remoteUid, int elapsed) {
+          emit(CallLoading());
           debugPrint("joined $remoteUid");
           users.add(remoteUid);
           emit(CallLoaded());
         },
         onUserOffline:
             (RtcConnection conn, int remoteUid, UserOfflineReasonType reason) {
+              emit(CallLoading());
               users.remove(remoteUid);
-              if (users.isEmpty) Navigator.pop(context);
+              emit(CallLoaded());
+
+              if (users.isEmpty) navigatorKey.currentContext!.router.pop();
             },
         onLeaveChannel: (RtcConnection conn, RtcStats stats) {
+          emit(CallLoading());
+
           joined = false;
           users.clear();
-          Navigator.pop(context);
+          emit(CallLoaded());
+          navigatorKey.currentContext!.router.pop();
           // Navigator.of(context).pushReplacement(
           //   MaterialPageRoute(
           //     builder: (context) => const HomeMain(null, false),
