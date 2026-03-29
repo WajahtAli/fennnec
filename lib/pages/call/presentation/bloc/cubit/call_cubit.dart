@@ -220,14 +220,12 @@ class CallCubit extends Cubit<CallState> {
               debugPrint("👤 Remote user offline: $remoteUid");
               users.remove(remoteUid);
               emit(CallLoaded());
-
-              if (users.isEmpty) {
-                navigatorKey.currentContext!.router.pop();
-              }
+              // if (users.isEmpty) {
+              //   navigatorKey.currentContext!.router.pop();
+              // }
             },
         onLeaveChannel: (RtcConnection conn, RtcStats stats) {
           emit(CallLoading());
-
           debugPrint("🚪 Left channel: ${conn.channelId}");
           joined = false;
           users.clear();
