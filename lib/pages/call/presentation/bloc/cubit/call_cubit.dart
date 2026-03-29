@@ -79,12 +79,10 @@ class CallCubit extends Cubit<CallState> {
     this.channelName = channelName;
     this.callId = callId;
     callType = mediaType == 'video' ? CallType.video : CallType.audio;
-    // Both participants must be broadcasters for 1-to-1 video/audio
     role = ClientRoleType.clientRoleBroadcaster;
     emit(CallLoaded());
   }
 
-  // 🔹 Step 1: Initialize Agora engine
   Future<void> initAgora(BuildContext context) async {
     emit(CallLoading());
     users.clear();
@@ -97,10 +95,8 @@ class CallCubit extends Cubit<CallState> {
     await engine.initialize(RtcEngineContext(appId: AppConstants.agoraAppId));
     _isEngineReady = true;
 
-    // Attach event handlers
     _addEventHandlers(context);
 
-    // Enable the proper media mode
     if (callType == CallType.video) {
       await engine.enableVideo();
       await engine.startPreview();
@@ -112,14 +108,11 @@ class CallCubit extends Cubit<CallState> {
 
     await engine.setClientRole(role: role);
 
-    // Use API token only if it is an Agora RTC token. Backend currently returns
-    // LiveKit JWT for this endpoint, which Agora rejects as invalid token.
     final tokenToUse = _resolveAgoraToken();
     final channelToUse = channelName ?? 'test';
 
     debugPrint("🎯 Joining channel: $channelToUse as $role");
 
-    // Finally join
     await engine.joinChannel(
       token: tokenToUse,
       channelId: channelToUse,
@@ -129,7 +122,6 @@ class CallCubit extends Cubit<CallState> {
     emit(CallLoaded());
   }
 
-  // 🔹 Step 2: Generate token (for demo)
   String _generateToken() {
     final activeChannelName = channelName ?? 'test';
     final token = RtcTokenBuilder.build(
@@ -146,8 +138,6 @@ class CallCubit extends Cubit<CallState> {
   }
 
   String _resolveAgoraToken() {
-    // Agora RTC tokens typically start with "007".
-    // The backend response currently returns a JWT (LiveKit), so fallback.
     if (_token != null && _token!.startsWith('007')) {
       return _token!;
     }
@@ -155,6 +145,8 @@ class CallCubit extends Cubit<CallState> {
   }
 
   Future<void> toggleMute() async {
+    emit(CallLoading());
+
     muted = !muted;
     if (_isEngineReady) {
       await engine.muteLocalAudioStream(muted);
@@ -163,6 +155,8 @@ class CallCubit extends Cubit<CallState> {
   }
 
   Future<void> toggleSpeaker() async {
+    emit(CallLoading());
+
     speaker = !speaker;
     if (_isEngineReady) {
       await engine.setEnableSpeakerphone(speaker);
@@ -171,6 +165,8 @@ class CallCubit extends Cubit<CallState> {
   }
 
   Future<void> toggleCamera() async {
+    emit(CallLoading());
+
     cameraOff = !cameraOff;
     if (_isEngineReady) {
       await engine.muteLocalVideoStream(cameraOff);
@@ -187,6 +183,8 @@ class CallCubit extends Cubit<CallState> {
   }
 
   Future<void> endCall() async {
+    emit(CallLoading());
+
     if (_isEngineReady) {
       await engine.leaveChannel();
       await engine.release();
@@ -197,32 +195,39 @@ class CallCubit extends Cubit<CallState> {
     emit(CallLoaded());
   }
 
-  // 🔹 Step 3: Agora event handlers
   void _addEventHandlers(BuildContext context) {
     engine.registerEventHandler(
       RtcEngineEventHandler(
         onJoinChannelSuccess: (RtcConnection conn, int elapsed) {
+          emit(CallLoading());
+
           debugPrint("✅ Local user joined channel: ${conn.channelId}");
           joined = true;
           loading = false;
-          emit(CallLoaded()); // Only emit when actually ready
+          emit(CallLoaded());
         },
         onUserJoined: (RtcConnection conn, int remoteUid, int elapsed) {
+          emit(CallLoading());
+
           debugPrint("👤 Remote user joined: $remoteUid");
           users.add(remoteUid);
-          emit(CallLoaded()); // UI will now show remote video view
+          emit(CallLoaded());
         },
         onUserOffline:
             (RtcConnection conn, int remoteUid, UserOfflineReasonType reason) {
-          debugPrint("👤 Remote user offline: $remoteUid");
-          users.remove(remoteUid);
-          emit(CallLoaded());
+              emit(CallLoading());
 
-          if (users.isEmpty) {
-            navigatorKey.currentContext!.router.pop();
-          }
-        },
+              debugPrint("👤 Remote user offline: $remoteUid");
+              users.remove(remoteUid);
+              emit(CallLoaded());
+
+              if (users.isEmpty) {
+                navigatorKey.currentContext!.router.pop();
+              }
+            },
         onLeaveChannel: (RtcConnection conn, RtcStats stats) {
+          emit(CallLoading());
+
           debugPrint("🚪 Left channel: ${conn.channelId}");
           joined = false;
           users.clear();
