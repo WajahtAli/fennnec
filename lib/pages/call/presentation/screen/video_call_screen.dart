@@ -150,7 +150,6 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                           GestureDetector(
                             onTap: () {
                               _callCubit.endCall();
-                              context.router.pop();
                             },
                             child: Container(
                               width: 40.w,
@@ -217,7 +216,6 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                           GestureDetector(
                             onTap: () {
                               _callCubit.endCall();
-                              context.router.pop();
                             },
                             child: Container(
                               width: 114.w,
