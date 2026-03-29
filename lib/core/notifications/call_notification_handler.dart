@@ -19,8 +19,11 @@ class CallNotificationHandler {
   factory CallNotificationHandler() => _instance;
   CallNotificationHandler._internal();
 
+  bool _isNavigating = false;
+
   void init() {
     FlutterCallkitIncoming.onEvent.listen(_onCallEvent);
+    _checkInitialCallAccept();
   }
 
   static Future<void> handleCallNotification(RemoteMessage message) async {
@@ -87,46 +90,84 @@ class CallNotificationHandler {
 
     switch (event.event) {
       case Event.actionCallAccept:
-        log('Call Accepted: ${event.body}');
+        log('Call Accepted Event: ${event.body}');
         _handleCallAccept(event.body);
         break;
       case Event.actionCallDecline:
         log('Call Declined: ${event.body}');
+        _isNavigating = false;
+        FlutterCallkitIncoming.endAllCalls();
         break;
       case Event.actionCallEnded:
         log('Call Ended: ${event.body}');
+        _isNavigating = false;
+        FlutterCallkitIncoming.endAllCalls();
         break;
       case Event.actionCallTimeout:
         log('Call Timeout: ${event.body}');
+        _isNavigating = false;
+        FlutterCallkitIncoming.endAllCalls();
         break;
       default:
         break;
     }
   }
 
-  void _handleCallAccept(dynamic body) {
+  Future<void> _checkInitialCallAccept() async {
+    final calls = await FlutterCallkitIncoming.activeCalls();
+    if (calls is List && calls.isNotEmpty) {
+      log('Initial active calls found: $calls');
+      for (var call in calls) {
+        if (call['accepted'] == true) {
+          log('Handling initial accepted call: $call');
+          _handleCallAccept(call);
+          break;
+        }
+      }
+    }
+  }
+
+  Future<void> _handleCallAccept(dynamic body) async {
+    if (_isNavigating) return;
+    _isNavigating = true;
+
     final extra = body['extra'];
-    if (extra == null) return;
+    if (extra == null) {
+      _isNavigating = false;
+      return;
+    }
 
     final channelName = extra['channelName'] as String?;
     final callId = extra['callRecordId'] as String?;
     final mediaType = extra['mediaType'] as String?;
 
     if (channelName != null && callId != null && mediaType != null) {
-      final callCubit = Di().sl<CallCubit>();
-      callCubit.setIncomingCallData(
-        channelName: channelName,
-        callId: callId,
-        mediaType: mediaType,
-      );
+      int retryCount = 0;
+      while (navigatorKey.currentContext == null && retryCount < 50) {
+        log('Waiting for navigatorKey.currentContext... retry $retryCount');
+        await Future.delayed(const Duration(milliseconds: 200));
+        retryCount++;
+      }
 
-      if (navigatorKey.currentState != null) {
+      if (navigatorKey.currentContext != null) {
+        final callCubit = Di().sl<CallCubit>();
+        callCubit.setIncomingCallData(
+          channelName: channelName,
+          callId: callId,
+          mediaType: mediaType,
+        );
+
         if (mediaType == 'video') {
           navigatorKey.currentContext!.pushRoute(VideoCallRoute());
         } else {
           navigatorKey.currentContext!.pushRoute(AudioCallRoute());
         }
+      } else {
+        log('Navigator context never became ready.');
       }
     }
+
+    await Future.delayed(const Duration(seconds: 2));
+    _isNavigating = false;
   }
 }
