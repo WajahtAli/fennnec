@@ -81,6 +81,7 @@ class CallCubit extends Cubit<CallState> {
 
   // 🔹 Step 1: Initialize Agora engine
   Future<void> initAgora(BuildContext context) async {
+    emit(CallLoading());
     users.clear();
     joined = false;
     loading = true;
@@ -120,6 +121,7 @@ class CallCubit extends Cubit<CallState> {
       uid: _localUid,
       options: ChannelMediaOptions(clientRoleType: role),
     );
+    emit(CallLoaded());
   }
 
   // 🔹 Step 2: Generate token (for demo)

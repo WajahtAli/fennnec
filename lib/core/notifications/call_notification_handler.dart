@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:auto_route/auto_route.dart';
 import 'package:fennac_app/app/app.dart';
 import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/pages/call/presentation/bloc/cubit/call_cubit.dart';
@@ -104,7 +105,7 @@ class CallNotificationHandler {
   }
 
   void _handleCallAccept(dynamic body) {
-    final extra = body['extra'] as Map<String, dynamic>?;
+    final extra = body['extra'];
     if (extra == null) return;
 
     final channelName = extra['channelName'] as String?;
@@ -121,9 +122,9 @@ class CallNotificationHandler {
 
       if (navigatorKey.currentState != null) {
         if (mediaType == 'video') {
-          navigatorKey.currentState!.pushNamed(VideoCallRoute.name);
+          navigatorKey.currentContext!.pushRoute(VideoCallRoute());
         } else {
-          navigatorKey.currentState!.pushNamed(AudioCallRoute.name);
+          navigatorKey.currentContext!.pushRoute(AudioCallRoute());
         }
       }
     }
