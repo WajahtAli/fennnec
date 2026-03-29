@@ -24,7 +24,7 @@ class CallCubit extends Cubit<CallState> {
   bool loading = true;
   bool isStartingCall = false;
   CallType callType = CallType.audio;
-  ClientRoleType role = ClientRoleType.clientRoleAudience;
+  ClientRoleType role = ClientRoleType.clientRoleBroadcaster;
   String? _token;
   String? channelName;
   String? callId;
@@ -75,9 +75,11 @@ class CallCubit extends Cubit<CallState> {
     required String callId,
     required String mediaType,
   }) {
+    emit(CallLoading());
     this.channelName = channelName;
     this.callId = callId;
     callType = mediaType == 'video' ? CallType.video : CallType.audio;
+    role = ClientRoleType.clientRoleAudience;
     emit(CallLoaded());
   }
 
