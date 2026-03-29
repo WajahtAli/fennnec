@@ -1,16 +1,23 @@
+import 'dart:developer';
+
 import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/pages/auth/presentation/bloc/cubit/create_account_cubit.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'local_notification_service.dart';
+import 'call_notification_handler.dart';
 import '../../app/constants/app_constants.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  debugPrint(
-    'Background message received: \${message.notification?.title}, \${message.notification?.body}',
+  log(
+    'Background message received: ${message.notification?.title}, ${message.notification?.body}',
   );
-  await LocalNotificationService.init();
+  if (message.data['type'] == 'call_incoming') {
+    await CallNotificationHandler.handleCallNotification(message);
+  } else {
+    await LocalNotificationService.init();
+  }
 }
 
 class PushNotificationService {
@@ -18,6 +25,8 @@ class PushNotificationService {
       FirebaseMessaging.instance;
 
   static Future<void> init() async {
+    CallNotificationHandler().init();
+
     await _firebaseMessaging.requestPermission(
       alert: true,
       badge: true,
@@ -56,11 +65,13 @@ class PushNotificationService {
   }
 
   static void _onForegroundMessage(RemoteMessage message) {
-    debugPrint(
-      'Foreground message received: \${message.notification?.title}, \${message.notification?.body}',
+    log(
+      'Foreground message received: ${message.toMap()}, ${message.notification?.body}',
     );
 
-    if (message.notification != null) {
+    if (message.data['type'] == 'call_incoming') {
+      CallNotificationHandler.handleCallNotification(message);
+    } else if (message.notification != null) {
       LocalNotificationService.showNotification(
         title: message.notification!.title ?? '',
         body: message.notification!.body ?? '',
@@ -72,14 +83,14 @@ class PushNotificationService {
   }
 
   static void _onMessageOpenedApp(RemoteMessage message) {
-    debugPrint('Opened app from background message: \${message.data}');
+    log('Opened app from background message: ${message.data}');
   }
 
   static Future<void> _checkInitialMessage() async {
     final RemoteMessage? initialMessage = await _firebaseMessaging
         .getInitialMessage();
     if (initialMessage != null) {
-      debugPrint('Opened app from terminated state: \${initialMessage.data}');
+      log('Opened app from terminated state: ${initialMessage.data}');
     }
   }
 }

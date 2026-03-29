@@ -68,6 +68,17 @@ class CallCubit extends Cubit<CallState> {
     }
   }
 
+  void setIncomingCallData({
+    required String channelName,
+    required String callId,
+    required String mediaType,
+  }) {
+    this.channelName = channelName;
+    this.callId = callId;
+    callType = mediaType == 'video' ? CallType.video : CallType.audio;
+    emit(CallLoaded());
+  }
+
   // 🔹 Step 1: Initialize Agora engine
   Future<void> initAgora(BuildContext context) async {
     users.clear();
