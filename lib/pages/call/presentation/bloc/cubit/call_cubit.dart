@@ -79,7 +79,8 @@ class CallCubit extends Cubit<CallState> {
     this.channelName = channelName;
     this.callId = callId;
     callType = mediaType == 'video' ? CallType.video : CallType.audio;
-    role = ClientRoleType.clientRoleAudience;
+    // Both participants must be broadcasters for 1-to-1 video/audio
+    role = ClientRoleType.clientRoleBroadcaster;
     emit(CallLoaded());
   }
 
@@ -107,7 +108,7 @@ class CallCubit extends Cubit<CallState> {
       await engine.enableAudio();
     }
 
-    debugPrint("user role is ${role.name}");
+    debugPrint("🎯 User role set to: ${role.name}");
 
     await engine.setClientRole(role: role);
 
@@ -116,7 +117,7 @@ class CallCubit extends Cubit<CallState> {
     final tokenToUse = _resolveAgoraToken();
     final channelToUse = channelName ?? 'test';
 
-    debugPrint("🎯 Joining channel: $channelToUse");
+    debugPrint("🎯 Joining channel: $channelToUse as $role");
 
     // Finally join
     await engine.joinChannel(
@@ -154,7 +155,6 @@ class CallCubit extends Cubit<CallState> {
   }
 
   Future<void> toggleMute() async {
-    emit(CallLoading());
     muted = !muted;
     if (_isEngineReady) {
       await engine.muteLocalAudioStream(muted);
@@ -163,7 +163,6 @@ class CallCubit extends Cubit<CallState> {
   }
 
   Future<void> toggleSpeaker() async {
-    emit(CallLoading());
     speaker = !speaker;
     if (_isEngineReady) {
       await engine.setEnableSpeakerphone(speaker);
@@ -172,7 +171,6 @@ class CallCubit extends Cubit<CallState> {
   }
 
   Future<void> toggleCamera() async {
-    emit(CallLoading());
     cameraOff = !cameraOff;
     if (_isEngineReady) {
       await engine.muteLocalVideoStream(cameraOff);
@@ -189,7 +187,6 @@ class CallCubit extends Cubit<CallState> {
   }
 
   Future<void> endCall() async {
-    emit(CallLoading());
     if (_isEngineReady) {
       await engine.leaveChannel();
       await engine.release();
@@ -202,46 +199,39 @@ class CallCubit extends Cubit<CallState> {
 
   // 🔹 Step 3: Agora event handlers
   void _addEventHandlers(BuildContext context) {
-    emit(CallLoading());
-
     engine.registerEventHandler(
       RtcEngineEventHandler(
         onJoinChannelSuccess: (RtcConnection conn, int elapsed) {
-          emit(CallLoading());
-          debugPrint("joined ${conn.channelId}.");
+          debugPrint("✅ Local user joined channel: ${conn.channelId}");
           joined = true;
           loading = false;
-          emit(CallLoaded());
+          emit(CallLoaded()); // Only emit when actually ready
         },
         onUserJoined: (RtcConnection conn, int remoteUid, int elapsed) {
-          emit(CallLoading());
-          debugPrint("joined $remoteUid");
+          debugPrint("👤 Remote user joined: $remoteUid");
           users.add(remoteUid);
-          emit(CallLoaded());
+          emit(CallLoaded()); // UI will now show remote video view
         },
         onUserOffline:
             (RtcConnection conn, int remoteUid, UserOfflineReasonType reason) {
-              emit(CallLoading());
-              users.remove(remoteUid);
-              emit(CallLoaded());
+          debugPrint("👤 Remote user offline: $remoteUid");
+          users.remove(remoteUid);
+          emit(CallLoaded());
 
-              if (users.isEmpty) navigatorKey.currentContext!.router.pop();
-            },
+          if (users.isEmpty) {
+            navigatorKey.currentContext!.router.pop();
+          }
+        },
         onLeaveChannel: (RtcConnection conn, RtcStats stats) {
-          emit(CallLoading());
-
+          debugPrint("🚪 Left channel: ${conn.channelId}");
           joined = false;
           users.clear();
           emit(CallLoaded());
           navigatorKey.currentContext!.router.pop();
-          // Navigator.of(context).pushReplacement(
-          //   MaterialPageRoute(
-          //     builder: (context) => const HomeMain(null, false),
-          //   ),
-          // );
         },
         onError: (ErrorCodeType code, String msg) {
           debugPrint('⚠️ Agora Error: $code | $msg');
+          emit(CallError('Agora Error ($code): $msg'));
         },
       ),
     );
