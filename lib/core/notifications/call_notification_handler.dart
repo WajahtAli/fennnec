@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'package:auto_route/auto_route.dart';
 import 'package:fennac_app/app/app.dart';
+import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/pages/call/presentation/bloc/cubit/call_cubit.dart';
 import 'package:fennac_app/routes/routes_imports.gr.dart';
@@ -11,6 +12,7 @@ import 'package:flutter_callkit_incoming/entities/call_kit_params.dart';
 import 'package:flutter_callkit_incoming/entities/ios_params.dart';
 import 'package:flutter_callkit_incoming/entities/notification_params.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
+import 'package:hexcolor/hexcolor.dart';
 import 'package:uuid/uuid.dart';
 
 class CallNotificationHandler {
@@ -32,12 +34,13 @@ class CallNotificationHandler {
     final callerName = message.notification?.title ?? "Incoming Call";
     final callerNumber = data['callerId'] ?? "";
     final mediaType = data['mediaType'] ?? "audio";
+    final imageUrl = data['imageUrl'] ?? "";
 
     final params = CallKitParams(
       id: callId,
       nameCaller: callerName,
       appName: 'Fennac',
-      avatar: 'https://i.pravatar.cc/100',
+      avatar: imageUrl,
       handle: callerNumber,
       type: mediaType == 'video' ? 1 : 0,
       duration: 30000,
@@ -53,18 +56,20 @@ class CallNotificationHandler {
         'channelName': data['channelName'],
         'callRecordId': data['callRecordId'],
         'mediaType': mediaType,
+        'imageUrl': imageUrl,
       },
       headers: <String, dynamic>{'Content-Type': 'application/json'},
-      android: const AndroidParams(
+      android: AndroidParams(
         isCustomNotification: true,
         isShowLogo: false,
         ringtonePath: 'system_ringtone_default',
-        backgroundColor: '#0955fa',
-        backgroundUrl: 'https://i.pravatar.cc/500',
+        backgroundColor: ColorPalette.primary.toHex(),
+        backgroundUrl: imageUrl,
+        logoUrl: imageUrl,
         actionColor: '#4CAF50',
         textColor: '#ffffff',
       ),
-      ios: const IOSParams(
+      ios: IOSParams(
         iconName: 'AppIcon',
         handleType: 'generic',
         supportsVideo: true,
@@ -140,6 +145,7 @@ class CallNotificationHandler {
     final channelName = extra['channelName'] as String?;
     final callId = extra['callRecordId'] as String?;
     final mediaType = extra['mediaType'] as String?;
+    final imageUrl = extra['imageUrl'] as String?;
 
     if (channelName != null && callId != null && mediaType != null) {
       int retryCount = 0;
@@ -155,6 +161,7 @@ class CallNotificationHandler {
           channelName: channelName,
           callId: callId,
           mediaType: mediaType,
+          imageUrl: imageUrl ?? "",
         );
 
         if (mediaType == 'video') {

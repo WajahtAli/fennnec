@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:fennac_app/app/constants/dummy_constants.dart';
+import 'package:fennac_app/app/theme/app_assets.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/core/di_container.dart';
@@ -16,6 +17,7 @@ import 'package:fennac_app/widgets/custom_bottom_sheet.dart';
 import 'package:fennac_app/widgets/custom_sized_box.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 
 class MessageList extends StatefulWidget {
   final bool isGroup;
@@ -56,6 +58,7 @@ class _MessageListState extends State<MessageList> {
 
   @override
   void dispose() {
+    messageCubit.stopPolling();
     _scrollController.dispose();
     _removeReactionOverlay('', '');
     super.dispose();
@@ -199,6 +202,7 @@ class _MessageListState extends State<MessageList> {
             InkWell(
               borderRadius: BorderRadius.circular(24),
               onTap: () async {
+                _removeReactionOverlay(message.id, '');
                 await _deleteMessageFromOverlay(message);
               },
               child: Container(
@@ -210,10 +214,10 @@ class _MessageListState extends State<MessageList> {
                   color: Colors.black.withOpacity(0.95),
                   borderRadius: BorderRadius.circular(24),
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.delete_outline, color: Colors.white, size: 18),
+                    SvgPicture.asset(Assets.icons.trash.path),
                     SizedBox(width: 8),
                     Text(
                       'Delete',

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 import 'package:equatable/equatable.dart';
 
@@ -23,6 +24,7 @@ class MessageCubit extends Cubit<MessageState> {
   bool showAttachmentPanel = false;
   bool fieldHaveText = false;
   bool isRecordingAudio = false;
+  Timer? _pollingTimer;
 
   void toggleAttachmentPanel({bool? close}) {
     emit(MessageLoading());
@@ -97,6 +99,9 @@ class MessageCubit extends Cubit<MessageState> {
 
   /// Initialize messages (can load from local storage or backend)
   Future<void> initializeMessages(String id, {bool isGroup = true}) async {
+    // Ensure existing polling is stopped before switching chats
+    stopPolling();
+
     _groupId = id;
     _isGroup = isGroup;
     _page = 1;
@@ -112,6 +117,9 @@ class MessageCubit extends Cubit<MessageState> {
       isLoading = false;
       hasError = false;
       emit(MessageSuccess());
+
+      // Start real-time polling every 2 seconds
+      startPolling();
     } catch (e) {
       isLoading = false;
       hasError = true;
@@ -121,22 +129,87 @@ class MessageCubit extends Cubit<MessageState> {
     }
   }
 
+  void startPolling() {
+    _pollingTimer?.cancel();
+    _pollingTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
+      _pollMessages();
+    });
+  }
+
+  void stopPolling() {
+    _pollingTimer?.cancel();
+    _pollingTimer = null;
+  }
+
+  Future<void> _pollMessages() async {
+    if (_groupId == null || isLoading || isFetchingMore || isSendingMessage) {
+      return;
+    }
+
+    final pollingGroupId = _groupId;
+    try {
+      final freshMessages = _isGroup
+          ? await _myGroupRepository.fetchGroupMessages(
+              pollingGroupId!,
+              page: 1,
+              limit: _limit,
+            )
+          : await _myGroupRepository.fetchDirectMessages(
+              pollingGroupId!,
+              page: 1,
+              limit: _limit,
+            );
+
+      if (_groupId != pollingGroupId) {
+        log(
+          "Polling discarded: User switched chat ($pollingGroupId -> $_groupId)",
+        );
+        return;
+      }
+
+      final normalizedMessages = freshMessages
+          .map(_normalizeFetchedMessage)
+          .toList();
+
+      final previousCount = messages.length;
+      emit(MessageLoading());
+
+      messages = _mergeAndSortMessages(messages, normalizedMessages);
+
+      if (messages.length != previousCount) {
+        emit(MessageSuccess());
+      }
+    } catch (e) {
+      log("Polling error: $e");
+    }
+  }
+
   Future<void> loadMoreMessages() async {
     if (!_hasMore || _groupId == null || isFetchingMore) return;
 
+    final loadingGroupId = _groupId;
     isFetchingMore = true;
     try {
       final newMessages = _isGroup
           ? await _myGroupRepository.fetchGroupMessages(
-              _groupId!,
+              loadingGroupId!,
               page: _page,
               limit: _limit,
             )
           : await _myGroupRepository.fetchDirectMessages(
-              _groupId!,
+              loadingGroupId!,
               page: _page,
               limit: _limit,
             );
+
+      // Verify that the user still has the same chat open
+      if (_groupId != loadingGroupId) {
+        log(
+          "Load more discarded: User switched chat ($loadingGroupId -> $_groupId)",
+        );
+        isFetchingMore = false;
+        return;
+      }
 
       if (newMessages.length < _limit) {
         _hasMore = false;
@@ -154,6 +227,12 @@ class MessageCubit extends Cubit<MessageState> {
       isFetchingMore = false;
       rethrow;
     }
+  }
+
+  @override
+  Future<void> close() {
+    stopPolling();
+    return super.close();
   }
 
   Future<void> _hydrateCurrentUser() async {
@@ -509,6 +588,7 @@ class MessageCubit extends Cubit<MessageState> {
 
   /// Delete a message
   Future<bool> deleteMessage(String messageId) async {
+    emit(MessageLoading());
     final messageIndex = messages.indexWhere((m) => m.id == messageId);
     if (messageIndex == -1) return false;
     if (_groupId == null || _groupId!.isEmpty) return false;

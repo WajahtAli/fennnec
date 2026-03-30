@@ -81,12 +81,12 @@ class LocalNotificationService {
         title: title,
         body: body,
         payload: payload?.map((key, value) => MapEntry(key, value?.toString())),
-        notificationLayout: payload?.containsKey('image_url') == true
+        notificationLayout: payload?.containsKey('imageUrl') == true
             ? NotificationLayout.BigPicture
             : NotificationLayout.Default,
         backgroundColor: Colors.amber,
-        bigPicture: payload?.containsKey('image_url') == true
-            ? payload!['image_url']
+        bigPicture: payload?.containsKey('imageUrl') == true
+            ? payload!['imageUrl']
             : null,
       ),
     );

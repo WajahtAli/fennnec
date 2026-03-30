@@ -22,7 +22,6 @@ class AudioCallScreen extends StatefulWidget {
 }
 
 class _AudioCallScreenState extends State<AudioCallScreen> {
-  Duration callDuration = const Duration(minutes: 17, seconds: 42);
   final CallCubit _callCubit = Di().sl<CallCubit>();
 
   @override
@@ -68,7 +67,6 @@ class _AudioCallScreenState extends State<AudioCallScreen> {
                             GestureDetector(
                               onTap: () {
                                 _callCubit.endCall();
-                                context.router.pop();
                               },
                               child: Container(
                                 width: 32.w,
@@ -85,10 +83,10 @@ class _AudioCallScreenState extends State<AudioCallScreen> {
                               ),
                             ),
                             AppText(
-                              text: _formatDuration(callDuration),
+                              text: _formatDuration(_callCubit.callDuration),
                               style: AppTextStyles.body(
                                 context,
-                              ).copyWith(color: Colors.white, fontSize: 16.sp),
+                              ).copyWith(color: Colors.black, fontSize: 16.sp),
                             ),
                             CustomSizedBox(width: 30),
                           ],
@@ -115,8 +113,8 @@ class _AudioCallScreenState extends State<AudioCallScreen> {
                             ],
                           ),
                           child: ClipOval(
-                            child: Image.asset(
-                              Assets.images.girlsGroup.path,
+                            child: Image.network(
+                              _callCubit.imageUrl ?? "",
                               fit: BoxFit.cover,
                             ),
                           ),
@@ -176,7 +174,6 @@ class _AudioCallScreenState extends State<AudioCallScreen> {
                         GestureDetector(
                           onTap: () {
                             _callCubit.endCall();
-                            context.router.pop();
                           },
                           child: Container(
                             width: 114.w,

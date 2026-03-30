@@ -20,7 +20,6 @@ class VideoCallScreen extends StatefulWidget {
 }
 
 class _VideoCallScreenState extends State<VideoCallScreen> {
-  Duration callDuration = const Duration(minutes: 17, seconds: 42);
   final CallCubit _callCubit = Di().sl<CallCubit>();
 
   @override
@@ -167,7 +166,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                           ),
                           // Time display
                           Text(
-                            _formatDuration(callDuration),
+                            _formatDuration(_callCubit.callDuration),
                             style: AppTextStyles.h4(context).copyWith(
                               color: Colors.white,
                               fontWeight: FontWeight.w600,

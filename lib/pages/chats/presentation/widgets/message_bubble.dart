@@ -139,14 +139,21 @@ class ChatImage extends StatelessWidget {
         imageUrl: path,
         fit: BoxFit.cover,
         height: height,
+        radius: 16,
       );
     }
 
     if (isFile) {
-      return Image.file(File(path), fit: BoxFit.cover, height: height);
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Image.file(File(path), fit: BoxFit.cover, height: height),
+      );
     }
 
-    return Image.asset(path, fit: BoxFit.cover, height: height);
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: Image.asset(path, fit: BoxFit.cover, height: height),
+    );
   }
 }
 

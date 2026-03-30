@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:auto_route/auto_route.dart';
 import 'package:fennac_app/app/app.dart';
 import 'package:fennac_app/app/constants/app_constants.dart';
@@ -7,6 +8,7 @@ import 'package:fennac_app/pages/call/presentation/bloc/state/call_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
+import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:agora_token_service/agora_token_service.dart';
 
@@ -30,6 +32,9 @@ class CallCubit extends Cubit<CallState> {
   String? _token;
   String? channelName;
   String? callId;
+  String? imageUrl;
+  Duration callDuration = Duration.zero;
+  Timer? _durationTimer;
   bool _isEngineReady = false;
   final int _localUid = DateTime.now().millisecondsSinceEpoch.remainder(
     1000000,
@@ -76,10 +81,12 @@ class CallCubit extends Cubit<CallState> {
     required String channelName,
     required String callId,
     required String mediaType,
+    required String imageUrl,
   }) {
     emit(CallLoading());
     this.channelName = channelName;
     this.callId = callId;
+    this.imageUrl = imageUrl;
     callType = mediaType == 'video' ? CallType.video : CallType.audio;
     role = ClientRoleType.clientRoleBroadcaster;
     emit(CallLoaded());
@@ -148,8 +155,9 @@ class CallCubit extends Cubit<CallState> {
 
   Future<void> toggleMute() async {
     emit(CallLoading());
-
     muted = !muted;
+    await FlutterCallkitIncoming.muteCall(callId ?? "", isMuted: muted);
+
     if (_isEngineReady) {
       await engine.muteLocalAudioStream(muted);
     }
@@ -187,7 +195,10 @@ class CallCubit extends Cubit<CallState> {
   Future<void> endCall() async {
     emit(CallLoading());
 
+    _stopTimer();
+
     if (_isEngineReady) {
+      FlutterCallkitIncoming.endAllCalls();
       await engine.leaveChannel();
       await engine.release();
       _isEngineReady = false;
@@ -206,11 +217,12 @@ class CallCubit extends Cubit<CallState> {
           debugPrint("✅ Local user joined channel: ${conn.channelId}");
           joined = true;
           loading = false;
+          _startTimer();
           emit(CallLoaded());
         },
-        onUserJoined: (RtcConnection conn, int remoteUid, int elapsed) {
+        onUserJoined: (RtcConnection conn, int remoteUid, int elapsed) async {
           emit(CallLoading());
-
+          await FlutterCallkitIncoming.setCallConnected(callId ?? "");
           debugPrint("👤 Remote user joined: $remoteUid");
           users.add(remoteUid);
           emit(CallLoaded());
@@ -222,17 +234,20 @@ class CallCubit extends Cubit<CallState> {
               debugPrint("👤 Remote user offline: $remoteUid");
               users.remove(remoteUid);
               emit(CallLoaded());
-              // if (users.isEmpty) {
-              //   navigatorKey.currentContext!.router.pop();
-              // }
+              if (users.isEmpty) {
+                navigatorKey.currentContext!.router.pop();
+              }
             },
         onLeaveChannel: (RtcConnection conn, RtcStats stats) {
           emit(CallLoading());
           debugPrint("🚪 Left channel: ${conn.channelId}");
           joined = false;
           users.clear();
+          _stopTimer();
           emit(CallLoaded());
-          navigatorKey.currentContext!.router.pop();
+          if (navigatorKey.currentContext!.mounted) {
+            navigatorKey.currentContext!.router.pop();
+          }
         },
         onError: (ErrorCodeType code, String msg) {
           debugPrint('⚠️ Agora Error: $code | $msg');
@@ -240,5 +255,26 @@ class CallCubit extends Cubit<CallState> {
         },
       ),
     );
+  }
+
+  void _startTimer() {
+    emit(CallLoading());
+    _durationTimer?.cancel();
+    callDuration = Duration.zero;
+    _durationTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      emit(CallLoading());
+
+      callDuration = Duration(seconds: timer.tick);
+      emit(CallLoaded());
+    });
+  }
+
+  void _stopTimer() {
+    emit(CallLoading());
+
+    _durationTimer?.cancel();
+    _durationTimer = null;
+    callDuration = Duration.zero;
+    emit(CallLoaded());
   }
 }
