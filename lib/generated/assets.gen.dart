@@ -570,6 +570,9 @@ class $AssetsIconsGen {
   SvgGenImage get navigation =>
       const SvgGenImage('assets/icons/navigation.svg');
 
+  /// File path: assets/icons/pause.svg
+  SvgGenImage get pause => const SvgGenImage('assets/icons/pause.svg');
+
   /// File path: assets/icons/people.png
   AssetGenImage get people => const AssetGenImage('assets/icons/people.png');
 
@@ -710,6 +713,7 @@ class $AssetsIconsGen {
     micTurnOff,
     moreVertical,
     navigation,
+    pause,
     people,
     phone,
     play,

@@ -405,12 +405,12 @@ class VoiceMessageBubble extends StatelessWidget {
         height: 72,
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         backgroundColor: isLightTheme(context)
-            ? ColorPalette.primary.withValues(alpha: 0.2)
-            : ColorPalette.primary,
-        playButtonColor: ColorPalette.primary,
-        waveformColor: isLightTheme(context)
-            ? ColorPalette.black
-            : ColorPalette.white,
+            ? ColorPalette.primary
+            : ColorPalette.primary.withValues(alpha: 0.2),
+        playButtonColor: !isLightTheme(context)
+            ? ColorPalette.secondary
+            : Colors.white,
+        waveformColor: ColorPalette.white,
         borderRadius: BorderRadius.circular(20),
       ),
     );

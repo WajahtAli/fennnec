@@ -508,26 +508,27 @@ class MessageCubit extends Cubit<MessageState> {
   }
 
   /// Delete a message
-  Future<void> deleteMessage(String messageId) async {
+  Future<bool> deleteMessage(String messageId) async {
     final messageIndex = messages.indexWhere((m) => m.id == messageId);
-    if (messageIndex == -1) return;
+    if (messageIndex == -1) return false;
+    if (_groupId == null || _groupId!.isEmpty) return false;
 
     // Optimistically update UI
     final deletedMessage = messages.removeAt(messageIndex);
     emit(MessageSuccess());
 
     try {
-      if (_groupId != null) {
-        if (_isGroup) {
-          await _myGroupRepository.deleteGroupMessage(_groupId!, messageId);
-        } else {
-          await _myGroupRepository.deleteDirectMessage(_groupId!, messageId);
-        }
+      if (_isGroup) {
+        await _myGroupRepository.deleteGroupMessage(_groupId!, messageId);
+      } else {
+        await _myGroupRepository.deleteDirectMessage(_groupId!, messageId);
       }
+      return true;
     } catch (e) {
       // Revert if API call fails
       messages.insert(messageIndex, deletedMessage);
       emit(MessageError(e.toString()));
+      return false;
     }
   }
 

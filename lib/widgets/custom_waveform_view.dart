@@ -149,7 +149,7 @@ class _WaveformViewState extends State<WaveformView>
                             0,
                         decoration: BoxDecoration(
                           color: isPlayed
-                              ? ColorPalette.primary
+                              ? ColorPalette.black
                               : (widget.waveformColor ??
                                     (isLightTheme(context)
                                         ? Colors.black

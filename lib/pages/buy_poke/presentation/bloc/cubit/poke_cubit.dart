@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:fennac_app/pages/auth/presentation/bloc/cubit/create_account_cubit.dart';

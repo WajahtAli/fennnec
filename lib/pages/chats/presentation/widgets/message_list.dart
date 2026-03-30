@@ -4,6 +4,7 @@ import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
+import 'package:fennac_app/helpers/gradient_toast.dart';
 import 'package:fennac_app/pages/chats/data/models/message_model.dart';
 import 'package:fennac_app/pages/chats/data/models/message_type_enum.dart';
 import 'package:fennac_app/pages/chats/data/models/reaction_model.dart';
@@ -11,6 +12,7 @@ import 'package:fennac_app/pages/chats/presentation/bloc/cubit/message_cubit.dar
 import 'package:fennac_app/pages/chats/presentation/widgets/message_bubble.dart';
 import 'package:fennac_app/models/dummy/chat_message_model.dart';
 import 'package:fennac_app/reusable_widgets/empty_widget.dart';
+import 'package:fennac_app/widgets/custom_bottom_sheet.dart';
 import 'package:fennac_app/widgets/custom_sized_box.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -134,6 +136,7 @@ class _MessageListState extends State<MessageList> {
             top: position.dy - 56,
             child: _buildReactionBar(message),
           ),
+          _buildOverlayActionBar(message, isMineSide),
         ],
       ),
     );
@@ -177,6 +180,88 @@ class _MessageListState extends State<MessageList> {
         ),
       ),
     );
+  }
+
+  Widget _buildOverlayActionBar(MessageModel message, bool isMineSide) {
+    if (!isMineSide) {
+      return const SizedBox.shrink();
+    }
+
+    return Positioned(
+      top: MediaQuery.paddingOf(context).top + 8,
+      left: 16,
+      right: 16,
+      child: Material(
+        color: Colors.transparent,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            InkWell(
+              borderRadius: BorderRadius.circular(24),
+              onTap: () async {
+                await _deleteMessageFromOverlay(message);
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 10,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.95),
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.delete_outline, color: Colors.white, size: 18),
+                    SizedBox(width: 8),
+                    Text(
+                      'Delete',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _deleteMessageFromOverlay(MessageModel message) async {
+    var shouldDelete = false;
+    await CustomBottomSheet.show(
+      context: context,
+      title: 'Delete message?',
+      description: 'This action cannot be undone.',
+      buttonText: 'Delete',
+      secondaryButtonText: 'Cancel',
+      isHorizontalButton: true,
+      onButtonPressed: () {
+        shouldDelete = true;
+      },
+      onSecondaryButtonPressed: () {
+        Navigator.of(context).pop();
+      },
+    );
+
+    if (!shouldDelete) return;
+
+    if (!mounted) return;
+    _removeReactionOverlay(message.id, '');
+    final isDeleted = await messageCubit.deleteMessage(message.id);
+    if (!mounted) return;
+
+    if (isDeleted) {
+      VxToast.show(message: 'Message deleted');
+      return;
+    }
+
+    VxToast.show(message: 'Unable to delete message. Please try again.');
   }
 
   void _removeReactionOverlay(String messageId, String emoji) {
@@ -282,7 +367,12 @@ class _MessageListState extends State<MessageList> {
           controller: _scrollController,
           reverse: true,
           keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: const EdgeInsets.only(
+            left: 16,
+            right: 16,
+            top: 140,
+            bottom: 0,
+          ),
           itemCount: messagesToRender.length,
           itemBuilder: (context, index) {
             final message = messagesToRender[index];

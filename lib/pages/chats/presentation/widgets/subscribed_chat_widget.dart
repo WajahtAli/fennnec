@@ -122,7 +122,24 @@ class _SubscribedChatWidgetState extends State<SubscribedChatWidget> {
                             );
                             return;
                           }
-
+                          if (chat.pokes.isNotEmpty &&
+                              chat.pokes.first.status?.toLowerCase() ==
+                                  'started_chat') {
+                            final otherUserId =
+                                chat.meta.directChat?.otherUserId;
+                            context.router.push(
+                              GroupChatRoute(
+                                isGroup: false,
+                                groupId: otherUserId?.isNotEmpty == true
+                                    ? otherUserId!
+                                    : chat.id,
+                                contactAvatar: chat.image,
+                                contactName: chat.name,
+                                isOnline: false,
+                              ),
+                            );
+                            return;
+                          }
                           await _openPokeDetailIfAllowed(context, pokeId);
                           return;
                         }

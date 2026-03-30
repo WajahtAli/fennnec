@@ -45,6 +45,7 @@ class ChatAppBar extends StatelessWidget {
   }
 
   Widget _buildGroupHeader(BuildContext context) {
+    final isLight = isLightTheme(context);
     final currentChat = Di()
         .sl<ChatLandingCubit>()
         .state
@@ -60,6 +61,134 @@ class ChatAppBar extends StatelessWidget {
     );
 
     final topPadding = MediaQuery.of(context).padding.top;
+    final headerContent = Padding(
+      padding: EdgeInsets.only(
+        left: 16,
+        right: 16,
+        top: topPadding + 12,
+        bottom: 12,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          CustomBackButton(height: 40, width: 40),
+          const CustomSizedBox(width: 8),
+          Expanded(
+            child: GestureDetector(
+              onTap: () {
+                context.router.push(
+                  GroupDetailRoute(
+                    isGroup: true,
+                    contactName: currentChat?.name ?? contactName,
+                    contactAvatar: currentChat?.image ?? contactAvatar,
+                  ),
+                );
+              },
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Avatars Stack
+                  SizedBox(
+                    width: 210,
+                    height: 24,
+                    child: Stack(
+                      children: List.generate(displayMembers.length, (index) {
+                        final imageUrl = displayMembers[index].image;
+                        return Positioned(
+                          left: index * 14.0,
+                          child: Container(
+                            width: 24,
+                            height: 24,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: ColorPalette.secondary,
+                                width: 2,
+                              ),
+                              image: imageUrl.isNotEmpty
+                                  ? DecorationImage(
+                                      image: CachedNetworkImageProvider(
+                                        imageUrl,
+                                      ),
+                                      fit: BoxFit.cover,
+                                    )
+                                  : null,
+                              color: Colors.black26,
+                            ),
+                          ),
+                        );
+                      }),
+                    ),
+                  ),
+                  const CustomSizedBox(height: 4),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        '${members.length} member${members.length == 1 ? '' : 's'}',
+                        style: AppTextStyles.bodySmall(
+                          context,
+                        ).copyWith(fontWeight: FontWeight.w400),
+                      ),
+                      const CustomSizedBox(width: 2),
+                      Icon(
+                        Icons.chevron_right,
+                        color: isLight
+                            ? ColorPalette.black
+                            : Colors.white,
+                        size: 16,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          // Phone Button
+          CircleIconButton(
+            customChild: SvgPicture.asset(
+              Assets.icons.phone.path,
+              colorFilter: ColorFilter.mode(
+                isLightTheme(context) ? ColorPalette.black : Colors.white,
+                BlendMode.srcIn,
+              ),
+              width: 20,
+              height: 20,
+            ),
+            onTap: () {
+              AutoRouter.of(
+                context,
+              ).push(GroupAudioCallRoute(group: group, isVideoCall: false));
+            },
+          ),
+          const CustomSizedBox(width: 8),
+          // Video Button
+          CircleIconButton(
+            customChild: SvgPicture.asset(
+              Assets.icons.video.path,
+              colorFilter: ColorFilter.mode(
+                isLightTheme(context) ? ColorPalette.black : Colors.white,
+                BlendMode.srcIn,
+              ),
+              width: 20,
+              height: 20,
+            ),
+            onTap: () {
+              AutoRouter.of(
+                context,
+              ).push(GroupAudioCallRoute(group: group, isVideoCall: true));
+            },
+          ),
+        ],
+      ),
+    );
+
+    if (isLight) {
+      return Container(color: Colors.white, child: headerContent);
+    }
+
     return ClipRRect(
       borderRadius: BorderRadius.zero,
       child: Stack(
@@ -98,140 +227,159 @@ class ChatAppBar extends StatelessWidget {
             ),
           ),
           // Content
-          Padding(
-            padding: EdgeInsets.only(
-              left: 16,
-              right: 16,
-              top: topPadding + 12,
-              bottom: 12,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                CustomBackButton(height: 40, width: 40),
-                const CustomSizedBox(width: 8),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      context.router.push(
-                        GroupDetailRoute(
-                          isGroup: true,
-                          contactName: currentChat?.name ?? contactName,
-                          contactAvatar: currentChat?.image ?? contactAvatar,
-                        ),
-                      );
-                    },
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Avatars Stack
-                        SizedBox(
-                          width: 210,
-                          height: 24,
-                          child: Stack(
-                            children: List.generate(displayMembers.length, (
-                              index,
-                            ) {
-                              final imageUrl = displayMembers[index].image;
-                              return Positioned(
-                                left: index * 14.0,
-                                child: Container(
-                                  width: 24,
-                                  height: 24,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: ColorPalette.secondary,
-                                      width: 2,
-                                    ),
-                                    image: imageUrl.isNotEmpty
-                                        ? DecorationImage(
-                                            image: CachedNetworkImageProvider(
-                                              imageUrl,
-                                            ),
-                                            fit: BoxFit.cover,
-                                          )
-                                        : null,
-                                    color: Colors.black26,
-                                  ),
-                                ),
-                              );
-                            }),
-                          ),
-                        ),
-                        const CustomSizedBox(height: 4),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              '${members.length} member${members.length == 1 ? '' : 's'}',
-                              style: AppTextStyles.bodySmall(
-                                context,
-                              ).copyWith(fontWeight: FontWeight.w400),
-                            ),
-                            const CustomSizedBox(width: 2),
-                            Icon(
-                              Icons.chevron_right,
-                              color: ColorPalette.white,
-                              size: 16,
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                // Phone Button
-                CircleIconButton(
-                  customChild: SvgPicture.asset(
-                    Assets.icons.phone.path,
-                    colorFilter: ColorFilter.mode(
-                      isLightTheme(context)
-                          ? ColorPalette.black
-                          : ColorPalette.white,
-                      BlendMode.srcIn,
-                    ),
-                    width: 20,
-                    height: 20,
-                  ),
-                  onTap: () {
-                    AutoRouter.of(context).push(
-                      GroupAudioCallRoute(group: group, isVideoCall: false),
-                    );
-                  },
-                ),
-                const CustomSizedBox(width: 8),
-                // Video Button
-                CircleIconButton(
-                  customChild: SvgPicture.asset(
-                    Assets.icons.video.path,
-                    colorFilter: ColorFilter.mode(
-                      isLightTheme(context)
-                          ? ColorPalette.black
-                          : ColorPalette.white,
-                      BlendMode.srcIn,
-                    ),
-                    width: 20,
-                    height: 20,
-                  ),
-                  onTap: () {
-                    AutoRouter.of(context).push(
-                      GroupAudioCallRoute(group: group, isVideoCall: true),
-                    );
-                  },
-                ),
-              ],
-            ),
-          ),
+          headerContent,
         ],
       ),
     );
   }
 
   Widget _buildIndividualHeader(BuildContext context) {
+    final isLight = isLightTheme(context);
     final topPadding = MediaQuery.of(context).padding.top;
+    final headerContent = Padding(
+      padding: EdgeInsets.only(
+        left: 6,
+        right: 6,
+        top: topPadding + 12,
+        bottom: 12,
+      ),
+      child: Row(
+        children: [
+          CustomBackButton(height: 40, width: 40),
+          const CustomSizedBox(width: 12),
+          Expanded(
+            child: Row(
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    image: contactAvatar != null
+                        ? DecorationImage(
+                            image: NetworkImage(contactAvatar!),
+                            fit: BoxFit.cover,
+                          )
+                        : null,
+                    color: Colors.black.withValues(alpha: 0.3),
+                  ),
+                ),
+                const CustomSizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        contactName ?? 'Unknown',
+                        style: AppTextStyles.body(
+                          context,
+                        ).copyWith(fontWeight: FontWeight.w600),
+                      ),
+                      const CustomSizedBox(height: 4),
+                      Row(
+                        children: [
+                          Container(
+                            width: 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: isOnline ? Colors.green : Colors.grey,
+                            ),
+                          ),
+                          const CustomSizedBox(width: 6),
+                          Text(
+                            textAlign: TextAlign.start,
+                            isOnline ? 'Online' : 'Offline',
+                            style: AppTextStyles.bodySmall(context).copyWith(
+                              color: isLightTheme(context)
+                                  ? ColorPalette.black
+                                  : Colors.white.withValues(alpha: 0.7),
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const CustomSizedBox(width: 12),
+          BlocBuilder<CallCubit, CallState>(
+            bloc: Di().sl<CallCubit>(),
+            builder: (context, state) {
+              final callCubit = Di().sl<CallCubit>();
+              final isStartingCall = callCubit.isStartingCall;
+              final isStartingAudioCall = callCubit.isStartingAudioCall;
+              final isStartingVideoCall = callCubit.isStartingVideoCall;
+
+              return Row(
+                children: [
+                  CircleIconButton(
+                    customChild: isStartingAudioCall
+                        ? SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: Lottie.asset(
+                              Assets.animations.loadingSpinner,
+                            ),
+                          )
+                        : SvgPicture.asset(
+                            Assets.icons.phone.path,
+                            colorFilter: ColorFilter.mode(
+                              isLightTheme(context)
+                                  ? ColorPalette.black
+                                  : Colors.white,
+                              BlendMode.srcIn,
+                            ),
+                            width: 20,
+                            height: 20,
+                          ),
+                    onTap: isStartingCall
+                        ? null
+                        : () =>
+                              _startCallFromHeader(context, isVideoCall: false),
+                  ),
+                  const CustomSizedBox(width: 8),
+                  CircleIconButton(
+                    customChild: isStartingVideoCall
+                        ? SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: Lottie.asset(
+                              Assets.animations.loadingSpinner,
+                            ),
+                          )
+                        : SvgPicture.asset(
+                            Assets.icons.video.path,
+                            colorFilter: ColorFilter.mode(
+                              isLightTheme(context)
+                                  ? ColorPalette.black
+                                  : Colors.white,
+                              BlendMode.srcIn,
+                            ),
+                            width: 20,
+                            height: 20,
+                          ),
+                    onTap: isStartingCall
+                        ? null
+                        : () =>
+                              _startCallFromHeader(context, isVideoCall: true),
+                  ),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+
+    if (isLight) {
+      return Container(color: Colors.white, child: headerContent);
+    }
+
     return ClipRRect(
       borderRadius: BorderRadius.zero,
       child: Stack(
@@ -284,152 +432,7 @@ class ChatAppBar extends StatelessWidget {
             ),
           ),
           // Content
-          Padding(
-            padding: EdgeInsets.only(
-              left: 6,
-              right: 6,
-              top: topPadding + 12,
-              bottom: 12,
-            ),
-            child: Row(
-              children: [
-                CustomBackButton(height: 40, width: 40),
-                const CustomSizedBox(width: 12),
-                Expanded(
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          image: contactAvatar != null
-                              ? DecorationImage(
-                                  image: NetworkImage(contactAvatar!),
-                                  fit: BoxFit.cover,
-                                )
-                              : null,
-                          color: Colors.black.withValues(alpha: 0.3),
-                        ),
-                      ),
-                      const CustomSizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              contactName ?? 'Unknown',
-                              style: AppTextStyles.body(
-                                context,
-                              ).copyWith(fontWeight: FontWeight.w600),
-                            ),
-                            const CustomSizedBox(height: 4),
-                            Row(
-                              children: [
-                                Container(
-                                  width: 8,
-                                  height: 8,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: isOnline
-                                        ? Colors.green
-                                        : Colors.grey,
-                                  ),
-                                ),
-                                const CustomSizedBox(width: 6),
-                                Text(
-                                  textAlign: TextAlign.start,
-                                  isOnline ? 'Online' : 'Offline',
-                                  style: AppTextStyles.bodySmall(context)
-                                      .copyWith(
-                                        color: isLightTheme(context)
-                                            ? ColorPalette.black
-                                            : ColorPalette.white.withValues(
-                                                alpha: 0.7,
-                                              ),
-                                        fontSize: 12,
-                                      ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const CustomSizedBox(width: 12),
-                BlocBuilder<CallCubit, CallState>(
-                  bloc: Di().sl<CallCubit>(),
-                  builder: (context, state) {
-                    final callCubit = Di().sl<CallCubit>();
-                    final isStartingCall = callCubit.isStartingCall;
-
-                    return Row(
-                      children: [
-                        CircleIconButton(
-                          customChild: isStartingCall
-                              ? SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: Lottie.asset(
-                                    Assets.animations.loadingSpinner,
-                                  ),
-                                )
-                              : SvgPicture.asset(
-                                  Assets.icons.phone.path,
-                                  colorFilter: ColorFilter.mode(
-                                    isLightTheme(context)
-                                        ? ColorPalette.black
-                                        : ColorPalette.white,
-                                    BlendMode.srcIn,
-                                  ),
-                                  width: 20,
-                                  height: 20,
-                                ),
-                          onTap: isStartingCall
-                              ? null
-                              : () => _startCallFromHeader(
-                                  context,
-                                  isVideoCall: false,
-                                ),
-                        ),
-                        const CustomSizedBox(width: 8),
-                        CircleIconButton(
-                          customChild: isStartingCall
-                              ? SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: Lottie.asset(
-                                    Assets.animations.loadingSpinner,
-                                  ),
-                                )
-                              : SvgPicture.asset(
-                                  Assets.icons.video.path,
-                                  colorFilter: ColorFilter.mode(
-                                    isLightTheme(context)
-                                        ? ColorPalette.black
-                                        : ColorPalette.white,
-                                    BlendMode.srcIn,
-                                  ),
-                                  width: 20,
-                                  height: 20,
-                                ),
-                          onTap: isStartingCall
-                              ? null
-                              : () => _startCallFromHeader(
-                                  context,
-                                  isVideoCall: true,
-                                ),
-                        ),
-                      ],
-                    );
-                  },
-                ),
-              ],
-            ),
-          ),
+          headerContent,
         ],
       ),
     );

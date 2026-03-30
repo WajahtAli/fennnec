@@ -82,7 +82,10 @@ class _ChatLandingScreenState extends State<ChatLandingScreen> {
       backgroundColor: Colors.white,
       onRefresh: () => _chatLandingCubit.fetchChatsAndCalls(),
       child: isSubscribed
-          ? const SubscribedChatWidget()
+          ? SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: const SubscribedChatWidget(),
+            )
           : SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               child: Column(

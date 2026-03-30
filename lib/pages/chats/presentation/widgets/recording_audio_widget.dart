@@ -1,9 +1,11 @@
 import 'package:fennac_app/app/constants/media_query_constants.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
+import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:fennac_app/pages/chats/presentation/bloc/cubit/message_cubit.dart';
 import 'package:fennac_app/widgets/prompt_audio_row.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 
 import '../../../../app/theme/text_styles.dart';
 import '../../../../core/di_container.dart';
@@ -34,14 +36,18 @@ class RecordingAudioWidget extends StatelessWidget {
                 child: Container(
                   height: 48,
                   width: 48,
+                  alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: ColorPalette.secondary,
+                    color: isLightTheme(context)
+                        ? ColorPalette.textGrey
+                        : ColorPalette.secondary,
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(
-                    Icons.message_outlined,
-                    color: Colors.white,
-                    size: 24,
+                  child: SvgPicture.asset(
+                    Assets.icons.messageCircle.path,
+                    color: !isLightTheme(context) ? Colors.white : Colors.black,
+                    height: 24,
+                    width: 24,
                   ),
                 ),
               ),
@@ -56,14 +62,20 @@ class RecordingAudioWidget extends StatelessWidget {
                   child: Container(
                     height: 48,
                     width: 48,
+                    alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: ColorPalette.secondary,
+                      color: isLightTheme(context)
+                          ? ColorPalette.textGrey
+                          : ColorPalette.secondary,
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(
-                      Icons.delete_outline_rounded,
-                      color: Colors.white,
-                      size: 24,
+                    child: SvgPicture.asset(
+                      Assets.icons.trash.path,
+                      color: !isLightTheme(context)
+                          ? Colors.white
+                          : Colors.black,
+                      height: 24,
+                      width: 24,
                     ),
                   ),
                 ),
@@ -83,7 +95,9 @@ class RecordingAudioWidget extends StatelessWidget {
                     waveformData: [...recordingCubit.recordedWaveformData],
                     backgroundColor: Colors.transparent,
                     duration: recordingCubit.recordedDuration,
-                    playButtonColor: ColorPalette.secondary,
+                    playButtonColor: isLightTheme(context)
+                        ? ColorPalette.textGrey
+                        : ColorPalette.primary,
                     waveformColor: isLightTheme(context)
                         ? Colors.black
                         : Colors.white,
@@ -147,20 +161,25 @@ class RecordingAudioWidget extends StatelessWidget {
                 child: Container(
                   height: 48,
                   width: 48,
+                  alignment: Alignment.center,
                   decoration: BoxDecoration(
                     color: recordingCubit.isRecording
                         ? Colors.red
                         : ColorPalette.primary,
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(
+                  child: SvgPicture.asset(
                     recordingCubit.isRecorded
-                        ? Icons.send
+                        ? Assets.icons.send.path
                         : recordingCubit.isRecording
-                        ? Icons.stop
-                        : Icons.mic,
-                    color: Colors.white,
-                    size: 28,
+                        ? Assets.icons.pause.path
+                        : Assets.icons.mic.path,
+                    colorFilter: const ColorFilter.mode(
+                      Colors.white,
+                      BlendMode.srcIn,
+                    ),
+                    height: 24,
+                    width: 24,
                   ),
                 ),
               ),

@@ -47,7 +47,7 @@ class _PromptAudioRowState extends State<PromptAudioRow> {
         height: widget.height,
         padding:
             widget.padding ??
-            const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            const EdgeInsets.symmetric(horizontal: 6, vertical: 0),
         decoration: BoxDecoration(
           color:
               widget.backgroundColor ??

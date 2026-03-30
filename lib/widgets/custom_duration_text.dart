@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../app/constants/media_query_constants.dart';
 import '../app/theme/app_colors.dart';
 import '../app/theme/text_styles.dart';
 import '../bloc/cubit/audio_player_cubit.dart';
@@ -27,11 +26,9 @@ class DurationText extends StatelessWidget {
         final bool isPlaying = state.status == AudioStatus.playing;
         return Text(
           isPlaying ? _format(pos) : _format(dur),
-          style: AppTextStyles.bodySmall(context).copyWith(
-            color: isLightTheme(context)
-                ? ColorPalette.black
-                : ColorPalette.white,
-          ),
+          style: AppTextStyles.bodySmall(
+            context,
+          ).copyWith(color: ColorPalette.white),
         );
       },
     );
