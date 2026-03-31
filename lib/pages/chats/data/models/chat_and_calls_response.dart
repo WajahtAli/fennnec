@@ -56,6 +56,7 @@ abstract class ChatModel with _$ChatModel {
     required String id,
     required String name,
     @Default('') String image,
+    @Default('') String status,
     @Default('') String lastMessage,
     @JsonKey(
       fromJson: _dateTimeFromJsonNullable,

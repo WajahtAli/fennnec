@@ -612,7 +612,7 @@ $PaginationModelCopyWith<$Res> get pagination {
 /// @nodoc
 mixin _$ChatModel {
 
- String get type; String get id; String get name; String get image; String get lastMessage;@JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable) DateTime? get lastMessageAt; String? get fromUserId; int get unreadCount; List<ChatPokeModel> get pokes; ChatMetaModel get meta; List<MemberModel>? get members;
+ String get type; String get id; String get name; String get image; String get status; String get lastMessage;@JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable) DateTime? get lastMessageAt; String? get fromUserId; int get unreadCount; List<ChatPokeModel> get pokes; ChatMetaModel get meta; List<MemberModel>? get members;
 /// Create a copy of ChatModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -625,16 +625,16 @@ $ChatModelCopyWith<ChatModel> get copyWith => _$ChatModelCopyWithImpl<ChatModel>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChatModel&&(identical(other.type, type) || other.type == type)&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.image, image) || other.image == image)&&(identical(other.lastMessage, lastMessage) || other.lastMessage == lastMessage)&&(identical(other.lastMessageAt, lastMessageAt) || other.lastMessageAt == lastMessageAt)&&(identical(other.fromUserId, fromUserId) || other.fromUserId == fromUserId)&&(identical(other.unreadCount, unreadCount) || other.unreadCount == unreadCount)&&const DeepCollectionEquality().equals(other.pokes, pokes)&&(identical(other.meta, meta) || other.meta == meta)&&const DeepCollectionEquality().equals(other.members, members));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChatModel&&(identical(other.type, type) || other.type == type)&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.image, image) || other.image == image)&&(identical(other.status, status) || other.status == status)&&(identical(other.lastMessage, lastMessage) || other.lastMessage == lastMessage)&&(identical(other.lastMessageAt, lastMessageAt) || other.lastMessageAt == lastMessageAt)&&(identical(other.fromUserId, fromUserId) || other.fromUserId == fromUserId)&&(identical(other.unreadCount, unreadCount) || other.unreadCount == unreadCount)&&const DeepCollectionEquality().equals(other.pokes, pokes)&&(identical(other.meta, meta) || other.meta == meta)&&const DeepCollectionEquality().equals(other.members, members));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,type,id,name,image,lastMessage,lastMessageAt,fromUserId,unreadCount,const DeepCollectionEquality().hash(pokes),meta,const DeepCollectionEquality().hash(members));
+int get hashCode => Object.hash(runtimeType,type,id,name,image,status,lastMessage,lastMessageAt,fromUserId,unreadCount,const DeepCollectionEquality().hash(pokes),meta,const DeepCollectionEquality().hash(members));
 
 @override
 String toString() {
-  return 'ChatModel(type: $type, id: $id, name: $name, image: $image, lastMessage: $lastMessage, lastMessageAt: $lastMessageAt, fromUserId: $fromUserId, unreadCount: $unreadCount, pokes: $pokes, meta: $meta, members: $members)';
+  return 'ChatModel(type: $type, id: $id, name: $name, image: $image, status: $status, lastMessage: $lastMessage, lastMessageAt: $lastMessageAt, fromUserId: $fromUserId, unreadCount: $unreadCount, pokes: $pokes, meta: $meta, members: $members)';
 }
 
 
@@ -645,7 +645,7 @@ abstract mixin class $ChatModelCopyWith<$Res>  {
   factory $ChatModelCopyWith(ChatModel value, $Res Function(ChatModel) _then) = _$ChatModelCopyWithImpl;
 @useResult
 $Res call({
- String type, String id, String name, String image, String lastMessage,@JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable) DateTime? lastMessageAt, String? fromUserId, int unreadCount, List<ChatPokeModel> pokes, ChatMetaModel meta, List<MemberModel>? members
+ String type, String id, String name, String image, String status, String lastMessage,@JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable) DateTime? lastMessageAt, String? fromUserId, int unreadCount, List<ChatPokeModel> pokes, ChatMetaModel meta, List<MemberModel>? members
 });
 
 
@@ -662,12 +662,13 @@ class _$ChatModelCopyWithImpl<$Res>
 
 /// Create a copy of ChatModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? type = null,Object? id = null,Object? name = null,Object? image = null,Object? lastMessage = null,Object? lastMessageAt = freezed,Object? fromUserId = freezed,Object? unreadCount = null,Object? pokes = null,Object? meta = null,Object? members = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? type = null,Object? id = null,Object? name = null,Object? image = null,Object? status = null,Object? lastMessage = null,Object? lastMessageAt = freezed,Object? fromUserId = freezed,Object? unreadCount = null,Object? pokes = null,Object? meta = null,Object? members = freezed,}) {
   return _then(_self.copyWith(
 type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
 as String,id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,image: null == image ? _self.image : image // ignore: cast_nullable_to_non_nullable
+as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as String,lastMessage: null == lastMessage ? _self.lastMessage : lastMessage // ignore: cast_nullable_to_non_nullable
 as String,lastMessageAt: freezed == lastMessageAt ? _self.lastMessageAt : lastMessageAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,fromUserId: freezed == fromUserId ? _self.fromUserId : fromUserId // ignore: cast_nullable_to_non_nullable
@@ -769,10 +770,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String type,  String id,  String name,  String image,  String lastMessage, @JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable)  DateTime? lastMessageAt,  String? fromUserId,  int unreadCount,  List<ChatPokeModel> pokes,  ChatMetaModel meta,  List<MemberModel>? members)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String type,  String id,  String name,  String image,  String status,  String lastMessage, @JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable)  DateTime? lastMessageAt,  String? fromUserId,  int unreadCount,  List<ChatPokeModel> pokes,  ChatMetaModel meta,  List<MemberModel>? members)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ChatModel() when $default != null:
-return $default(_that.type,_that.id,_that.name,_that.image,_that.lastMessage,_that.lastMessageAt,_that.fromUserId,_that.unreadCount,_that.pokes,_that.meta,_that.members);case _:
+return $default(_that.type,_that.id,_that.name,_that.image,_that.status,_that.lastMessage,_that.lastMessageAt,_that.fromUserId,_that.unreadCount,_that.pokes,_that.meta,_that.members);case _:
   return orElse();
 
 }
@@ -790,10 +791,10 @@ return $default(_that.type,_that.id,_that.name,_that.image,_that.lastMessage,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String type,  String id,  String name,  String image,  String lastMessage, @JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable)  DateTime? lastMessageAt,  String? fromUserId,  int unreadCount,  List<ChatPokeModel> pokes,  ChatMetaModel meta,  List<MemberModel>? members)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String type,  String id,  String name,  String image,  String status,  String lastMessage, @JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable)  DateTime? lastMessageAt,  String? fromUserId,  int unreadCount,  List<ChatPokeModel> pokes,  ChatMetaModel meta,  List<MemberModel>? members)  $default,) {final _that = this;
 switch (_that) {
 case _ChatModel():
-return $default(_that.type,_that.id,_that.name,_that.image,_that.lastMessage,_that.lastMessageAt,_that.fromUserId,_that.unreadCount,_that.pokes,_that.meta,_that.members);case _:
+return $default(_that.type,_that.id,_that.name,_that.image,_that.status,_that.lastMessage,_that.lastMessageAt,_that.fromUserId,_that.unreadCount,_that.pokes,_that.meta,_that.members);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -810,10 +811,10 @@ return $default(_that.type,_that.id,_that.name,_that.image,_that.lastMessage,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String type,  String id,  String name,  String image,  String lastMessage, @JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable)  DateTime? lastMessageAt,  String? fromUserId,  int unreadCount,  List<ChatPokeModel> pokes,  ChatMetaModel meta,  List<MemberModel>? members)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String type,  String id,  String name,  String image,  String status,  String lastMessage, @JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable)  DateTime? lastMessageAt,  String? fromUserId,  int unreadCount,  List<ChatPokeModel> pokes,  ChatMetaModel meta,  List<MemberModel>? members)?  $default,) {final _that = this;
 switch (_that) {
 case _ChatModel() when $default != null:
-return $default(_that.type,_that.id,_that.name,_that.image,_that.lastMessage,_that.lastMessageAt,_that.fromUserId,_that.unreadCount,_that.pokes,_that.meta,_that.members);case _:
+return $default(_that.type,_that.id,_that.name,_that.image,_that.status,_that.lastMessage,_that.lastMessageAt,_that.fromUserId,_that.unreadCount,_that.pokes,_that.meta,_that.members);case _:
   return null;
 
 }
@@ -825,13 +826,14 @@ return $default(_that.type,_that.id,_that.name,_that.image,_that.lastMessage,_th
 @JsonSerializable()
 
 class _ChatModel implements ChatModel {
-  const _ChatModel({required this.type, required this.id, required this.name, this.image = '', this.lastMessage = '', @JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable) this.lastMessageAt, this.fromUserId, required this.unreadCount, final  List<ChatPokeModel> pokes = const [], this.meta = const ChatMetaModel(), final  List<MemberModel>? members}): _pokes = pokes,_members = members;
+  const _ChatModel({required this.type, required this.id, required this.name, this.image = '', this.status = '', this.lastMessage = '', @JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable) this.lastMessageAt, this.fromUserId, required this.unreadCount, final  List<ChatPokeModel> pokes = const [], this.meta = const ChatMetaModel(), final  List<MemberModel>? members}): _pokes = pokes,_members = members;
   factory _ChatModel.fromJson(Map<String, dynamic> json) => _$ChatModelFromJson(json);
 
 @override final  String type;
 @override final  String id;
 @override final  String name;
 @override@JsonKey() final  String image;
+@override@JsonKey() final  String status;
 @override@JsonKey() final  String lastMessage;
 @override@JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable) final  DateTime? lastMessageAt;
 @override final  String? fromUserId;
@@ -867,16 +869,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChatModel&&(identical(other.type, type) || other.type == type)&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.image, image) || other.image == image)&&(identical(other.lastMessage, lastMessage) || other.lastMessage == lastMessage)&&(identical(other.lastMessageAt, lastMessageAt) || other.lastMessageAt == lastMessageAt)&&(identical(other.fromUserId, fromUserId) || other.fromUserId == fromUserId)&&(identical(other.unreadCount, unreadCount) || other.unreadCount == unreadCount)&&const DeepCollectionEquality().equals(other._pokes, _pokes)&&(identical(other.meta, meta) || other.meta == meta)&&const DeepCollectionEquality().equals(other._members, _members));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChatModel&&(identical(other.type, type) || other.type == type)&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.image, image) || other.image == image)&&(identical(other.status, status) || other.status == status)&&(identical(other.lastMessage, lastMessage) || other.lastMessage == lastMessage)&&(identical(other.lastMessageAt, lastMessageAt) || other.lastMessageAt == lastMessageAt)&&(identical(other.fromUserId, fromUserId) || other.fromUserId == fromUserId)&&(identical(other.unreadCount, unreadCount) || other.unreadCount == unreadCount)&&const DeepCollectionEquality().equals(other._pokes, _pokes)&&(identical(other.meta, meta) || other.meta == meta)&&const DeepCollectionEquality().equals(other._members, _members));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,type,id,name,image,lastMessage,lastMessageAt,fromUserId,unreadCount,const DeepCollectionEquality().hash(_pokes),meta,const DeepCollectionEquality().hash(_members));
+int get hashCode => Object.hash(runtimeType,type,id,name,image,status,lastMessage,lastMessageAt,fromUserId,unreadCount,const DeepCollectionEquality().hash(_pokes),meta,const DeepCollectionEquality().hash(_members));
 
 @override
 String toString() {
-  return 'ChatModel(type: $type, id: $id, name: $name, image: $image, lastMessage: $lastMessage, lastMessageAt: $lastMessageAt, fromUserId: $fromUserId, unreadCount: $unreadCount, pokes: $pokes, meta: $meta, members: $members)';
+  return 'ChatModel(type: $type, id: $id, name: $name, image: $image, status: $status, lastMessage: $lastMessage, lastMessageAt: $lastMessageAt, fromUserId: $fromUserId, unreadCount: $unreadCount, pokes: $pokes, meta: $meta, members: $members)';
 }
 
 
@@ -887,7 +889,7 @@ abstract mixin class _$ChatModelCopyWith<$Res> implements $ChatModelCopyWith<$Re
   factory _$ChatModelCopyWith(_ChatModel value, $Res Function(_ChatModel) _then) = __$ChatModelCopyWithImpl;
 @override @useResult
 $Res call({
- String type, String id, String name, String image, String lastMessage,@JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable) DateTime? lastMessageAt, String? fromUserId, int unreadCount, List<ChatPokeModel> pokes, ChatMetaModel meta, List<MemberModel>? members
+ String type, String id, String name, String image, String status, String lastMessage,@JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable) DateTime? lastMessageAt, String? fromUserId, int unreadCount, List<ChatPokeModel> pokes, ChatMetaModel meta, List<MemberModel>? members
 });
 
 
@@ -904,12 +906,13 @@ class __$ChatModelCopyWithImpl<$Res>
 
 /// Create a copy of ChatModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? type = null,Object? id = null,Object? name = null,Object? image = null,Object? lastMessage = null,Object? lastMessageAt = freezed,Object? fromUserId = freezed,Object? unreadCount = null,Object? pokes = null,Object? meta = null,Object? members = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? type = null,Object? id = null,Object? name = null,Object? image = null,Object? status = null,Object? lastMessage = null,Object? lastMessageAt = freezed,Object? fromUserId = freezed,Object? unreadCount = null,Object? pokes = null,Object? meta = null,Object? members = freezed,}) {
   return _then(_ChatModel(
 type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
 as String,id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,image: null == image ? _self.image : image // ignore: cast_nullable_to_non_nullable
+as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as String,lastMessage: null == lastMessage ? _self.lastMessage : lastMessage // ignore: cast_nullable_to_non_nullable
 as String,lastMessageAt: freezed == lastMessageAt ? _self.lastMessageAt : lastMessageAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,fromUserId: freezed == fromUserId ? _self.fromUserId : fromUserId // ignore: cast_nullable_to_non_nullable

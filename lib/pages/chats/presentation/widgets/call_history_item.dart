@@ -13,6 +13,7 @@ class CallHistoryItem extends StatelessWidget {
   final String? duration;
   final String? lastMessage;
   final String timeAgo;
+  final int unreadCount;
   final String? avatar;
   final List<String>? avatars;
   final bool isGroup;
@@ -29,6 +30,7 @@ class CallHistoryItem extends StatelessWidget {
     this.duration,
     this.lastMessage,
     required this.timeAgo,
+    this.unreadCount = 0,
     this.avatar,
     this.avatars,
     this.isGroup = false,
@@ -75,34 +77,55 @@ class CallHistoryItem extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  isGroup ? names!.join(', ') : name!,
-                  style: AppTextStyles.body(context),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      isGroup ? names!.join(', ') : name!,
+                      style: AppTextStyles.body(context),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    if (unreadCount > 0)
+                      Text(
+                        unreadCount.toString(),
+                        style: AppTextStyles.bodyRegular(context).copyWith(
+                          color: ColorPalette.secondary,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                  ],
                 ),
                 const CustomSizedBox(height: 4),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      _buildSecondaryText(isCallItem),
-                      style: AppTextStyles.description(context).copyWith(
-                        color: isLightTheme(context)
-                            ? ColorPalette.black.withValues(alpha: 0.8)
-                            : ColorPalette.textSecondary,
+                    Expanded(
+                      child: Text(
+                        _buildSecondaryText(isCallItem),
+                        style: AppTextStyles.description(context).copyWith(
+                          color: isLightTheme(context)
+                              ? ColorPalette.black.withValues(alpha: 0.8)
+                              : ColorPalette.textSecondary,
+                        ),
+                        maxLines: isCallItem ? 1 : 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      maxLines: isCallItem ? 1 : 2,
-                      overflow: TextOverflow.ellipsis,
                     ),
-                    Text(
-                      timeAgo,
-                      style: AppTextStyles.bodySmall(context).copyWith(
-                        color: isLightTheme(context)
-                            ? ColorPalette.black.withValues(alpha: 0.8)
-                            : ColorPalette.textSecondary,
-                        fontSize: 10,
-                      ),
+                    const CustomSizedBox(width: 8),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          timeAgo,
+                          style: AppTextStyles.bodySmall(context).copyWith(
+                            color: isLightTheme(context)
+                                ? ColorPalette.black.withValues(alpha: 0.8)
+                                : ColorPalette.textSecondary,
+                            fontSize: 10,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),

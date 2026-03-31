@@ -1,6 +1,6 @@
 import 'dart:ui';
 import 'package:fennac_app/app/constants/dummy_constants.dart';
-import 'package:fennac_app/app/theme/app_assets.dart';
+import 'package:fennac_app/app/constants/media_query_constants.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/core/di_container.dart';
@@ -59,7 +59,9 @@ class _MessageListState extends State<MessageList> {
   @override
   void dispose() {
     messageCubit.stopPolling();
+
     _scrollController.dispose();
+
     _removeReactionOverlay('', '');
     super.dispose();
   }
@@ -114,6 +116,27 @@ class _MessageListState extends State<MessageList> {
     final box = key.currentContext!.findRenderObject() as RenderBox;
     final position = box.localToGlobal(Offset.zero);
     final size = box.size;
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    const horizontalMargin = 12.0;
+    const reactionHorizontalPadding = 14.0;
+    const reactionItemWidth = 38.0;
+    final preferredReactionBarWidth =
+        (reactionHorizontalPadding * 2) +
+        (_availableReactions.length * reactionItemWidth);
+    final reactionBarWidth = preferredReactionBarWidth.clamp(
+      0.0,
+      screenWidth - (horizontalMargin * 2),
+    );
+    final reactionCenterX = position.dx + (size.width / 2);
+    final reactionLeft = (reactionCenterX - (reactionBarWidth / 2)).clamp(
+      horizontalMargin,
+      screenWidth - horizontalMargin - reactionBarWidth,
+    );
+    final minReactionTop = MediaQuery.paddingOf(context).top + 8;
+    final reactionTop = (position.dy - 56).clamp(
+      minReactionTop,
+      double.infinity,
+    );
 
     _reactionOverlay = OverlayEntry(
       builder: (_) => Stack(
@@ -135,8 +158,9 @@ class _MessageListState extends State<MessageList> {
             ),
           ),
           Positioned(
-            left: position.dx + size.width / 2 - 220,
-            top: position.dy - 56,
+            left: reactionLeft,
+            top: reactionTop,
+            width: reactionBarWidth,
             child: _buildReactionBar(message),
           ),
           _buildOverlayActionBar(message, isMineSide),
@@ -162,23 +186,29 @@ class _MessageListState extends State<MessageList> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.95),
+            color: isLightTheme(context)
+                ? ColorPalette.textGrey
+                : Colors.black.withOpacity(0.95),
             borderRadius: BorderRadius.circular(30),
           ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: _availableReactions.map((emoji) {
-              return GestureDetector(
-                onTap: () {
-                  messageCubit.addReaction(message.id, emoji);
-                  _removeReactionOverlay(message.id, emoji);
-                },
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 6),
-                  child: Text(emoji, style: const TextStyle(fontSize: 26)),
-                ),
-              );
-            }).toList(),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: _availableReactions.map((emoji) {
+                return GestureDetector(
+                  onTap: () {
+                    messageCubit.addReaction(message.id, emoji);
+                    _removeReactionOverlay(message.id, emoji);
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 6),
+                    child: Text(emoji, style: const TextStyle(fontSize: 26)),
+                  ),
+                );
+              }).toList(),
+            ),
           ),
         ),
       ),

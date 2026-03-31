@@ -5,6 +5,7 @@ class GroupListItem extends StatelessWidget {
   final List<String> names;
   final String lastMessage;
   final String time;
+  final int unreadCount;
   final List<String> avatars;
 
   const GroupListItem({
@@ -12,6 +13,7 @@ class GroupListItem extends StatelessWidget {
     required this.names,
     required this.lastMessage,
     required this.time,
+    this.unreadCount = 0,
     required this.avatars,
   });
 
@@ -21,6 +23,7 @@ class GroupListItem extends StatelessWidget {
       names: names,
       lastMessage: lastMessage,
       timeAgo: time,
+      unreadCount: unreadCount,
       avatars: avatars,
       isGroup: true,
     );

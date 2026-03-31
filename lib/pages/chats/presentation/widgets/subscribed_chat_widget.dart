@@ -101,6 +101,7 @@ class _SubscribedChatWidgetState extends State<SubscribedChatWidget> {
                     final chat = activeChats[index];
                     final isHighlighted = _tappedIndex == index;
                     final isGroup = chat.type == 'group';
+                    final isOnline = chat.status.toLowerCase() == 'online';
 
                     return GestureDetector(
                       onTap: () async {
@@ -117,7 +118,7 @@ class _SubscribedChatWidgetState extends State<SubscribedChatWidget> {
                                 groupId: chat.meta.directChat!.otherUserId!,
                                 contactAvatar: chat.image,
                                 contactName: chat.name,
-                                isOnline: false,
+                                isOnline: isOnline,
                               ),
                             );
                             return;
@@ -135,7 +136,7 @@ class _SubscribedChatWidgetState extends State<SubscribedChatWidget> {
                                     : chat.id,
                                 contactAvatar: chat.image,
                                 contactName: chat.name,
-                                isOnline: false,
+                                isOnline: isOnline,
                               ),
                             );
                             return;
@@ -150,7 +151,7 @@ class _SubscribedChatWidgetState extends State<SubscribedChatWidget> {
                             groupId: chat.id,
                             contactAvatar: chat.image,
                             contactName: chat.name,
-                            isOnline: false,
+                            isOnline: isOnline,
                           ),
                         );
                       },
@@ -181,6 +182,7 @@ class _SubscribedChatWidgetState extends State<SubscribedChatWidget> {
                           isGroup: isGroup,
                           avatar: chat.image,
                           avatars: chat.members?.map((m) => m.image).toList(),
+                          unreadCount: chat.unreadCount,
                           timeAgo: chat.lastMessageAt != null
                               ? _getTimeAgo(chat.lastMessageAt!)
                               : '',

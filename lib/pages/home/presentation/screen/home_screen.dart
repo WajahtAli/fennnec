@@ -5,8 +5,11 @@ import 'package:fennac_app/app/constants/app_enums.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/helpers/gradient_toast.dart';
+import 'package:fennac_app/pages/auth/presentation/bloc/cubit/login_cubit.dart';
+import 'package:fennac_app/pages/dashboard/presentation/bloc/cubit/dashboard_cubit.dart';
 import 'package:fennac_app/pages/home/presentation/bloc/cubit/groups_cubit.dart';
 import 'package:fennac_app/pages/home/presentation/bloc/state/groups_state.dart';
+import 'package:fennac_app/pages/chats/presentation/widgets/premium_card.dart';
 import 'package:fennac_app/pages/home/presentation/widgets/group_gallery_widget.dart';
 import 'package:fennac_app/pages/home/presentation/widgets/hero_section.dart';
 import 'package:fennac_app/pages/home/presentation/widgets/home_top_bar.dart';
@@ -258,6 +261,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           child: BlocBuilder(
             bloc: homeCubit,
             builder: (context, state) {
+              final isNonSubscribedUser =
+                  Di().sl<LoginCubit>().userData?.user?.subscriptionActive ==
+                  false;
+              final shouldShowPremiumCard =
+                  widget.isLikedGroups &&
+                  isNonSubscribedUser &&
+                  homeCubit.groups.isNotEmpty;
+
               return RefreshIndicator(
                 color: ColorPalette.primary,
                 backgroundColor: Colors.white,
@@ -300,6 +311,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           },
                         ),
                         const CustomSizedBox(height: 20),
+                        if (shouldShowPremiumCard) ...[
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 24),
+                            child: const PremiumCard(),
+                          ),
+                          const CustomSizedBox(height: 16),
+                        ],
 
                         Expanded(
                           child: Stack(
@@ -450,19 +468,36 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                           horizontal: 24,
                                         ),
                                         child: EmptyWidget(
-                                          title: 'No Groups Available',
-                                          description:
-                                              'We couldn\'t find any groups right now. Try refreshing or check back soon.',
-                                          imagePath:
-                                              Assets.icons.alertTriangle.path,
+                                          title: widget.isLikedGroups
+                                              ? 'No Likes Yet!!'
+                                              : 'No Groups Available',
+                                          description: widget.isLikedGroups
+                                              ? 'Your group hasn’t received any likes yet. Keep swiping to get discovered and increase your chances matching.'
+                                              : 'We couldn\'t find any groups right now. Try refreshing or check back soon.',
+                                          imagePath: widget.isLikedGroups
+                                              ? Assets.icons.noLikes.path
+                                              : Assets.icons.alertTriangle.path,
                                           showButton: true,
-                                          buttonText: 'Refresh',
-                                          onButtonTap: () {
-                                            _groupsCubit.fetchAllGroups(
-                                              isLikedGroups:
-                                                  widget.isLikedGroups,
-                                            );
-                                          },
+                                          buttonText: widget.isLikedGroups
+                                              ? 'Explore Groups'
+                                              : 'Refresh',
+                                          onButtonTap: widget.isLikedGroups
+                                              ? () async {
+                                                  AutoRouter.of(context).pop();
+                                                  Di()
+                                                      .sl<DashboardCubit>()
+                                                      .changeIndex(0);
+                                                  await _groupsCubit
+                                                      .fetchAllGroups(
+                                                        isLikedGroups: false,
+                                                      );
+                                                }
+                                              : () {
+                                                  _groupsCubit.fetchAllGroups(
+                                                    isLikedGroups:
+                                                        widget.isLikedGroups,
+                                                  );
+                                                },
                                         ),
                                       ),
                                     );

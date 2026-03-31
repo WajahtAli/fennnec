@@ -4,6 +4,7 @@ import 'package:fennac_app/app/constants/dummy_constants.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/core/di_container.dart';
+import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:fennac_app/helpers/gradient_toast.dart';
 import 'package:fennac_app/pages/auth/presentation/bloc/cubit/login_cubit.dart';
 import 'package:fennac_app/pages/chats/presentation/bloc/cubit/chat_landing_cubit.dart';
@@ -14,6 +15,7 @@ import 'package:fennac_app/pages/chats/presentation/widgets/group_list_item.dart
 import 'package:fennac_app/pages/chats/presentation/widgets/premium_card.dart';
 import 'package:fennac_app/pages/chats/presentation/widgets/subscribed_chat_widget.dart';
 import 'package:fennac_app/pages/home/data/models/groups_model.dart';
+import 'package:fennac_app/reusable_widgets/empty_widget.dart';
 import 'package:fennac_app/routes/routes_imports.gr.dart';
 import 'package:fennac_app/widgets/custom_search_field.dart';
 import 'package:fennac_app/widgets/custom_sized_box.dart';
@@ -124,6 +126,7 @@ class _ChatLandingScreenState extends State<ChatLandingScreen> {
                           names: List<String>.from(group['names']),
                           lastMessage: group['lastMessage'],
                           time: group['time'],
+                          unreadCount: (group['unreadCount'] as int?) ?? 0,
                           avatars: List<String>.from(group['avatars']),
                         ),
                       );
@@ -151,6 +154,7 @@ class _ChatLandingScreenState extends State<ChatLandingScreen> {
         time: chat.lastMessageAt != null
             ? _getTimeAgo(chat.lastMessageAt!)
             : '',
+        unreadCount: chat.unreadCount,
         avatars: isGroup
             ? (chat.members?.map((m) => m.image).toList() ?? [chat.image])
             : [chat.image],
@@ -193,12 +197,19 @@ class _ChatLandingScreenState extends State<ChatLandingScreen> {
           if (state.isLoadingData && state.calls.isEmpty)
             const Center(child: CircularProgressIndicator())
           else if (state.calls.isEmpty)
-            Center(
+            Align(
+              alignment: Alignment.center,
               child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Text(
-                  'No call history yet',
-                  style: AppTextStyles.description(context),
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: EmptyWidget(
+                  title: 'No calls yet!',
+                  description:
+                      'Voice and video calls will appear here once you start talking.',
+                  imagePath: Assets.icons.noLikes.path,
+
+                  showButton: true,
+                  buttonText: 'Refresh',
+                  onButtonTap: () {},
                 ),
               ),
             )
