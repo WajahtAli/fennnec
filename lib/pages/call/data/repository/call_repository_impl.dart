@@ -18,4 +18,9 @@ class CallRepositoryImpl extends CallRepository {
       participantIds: participantIds,
     );
   }
+
+  @override
+  Future<Map<String, dynamic>> endCall({required String callRecordId}) {
+    return _dataSource.endCall(callRecordId: callRecordId);
+  }
 }

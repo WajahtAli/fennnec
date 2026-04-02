@@ -28,7 +28,9 @@ class _AudioCallScreenState extends State<AudioCallScreen> {
   void initState() {
     super.initState();
     // Initialize Agora with channel and token from API
-    _callCubit.initAgora(context);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _callCubit.initAgora(context);
+    });
   }
 
   @override

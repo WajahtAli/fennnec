@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'local_notification_service.dart';
 import 'call_notification_handler.dart';
 import '../../app/constants/app_constants.dart';
+import 'voip_bridge.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -27,11 +28,20 @@ class PushNotificationService {
   static Future<void> init() async {
     CallNotificationHandler().init();
 
+    VoipBridge.init(
+      onAccept: (data) {
+        log('Call accepted with data: $data');
+        CallNotificationHandler().handleBridgeAccept(data);
+      },
+      onDecline: (_) {},
+    );
+
     await _firebaseMessaging.requestPermission(
       alert: true,
       badge: true,
       sound: true,
       provisional: false,
+      announcement: true,
     );
 
     // Wait for APNS token on iOS before calling getToken

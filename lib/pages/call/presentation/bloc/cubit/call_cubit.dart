@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'package:auto_route/auto_route.dart';
 import 'package:fennac_app/app/app.dart';
 import 'package:fennac_app/app/constants/app_constants.dart';
@@ -32,6 +33,7 @@ class CallCubit extends Cubit<CallState> {
   String? _token;
   String? channelName;
   String? callId;
+  String? callkitId;
   String? imageUrl;
   Duration callDuration = Duration.zero;
   Timer? _durationTimer;
@@ -82,17 +84,29 @@ class CallCubit extends Cubit<CallState> {
     required String callId,
     required String mediaType,
     required String imageUrl,
+    String? callkitId,
   }) {
     emit(CallLoading());
     this.channelName = channelName;
     this.callId = callId;
+    this.callkitId = callkitId;
     this.imageUrl = imageUrl;
     callType = mediaType == 'video' ? CallType.video : CallType.audio;
     role = ClientRoleType.clientRoleBroadcaster;
     emit(CallLoaded());
   }
 
+  bool _isValidUuid(String value) {
+    final uuidRegex = RegExp(
+      r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
+    );
+    return uuidRegex.hasMatch(value);
+  }
+
   Future<void> initAgora(BuildContext context) async {
+    log(
+      "Initializing Agora with channel: $channelName, callId: $callId, mediaType: ${callType.name}",
+    );
     emit(CallLoading());
     users.clear();
     joined = false;
@@ -197,6 +211,12 @@ class CallCubit extends Cubit<CallState> {
 
     _stopTimer();
 
+    if (callId != null) {
+      try {
+        await _callUsecase.endCall(callRecordId: callId!);
+      } catch (_) {}
+    }
+
     if (_isEngineReady) {
       FlutterCallkitIncoming.endAllCalls();
       await engine.leaveChannel();
@@ -222,7 +242,11 @@ class CallCubit extends Cubit<CallState> {
         },
         onUserJoined: (RtcConnection conn, int remoteUid, int elapsed) async {
           emit(CallLoading());
-          await FlutterCallkitIncoming.setCallConnected(callId ?? "");
+          final callkitConnectionId = callkitId;
+          if (callkitConnectionId != null &&
+              _isValidUuid(callkitConnectionId)) {
+            await FlutterCallkitIncoming.setCallConnected(callkitConnectionId);
+          }
           debugPrint("👤 Remote user joined: $remoteUid");
           users.add(remoteUid);
           emit(CallLoaded());

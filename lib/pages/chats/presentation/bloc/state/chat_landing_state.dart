@@ -10,6 +10,7 @@ class ChatLandingState extends Equatable {
   final int selectedTab;
   final SubscriptionStatus subscriptionStatus;
   final String searchQuery;
+  final String callSearchQuery;
 
   const ChatLandingState({
     this.chats = const [],
@@ -19,6 +20,7 @@ class ChatLandingState extends Equatable {
     this.selectedTab = 0,
     this.subscriptionStatus = SubscriptionStatus.unsubscribed,
     this.searchQuery = '',
+    this.callSearchQuery = '',
   });
 
   ChatLandingState copyWith({
@@ -29,6 +31,7 @@ class ChatLandingState extends Equatable {
     int? selectedTab,
     SubscriptionStatus? subscriptionStatus,
     String? searchQuery,
+    String? callSearchQuery,
   }) {
     return ChatLandingState(
       chats: chats ?? this.chats,
@@ -38,6 +41,7 @@ class ChatLandingState extends Equatable {
       selectedTab: selectedTab ?? this.selectedTab,
       subscriptionStatus: subscriptionStatus ?? this.subscriptionStatus,
       searchQuery: searchQuery ?? this.searchQuery,
+      callSearchQuery: callSearchQuery ?? this.callSearchQuery,
     );
   }
 
@@ -50,6 +54,7 @@ class ChatLandingState extends Equatable {
     selectedTab,
     subscriptionStatus,
     searchQuery,
+    callSearchQuery,
   ];
 }
 

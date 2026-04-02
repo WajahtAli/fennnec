@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:ui';
 
 import 'package:auto_route/auto_route.dart';
@@ -58,6 +59,16 @@ class ChatAppBar extends StatelessWidget {
       id: currentChat?.id ?? chatId,
       name: currentChat?.name,
       coverImage: currentChat?.image,
+      members: (currentChat?.members ?? [])
+          .map(
+            (m) => Member(
+              id: m.id,
+              name: m.name,
+              firstName: m.name,
+              coverImage: m.image,
+            ),
+          )
+          .toList(),
     );
 
     final topPadding = MediaQuery.of(context).padding.top;
@@ -135,9 +146,7 @@ class ChatAppBar extends StatelessWidget {
                       const CustomSizedBox(width: 2),
                       Icon(
                         Icons.chevron_right,
-                        color: isLight
-                            ? ColorPalette.black
-                            : Colors.white,
+                        color: isLight ? ColorPalette.black : Colors.white,
                         size: 16,
                       ),
                     ],
@@ -158,9 +167,12 @@ class ChatAppBar extends StatelessWidget {
               height: 20,
             ),
             onTap: () {
-              AutoRouter.of(
+              _startCallFromHeader(
                 context,
-              ).push(GroupAudioCallRoute(group: group, isVideoCall: false));
+                isVideoCall: false,
+                isGroup: isGroup,
+                group: group,
+              );
             },
           ),
           const CustomSizedBox(width: 8),
@@ -176,9 +188,12 @@ class ChatAppBar extends StatelessWidget {
               height: 20,
             ),
             onTap: () {
-              AutoRouter.of(
+              _startCallFromHeader(
                 context,
-              ).push(GroupAudioCallRoute(group: group, isVideoCall: true));
+                isVideoCall: true,
+                isGroup: isGroup,
+                group: group,
+              );
             },
           ),
         ],
@@ -339,8 +354,11 @@ class ChatAppBar extends StatelessWidget {
                           ),
                     onTap: isStartingCall
                         ? null
-                        : () =>
-                              _startCallFromHeader(context, isVideoCall: false),
+                        : () => _startCallFromHeader(
+                            context,
+                            isVideoCall: false,
+                            isGroup: isGroup,
+                          ),
                   ),
                   const CustomSizedBox(width: 8),
                   CircleIconButton(
@@ -365,8 +383,11 @@ class ChatAppBar extends StatelessWidget {
                           ),
                     onTap: isStartingCall
                         ? null
-                        : () =>
-                              _startCallFromHeader(context, isVideoCall: true),
+                        : () => _startCallFromHeader(
+                            context,
+                            isVideoCall: true,
+                            isGroup: isGroup,
+                          ),
                   ),
                 ],
               );
@@ -441,21 +462,30 @@ class ChatAppBar extends StatelessWidget {
   Future<void> _startCallFromHeader(
     BuildContext context, {
     required bool isVideoCall,
+    bool isGroup = false,
+    Group? group,
   }) async {
     final callCubit = Di().sl<CallCubit>();
     final participantId = _resolveParticipantId();
-
+    log("ids $participantId");
     if (participantId == null || participantId.isEmpty) {
       return;
     }
 
     final response = await callCubit.startCall(
       mediaType: isVideoCall ? 'video' : 'audio',
-      callType: 'individual',
-      participantIds: [participantId],
+      callType: isGroup ? 'group' : 'individual',
+      participantIds: participantId,
     );
 
     if (!context.mounted || response == null) return;
+
+    // if (isGroup && group != null) {
+    //   AutoRouter.of(
+    //     context,
+    //   ).push(GroupAudioCallRoute(group: group, isVideoCall: isVideoCall));
+    //   return;
+    // }
 
     if (isVideoCall) {
       AutoRouter.of(context).push(VideoCallRoute());
@@ -464,7 +494,7 @@ class ChatAppBar extends StatelessWidget {
     }
   }
 
-  String? _resolveParticipantId() {
+  List<String>? _resolveParticipantId() {
     final targetChatId = chatId;
     if (targetChatId == null || targetChatId.isEmpty) return null;
 
@@ -478,13 +508,13 @@ class ChatAppBar extends StatelessWidget {
       if (members != null && members.isNotEmpty) {
         for (final member in members) {
           if (member.id != currentUserId) {
-            return member.id;
+            return [member.id];
           }
         }
-        return members.first.id;
+        return members.map((m) => m.id).toList();
       }
     }
 
-    return targetChatId;
+    return [targetChatId];
   }
 }

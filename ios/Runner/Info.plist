@@ -2,14 +2,20 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>FlutterDeepLinkingEnabled</key>
+    <false/>
+    <key>com.apple.developer.associated-domains</key>
+    <array>
+       <string>applinks:com.fennac.ostryx</string>
+    </array>
 	<key>NSContactsUsageDescription</key>  
 	<string>This app requires access to your contacts to help you easily find and add your friends.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>This app needs access to your microphone for voice communication and audio recording.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>This app needs access to your camera to capture photos and videos.</string>
+	<string>This app needs camera access to scan QR codes, capture photos and videos.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Application need access to your photo library to upload images and videos.</string>
+	<string>This app needs photos access to get QR codes from photo library, upload images and videos.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Application need permission to save media to your photo library.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>

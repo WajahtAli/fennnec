@@ -8,12 +8,16 @@ import 'package:fennac_app/pages/chats/data/repository/chat_repository.dart';
 class ChatLandingCubit extends Cubit<ChatLandingState> {
   final ChatRepository _chatRepository = Di().sl<ChatRepository>();
   String _searchQuery = '';
+  String _callsSearchQuery = '';
   List<ChatModel> _filteredChats = const [];
+  List<CallModel> _filteredCalls = const [];
 
   ChatLandingCubit() : super(const ChatLandingState());
 
   List<ChatModel> get filteredChats => _filteredChats;
+  List<CallModel> get filteredCalls => _filteredCalls;
   bool get isSearching => _searchQuery.trim().isNotEmpty;
+  bool get isCallsSearching => _callsSearchQuery.trim().isNotEmpty;
 
   void selectTab(int index) {
     emit(state.copyWith(selectedTab: index));
@@ -27,6 +31,12 @@ class ChatLandingCubit extends Cubit<ChatLandingState> {
     _searchQuery = query;
     _applyChatFilter(state.chats);
     emit(state.copyWith(searchQuery: _searchQuery));
+  }
+
+  void onCallsSearchChanged(String query) {
+    _callsSearchQuery = query;
+    _applyCallsFilter(state.calls);
+    emit(state.copyWith(callSearchQuery: _callsSearchQuery));
   }
 
   Future<void> fetchChatsAndCalls({int page = 1, int limit = 20}) async {
@@ -43,6 +53,7 @@ class ChatLandingCubit extends Cubit<ChatLandingState> {
           calls: response.data.calls,
         );
         _applyChatFilter(nextState.chats);
+        _applyCallsFilter(nextState.calls);
         emit(nextState);
       } else {
         emit(
@@ -67,6 +78,31 @@ class ChatLandingCubit extends Cubit<ChatLandingState> {
       }
 
       return chat.members?.any(
+            (member) => member.name.toLowerCase().contains(normalizedQuery),
+          ) ??
+          false;
+    }).toList();
+  }
+
+  void _applyCallsFilter(List<CallModel> calls) {
+    final normalizedQuery = _callsSearchQuery.trim().toLowerCase();
+    if (normalizedQuery.isEmpty) {
+      _filteredCalls = const [];
+      return;
+    }
+
+    _filteredCalls = calls.where((call) {
+      if ((call.name ?? '').toLowerCase().contains(normalizedQuery)) {
+        return true;
+      }
+
+      if ((call.callTypeLabel ?? '').toLowerCase().contains(normalizedQuery) ||
+          (call.callType ?? '').toLowerCase().contains(normalizedQuery) ||
+          (call.mediaType ?? '').toLowerCase().contains(normalizedQuery)) {
+        return true;
+      }
+
+      return call.members?.any(
             (member) => member.name.toLowerCase().contains(normalizedQuery),
           ) ??
           false;

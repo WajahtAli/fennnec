@@ -381,7 +381,9 @@ class ReactionRow extends StatelessWidget {
           ),
           child: Text(
             '${e.key} ${e.value}',
-            style: AppTextStyles.bodySmall(context),
+            style: AppTextStyles.bodySmall(
+              context,
+            ).copyWith(color: Colors.white),
           ),
         );
       }).toList(),

@@ -7,6 +7,8 @@ abstract class CallDataSource {
     required String callType,
     required List<String> participantIds,
   });
+
+  Future<Map<String, dynamic>> endCall({required String callRecordId});
 }
 
 class CallDataSourceImpl extends CallDataSource {
@@ -30,6 +32,16 @@ class CallDataSourceImpl extends CallDataSource {
         },
       );
 
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>> endCall({required String callRecordId}) async {
+    try {
+      final response = await _apiHelper.post('calls/$callRecordId/end');
       return response;
     } catch (e) {
       rethrow;

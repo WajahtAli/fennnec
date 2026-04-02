@@ -21,6 +21,8 @@ class CallNotificationHandler {
   factory CallNotificationHandler() => _instance;
   CallNotificationHandler._internal();
 
+  static const Uuid _uuid = Uuid();
+
   bool _isNavigating = false;
 
   void init() {
@@ -31,13 +33,17 @@ class CallNotificationHandler {
   static Future<void> handleCallNotification(RemoteMessage message) async {
     final data = message.data;
     final callId = data['callRecordId'] ?? const Uuid().v4();
-    final callerName = message.notification?.title ?? "Incoming Call";
-    final callerNumber = data['callerId'] ?? "";
+    final callkitId = _uuid.v4();
+    final callerName =
+        message.notification?.title ?? data['senderName'] ?? "Incoming Call";
+    final callerNumber = (data['callerId'] as String? ?? '').isNotEmpty
+        ? data['callerId'] as String
+        : callerName;
     final mediaType = data['mediaType'] ?? "audio";
     final imageUrl = data['imageUrl'] ?? "";
 
     final params = CallKitParams(
-      id: callId,
+      id: callkitId,
       nameCaller: callerName,
       appName: 'Fennac',
       avatar: imageUrl,
@@ -53,8 +59,9 @@ class CallNotificationHandler {
         callbackText: 'Call back',
       ),
       extra: <String, dynamic>{
+        'callkitId': callkitId,
         'channelName': data['channelName'],
-        'callRecordId': data['callRecordId'],
+        'callRecordId': callId,
         'mediaType': mediaType,
         'imageUrl': imageUrl,
       },
@@ -70,7 +77,7 @@ class CallNotificationHandler {
         textColor: '#ffffff',
       ),
       ios: IOSParams(
-        iconName: 'AppIcon',
+        iconName: 'CallKitLogo',
         handleType: 'generic',
         supportsVideo: true,
         maximumCallGroups: 2,
@@ -88,6 +95,10 @@ class CallNotificationHandler {
     );
 
     await FlutterCallkitIncoming.showCallkitIncoming(params);
+  }
+
+  Future<void> handleBridgeAccept(Map<String, dynamic> body) async {
+    await _handleCallAccept(body);
   }
 
   void _onCallEvent(CallEvent? event) {
@@ -136,16 +147,23 @@ class CallNotificationHandler {
     if (_isNavigating) return;
     _isNavigating = true;
 
-    final extra = body['extra'];
+    final normalizedBody = _asStringDynamicMap(body) ?? <String, dynamic>{};
+    final extra = _extractPayload(normalizedBody);
     if (extra == null) {
+      log('Call accept payload missing required data: $body');
       _isNavigating = false;
       return;
     }
 
-    final channelName = extra['channelName'] as String?;
-    final callId = extra['callRecordId'] as String?;
-    final mediaType = extra['mediaType'] as String?;
-    final imageUrl = extra['imageUrl'] as String?;
+    final channelName = _pickString(extra, const ['channelName']);
+    final callId = _pickString(extra, const ['callRecordId', 'callId', '_id']);
+    final mediaType = _pickString(extra, const ['mediaType', 'type']);
+    final imageUrl = _pickString(extra, const ['imageUrl', 'avatar']) ?? '';
+    final callkitId = _pickString(normalizedBody, const [
+      'id',
+      'uuid',
+      'callkitId',
+    ]);
 
     if (channelName != null && callId != null && mediaType != null) {
       int retryCount = 0;
@@ -161,7 +179,8 @@ class CallNotificationHandler {
           channelName: channelName,
           callId: callId,
           mediaType: mediaType,
-          imageUrl: imageUrl ?? "",
+          imageUrl: imageUrl,
+          callkitId: callkitId,
         );
 
         if (mediaType == 'video') {
@@ -176,5 +195,44 @@ class CallNotificationHandler {
 
     await Future.delayed(const Duration(seconds: 2));
     _isNavigating = false;
+  }
+
+  Map<String, dynamic>? _extractPayload(Map<String, dynamic> body) {
+    final extraMap = _asStringDynamicMap(body['extra']);
+    if (extraMap != null &&
+        _pickString(extraMap, const ['channelName']) != null &&
+        _pickString(extraMap, const ['callRecordId', 'callId', '_id']) !=
+            null) {
+      return extraMap;
+    }
+
+    final dataMap = _asStringDynamicMap(body['data']);
+    if (dataMap != null) {
+      return dataMap;
+    }
+
+    if (_pickString(body, const ['channelName']) != null &&
+        _pickString(body, const ['callRecordId', 'callId', '_id']) != null) {
+      return body;
+    }
+
+    return null;
+  }
+
+  Map<String, dynamic>? _asStringDynamicMap(dynamic value) {
+    if (value is Map) {
+      return Map<String, dynamic>.from(value);
+    }
+    return null;
+  }
+
+  String? _pickString(Map<String, dynamic> map, List<String> keys) {
+    for (final key in keys) {
+      final value = map[key];
+      if (value == null) continue;
+      final normalized = value.toString();
+      if (normalized.isNotEmpty) return normalized;
+    }
+    return null;
   }
 }

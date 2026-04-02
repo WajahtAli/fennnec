@@ -4,4 +4,6 @@ abstract class CallRepository {
     required String callType,
     required List<String> participantIds,
   });
+
+  Future<Map<String, dynamic>> endCall({required String callRecordId});
 }

@@ -1,9 +1,9 @@
-import 'package:fennac_app/app/constants/dummy_constants.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/helpers/cached_network_image_helper.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:flutter/material.dart';
 import 'package:fennac_app/widgets/app_inkwell.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class ProfileAvatar extends StatelessWidget {
   final String? imageUrl;
@@ -21,6 +21,9 @@ class ProfileAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final fallbackAvatar = _buildFallbackAvatar();
+    final hasImage = imageUrl?.trim().isNotEmpty == true;
+
     return SizedBox(
       width: size,
       height: size,
@@ -31,23 +34,33 @@ class ProfileAvatar extends StatelessWidget {
           Container(
             width: size,
             height: size,
+            alignment: Alignment.center,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(120),
               border: Border.all(color: ColorPalette.black, width: 2.5),
             ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(120),
-              child: imageUrl != null
-                  ? CachedImageHelper(
-                      imageUrl: imageUrl!,
+            child: hasImage
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(120),
+                    child: CachedImageHelper(
+                      imageUrl: imageUrl,
+                      width: size,
+                      height: size,
                       fit: BoxFit.cover,
-                      radius: 120,
-                    )
-                  : Image.asset(
-                      DummyConstants.avatarPaths[0],
-                      fit: BoxFit.cover,
+                      radius: 0,
+                      placeholder: fallbackAvatar,
+                      errorWidget: fallbackAvatar,
                     ),
-            ),
+                  )
+                : CachedImageHelper(
+                    imageUrl: imageUrl,
+                    width: size,
+                    height: size,
+                    fit: BoxFit.cover,
+                    radius: 0,
+                    placeholder: fallbackAvatar,
+                    errorWidget: fallbackAvatar,
+                  ),
           ),
 
           // Edit button
@@ -75,6 +88,18 @@ class ProfileAvatar extends StatelessWidget {
               ),
             ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildFallbackAvatar() {
+    return Center(
+      child: SvgPicture.asset(
+        Assets.icons.user.path,
+        fit: BoxFit.cover,
+        colorFilter: ColorFilter.mode(ColorPalette.primary, BlendMode.srcIn),
+        width: size * 0.5,
+        height: size * 0.5,
       ),
     );
   }

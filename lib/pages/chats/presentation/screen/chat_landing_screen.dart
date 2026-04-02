@@ -14,7 +14,7 @@ import 'package:fennac_app/pages/chats/presentation/widgets/chat_tab_selector.da
 import 'package:fennac_app/pages/chats/presentation/widgets/group_list_item.dart';
 import 'package:fennac_app/pages/chats/presentation/widgets/premium_card.dart';
 import 'package:fennac_app/pages/chats/presentation/widgets/subscribed_chat_widget.dart';
-import 'package:fennac_app/pages/home/data/models/groups_model.dart';
+import 'package:fennac_app/pages/call/presentation/bloc/cubit/call_cubit.dart';
 import 'package:fennac_app/reusable_widgets/empty_widget.dart';
 import 'package:fennac_app/routes/routes_imports.gr.dart';
 import 'package:fennac_app/widgets/custom_search_field.dart';
@@ -24,6 +24,7 @@ import 'package:flutter/material.dart';
 import 'package:fennac_app/widgets/app_inkwell.dart';
 import 'package:fennac_app/pages/chats/data/models/chat_and_calls_response.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lottie/lottie.dart';
 
 @RoutePage()
 class ChatLandingScreen extends StatefulWidget {
@@ -60,7 +61,7 @@ class _ChatLandingScreenState extends State<ChatLandingScreen> {
                   Expanded(
                     child: state.selectedTab == 0
                         ? _buildChatsContent(state)
-                        : _buildCallsContent(state),
+                        : _buildCallsContent(),
                   ),
                   CustomSizedBox(
                     height: MediaQuery.paddingOf(context).bottom + 30,
@@ -175,68 +176,85 @@ class _ChatLandingScreenState extends State<ChatLandingScreen> {
     }
   }
 
-  Widget _buildCallsContent(ChatLandingState state) {
-    return RefreshIndicator(
-      color: ColorPalette.primary,
-      backgroundColor: Colors.white,
-      onRefresh: () => _chatLandingCubit.fetchChatsAndCalls(),
-      child: ListView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        children: [
-          const CustomSizedBox(height: 12),
-          const CustomSearchField(hintText: 'Search'),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-            child: Text(
-              'Call History',
-              style: AppTextStyles.subHeading(
-                context,
-              ).copyWith(fontWeight: FontWeight.w600),
-            ),
-          ),
-          if (state.isLoadingData && state.calls.isEmpty)
-            const Center(child: CircularProgressIndicator())
-          else if (state.calls.isEmpty)
-            Align(
-              alignment: Alignment.center,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: EmptyWidget(
-                  title: 'No calls yet!',
-                  description:
-                      'Voice and video calls will appear here once you start talking.',
-                  imagePath: Assets.icons.noLikes.path,
+  Widget _buildCallsContent() {
+    return BlocBuilder<ChatLandingCubit, ChatLandingState>(
+      bloc: _chatLandingCubit,
+      builder: (context, state) {
+        final callsToShow = _chatLandingCubit.isCallsSearching
+            ? _chatLandingCubit.filteredCalls
+            : state.calls;
 
-                  showButton: true,
-                  buttonText: 'Refresh',
-                  onButtonTap: () {},
+        return RefreshIndicator(
+          color: ColorPalette.primary,
+          backgroundColor: Colors.white,
+          onRefresh: () => _chatLandingCubit.fetchChatsAndCalls(),
+          child: ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            children: [
+              const CustomSizedBox(height: 12),
+              CustomSearchField(
+                hintText: 'Search',
+                onChanged: _chatLandingCubit.onCallsSearchChanged,
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
+                child: Text(
+                  'Call History',
+                  style: AppTextStyles.subHeading(
+                    context,
+                  ).copyWith(fontWeight: FontWeight.w600),
                 ),
               ),
-            )
-          else
-            ...state.calls.map((call) {
-              final isGroup =
-                  (call.members?.length ?? 0) > 1 || (call.name == null);
-              return AppInkWell(
-                borderRadius: BorderRadius.circular(12),
-                onTap: () {
-                  _onCallHistoryTap(call);
-                },
-                child: CallHistoryItem(
-                  name: call.name,
-                  names: call.members?.map((m) => m.name).toList(),
-                  callType: call.callTypeLabel,
-                  duration: call.duration,
-                  timeAgo: call.timeAgo ?? '',
-                  avatar: call.image,
-                  avatars: call.members?.map((m) => m.image).toList(),
-                  isGroup: isGroup,
-                ),
-              );
-            }),
-          CustomSizedBox(height: MediaQuery.paddingOf(context).bottom + 30),
-        ],
-      ),
+              if (state.isLoadingData && state.calls.isEmpty)
+                Center(child: Lottie.asset(Assets.animations.loadingSpinner))
+              else if (callsToShow.isEmpty)
+                Align(
+                  alignment: Alignment.center,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: EmptyWidget(
+                      title: _chatLandingCubit.isCallsSearching
+                          ? 'No results found'
+                          : 'No calls yet!',
+                      description: _chatLandingCubit.isCallsSearching
+                          ? 'Try searching with a different name or call type.'
+                          : 'Voice and video calls will appear here once you start talking.',
+                      imagePath: Assets.icons.noLikes.path,
+                      showButton: true,
+                      buttonText: 'Refresh',
+                      onButtonTap: () {},
+                    ),
+                  ),
+                )
+              else
+                ...callsToShow.map((call) {
+                  final isGroup =
+                      (call.members?.length ?? 0) > 1 || (call.name == null);
+                  return AppInkWell(
+                    borderRadius: BorderRadius.circular(12),
+                    onTap: () {
+                      _onCallHistoryTap(call);
+                    },
+                    child: CallHistoryItem(
+                      name: call.name,
+                      names: call.members?.map((m) => m.name).toList(),
+                      callType: call.callTypeLabel,
+                      duration: call.duration,
+                      timeAgo: call.timeAgo ?? '',
+                      avatar: call.image,
+                      avatars: call.members?.map((m) => m.image).toList(),
+                      isGroup: isGroup,
+                    ),
+                  );
+                }),
+              CustomSizedBox(height: MediaQuery.paddingOf(context).bottom + 30),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -254,25 +272,37 @@ class _ChatLandingScreenState extends State<ChatLandingScreen> {
       return;
     }
 
-    final mappedMembers = members
-        .map(
-          (m) => Member(
-            id: m.id,
-            firstName: m.name,
-            name: m.name,
-            coverImage: m.image,
-          ),
-        )
+    final currentUserId = Di().sl<LoginCubit>().userData?.user?.id;
+    final participantIds = members
+        .map((m) => m.id)
+        .where((id) => id.isNotEmpty && id != currentUserId)
         .toList();
 
-    final group = Group(
-      id: call.id,
-      name: call.name ?? members.map((m) => m.name).join(', '),
-      members: mappedMembers,
-    );
+    if (participantIds.isEmpty) {
+      VxToast.show(message: 'Unable to start call for this record.');
+      return;
+    }
 
-    context.router.push(
-      GroupAudioCallRoute(group: group, isVideoCall: isVideo),
-    );
+    final callCubit = Di().sl<CallCubit>();
+    final callType = participantIds.length > 1 ? 'group' : 'individual';
+
+    callCubit
+        .startCall(
+          mediaType: isVideo ? 'video' : 'audio',
+          callType: callType,
+          participantIds: participantIds,
+        )
+        .then((response) {
+          if (!mounted || response == null) {
+            VxToast.show(message: 'Unable to start call. Please try again.');
+            return;
+          }
+
+          if (isVideo) {
+            AutoRouter.of(context).push(VideoCallRoute());
+          } else {
+            AutoRouter.of(context).push(AudioCallRoute());
+          }
+        });
   }
 }

@@ -3,7 +3,6 @@ import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/pages/chats/data/models/message_model.dart';
 import 'package:fennac_app/pages/chats/presentation/widgets/main_media_display.dart';
-import 'package:fennac_app/pages/chats/presentation/widgets/media_header.dart';
 import 'package:fennac_app/pages/chats/presentation/widgets/thumbnail_strip.dart';
 import 'package:fennac_app/reusable_widgets/custom_app_bar.dart';
 import 'package:fennac_app/widgets/movable_background.dart';
@@ -70,7 +69,7 @@ class _MediaPreviewScreenState extends State<MediaPreviewScreen> {
         backgroundType: MovableBackgroundType.dark,
         child: Column(
           children: [
-            MediaHeader(
+            CustomAppBar(
               title:
                   'Shared by ${widget.messages.first.mentionedUserName ?? ''} ',
             ),

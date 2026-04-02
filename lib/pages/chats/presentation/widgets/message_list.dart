@@ -1,5 +1,4 @@
 import 'dart:ui';
-import 'package:fennac_app/app/constants/dummy_constants.dart';
 import 'package:fennac_app/app/constants/media_query_constants.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
@@ -7,17 +6,15 @@ import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:fennac_app/helpers/gradient_toast.dart';
 import 'package:fennac_app/pages/chats/data/models/message_model.dart';
-import 'package:fennac_app/pages/chats/data/models/message_type_enum.dart';
-import 'package:fennac_app/pages/chats/data/models/reaction_model.dart';
 import 'package:fennac_app/pages/chats/presentation/bloc/cubit/message_cubit.dart';
 import 'package:fennac_app/pages/chats/presentation/widgets/message_bubble.dart';
-import 'package:fennac_app/models/dummy/chat_message_model.dart';
 import 'package:fennac_app/reusable_widgets/empty_widget.dart';
 import 'package:fennac_app/widgets/custom_bottom_sheet.dart';
 import 'package:fennac_app/widgets/custom_sized_box.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:lottie/lottie.dart';
 
 class MessageList extends StatefulWidget {
   final bool isGroup;
@@ -34,11 +31,6 @@ class _MessageListState extends State<MessageList> {
   final Map<String, GlobalKey> _messageKeys = {};
   OverlayEntry? _reactionOverlay;
   final List<String> _availableReactions = ['👍', '😂', '🔥', '❤️', '👌', '😮'];
-  final List<MessageModel> _dummyMessages = DummyConstants.getMessages()
-      .asMap()
-      .entries
-      .map((entry) => _mapChatMessageToMessageModel(entry.value, entry.key))
-      .toList();
 
   @override
   void initState() {
@@ -64,48 +56,6 @@ class _MessageListState extends State<MessageList> {
 
     _removeReactionOverlay('', '');
     super.dispose();
-  }
-
-  static MessageModel _mapChatMessageToMessageModel(
-    ChatMessage chat,
-    int index,
-  ) {
-    return MessageModel(
-      id: chat.id,
-      senderId: chat.id,
-      senderName: chat.name,
-      senderAvatar: chat.avatar,
-      content: chat.text ?? '',
-      type: MessageTypeExtension.fromString(chat.type),
-      imageUrls: chat.images,
-      mediaDuration: chat.duration,
-      mentionedUserName: chat.mentionedUser,
-      sentAt: DateTime.now().subtract(Duration(minutes: index * 2)),
-      isMe: chat.isMe,
-      isGroup: chat.isMyGroup,
-      reactions: _mapReactions(chat.reactions),
-    );
-  }
-
-  static List<ReactionModel> _mapReactions(
-    Map<String, List<String>> reactionsMap,
-  ) {
-    final List<ReactionModel> reactions = [];
-
-    reactionsMap.forEach((emoji, userIds) {
-      for (final userId in userIds) {
-        reactions.add(
-          ReactionModel(
-            userId: userId,
-            userName: userId,
-            emoji: emoji,
-            reactedAt: DateTime.now(),
-          ),
-        );
-      }
-    });
-
-    return reactions;
   }
 
   void _showReactionOverlay(MessageModel message, bool isMineSide) {
@@ -204,7 +154,7 @@ class _MessageListState extends State<MessageList> {
                   },
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 6),
-                    child: Text(emoji, style: const TextStyle(fontSize: 26)),
+                    child: Text(emoji, style: AppTextStyles.h4(context)),
                   ),
                 );
               }).toList(),
@@ -358,9 +308,7 @@ class _MessageListState extends State<MessageList> {
       bloc: messageCubit,
       builder: (context, state) {
         if (messageCubit.isLoading) {
-          return Center(
-            child: CircularProgressIndicator(color: ColorPalette.primary),
-          );
+          return Center(child: Lottie.asset(Assets.animations.loadingSpinner));
         }
 
         if (messageCubit.hasError) {
@@ -379,11 +327,8 @@ class _MessageListState extends State<MessageList> {
         }
 
         final messages = messageCubit.messages;
-        final messagesToRender = messages.isEmpty && widget.isGroup
-            ? _dummyMessages
-            : messages;
 
-        if (messages.isEmpty && !widget.isGroup) {
+        if (messages.isEmpty) {
           return Padding(
             padding: const EdgeInsets.all(24),
             child: Center(
@@ -407,9 +352,9 @@ class _MessageListState extends State<MessageList> {
             top: 140,
             bottom: 0,
           ),
-          itemCount: messagesToRender.length,
+          itemCount: messages.length,
           itemBuilder: (context, index) {
-            final message = messagesToRender[index];
+            final message = messages[index];
             final isMineSide = message.isMe;
 
             return Padding(
@@ -443,9 +388,7 @@ class _MessageListState extends State<MessageList> {
                             children: [
                               Text(
                                 message.senderName,
-                                style: AppTextStyles.bodySmall(
-                                  context,
-                                ).copyWith(fontSize: 12),
+                                style: AppTextStyles.bodySmall(context),
                               ),
                               const CustomSizedBox(height: 4),
                               _buildMessageWithLongPress(message, isMineSide),

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
@@ -69,7 +71,39 @@ class _SubscribedChatWidgetState extends State<SubscribedChatWidget> {
                 },
               ),
               const CustomSizedBox(height: 16),
-              if (members.isNotEmpty) HorizontalAvatarList(members: members),
+              if (members.isNotEmpty)
+                HorizontalAvatarList(
+                  members: members,
+                  onAvatarTap: (member) {
+                    log('Tapped member: ${member.name} (${member.id})');
+
+                    final chat = chats.firstWhere(
+                      (c) => c.members?.any((m) => m.id == member.id) ?? false,
+                      orElse: () => chats.first,
+                    );
+
+                    log('Chat ID: ${chat.id}');
+                    log('OtherUserId: ${chat.meta.directChat?.otherUserId}');
+                    log('Chat Type: ${chat.type}');
+
+                    final isOnline = chat.status.toLowerCase() == 'online';
+
+                    final chatId =
+                        chat.meta.directChat?.otherUserId?.isNotEmpty == true
+                        ? chat.meta.directChat!.otherUserId!
+                        : chat.id;
+
+                    context.router.push(
+                      GroupChatRoute(
+                        isGroup: chat.type == 'group' ? true : false,
+                        groupId: chatId,
+                        contactAvatar: member.image,
+                        contactName: member.name,
+                        isOnline: isOnline,
+                      ),
+                    );
+                  },
+                ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Text(

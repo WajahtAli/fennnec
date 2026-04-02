@@ -16,4 +16,8 @@ class CallUsecase {
       participantIds: participantIds,
     );
   }
+
+  Future<Map<String, dynamic>> endCall({required String callRecordId}) {
+    return _repository.endCall(callRecordId: callRecordId);
+  }
 }

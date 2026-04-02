@@ -6,6 +6,7 @@ import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
+import 'package:fennac_app/helpers/cached_network_image_helper.dart';
 import 'package:fennac_app/pages/chats/data/models/chat_and_calls_response.dart';
 import 'package:fennac_app/pages/chats/data/models/message_model.dart';
 import 'package:fennac_app/pages/chats/data/models/message_type_enum.dart';
@@ -132,23 +133,55 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
           BlocBuilder<MyGroupCubit, MyGroupState>(
             bloc: _myGroupCubit,
             builder: (context, _) {
+              final groupsDetails = currentChat?.meta.groupsDetails;
+
+              final userGroupMembers =
+                  (groupsDetails?.userGroupMembers ?? const [])
+                      .map(_mapChatGroupMemberToMemberModel)
+                      .toList();
+
+              final matchedGroupMembers =
+                  (groupsDetails?.matchedGroupMembers ?? const [])
+                      .expand((group) => group.members)
+                      .map(_mapChatGroupMemberToMemberModel)
+                      .toList();
+
               final rawMembers = groupData?.members ?? [];
-              final members = rawMembers
+              final fallbackMembers = rawMembers
                   .map(
                     (m) => MemberModel(
                       id: m.id ?? '',
                       name: [
                         m.firstName ?? '',
                         m.lastName ?? '',
-                      ].where((s) => s.isNotEmpty).join(' '),
+                      ].where((s) => s.isNotEmpty).join(' ').trim(),
                       image: m.image ?? '',
                     ),
                   )
                   .toList();
-              if (members.isEmpty && currentChat?.members != null) {
-                members.addAll(currentChat!.members!);
+
+              if (fallbackMembers.isEmpty && currentChat?.members != null) {
+                fallbackMembers.addAll(currentChat!.members!);
               }
-              return GroupDetailMembersAvatar(members: members);
+
+              if (userGroupMembers.isEmpty && matchedGroupMembers.isEmpty) {
+                return GroupDetailMembersAvatar(members: fallbackMembers);
+              }
+
+              return Column(
+                children: [
+                  if (userGroupMembers.isNotEmpty)
+                    GroupDetailMembersAvatar(members: userGroupMembers),
+                  if (userGroupMembers.isNotEmpty &&
+                      matchedGroupMembers.isNotEmpty)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      child: Divider(height: 8, color: Color(0x40FFFFFF)),
+                    ),
+                  if (matchedGroupMembers.isNotEmpty)
+                    GroupDetailMembersAvatar(members: matchedGroupMembers),
+                ],
+              );
             },
           ),
           CustomLabelTextField(
@@ -352,16 +385,15 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
         fit: StackFit.expand,
         children: [
           // Media thumbnail
-          Image.network(
-            mediaUrl,
+          CachedImageHelper(
+            imageUrl: mediaUrl,
             fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) {
-              return Container(
-                color: ColorPalette.black.withValues(alpha: 0.5),
-                child: const Icon(Icons.image, color: Colors.white, size: 40),
-              );
-            },
+            errorWidget: Container(
+              color: ColorPalette.black.withValues(alpha: 0.5),
+              child: const Icon(Icons.image, color: Colors.white, size: 40),
+            ),
           ),
+
           // Play button overlay for videos
           if (isVideo)
             Container(
@@ -492,6 +524,19 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
         .map((value) => value.trim())
         .where((value) => value.isNotEmpty)
         .toList();
+  }
+
+  MemberModel _mapChatGroupMemberToMemberModel(ChatGroupMemberUserModel m) {
+    final fullName = [
+      m.firstName ?? '',
+      m.lastName ?? '',
+    ].where((s) => s.trim().isNotEmpty).join(' ').trim();
+
+    return MemberModel(
+      id: m.id,
+      name: fullName.isEmpty ? 'Member' : fullName,
+      image: m.image ?? '',
+    );
   }
 
   List<String> _resolveMessageAttachmentMediaUrls(

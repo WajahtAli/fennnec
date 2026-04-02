@@ -311,14 +311,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           },
                         ),
                         const CustomSizedBox(height: 20),
-                        if (shouldShowPremiumCard) ...[
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 24),
-                            child: const PremiumCard(),
-                          ),
-                          const CustomSizedBox(height: 16),
-                        ],
 
+                        //todo comment only for testing
+                        // if (shouldShowPremiumCard) ...[
+                        //   Padding(
+                        //     padding: const EdgeInsets.symmetric(horizontal: 24),
+                        //     child: const PremiumCard(),
+                        //   ),
+                        //   const CustomSizedBox(height: 16),
+                        // ],
                         Expanded(
                           child: Stack(
                             children: [
@@ -731,6 +732,21 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                             controller: swipeController,
                                             onSwipe: (result) {
                                               if (result != SwipeResult.none) {
+                                                final groupId =
+                                                    homeCubit
+                                                        .currentGroup
+                                                        ?.id ??
+                                                    '';
+                                                if (groupId.isNotEmpty) {
+                                                  _groupsCubit.likeDislikeGroup(
+                                                    groupId: groupId,
+                                                    type:
+                                                        result ==
+                                                            SwipeResult.right
+                                                        ? 'like'
+                                                        : 'dislike',
+                                                  );
+                                                }
                                                 handleAnim(result);
                                               }
                                             },

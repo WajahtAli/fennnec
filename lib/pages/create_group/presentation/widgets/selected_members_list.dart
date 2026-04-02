@@ -122,9 +122,12 @@ class _MembersWrap extends StatelessWidget {
         : currentUser?.lastName?.trim();
     final adminId = isEditMode ? createdBy?.id : currentUser?.id;
     final adminEmail = isEditMode ? createdBy?.email : currentUser?.email;
+    final currentUserBestShorts = currentUser?.bestShorts;
     final adminImage = isEditMode
         ? createdBy?.image
-        : (currentUser?.bestShorts?.first ?? '');
+        : ((currentUserBestShorts != null && currentUserBestShorts.isNotEmpty)
+              ? currentUserBestShorts.first
+              : '');
 
     final createdByName = [
       adminFirstName,

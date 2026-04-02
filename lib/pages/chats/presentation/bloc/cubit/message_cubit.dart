@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:equatable/equatable.dart';
 
 import 'package:fennac_app/core/di_container.dart';
+import 'package:fennac_app/core/sockets/sockets_service.dart';
 import 'package:fennac_app/helpers/shared_pref_helper.dart';
 import 'package:fennac_app/pages/auth/presentation/bloc/cubit/create_account_cubit.dart';
 import 'package:fennac_app/pages/chats/data/models/message_model.dart';
@@ -26,34 +27,28 @@ class MessageCubit extends Cubit<MessageState> {
   bool isRecordingAudio = false;
   Timer? _pollingTimer;
 
-  void toggleAttachmentPanel({bool? close}) {
+  void _emitLoadingSuccess(void Function() action) {
     emit(MessageLoading());
-    if (close != null) {
-      showAttachmentPanel = !close;
-      emit(MessageSuccess());
-      return;
-    } else {
-      showAttachmentPanel = !showAttachmentPanel;
-    }
+    action();
     emit(MessageSuccess());
+  }
+
+  void toggleAttachmentPanel({bool? close}) {
+    _emitLoadingSuccess(() {
+      showAttachmentPanel = close == null ? !showAttachmentPanel : !close;
+    });
   }
 
   void toggleRecordingAudio({bool? stop}) {
-    emit(MessageLoading());
-    if (stop != null) {
-      isRecordingAudio = !stop;
-      emit(MessageSuccess());
-      return;
-    } else {
-      isRecordingAudio = !isRecordingAudio;
-    }
-    emit(MessageSuccess());
+    _emitLoadingSuccess(() {
+      isRecordingAudio = stop == null ? !isRecordingAudio : !stop;
+    });
   }
 
   void updateFieldHaveText(bool haveText) {
-    emit(MessageLoading());
-    fieldHaveText = haveText;
-    emit(MessageSuccess());
+    _emitLoadingSuccess(() {
+      fieldHaveText = haveText;
+    });
   }
 
   // check is text input is empty
@@ -80,11 +75,12 @@ class MessageCubit extends Cubit<MessageState> {
   bool hasError = false;
   String? errorMessage;
   bool isSendingMessage = false;
+  // IDs of messages currently in-flight (added on send, removed on success/error)
+  final Set<String> sendingMessageIds = {};
   final _uuid = const Uuid();
   final SharedPreferencesHelper _sharedPreferencesHelper = Di()
       .sl<SharedPreferencesHelper>();
 
-  // Current user ID (should be fetched from auth in real app)
   String currentUserId = '1';
   String currentUserName = 'You';
   String? currentUserAvatar;
@@ -93,9 +89,113 @@ class MessageCubit extends Cubit<MessageState> {
   int _page = 1;
   final int _limit = 20;
   bool _hasMore = true;
-  String? _groupId; // used as chat id (group or user depending on _isGroup)
+  String? _groupId;
   bool _isGroup = true;
   bool isFetchingMore = false;
+
+  Future<List<MessageModel>> _fetchMessages({
+    required String chatId,
+    required int page,
+    required int limit,
+  }) {
+    return _isGroup
+        ? _myGroupRepository.fetchGroupMessages(
+            chatId,
+            page: page,
+            limit: limit,
+          )
+        : _myGroupRepository.fetchDirectMessages(
+            chatId,
+            page: page,
+            limit: limit,
+          );
+  }
+
+  Future<void> _sendMessageRequest({
+    required String content,
+    required String type,
+    List<String>? attachments,
+    List<double>? wave,
+    String? duration,
+  }) async {
+    final chatId = _groupId;
+    if (chatId == null || chatId.isEmpty) {
+      throw Exception('Chat id is missing');
+    }
+
+    if (_isGroup) {
+      await _myGroupRepository.sendGroupMessage(
+        chatId,
+        content: content,
+        type: type,
+        attachments: attachments,
+        wave: wave,
+        duration: duration,
+      );
+      return;
+    }
+
+    await _myGroupRepository.sendDirectMessage(
+      chatId,
+      content: content,
+      type: type,
+      attachments: attachments,
+      wave: wave,
+      duration: duration,
+    );
+  }
+
+  Future<void> _reactToMessageRequest({
+    required String messageId,
+    required String emoji,
+    required bool isRemove,
+  }) async {
+    final chatId = _groupId;
+    if (chatId == null || chatId.isEmpty) return;
+
+    if (_isGroup) {
+      await _myGroupRepository.reactToGroupMessage(
+        chatId,
+        messageId,
+        emoji,
+        isRemove: isRemove,
+      );
+      return;
+    }
+
+    await _myGroupRepository.reactToDirectMessage(
+      chatId,
+      messageId,
+      emoji,
+      isRemove: isRemove,
+    );
+  }
+
+  Future<void> _markMessageAsReadRequest(String messageId) async {
+    final chatId = _groupId;
+    if (chatId == null || chatId.isEmpty) return;
+
+    if (_isGroup) {
+      await _myGroupRepository.markGroupMessageAsRead(chatId, messageId);
+      return;
+    }
+
+    await _myGroupRepository.markDirectMessageAsRead(chatId, messageId);
+  }
+
+  Future<void> _deleteMessageRequest(String messageId) async {
+    final chatId = _groupId;
+    if (chatId == null || chatId.isEmpty) {
+      throw Exception('Chat id is missing');
+    }
+
+    if (_isGroup) {
+      await _myGroupRepository.deleteGroupMessage(chatId, messageId);
+      return;
+    }
+
+    await _myGroupRepository.deleteDirectMessage(chatId, messageId);
+  }
 
   /// Initialize messages (can load from local storage or backend)
   Future<void> initializeMessages(String id, {bool isGroup = true}) async {
@@ -118,8 +218,8 @@ class MessageCubit extends Cubit<MessageState> {
       hasError = false;
       emit(MessageSuccess());
 
-      // Start real-time polling every 2 seconds
-      startPolling();
+      // Register real-time socket listener for new messages
+      SocketService.onNewMessage(onMessage: _handleIncomingMessage);
     } catch (e) {
       isLoading = false;
       hasError = true;
@@ -129,59 +229,9 @@ class MessageCubit extends Cubit<MessageState> {
     }
   }
 
-  void startPolling() {
-    _pollingTimer?.cancel();
-    _pollingTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
-      _pollMessages();
-    });
-  }
-
   void stopPolling() {
     _pollingTimer?.cancel();
     _pollingTimer = null;
-  }
-
-  Future<void> _pollMessages() async {
-    if (_groupId == null || isLoading || isFetchingMore || isSendingMessage) {
-      return;
-    }
-
-    final pollingGroupId = _groupId;
-    try {
-      final freshMessages = _isGroup
-          ? await _myGroupRepository.fetchGroupMessages(
-              pollingGroupId!,
-              page: 1,
-              limit: _limit,
-            )
-          : await _myGroupRepository.fetchDirectMessages(
-              pollingGroupId!,
-              page: 1,
-              limit: _limit,
-            );
-
-      if (_groupId != pollingGroupId) {
-        log(
-          "Polling discarded: User switched chat ($pollingGroupId -> $_groupId)",
-        );
-        return;
-      }
-
-      final normalizedMessages = freshMessages
-          .map(_normalizeFetchedMessage)
-          .toList();
-
-      final previousCount = messages.length;
-      emit(MessageLoading());
-
-      messages = _mergeAndSortMessages(messages, normalizedMessages);
-
-      if (messages.length != previousCount) {
-        emit(MessageSuccess());
-      }
-    } catch (e) {
-      log("Polling error: $e");
-    }
   }
 
   Future<void> loadMoreMessages() async {
@@ -190,17 +240,11 @@ class MessageCubit extends Cubit<MessageState> {
     final loadingGroupId = _groupId;
     isFetchingMore = true;
     try {
-      final newMessages = _isGroup
-          ? await _myGroupRepository.fetchGroupMessages(
-              loadingGroupId!,
-              page: _page,
-              limit: _limit,
-            )
-          : await _myGroupRepository.fetchDirectMessages(
-              loadingGroupId!,
-              page: _page,
-              limit: _limit,
-            );
+      final newMessages = await _fetchMessages(
+        chatId: loadingGroupId!,
+        page: _page,
+        limit: _limit,
+      );
 
       // Verify that the user still has the same chat open
       if (_groupId != loadingGroupId) {
@@ -232,7 +276,71 @@ class MessageCubit extends Cubit<MessageState> {
   @override
   Future<void> close() {
     stopPolling();
+    SocketService.offNewMessage();
     return super.close();
+  }
+
+  /// Handle incoming real-time messages from socket events.
+  void _handleIncomingMessage(dynamic data) {
+    try {
+      if (data == null) return;
+
+      final json = data is Map<String, dynamic>
+          ? data
+          : Map<String, dynamic>.from(data as Map);
+
+      // Filter messages that don't belong to the currently open chat.
+      // Backend may set the chat id in different fields depending on chat type.
+      final rawChatId =
+          json['chatId'] ??
+          json['groupId'] ??
+          json['directChatId'] ??
+          json['roomId'];
+
+      if (rawChatId != null && rawChatId.toString() != _groupId) {
+        log(
+          'Socket message ignored: belongs to $rawChatId, current chat is $_groupId',
+        );
+        return;
+      }
+
+      final message = MessageModel.fromJson(json);
+
+      if (message.id.isEmpty) {
+        log('Socket message ignored: empty id');
+        return;
+      }
+
+      final normalized = _normalizeFetchedMessage(message);
+
+      // Prevent exact duplicate by server id.
+      if (messages.any((m) => m.id == normalized.id)) {
+        log('Socket message ignored: duplicate id \${normalized.id}');
+        return;
+      }
+
+      // Replace optimistic message when the confirmed server message
+      // arrives for the same content + sender, avoiding a visual duplicate.
+      if (normalized.isMe) {
+        final optimisticIndex = messages.indexWhere(
+          (m) =>
+              m.isSending &&
+              m.senderId == normalized.senderId &&
+              m.content.trim() == normalized.content.trim() &&
+              m.type == normalized.type,
+        );
+        if (optimisticIndex != -1) {
+          messages[optimisticIndex] = normalized;
+          emit(MessageSuccess());
+          return;
+        }
+      }
+
+      messages.insert(0, normalized);
+      emit(MessageSuccess());
+    } catch (e) {
+      log('Error handling incoming socket message: $e');
+    }
   }
 
   Future<void> _hydrateCurrentUser() async {
@@ -306,9 +414,9 @@ class MessageCubit extends Cubit<MessageState> {
 
   /// Send a text message
   Future<void> sendTextMessage() async {
-    emit(MessageLoading());
     final content = messageController.text;
     if (content.trim().isEmpty) return;
+    emit(MessageLoading());
 
     final message = MessageModel(
       id: _uuid.v4(),
@@ -323,30 +431,29 @@ class MessageCubit extends Cubit<MessageState> {
     );
 
     _addMessage(message);
+    sendingMessageIds.add(message.id);
 
     messageController.clear();
 
     final index = messages.indexWhere((m) => m.id == message.id);
     if (index != -1) {
       try {
-        if (_isGroup) {
-          await _myGroupRepository.sendGroupMessage(
-            _groupId!,
-            content: content,
-            type: 'text',
-          );
-        } else {
-          await _myGroupRepository.sendDirectMessage(
-            _groupId!,
-            content: content,
-            type: 'text',
-          );
-        }
+        await _sendMessageRequest(content: content, type: 'text');
         messages[index] = message.copyWith(isSending: false);
         emit(MessageSuccess());
       } catch (e) {
         messages[index] = message.copyWith(isSending: false, hasFailed: true);
         emit(MessageError(e.toString()));
+      } finally {
+        emit(MessageLoading());
+        Future.delayed(const Duration(seconds: 1), () {
+          messages.removeWhere((m) => m.id == message.id);
+          sendingMessageIds.remove(message.id);
+        });
+        emit(MessageSuccess());
+        log(
+          "Finished sending message ${message.id}, success: ${!message.hasFailed}, error: ${message.hasFailed ? "" : 'none'}",
+        );
       }
     }
   }
@@ -377,6 +484,7 @@ class MessageCubit extends Cubit<MessageState> {
     );
 
     _addMessage(message);
+    sendingMessageIds.add(message.id);
 
     final index = messages.indexWhere((m) => m.id == message.id);
     if (index != -1) {
@@ -398,28 +506,16 @@ class MessageCubit extends Cubit<MessageState> {
         }
 
         final String effectiveContent = (caption == null || caption.isEmpty)
-            ? " "
+            ? (type == MessageType.audio ? 'Audio message' : ' ')
             : caption;
 
-        if (_isGroup) {
-          await _myGroupRepository.sendGroupMessage(
-            _groupId!,
-            content: effectiveContent,
-            type: type.name,
-            attachments: uploadedUrls,
-            wave: waveformData,
-            duration: duration,
-          );
-        } else {
-          await _myGroupRepository.sendDirectMessage(
-            _groupId!,
-            content: effectiveContent,
-            type: type.name,
-            attachments: uploadedUrls,
-            wave: waveformData,
-            duration: duration,
-          );
-        }
+        await _sendMessageRequest(
+          content: effectiveContent,
+          type: type.name,
+          attachments: uploadedUrls,
+          wave: type == MessageType.audio ? null : waveformData,
+          duration: type == MessageType.audio ? null : duration,
+        );
         messages[index] = message.copyWith(
           isSending: false,
           imageUrls: uploadedUrls,
@@ -429,6 +525,13 @@ class MessageCubit extends Cubit<MessageState> {
       } catch (e) {
         messages[index] = message.copyWith(isSending: false, hasFailed: true);
         emit(MessageError(e.toString()));
+      } finally {
+        emit(MessageSuccess());
+        Future.delayed(const Duration(seconds: 1), () {
+          messages.removeWhere((m) => m.id == message.id);
+          sendingMessageIds.remove(message.id);
+        });
+        emit(MessageSuccess());
       }
     }
   }
@@ -472,23 +575,11 @@ class MessageCubit extends Cubit<MessageState> {
     emit(MessageSuccess());
 
     try {
-      if (_groupId != null) {
-        if (_isGroup) {
-          await _myGroupRepository.reactToGroupMessage(
-            _groupId!,
-            messageId,
-            emoji,
-            isRemove: isRemove,
-          );
-        } else {
-          await _myGroupRepository.reactToDirectMessage(
-            _groupId!,
-            messageId,
-            emoji,
-            isRemove: isRemove,
-          );
-        }
-      }
+      await _reactToMessageRequest(
+        messageId: messageId,
+        emoji: emoji,
+        isRemove: isRemove,
+      );
     } catch (e) {
       emit(MessageError(e.toString()));
     }
@@ -508,23 +599,11 @@ class MessageCubit extends Cubit<MessageState> {
     emit(MessageSuccess());
 
     try {
-      if (_groupId != null) {
-        if (_isGroup) {
-          await _myGroupRepository.reactToGroupMessage(
-            _groupId!,
-            messageId,
-            emoji,
-            isRemove: true,
-          );
-        } else {
-          await _myGroupRepository.reactToDirectMessage(
-            _groupId!,
-            messageId,
-            emoji,
-            isRemove: true,
-          );
-        }
-      }
+      await _reactToMessageRequest(
+        messageId: messageId,
+        emoji: emoji,
+        isRemove: true,
+      );
     } catch (e) {
       emit(MessageError(e.toString()));
     }
@@ -544,19 +623,7 @@ class MessageCubit extends Cubit<MessageState> {
       emit(MessageSuccess());
 
       try {
-        if (_groupId != null) {
-          if (_isGroup) {
-            await _myGroupRepository.markGroupMessageAsRead(
-              _groupId!,
-              messageId,
-            );
-          } else {
-            await _myGroupRepository.markDirectMessageAsRead(
-              _groupId!,
-              messageId,
-            );
-          }
-        }
+        await _markMessageAsReadRequest(messageId);
       } catch (e) {
         messages[messageIndex] = message.copyWith(isRead: false, readAt: null);
         emit(MessageError(e.toString()));
@@ -598,11 +665,7 @@ class MessageCubit extends Cubit<MessageState> {
     emit(MessageSuccess());
 
     try {
-      if (_isGroup) {
-        await _myGroupRepository.deleteGroupMessage(_groupId!, messageId);
-      } else {
-        await _myGroupRepository.deleteDirectMessage(_groupId!, messageId);
-      }
+      await _deleteMessageRequest(messageId);
       return true;
     } catch (e) {
       // Revert if API call fails
@@ -640,17 +703,17 @@ class MessageCubit extends Cubit<MessageState> {
 
   /// Private helper to add message and emit state
   void _addMessage(MessageModel message) {
-    emit(MessageLoading());
-    messages.insert(0, message);
-    emit(MessageSuccess());
+    _emitLoadingSuccess(() {
+      messages.insert(0, message);
+    });
   }
 
   /// Get grouped reactions for display
   Map<String, List<String>> getGroupedReactions(String messageId) {
-    final message = messages.firstWhere(
-      (m) => m.id == messageId,
-      orElse: () => messages.first,
-    );
+    final index = messages.indexWhere((m) => m.id == messageId);
+    if (index == -1) return {};
+
+    final message = messages[index];
 
     final grouped = <String, List<String>>{};
     for (var reaction in message.reactions) {

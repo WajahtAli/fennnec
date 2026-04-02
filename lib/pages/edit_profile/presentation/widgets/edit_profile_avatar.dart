@@ -1,4 +1,4 @@
-import 'package:fennac_app/app/constants/dummy_constants.dart';
+import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:fennac_app/pages/profile/presentation/widgets/profile_avatar.dart';
 import 'package:flutter/material.dart';
 
@@ -21,7 +21,7 @@ class EditProfileAvatar extends StatelessWidget {
       onEditTap: onEditTap,
       imageUrl: imageUrl?.isNotEmpty == true
           ? imageUrl!
-          : DummyConstants.avatarPaths[0],
+          : Assets.icons.user.path,
       size: size,
     );
   }

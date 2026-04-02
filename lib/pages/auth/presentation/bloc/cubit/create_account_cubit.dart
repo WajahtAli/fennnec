@@ -135,14 +135,7 @@ class CreateAccountCubit extends Cubit<CreateAccountState> {
       }
 
       if (response is Map<String, dynamic>) {
-        String? url;
-
-        if (response.containsKey('data') && response['data'] is Map) {
-          final data = response['data'] as Map<String, dynamic>;
-          url = data['url'] as String?;
-        } else if (response.containsKey('url')) {
-          url = response['url'] as String?;
-        }
+        final url = _extractUploadUrl(response);
 
         if (url != null && url.isNotEmpty) {
           mediaLinks.add(url);
@@ -163,6 +156,34 @@ class CreateAccountCubit extends Cubit<CreateAccountState> {
       emit(CreateAccountError("Failed to upload media: $e"));
       return "";
     }
+  }
+
+  String? _extractUploadUrl(Map<String, dynamic> response) {
+    final directUrl =
+        response['url'] ??
+        response['fileUrl'] ??
+        response['link'] ??
+        response['location'];
+
+    if (directUrl is String && directUrl.isNotEmpty) {
+      return directUrl;
+    }
+
+    for (final key in ['data', 'result', 'payload']) {
+      final nested = response[key];
+      if (nested is Map<String, dynamic>) {
+        final nestedUrl =
+            nested['url'] ??
+            nested['fileUrl'] ??
+            nested['link'] ??
+            nested['location'];
+        if (nestedUrl is String && nestedUrl.isNotEmpty) {
+          return nestedUrl;
+        }
+      }
+    }
+
+    return null;
   }
 
   Future<void> resetVerificationCode({
