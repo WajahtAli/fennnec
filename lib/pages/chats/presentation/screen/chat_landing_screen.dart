@@ -4,6 +4,7 @@ import 'package:fennac_app/app/constants/dummy_constants.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/core/di_container.dart';
+import 'package:fennac_app/core/sockets/sockets_service.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:fennac_app/helpers/gradient_toast.dart';
 import 'package:fennac_app/pages/auth/presentation/bloc/cubit/login_cubit.dart';
@@ -41,6 +42,16 @@ class _ChatLandingScreenState extends State<ChatLandingScreen> {
   void initState() {
     super.initState();
     _chatLandingCubit.fetchChatsAndCalls();
+    SocketService.onChatRelatedUpdate(() {
+      if (!mounted) return;
+      _chatLandingCubit.fetchChatsAndCalls();
+    });
+  }
+
+  @override
+  void dispose() {
+    SocketService.offChatRelatedUpdate();
+    super.dispose();
   }
 
   @override

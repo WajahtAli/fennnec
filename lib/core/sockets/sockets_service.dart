@@ -1,4 +1,6 @@
 import 'dart:developer';
+import 'package:fennac_app/core/di_container.dart';
+import 'package:fennac_app/helpers/shared_pref_helper.dart';
 import 'package:flutter/widgets.dart';
 import 'package:socket_io_client/socket_io_client.dart' as io;
 
@@ -11,41 +13,57 @@ final class SocketService with WidgetsBindingObserver {
   static bool _isConnected = false;
   static bool _isInitialized = false;
 
+  static String? get _authToken {
+    try {
+      return Di().sl<SharedPreferencesHelper>().getAuthToken();
+    } catch (_) {
+      return null;
+    }
+  }
+
   static String get _socketBaseUrl => AppConstants.baseUrl.endsWith('/')
       ? AppConstants.baseUrl.substring(0, AppConstants.baseUrl.length - 1)
       : AppConstants.baseUrl;
 
-  /// 🔥 Chat events that MAY come without payload (fallback triggers)
   static const List<String> _chatEvents = [
     'chatAndCallsUpdated',
     'chat-updated',
     'chat-updates',
+    'unified:chats:updated',
+    'unified:chats:list',
     'call-updated',
     'call-updates',
     'poke-chat-started',
   ];
 
-  /// ✅ Actual message events (WITH DATA)
   static const String _groupMessageEvent = 'group:message:new';
   static const String _directMessageEvent = 'direct:message:new';
 
-  // ===========================
-  // 🚀 CONNECT
-  // ===========================
   static void connect() {
     if (_isInitialized) {
       if (!_isConnected) {
-        _socket.connect();
+        _socket.dispose();
+        _isInitialized = false;
+      } else {
+        return;
       }
-      return;
     }
 
+    final token = _authToken;
+
     final options = io.OptionBuilder()
-        .setTransports(["polling", "websocket"])
-        .setPath('/socket.io')
+        .setTransports(["websocket", "polling"])
+        .setPath('/socket.io/')
+        .setTimeout(20000)
         .enableReconnection()
         .setReconnectionDelay(2000)
+        .setReconnectionDelayMax(10000)
         .setReconnectionAttempts(999999)
+        .setExtraHeaders({
+          if (token != null && token.isNotEmpty)
+            'Authorization': 'Bearer $token',
+        })
+        .setAuth({if (token != null && token.isNotEmpty) 'token': token})
         .enableAutoConnect()
         .build();
 
@@ -74,7 +92,16 @@ final class SocketService with WidgetsBindingObserver {
       log('Reconnect error: $err');
     });
 
-    /// 🔥 Debug all events
+    _socket.onConnectError((err) {
+      _isConnected = false;
+      log('❌ Socket connect error: $err');
+    });
+
+    _socket.onError((err) {
+      _isConnected = false;
+      log('❌ Socket error: $err');
+    });
+
     _socket.onAny((event, data) {
       log('📩 [$event] => $data');
     });
@@ -90,11 +117,7 @@ final class SocketService with WidgetsBindingObserver {
 
   static final _lifecycleObserver = _SocketLifecycleHandler();
 
-  // ===========================
-  // 💬 CHAT LISTENERS
-  // ===========================
-
-  /// ✅ Listen to NEW MESSAGES (main one you need)
+  // Listen to NEW MESSAGES
   static void onNewMessage({required Function(dynamic data) onMessage}) {
     if (!_isInitialized) connect();
 
@@ -113,7 +136,7 @@ final class SocketService with WidgetsBindingObserver {
     });
   }
 
-  /// ❌ Stop listening messages
+  /// Stop listening messages
   static void offNewMessage() {
     if (!_isInitialized) return;
     _socket.off(_groupMessageEvent);
@@ -140,10 +163,6 @@ final class SocketService with WidgetsBindingObserver {
     }
   }
 
-  // ===========================
-  // 📍 LOCATION (unchanged)
-  // ===========================
-
   static void userLocation(Map<String, dynamic> data) {
     if (_isInitialized && _isConnected) {
       _socket.emit('userLocation', data);
@@ -168,10 +187,6 @@ final class SocketService with WidgetsBindingObserver {
     });
   }
 
-  // ===========================
-  // 🧹 CLEANUP
-  // ===========================
-
   static void disconnect() {
     if (!_isInitialized) return;
 
@@ -185,9 +200,6 @@ final class SocketService with WidgetsBindingObserver {
   }
 }
 
-// ===========================
-// 🔄 APP LIFECYCLE HANDLER
-// ===========================
 class _SocketLifecycleHandler extends WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -196,11 +208,11 @@ class _SocketLifecycleHandler extends WidgetsBindingObserver {
     if (state == AppLifecycleState.resumed) {
       if (!SocketService._isConnected) {
         log('▶️ App resumed → reconnect socket');
-        SocketService._socket.connect();
+        SocketService.connect();
       }
-    } else if (state == AppLifecycleState.paused) {
-      log('⏸ App paused → disconnect socket');
-      SocketService._socket.disconnect();
+    } else if (state == AppLifecycleState.detached) {
+      log('⏹ App detached → disconnect socket');
+      SocketService.disconnect();
     }
   }
 }

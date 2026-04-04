@@ -67,8 +67,9 @@ class _AudioCallScreenState extends State<AudioCallScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             GestureDetector(
-                              onTap: () {
-                                _callCubit.endCall();
+                              onTap: () async {
+                                await _callCubit.endCall();
+                                AutoRouter.of(context).pop();
                               },
                               child: Container(
                                 width: 32.w,

@@ -172,6 +172,24 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                 children: [
                   if (userGroupMembers.isNotEmpty)
                     GroupDetailMembersAvatar(members: userGroupMembers),
+                  Container(
+                    width: 408,
+                    height: 2,
+                    margin: const EdgeInsets.only(bottom: 12),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(80),
+                      gradient: LinearGradient(
+                        begin: Alignment.centerRight,
+                        end: Alignment.centerLeft,
+                        colors: const [
+                          Color.fromRGBO(95, 0, 219, 0.0),
+                          Colors.white,
+                          Color.fromRGBO(95, 0, 219, 0.0),
+                        ],
+                        stops: const [0.0, 0.5, 1.0],
+                      ),
+                    ),
+                  ),
                   if (userGroupMembers.isNotEmpty &&
                       matchedGroupMembers.isNotEmpty)
                     const Padding(

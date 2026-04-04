@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:fennac_app/utils/validators.dart';
 
 part 'reaction_model.freezed.dart';
 
@@ -12,16 +13,35 @@ abstract class ReactionModel with _$ReactionModel {
   }) = _ReactionModel;
 
   factory ReactionModel.fromJson(Map<String, dynamic> json) {
-    final userObj =
-        json['userId'] is Map ? json['userId'] as Map<String, dynamic> : null;
+    Map<String, dynamic>? mapOrNull(dynamic value) {
+      if (value is! Map) return null;
+      return Map<String, dynamic>.from(value);
+    }
+
+    DateTime parseDate(dynamic primary, dynamic secondary) {
+      final parsedPrimary = DateTime.tryParse(validateString(primary));
+      if (parsedPrimary != null) return parsedPrimary;
+
+      final parsedSecondary = DateTime.tryParse(validateString(secondary));
+      if (parsedSecondary != null) return parsedSecondary;
+
+      return DateTime.now();
+    }
+
+    final userObj = mapOrNull(json['userId']);
+    final firstName = validateString(userObj?['firstName']).trim();
+    final lastName = validateString(userObj?['lastName']).trim();
+    final fullName = '$firstName $lastName'.trim();
+
     return ReactionModel(
-      userId: userObj?['_id'] ?? json['userId'] ?? '',
-      userName: userObj != null
-          ? '${userObj['firstName']} ${userObj['lastName']}'.trim()
-          : (json['userName'] ?? ''),
-      emoji: json['emoji'] ?? '',
-      reactedAt: DateTime.tryParse(json['createdAt'] ?? json['reactedAt'] ?? '') ??
-          DateTime.now(),
+      userId: validateString(userObj?['_id']).isNotEmpty
+          ? validateString(userObj?['_id'])
+          : validateString(json['userId']),
+      userName: fullName.isNotEmpty
+          ? fullName
+          : validateString(json['userName']),
+      emoji: validateString(json['emoji']),
+      reactedAt: parseDate(json['createdAt'], json['reactedAt']),
     );
   }
 }

@@ -311,7 +311,9 @@ class _MessageListState extends State<MessageList> {
           return Center(child: Lottie.asset(Assets.animations.loadingSpinner));
         }
 
-        if (messageCubit.hasError) {
+        final messages = messageCubit.messages;
+
+        if (messageCubit.hasError && messages.isEmpty) {
           return Padding(
             padding: const EdgeInsets.all(24),
             child: Center(
@@ -325,8 +327,6 @@ class _MessageListState extends State<MessageList> {
             ),
           );
         }
-
-        final messages = messageCubit.messages;
 
         if (messages.isEmpty) {
           return Padding(

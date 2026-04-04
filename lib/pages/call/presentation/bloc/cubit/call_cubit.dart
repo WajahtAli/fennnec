@@ -38,6 +38,8 @@ class CallCubit extends Cubit<CallState> {
   Duration callDuration = Duration.zero;
   Timer? _durationTimer;
   bool _isEngineReady = false;
+  bool _isEndingCall = false;
+  bool _hasPoppedAfterLeave = false;
   final int _localUid = DateTime.now().millisecondsSinceEpoch.remainder(
     1000000,
   );
@@ -111,6 +113,7 @@ class CallCubit extends Cubit<CallState> {
     users.clear();
     joined = false;
     loading = true;
+    _hasPoppedAfterLeave = false;
 
     await [Permission.microphone, Permission.camera].request();
 
@@ -207,6 +210,8 @@ class CallCubit extends Cubit<CallState> {
   }
 
   Future<void> endCall() async {
+    if (_isEndingCall) return;
+    _isEndingCall = true;
     emit(CallLoading());
 
     _stopTimer();
@@ -226,6 +231,20 @@ class CallCubit extends Cubit<CallState> {
     joined = false;
     users.clear();
     emit(CallLoaded());
+    _isEndingCall = false;
+  }
+
+  void _popCallScreen() {
+    if (_hasPoppedAfterLeave) return;
+
+    final context = navigatorKey.currentContext;
+    if (context == null || !context.mounted) return;
+
+    final router = context.router;
+    if (router.canPop()) {
+      _hasPoppedAfterLeave = true;
+      router.pop();
+    }
   }
 
   void _addEventHandlers(BuildContext context) {
@@ -259,7 +278,7 @@ class CallCubit extends Cubit<CallState> {
               users.remove(remoteUid);
               emit(CallLoaded());
               if (users.isEmpty) {
-                navigatorKey.currentContext!.router.pop();
+                endCall();
               }
             },
         onLeaveChannel: (RtcConnection conn, RtcStats stats) {
@@ -269,9 +288,7 @@ class CallCubit extends Cubit<CallState> {
           users.clear();
           _stopTimer();
           emit(CallLoaded());
-          if (navigatorKey.currentContext!.mounted) {
-            navigatorKey.currentContext!.router.pop();
-          }
+          _popCallScreen();
         },
         onError: (ErrorCodeType code, String msg) {
           debugPrint('⚠️ Agora Error: $code | $msg');

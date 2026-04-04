@@ -3,7 +3,6 @@ import 'dart:developer';
 import 'package:equatable/equatable.dart';
 
 import 'package:fennac_app/core/di_container.dart';
-import 'package:fennac_app/core/sockets/sockets_service.dart';
 import 'package:fennac_app/helpers/shared_pref_helper.dart';
 import 'package:fennac_app/pages/auth/presentation/bloc/cubit/create_account_cubit.dart';
 import 'package:fennac_app/pages/chats/data/models/message_model.dart';
@@ -13,6 +12,8 @@ import 'package:fennac_app/pages/my_group/domain/repository/my_group_repository.
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
+
+import '../../../../../core/sockets/sockets_service.dart';
 
 part '../state/message_state.dart';
 
@@ -56,9 +57,7 @@ class MessageCubit extends Cubit<MessageState> {
     return messageController.text.trim().isEmpty;
   }
 
-  // Variables in cubit (not in state)
   List<MessageModel> messages = [];
-  // get all medias from messages
   List<String> getMedias() {
     return messages
         .where(
@@ -285,22 +284,14 @@ class MessageCubit extends Cubit<MessageState> {
     try {
       if (data == null) return;
 
-      final json = data is Map<String, dynamic>
-          ? data
-          : Map<String, dynamic>.from(data as Map);
+      final json = _extractSocketMessageJson(data);
+      if (json == null) {
+        log('Socket message ignored: invalid payload type');
+        return;
+      }
 
-      // Filter messages that don't belong to the currently open chat.
-      // Backend may set the chat id in different fields depending on chat type.
-      final rawChatId =
-          json['chatId'] ??
-          json['groupId'] ??
-          json['directChatId'] ??
-          json['roomId'];
-
-      if (rawChatId != null && rawChatId.toString() != _groupId) {
-        log(
-          'Socket message ignored: belongs to $rawChatId, current chat is $_groupId',
-        );
+      if (!_isSocketMessageForCurrentChat(json)) {
+        log('Socket message ignored: not for current chat $_groupId');
         return;
       }
 
@@ -315,7 +306,7 @@ class MessageCubit extends Cubit<MessageState> {
 
       // Prevent exact duplicate by server id.
       if (messages.any((m) => m.id == normalized.id)) {
-        log('Socket message ignored: duplicate id \${normalized.id}');
+        log('Socket message ignored: duplicate id ${normalized.id}');
         return;
       }
 
@@ -337,10 +328,75 @@ class MessageCubit extends Cubit<MessageState> {
       }
 
       messages.insert(0, normalized);
+      hasError = false;
+      isLoading = false;
       emit(MessageSuccess());
     } catch (e) {
       log('Error handling incoming socket message: $e');
     }
+  }
+
+  bool _isSocketMessageForCurrentChat(Map<String, dynamic> json) {
+    final activeChatId = _groupId;
+    if (activeChatId == null || activeChatId.isEmpty) return false;
+
+    final rawChatId =
+        json['chatId'] ??
+        json['groupId'] ??
+        json['directChatId'] ??
+        json['roomId'];
+    if (_isGroup) {
+      if (rawChatId == null) return false;
+      return rawChatId.toString() == activeChatId;
+    }
+
+    if (rawChatId != null && rawChatId.toString() == activeChatId) return true;
+
+    final senderMap = json['senderId'] is Map
+        ? Map<String, dynamic>.from(json['senderId'])
+        : null;
+    final receiverMap = json['receiverId'] is Map
+        ? Map<String, dynamic>.from(json['receiverId'])
+        : null;
+
+    final senderId = senderMap?['_id'] ?? json['senderId'];
+    final receiverId = receiverMap?['_id'] ?? json['receiverId'];
+
+    final sender = senderId?.toString();
+    final receiver = receiverId?.toString();
+
+    if (sender == null || receiver == null) {
+      return false;
+    }
+
+    final isBetweenCurrentPair =
+        (sender == currentUserId && receiver == activeChatId) ||
+        (sender == activeChatId && receiver == currentUserId);
+
+    return isBetweenCurrentPair;
+  }
+
+  Map<String, dynamic>? _extractSocketMessageJson(dynamic payload) {
+    emit(MessageLoading());
+    if (payload is! Map) return null;
+
+    final root = Map<String, dynamic>.from(payload);
+
+    dynamic nested = root['message'] ?? root['data'] ?? root['payload'];
+    if (nested is Map) {
+      final json = Map<String, dynamic>.from(nested);
+      json['chatId'] ??=
+          root['chatId'] ?? root['groupId'] ?? root['directChatId'];
+      json['_id'] ??= root['_id'] ?? root['id'] ?? root['messageId'];
+      json['senderId'] ??= root['senderId'];
+      json['receiverId'] ??= root['receiverId'];
+      json['groupId'] ??= root['groupId'];
+      return json;
+    }
+
+    root['_id'] ??= root['id'] ?? root['messageId'];
+    emit(MessageSuccess());
+    return root;
   }
 
   Future<void> _hydrateCurrentUser() async {

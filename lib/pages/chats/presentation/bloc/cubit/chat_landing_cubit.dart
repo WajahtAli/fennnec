@@ -51,6 +51,7 @@ class ChatLandingCubit extends Cubit<ChatLandingState> {
           isLoadingData: false,
           chats: response.data.chats,
           calls: response.data.calls,
+          members: response.data.members,
         );
         _applyChatFilter(nextState.chats);
         _applyCallsFilter(nextState.calls);

@@ -132,7 +132,7 @@ class CustomLabelTextField extends StatelessWidget {
                   fillColor ?? (isLight ? Colors.white : Colors.transparent),
               suffixIcon: suffixIcon,
               prefixIcon: prefixIcon,
-              suffix: GestureDetector(onTap: () {}, child: suffix),
+              suffix: suffix,
               prefix: prefix,
               border: border,
               enabledBorder:

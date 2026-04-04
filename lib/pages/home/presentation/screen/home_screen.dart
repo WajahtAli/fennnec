@@ -9,7 +9,6 @@ import 'package:fennac_app/pages/auth/presentation/bloc/cubit/login_cubit.dart';
 import 'package:fennac_app/pages/dashboard/presentation/bloc/cubit/dashboard_cubit.dart';
 import 'package:fennac_app/pages/home/presentation/bloc/cubit/groups_cubit.dart';
 import 'package:fennac_app/pages/home/presentation/bloc/state/groups_state.dart';
-import 'package:fennac_app/pages/chats/presentation/widgets/premium_card.dart';
 import 'package:fennac_app/pages/home/presentation/widgets/group_gallery_widget.dart';
 import 'package:fennac_app/pages/home/presentation/widgets/hero_section.dart';
 import 'package:fennac_app/pages/home/presentation/widgets/home_top_bar.dart';

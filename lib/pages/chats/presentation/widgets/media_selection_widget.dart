@@ -80,7 +80,9 @@ class MediaSelectionWidget extends StatelessWidget {
                               color: ColorPalette.grey.withValues(alpha: 0.3),
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(
-                                color: ColorPalette.white.withValues(alpha: 0.1),
+                                color: ColorPalette.white.withValues(
+                                  alpha: 0.1,
+                                ),
                                 width: 1,
                               ),
                             ),
@@ -101,13 +103,13 @@ class MediaSelectionWidget extends StatelessWidget {
 
                             final mediaType =
                                 mediaList.first.type == MediaType.image
-                                    ? MessageType.image
-                                    : MessageType.video;
+                                ? MessageType.image
+                                : MessageType.video;
 
                             Di().sl<MessageCubit>().sendMediaMessage(
-                                  mediaPath: mediaList.map((e) => e.path).toList(),
-                                  type: mediaType,
-                                );
+                              mediaPath: mediaList.map((e) => e.path).toList(),
+                              type: mediaType,
+                            );
                             imagePickerCubit.clearAllMedia();
                           },
                           child: Container(

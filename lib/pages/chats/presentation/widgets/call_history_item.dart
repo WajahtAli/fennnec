@@ -81,7 +81,11 @@ class CallHistoryItem extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      isGroup ? names!.join(', ') : name!,
+                      isGroup
+                          ? ((names != null && names!.isNotEmpty)
+                                ? names!.join(', ')
+                                : 'Group')
+                          : (name ?? ''),
                       style: AppTextStyles.body(context),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,

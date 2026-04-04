@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:auto_route/auto_route.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
+import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:fennac_app/helpers/gradient_toast.dart';
 import 'package:fennac_app/pages/chats/data/models/chat_and_calls_response.dart';
 import 'package:fennac_app/pages/chats/presentation/bloc/cubit/chat_landing_cubit.dart';
@@ -16,6 +17,9 @@ import 'package:fennac_app/widgets/custom_sized_box.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fennac_app/core/di_container.dart';
+import 'package:lottie/lottie.dart';
+
+import '../../../../bloc/cubit/imagepicker_cubit.dart';
 
 class SubscribedChatWidget extends StatefulWidget {
   const SubscribedChatWidget({super.key});
@@ -36,9 +40,8 @@ class _SubscribedChatWidgetState extends State<SubscribedChatWidget> {
       bloc: chatLandingCubit,
       builder: (context, state) {
         if (state.isLoadingData && state.chats.isEmpty) {
-          return const Center(child: CircularProgressIndicator());
+          return Center(child: Lottie.asset(Assets.animations.loadingSpinner));
         }
-
         if (state.errorMessage != null && state.chats.isEmpty) {
           return Center(child: Text(state.errorMessage!));
         }
@@ -47,16 +50,7 @@ class _SubscribedChatWidgetState extends State<SubscribedChatWidget> {
         final activeChats = chatLandingCubit.isSearching
             ? chatLandingCubit.filteredChats
             : chats;
-        final members = activeChats
-            .expand((chat) => chat.members ?? <MemberModel>[])
-            .fold<Map<String, MemberModel>>({}, (map, member) {
-              if (!map.containsKey(member.id)) {
-                map[member.id] = member;
-              }
-              return map;
-            })
-            .values
-            .toList();
+        final members = state.members;
 
         return SingleChildScrollView(
           child: Column(
@@ -75,6 +69,7 @@ class _SubscribedChatWidgetState extends State<SubscribedChatWidget> {
                 HorizontalAvatarList(
                   members: members,
                   onAvatarTap: (member) {
+                    Di().sl<ImagePickerCubit>().clearAllMedia();
                     log('Tapped member: ${member.name} (${member.id})');
 
                     final chat = chats.firstWhere(
@@ -88,15 +83,10 @@ class _SubscribedChatWidgetState extends State<SubscribedChatWidget> {
 
                     final isOnline = chat.status.toLowerCase() == 'online';
 
-                    final chatId =
-                        chat.meta.directChat?.otherUserId?.isNotEmpty == true
-                        ? chat.meta.directChat!.otherUserId!
-                        : chat.id;
-
                     context.router.push(
                       GroupChatRoute(
                         isGroup: chat.type == 'group' ? true : false,
-                        groupId: chatId,
+                        groupId: _resolveChatRouteId(chat),
                         contactAvatar: member.image,
                         contactName: member.name,
                         isOnline: isOnline,
@@ -139,6 +129,8 @@ class _SubscribedChatWidgetState extends State<SubscribedChatWidget> {
 
                     return GestureDetector(
                       onTap: () async {
+                        Di().sl<ImagePickerCubit>().clearAllMedia();
+
                         if (chat.type == 'poke') {
                           final pokeId = _resolvePokeId(chat);
 
@@ -182,7 +174,7 @@ class _SubscribedChatWidgetState extends State<SubscribedChatWidget> {
                         context.router.push(
                           GroupChatRoute(
                             isGroup: isGroup,
-                            groupId: chat.id,
+                            groupId: _resolveChatRouteId(chat),
                             contactAvatar: chat.image,
                             contactName: chat.name,
                             isOnline: isOnline,
@@ -210,12 +202,12 @@ class _SubscribedChatWidgetState extends State<SubscribedChatWidget> {
                             : Colors.transparent,
                         child: CallHistoryItem(
                           name: isGroup ? null : chat.name,
-                          names: isGroup
-                              ? chat.members?.map((m) => m.name).toList()
-                              : null,
+                          names: isGroup ? _resolveGroupNames(chat) : null,
                           isGroup: isGroup,
                           avatar: chat.image,
-                          avatars: chat.members?.map((m) => m.image).toList(),
+                          avatars: isGroup
+                              ? _resolveGroupAvatars(chat)
+                              : chat.members?.map((m) => m.image).toList(),
                           unreadCount: chat.unreadCount,
                           timeAgo: chat.lastMessageAt != null
                               ? _getTimeAgo(chat.lastMessageAt!)
@@ -290,6 +282,76 @@ class _SubscribedChatWidgetState extends State<SubscribedChatWidget> {
     }
 
     return null;
+  }
+
+  List<String> _resolveGroupNames(ChatModel chat) {
+    final matchedMembers =
+        chat.meta.groupsDetails?.matchedGroupMembers ??
+        const <MatchedGroupMembersModel>[];
+
+    final names = matchedMembers
+        .expand((group) => group.members)
+        .map(
+          (member) =>
+              '${member.firstName ?? ''} ${member.lastName ?? ''}'.trim(),
+        )
+        .where((name) => name.isNotEmpty)
+        .toSet()
+        .toList();
+
+    if (names.isNotEmpty) {
+      return names;
+    }
+
+    final memberNames = (chat.members ?? const <MemberModel>[])
+        .map((member) => member.name.trim())
+        .where((name) => name.isNotEmpty)
+        .toSet()
+        .toList();
+
+    if (memberNames.isNotEmpty) {
+      return memberNames;
+    }
+
+    return [chat.name];
+  }
+
+  List<String> _resolveGroupAvatars(ChatModel chat) {
+    final matchedMembers =
+        chat.meta.groupsDetails?.matchedGroupMembers ??
+        const <MatchedGroupMembersModel>[];
+
+    final matchedAvatars = matchedMembers
+        .expand((group) => group.members)
+        .map((member) => (member.image ?? '').trim())
+        .where((image) => image.isNotEmpty)
+        .toSet()
+        .toList();
+
+    if (matchedAvatars.isNotEmpty) {
+      return matchedAvatars;
+    }
+
+    final memberAvatars = (chat.members ?? const <MemberModel>[])
+        .map((member) => member.image.trim())
+        .where((image) => image.isNotEmpty)
+        .toSet()
+        .toList();
+
+    if (memberAvatars.isNotEmpty) {
+      return memberAvatars;
+    }
+
+    return chat.image.trim().isNotEmpty ? [chat.image] : <String>[];
+  }
+
+  String _resolveChatRouteId(ChatModel chat) {
+    final directUserId = chat.meta.directChat?.otherUserId;
+    if (chat.type != 'group' && directUserId?.isNotEmpty == true) {
+      return directUserId!;
+    }
+
+    return chat.id;
   }
 
   String _getTimeAgo(DateTime dateTime) {

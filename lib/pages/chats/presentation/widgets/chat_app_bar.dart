@@ -506,12 +506,11 @@ class ChatAppBar extends StatelessWidget {
 
       final members = chat.members;
       if (members != null && members.isNotEmpty) {
-        for (final member in members) {
-          if (member.id != currentUserId) {
-            return [member.id];
-          }
-        }
-        return members.map((m) => m.id).toList();
+        return members
+            .map((m) => m.id)
+            .toList()
+            .where((id) => id != currentUserId)
+            .toList();
       }
     }
 

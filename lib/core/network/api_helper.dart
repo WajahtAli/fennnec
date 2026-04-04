@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:async';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
@@ -92,7 +93,10 @@ class ApiHelper {
       return _handleResponse(response, isRefreshToken: isRefreshToken);
     } catch (e) {
       log('🔥 API ERROR: ${e.toString()}');
-      throw _handleException(e);
+      if (e is ApiException) {
+        rethrow;
+      }
+      throw ApiException(_handleException(e), 0);
     }
   }
 
@@ -133,8 +137,10 @@ class ApiHelper {
       return _handleResponse(response);
     } catch (e) {
       log('🔥 API ERROR: $e');
-      _handleException(e);
-      throw _handleException(e);
+      if (e is ApiException) {
+        rethrow;
+      }
+      throw ApiException(_handleException(e), 0);
     }
   }
 
@@ -198,8 +204,10 @@ class ApiHelper {
       return _handleResponse(httpResponse);
     } catch (e) {
       log('🔥 API ERROR: $e');
-      _handleException(e);
-      return null;
+      if (e is ApiException) {
+        rethrow;
+      }
+      throw ApiException(_handleException(e), 0);
     }
   }
 
@@ -239,8 +247,11 @@ class ApiHelper {
       _printResponseLog(url, response);
       return _handleResponse(response);
     } catch (e) {
-      _handleException(e);
-      return null;
+      log('🔥 API ERROR: $e');
+      if (e is ApiException) {
+        rethrow;
+      }
+      throw ApiException(_handleException(e), 0);
     }
   }
 
@@ -278,6 +289,8 @@ class ApiHelper {
   String _handleException(dynamic e) {
     if (e is ApiException) {
       return e.message;
+    } else if (e is TimeoutException) {
+      return "Request timed out. Please check your internet connection and try again.";
     } else if (e is SocketException) {
       return "No internet connection";
     } else if (e is HttpException) {

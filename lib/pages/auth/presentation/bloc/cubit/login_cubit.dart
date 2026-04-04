@@ -474,7 +474,7 @@ class LoginCubit extends Cubit<LoginState> {
       final response = await _loginUsecase.logout();
 
       await sharedPreferencesHelper.clearUserData();
-
+      await sharedPreferencesHelper.clearAuthToken();
       loginModel = null;
       userData = null;
       email.clear();

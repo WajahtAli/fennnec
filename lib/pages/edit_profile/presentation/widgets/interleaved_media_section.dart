@@ -29,7 +29,11 @@ class InterleavedMediaSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (bestShorts.isEmpty && prompts.isEmpty) {
+    final mediaItems = bestShorts.length > 1
+        ? bestShorts.sublist(1)
+        : <String>[];
+
+    if (mediaItems.isEmpty && prompts.isEmpty) {
       return ProfileSectionWrapper(
         title: 'Gallery',
         child: Padding(
@@ -53,18 +57,18 @@ class InterleavedMediaSection extends StatelessWidget {
     int imageIndex = 0;
     int promptIndex = 0;
 
-    while (imageIndex < bestShorts.length ||
+    while (imageIndex < mediaItems.length ||
         promptIndex < validPrompts.length) {
-      for (int i = 0; i < 1 && imageIndex < bestShorts.length; i++) {
-        interleavedItems.add(bestShorts[imageIndex++]);
+      for (int i = 0; i < 1 && imageIndex < mediaItems.length; i++) {
+        interleavedItems.add(mediaItems[imageIndex++]);
       }
 
       if (promptIndex < validPrompts.length) {
         interleavedItems.add(validPrompts[promptIndex++]);
       }
 
-      if (imageIndex < bestShorts.length) {
-        interleavedItems.add(bestShorts[imageIndex++]);
+      if (imageIndex < mediaItems.length) {
+        interleavedItems.add(mediaItems[imageIndex++]);
       }
 
       if (promptIndex < validPrompts.length) {
@@ -83,14 +87,8 @@ class InterleavedMediaSection extends StatelessWidget {
           final item = interleavedItems[index];
 
           if (item is String) {
-            final imageIndex = bestShorts.indexOf(item);
-
-            final displayImage = imageIndex == 0 && bestShorts.length > 1
-                ? bestShorts[1]
-                : item;
-
             return _ImageItem(
-              imagePath: displayImage,
+              imagePath: item,
               onEditTap: onImageEditTap,
               isNeedEdit: isNeedEdit,
             );
