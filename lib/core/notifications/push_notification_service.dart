@@ -4,6 +4,7 @@ import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/pages/auth/presentation/bloc/cubit/create_account_cubit.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'local_notification_service.dart';
 import 'call_notification_handler.dart';
 import '../../app/constants/app_constants.dart';
@@ -16,6 +17,8 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   );
   if (message.data['type'] == 'call_incoming') {
     await CallNotificationHandler.handleCallNotification(message);
+  } else if (message.data['type'] == 'call_ended') {
+    FlutterCallkitIncoming.endAllCalls();
   } else {
     await LocalNotificationService.init();
   }
@@ -81,6 +84,8 @@ class PushNotificationService {
 
     if (message.data['type'] == 'call_incoming') {
       CallNotificationHandler.handleCallNotification(message);
+    } else if (message.data['type'] == 'call_ended') {
+      FlutterCallkitIncoming.endAllCalls();
     } else if (message.notification != null) {
       LocalNotificationService.showNotification(
         title: message.notification!.title ?? '',

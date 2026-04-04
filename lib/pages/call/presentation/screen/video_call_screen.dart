@@ -26,7 +26,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
   void initState() {
     super.initState();
     // Initialize Agora with channel and token from API
-    _callCubit.initAgora(context);
+    _callCubit.initAgora();
   }
 
   @override

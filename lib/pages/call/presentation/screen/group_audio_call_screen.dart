@@ -64,7 +64,7 @@ class _GroupAudioCallScreenState extends State<GroupAudioCallScreen> {
             children: [
               Column(
                 children: [
-                  CallHeaderWidget(duration: _duration),
+                  CallHeaderWidget(),
 
                   const SizedBox(height: 20),
 

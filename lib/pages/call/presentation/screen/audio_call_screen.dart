@@ -1,17 +1,17 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:fennac_app/app/theme/app_colors.dart';
-import 'package:fennac_app/app/theme/text_styles.dart';
+import 'package:fennac_app/app/constants/app_enums.dart';
 import 'package:fennac_app/core/di_container.dart';
-import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:fennac_app/pages/call/presentation/bloc/cubit/call_cubit.dart';
 import 'package:fennac_app/pages/call/presentation/bloc/state/call_state.dart';
-import 'package:fennac_app/widgets/custom_sized_box.dart';
-import 'package:fennac_app/widgets/custom_text.dart';
+import 'package:fennac_app/pages/call/presentation/widgets/call_action_buttons.dart';
+import 'package:fennac_app/pages/call/presentation/widgets/call_header_widget.dart';
 import 'package:fennac_app/widgets/movable_background.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+
+import '../widgets/self_video_widget.dart';
+import '../widgets/video_call_camera_view.dart';
 
 @RoutePage()
 class AudioCallScreen extends StatefulWidget {
@@ -27,9 +27,8 @@ class _AudioCallScreenState extends State<AudioCallScreen> {
   @override
   void initState() {
     super.initState();
-    // Initialize Agora with channel and token from API
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _callCubit.initAgora(context);
+      _callCubit.initAgora();
     });
   }
 
@@ -37,13 +36,6 @@ class _AudioCallScreenState extends State<AudioCallScreen> {
   void dispose() {
     _callCubit.endCall();
     super.dispose();
-  }
-
-  String _formatDuration(Duration duration) {
-    String twoDigits(int n) => n.toString().padLeft(2, '0');
-    final minutes = twoDigits(duration.inMinutes.remainder(60));
-    final seconds = twoDigits(duration.inSeconds.remainder(60));
-    return '$minutes:$seconds';
   }
 
   @override
@@ -54,197 +46,91 @@ class _AudioCallScreenState extends State<AudioCallScreen> {
         child: BlocBuilder<CallCubit, CallState>(
           bloc: _callCubit,
           builder: (context, state) {
-            return SafeArea(
-              child: Stack(
-                children: [
-                  Column(
+            return Stack(
+              children: [
+                if (_callCubit.callType == CallType.video) ...[
+                  Positioned.fill(child: VideoCallCameraView()),
+                  AnimatedPositioned(
+                    duration: _callCubit.isSelfViewDragging
+                        ? Duration.zero
+                        : const Duration(milliseconds: 300),
+                    curve: Curves.easeOutBack,
+                    top: _callCubit.selfViewTop,
+                    left: _callCubit.selfViewLeft,
+                    child: SafeArea(
+                      child: GestureDetector(
+                        onPanStart: (details) {
+                          _callCubit.updateSelfViewPosition(
+                            left: _callCubit.selfViewLeft,
+                            top: _callCubit.selfViewTop,
+                            isDragging: true,
+                          );
+                        },
+                        onPanUpdate: (details) {
+                          _callCubit.updateSelfViewPosition(
+                            left: _callCubit.selfViewLeft + details.delta.dx,
+                            top: _callCubit.selfViewTop + details.delta.dy,
+                            isDragging: true,
+                          );
+                        },
+                        onPanEnd: (details) {
+                          _callCubit.snapToNearestCorner(
+                            screenSize: MediaQuery.of(context).size,
+                            widgetWidth: 100.w,
+                            widgetHeight: 140.h,
+                            safeAreaPadding: MediaQuery.of(context).padding,
+                          );
+                        },
+                        child: const SelfVideoWidget(),
+                      ),
+                    ),
+                  ),
+                ],
+                SafeArea(
+                  child: Column(
                     children: [
                       const SizedBox(height: 24),
                       // Call duration and chevron
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 24.w),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            GestureDetector(
-                              onTap: () async {
-                                await _callCubit.endCall();
-                                AutoRouter.of(context).pop();
-                              },
-                              child: Container(
-                                width: 32.w,
-                                height: 32.w,
-                                decoration: BoxDecoration(
-                                  color: Colors.black.withValues(alpha: 0.3),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Icon(
-                                  Icons.keyboard_arrow_down,
-                                  color: Colors.white,
-                                  size: 20.sp,
-                                ),
-                              ),
-                            ),
-                            AppText(
-                              text: _formatDuration(_callCubit.callDuration),
-                              style: AppTextStyles.body(
-                                context,
-                              ).copyWith(color: Colors.black, fontSize: 16.sp),
-                            ),
-                            CustomSizedBox(width: 30),
-                          ],
-                        ),
-                      ),
+                      CallHeaderWidget(),
                       SizedBox(height: 200.h),
                       // Profile picture
-                      Center(
-                        child: Container(
-                          width: 120.w,
-                          height: 120.w,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.2),
-                              width: 2,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.35),
-                                blurRadius: 16,
-                                offset: const Offset(0, 8),
-                              ),
-                            ],
-                          ),
-                          child: ClipOval(
-                            child: Image.network(
-                              _callCubit.imageUrl ?? "",
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 12.h),
-                      AppText(
-                        text: _callCubit.users.isNotEmpty
-                            ? 'Connected'
-                            : (_callCubit.joined
-                                  ? 'Ringing...'
-                                  : 'Connecting...'),
-                        style: AppTextStyles.body(
-                          context,
-                        ).copyWith(color: ColorPalette.textSecondary),
-                      ),
-                      const Spacer(),
-                      SizedBox(height: 120.h),
-                    ],
-                  ),
-
-                  // Control buttons at bottom
-                  Positioned(
-                    left: 24.w,
-                    right: 24.w,
-                    bottom: 32.h,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        _buildControlButton(
-                          icon: Assets.icons.mic.path,
-                          icon1: Assets.icons.micTurnOff.path,
-                          isActive: !_callCubit.muted,
-                          activeColor: ColorPalette.primary,
-                          inactiveColor: ColorPalette.secondary,
-                          onTap: _callCubit.toggleMute,
-                        ),
-                        SizedBox(width: 16.w),
-                        _buildControlButton(
-                          icon: Assets.icons.speaker.path,
-                          icon1: Assets.icons.volumeX.path,
-                          isActive: _callCubit.speaker,
-                          activeColor: ColorPalette.primary,
-                          inactiveColor: ColorPalette.secondary,
-                          onTap: _callCubit.toggleSpeaker,
-                        ),
-                        SizedBox(width: 16.w),
-                        _buildControlButton(
-                          icon: Assets.icons.video.path,
-                          icon1: Assets.icons.videoCut.path,
-                          isActive: !_callCubit.cameraOff,
-                          activeColor: ColorPalette.primary,
-                          inactiveColor: ColorPalette.secondary,
-                          onTap: _callCubit.toggleCamera,
-                        ),
-                        SizedBox(width: 16.w),
-                        GestureDetector(
-                          onTap: () {
-                            _callCubit.endCall();
-                          },
+                      if (_callCubit.callType == CallType.audio) ...[
+                        Center(
                           child: Container(
-                            width: 114.w,
-                            height: 56,
+                            width: 120.w,
+                            height: 120.w,
                             decoration: BoxDecoration(
-                              color: const Color(0xFFFF4D5E),
-                              borderRadius: BorderRadius.circular(32.r),
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: Colors.white.withValues(alpha: 0.2),
+                                width: 2,
+                              ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(
-                                    0xFFFF4D5E,
-                                  ).withValues(alpha: 0.35),
-                                  blurRadius: 24,
-                                  offset: const Offset(0, 12),
+                                  color: Colors.black.withValues(alpha: 0.35),
+                                  blurRadius: 16,
+                                  offset: const Offset(0, 8),
                                 ),
                               ],
                             ),
-                            alignment: Alignment.center,
-                            child: Text(
-                              'End Call',
-                              style: AppTextStyles.button(context),
+                            child: ClipOval(
+                              child: Image.network(
+                                _callCubit.imageUrl ?? "",
+                                fit: BoxFit.cover,
+                              ),
                             ),
                           ),
                         ),
                       ],
-                    ),
+                      const Spacer(),
+                      CallActionButtons(),
+                      SizedBox(height: 20.h),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             );
           },
-        ),
-      ),
-    );
-  }
-
-  Widget _buildControlButton({
-    required String icon,
-    required String icon1,
-    required bool isActive,
-    required Color activeColor,
-    Color? inactiveColor,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 56.w,
-        height: 56.w,
-        decoration: BoxDecoration(
-          color: isActive
-              ? activeColor
-              : (inactiveColor ?? ColorPalette.secondary),
-          shape: BoxShape.circle,
-        ),
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            SvgPicture.asset(
-              isActive ? icon : icon1,
-              colorFilter: const ColorFilter.mode(
-                Colors.white,
-                BlendMode.srcIn,
-              ),
-              width: 24.w,
-              height: 24.w,
-            ),
-          ],
         ),
       ),
     );

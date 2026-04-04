@@ -35,7 +35,7 @@ class CallNotificationHandler {
     final callId = data['callRecordId'] ?? const Uuid().v4();
     final callkitId = _uuid.v4();
     final callerName =
-        message.notification?.title ?? data['senderName'] ?? "Incoming Call";
+        message.notification?.body ?? data['senderName'] ?? "Incoming Call";
     final callerNumber = (data['callerId'] as String? ?? '').isNotEmpty
         ? data['callerId'] as String
         : callerName;
@@ -54,7 +54,7 @@ class CallNotificationHandler {
       textDecline: 'Decline',
       missedCallNotification: const NotificationParams(
         showNotification: true,
-        isShowCallback: true,
+        isShowCallback: false,
         subtitle: 'Missed call',
         callbackText: 'Call back',
       ),
@@ -112,16 +112,21 @@ class CallNotificationHandler {
       case Event.actionCallDecline:
         log('Call Declined: ${event.body}');
         _isNavigating = false;
+        Di().sl<CallCubit>().callId = event.body['callRecordId'];
+        Di().sl<CallCubit>().endCall();
         FlutterCallkitIncoming.endAllCalls();
         break;
       case Event.actionCallEnded:
         log('Call Ended: ${event.body}');
         _isNavigating = false;
+        Di().sl<CallCubit>().endCall();
         FlutterCallkitIncoming.endAllCalls();
         break;
       case Event.actionCallTimeout:
         log('Call Timeout: ${event.body}');
         _isNavigating = false;
+        Di().sl<CallCubit>().callId = event.body['callRecordId'];
+        Di().sl<CallCubit>().endCall();
         FlutterCallkitIncoming.endAllCalls();
         break;
       default:
@@ -183,11 +188,11 @@ class CallNotificationHandler {
           callkitId: callkitId,
         );
 
-        if (mediaType == 'video') {
-          navigatorKey.currentContext!.pushRoute(VideoCallRoute());
-        } else {
-          navigatorKey.currentContext!.pushRoute(AudioCallRoute());
-        }
+        // if (mediaType == 'video') {
+        //   navigatorKey.currentContext!.pushRoute(VideoCallRoute());
+        // } else {
+        navigatorKey.currentContext!.pushRoute(AudioCallRoute());
+        // }
       } else {
         log('Navigator context never became ready.');
       }

@@ -309,11 +309,11 @@ class _ChatLandingScreenState extends State<ChatLandingScreen> {
             return;
           }
 
-          if (isVideo) {
-            AutoRouter.of(context).push(VideoCallRoute());
-          } else {
-            AutoRouter.of(context).push(AudioCallRoute());
-          }
+          // if (isVideo) {
+          //   AutoRouter.of(context).push(VideoCallRoute());
+          // } else {
+          AutoRouter.of(context).push(AudioCallRoute());
+          // }
         });
   }
 }

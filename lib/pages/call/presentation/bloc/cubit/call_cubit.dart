@@ -38,18 +38,20 @@ class CallCubit extends Cubit<CallState> {
   Duration callDuration = Duration.zero;
   Timer? _durationTimer;
   bool _isEngineReady = false;
+  bool get isEngineReady => _isEngineReady;
   bool _isEndingCall = false;
   bool _hasPoppedAfterLeave = false;
-  final int _localUid = DateTime.now().millisecondsSinceEpoch.remainder(
-    1000000,
-  );
+  final int localUid = DateTime.now().millisecondsSinceEpoch.remainder(1000000);
 
   Future<Map<String, dynamic>?> startCall({
     required String mediaType,
     required String callType,
     required List<String> participantIds,
+    String? callerImageUrl,
   }) async {
     this.callType = mediaType == 'video' ? CallType.video : CallType.audio;
+    cameraOff = this.callType == CallType.audio;
+    imageUrl = callerImageUrl;
     isStartingCall = true;
     emit(CallLoading());
 
@@ -61,7 +63,6 @@ class CallCubit extends Cubit<CallState> {
       );
       isStartingCall = false;
 
-      // Extract call data from API response
       final data = response['data'] as Map<String, dynamic>?;
       final callRecord = data?['callRecord'] as Map<String, dynamic>?;
       final token = data?['token'] as String?;
@@ -94,6 +95,7 @@ class CallCubit extends Cubit<CallState> {
     this.callkitId = callkitId;
     this.imageUrl = imageUrl;
     callType = mediaType == 'video' ? CallType.video : CallType.audio;
+    cameraOff = callType == CallType.audio;
     role = ClientRoleType.clientRoleBroadcaster;
     emit(CallLoaded());
   }
@@ -105,7 +107,7 @@ class CallCubit extends Cubit<CallState> {
     return uuidRegex.hasMatch(value);
   }
 
-  Future<void> initAgora(BuildContext context) async {
+  Future<void> initAgora() async {
     log(
       "Initializing Agora with channel: $channelName, callId: $callId, mediaType: ${callType.name}",
     );
@@ -121,13 +123,18 @@ class CallCubit extends Cubit<CallState> {
     await engine.initialize(RtcEngineContext(appId: AppConstants.agoraAppId));
     _isEngineReady = true;
 
-    _addEventHandlers(context);
+    _addEventHandlers();
 
     if (callType == CallType.video) {
+      cameraOff = false;
       await engine.enableVideo();
       await engine.startPreview();
+      await engine.muteLocalVideoStream(false);
     } else {
-      await engine.enableAudio();
+      cameraOff = true;
+      await engine.muteLocalVideoStream(true);
+      await engine.stopPreview();
+      await engine.disableVideo();
     }
 
     debugPrint("🎯 User role set to: ${role.name}");
@@ -142,7 +149,7 @@ class CallCubit extends Cubit<CallState> {
     await engine.joinChannel(
       token: tokenToUse,
       channelId: channelToUse,
-      uid: _localUid,
+      uid: localUid,
       options: ChannelMediaOptions(clientRoleType: role),
     );
     emit(CallLoaded());
@@ -154,7 +161,7 @@ class CallCubit extends Cubit<CallState> {
       appId: AppConstants.agoraAppId,
       appCertificate: AppConstants.agoraAppCertificate,
       channelName: activeChannelName,
-      uid: _localUid.toString(),
+      uid: localUid.toString(),
       role: role == ClientRoleType.clientRoleAudience
           ? RtcRole.subscriber
           : RtcRole.publisher,
@@ -195,17 +202,61 @@ class CallCubit extends Cubit<CallState> {
     emit(CallLoading());
 
     cameraOff = !cameraOff;
+
     if (_isEngineReady) {
       await engine.muteLocalVideoStream(cameraOff);
-      if (callType == CallType.video) {
-        if (cameraOff) {
-          await engine.stopPreview();
-        } else {
-          await engine.enableVideo();
-          await engine.startPreview();
-        }
+
+      if (!cameraOff) {
+        await engine.startPreview();
+      } else {
+        await engine.stopPreview();
       }
     }
+
+    emit(CallLoaded());
+  }
+
+  Future<void> switchToVideoCall() async {
+    if (callType == CallType.video) return;
+
+    emit(CallLoading());
+
+    callType = CallType.video;
+    cameraOff = false;
+
+    if (_isEngineReady) {
+      await engine.enableVideo();
+      await engine.startPreview();
+      await engine.muteLocalVideoStream(false);
+    }
+
+    emit(CallLoaded());
+  }
+
+  Future<void> switchToAudioCall() async {
+    if (callType == CallType.audio) return;
+
+    emit(CallLoading());
+
+    callType = CallType.audio;
+    cameraOff = true;
+
+    if (_isEngineReady) {
+      await engine.muteLocalVideoStream(true);
+      await engine.stopPreview();
+      await engine.disableVideo();
+    }
+
+    emit(CallLoaded());
+  }
+
+  bool isFrontCamera = true;
+
+  Future<void> switchCamera() async {
+    if (!_isEngineReady || callType != CallType.video || cameraOff) return;
+    emit(CallLoading());
+    isFrontCamera = !isFrontCamera;
+    await engine.switchCamera();
     emit(CallLoaded());
   }
 
@@ -247,16 +298,18 @@ class CallCubit extends Cubit<CallState> {
     }
   }
 
-  void _addEventHandlers(BuildContext context) {
+  bool isLocalVideoEnabled = false;
+  bool isRemoteVideoEnabled = false;
+
+  void _addEventHandlers() {
     engine.registerEventHandler(
       RtcEngineEventHandler(
         onJoinChannelSuccess: (RtcConnection conn, int elapsed) {
           emit(CallLoading());
-
           debugPrint("✅ Local user joined channel: ${conn.channelId}");
+          resetCallActions();
           joined = true;
           loading = false;
-          _startTimer();
           emit(CallLoaded());
         },
         onUserJoined: (RtcConnection conn, int remoteUid, int elapsed) async {
@@ -266,10 +319,29 @@ class CallCubit extends Cubit<CallState> {
               _isValidUuid(callkitConnectionId)) {
             await FlutterCallkitIncoming.setCallConnected(callkitConnectionId);
           }
+          _startTimer();
           debugPrint("👤 Remote user joined: $remoteUid");
           users.add(remoteUid);
           emit(CallLoaded());
         },
+        onRemoteVideoStateChanged:
+            (connection, remoteUid, state, reason, elapsed) async {
+              final isVideoActive =
+                  state == RemoteVideoState.remoteVideoStateStarting ||
+                  state == RemoteVideoState.remoteVideoStateDecoding;
+
+              isRemoteVideoEnabled = isVideoActive;
+
+              if (isVideoActive && callType == CallType.audio) {
+                debugPrint("📹 Remote enabled video → upgrading call");
+                await switchToVideoCall();
+              }
+
+              if (!isVideoActive && callType == CallType.video) {
+                debugPrint("📵 Remote disabled video → switching to audio");
+                await switchToAudioCall();
+              }
+            },
         onUserOffline:
             (RtcConnection conn, int remoteUid, UserOfflineReasonType reason) {
               emit(CallLoading());
@@ -304,7 +376,6 @@ class CallCubit extends Cubit<CallState> {
     callDuration = Duration.zero;
     _durationTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       emit(CallLoading());
-
       callDuration = Duration(seconds: timer.tick);
       emit(CallLoaded());
     });
@@ -312,10 +383,68 @@ class CallCubit extends Cubit<CallState> {
 
   void _stopTimer() {
     emit(CallLoading());
-
     _durationTimer?.cancel();
     _durationTimer = null;
     callDuration = Duration.zero;
+    emit(CallLoaded());
+  }
+
+  // reset call actions
+  void resetCallActions() {
+    emit(CallLoading());
+    muted = false;
+    cameraOff = callType == CallType.audio;
+    speaker = false;
+    emit(CallLoaded());
+  }
+
+  double selfViewTop = 80;
+  double selfViewLeft = 250;
+  bool isSelfViewDragging = false;
+
+  void updateSelfViewPosition({
+    required double left,
+    required double top,
+    required bool isDragging,
+  }) {
+    emit(CallLoading());
+    selfViewLeft = left;
+    selfViewTop = top;
+    isSelfViewDragging = isDragging;
+    emit(CallLoaded());
+  }
+
+  void snapToNearestCorner({
+    required Size screenSize,
+    required double widgetWidth,
+    required double widgetHeight,
+    required EdgeInsets safeAreaPadding,
+  }) {
+    emit(CallLoading());
+    isSelfViewDragging = false;
+
+    final double leftLimit = safeAreaPadding.left + 16;
+    final double rightLimit =
+        screenSize.width - widgetWidth - safeAreaPadding.right - 16;
+    final double topLimit = safeAreaPadding.top + 80;
+    final double bottomLimit =
+        screenSize.height - widgetHeight - safeAreaPadding.bottom - 120;
+
+    final bool isOnLeftSide = selfViewLeft < (screenSize.width / 2);
+    final bool isOnTopSide = selfViewTop < (screenSize.height / 2);
+
+    if (isOnLeftSide) {
+      selfViewLeft = leftLimit;
+    } else {
+      selfViewLeft = rightLimit;
+    }
+
+    if (isOnTopSide) {
+      selfViewTop = topLimit;
+    } else {
+      selfViewTop = bottomLimit;
+    }
+
     emit(CallLoaded());
   }
 }

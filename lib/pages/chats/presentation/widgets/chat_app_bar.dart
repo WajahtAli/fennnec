@@ -476,6 +476,7 @@ class ChatAppBar extends StatelessWidget {
       mediaType: isVideoCall ? 'video' : 'audio',
       callType: isGroup ? 'group' : 'individual',
       participantIds: participantId,
+      callerImageUrl: contactAvatar,
     );
 
     if (!context.mounted || response == null) return;
@@ -487,11 +488,11 @@ class ChatAppBar extends StatelessWidget {
     //   return;
     // }
 
-    if (isVideoCall) {
-      AutoRouter.of(context).push(VideoCallRoute());
-    } else {
-      AutoRouter.of(context).push(AudioCallRoute());
-    }
+    // if (isVideoCall) {
+    //   AutoRouter.of(context).push(VideoCallRoute());
+    // } else {
+    AutoRouter.of(context).push(AudioCallRoute());
+    // }
   }
 
   List<String>? _resolveParticipantId() {
