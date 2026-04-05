@@ -31,7 +31,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
 
   @override
   void dispose() {
-    _callCubit.endCall();
+    _callCubit.handleCallScreenDisposed();
     super.dispose();
   }
 
@@ -48,6 +48,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
       body: BlocBuilder<CallCubit, CallState>(
         bloc: _callCubit,
         builder: (context, state) {
+          final isSystemPipActive = _callCubit.isSystemPipActive;
           final remoteUid = _callCubit.users.isNotEmpty
               ? _callCubit.users.first
               : null;
@@ -90,7 +91,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                       ),
               ),
 
-              if (!showRemoteView)
+              if (!showRemoteView && !isSystemPipActive)
                 Positioned(
                   top: 110.h,
                   left: 16.w,
@@ -133,124 +134,122 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                 ),
               ),
 
-              SafeArea(
-                child: Column(
-                  children: [
-                    // Top bar with back button and time
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 16.w,
-                        vertical: 8.h,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          // Back button
-                          GestureDetector(
-                            onTap: () {
-                              _callCubit.endCall();
-                            },
-                            child: Container(
-                              width: 40.w,
-                              height: 40.w,
-                              decoration: BoxDecoration(
-                                color: Colors.black.withValues(alpha: 0.3),
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                Icons.keyboard_arrow_down,
-                                color: Colors.white,
-                                size: 24.sp,
-                              ),
-                            ),
-                          ),
-                          // Time display
-                          Text(
-                            _formatDuration(_callCubit.callDuration),
-                            style: AppTextStyles.h4(context).copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          // Placeholder for alignment
-                          SizedBox(width: 40.w),
-                        ],
-                      ),
-                    ),
-
-                    const Spacer(),
-
-                    // Bottom controls
-                    Padding(
-                      padding: EdgeInsets.only(
-                        left: 24.w,
-                        right: 24.w,
-                        bottom: 32.h,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          _buildControlButton(
-                            icon: Assets.icons.mic.path,
-                            iconOff: Assets.icons.micTurnOff.path,
-                            isActive: !_callCubit.muted,
-                            onTap: _callCubit.toggleMute,
-                          ),
-                          SizedBox(width: 16.w),
-                          _buildControlButton(
-                            icon: Assets.icons.speaker.path,
-                            iconOff: Assets.icons.volumeX.path,
-                            isActive: _callCubit.speaker,
-                            onTap: _callCubit.toggleSpeaker,
-                          ),
-                          SizedBox(width: 16.w),
-                          _buildControlButton(
-                            icon: Assets.icons.video.path,
-                            iconOff: Assets.icons.videoCut.path,
-                            isActive: !_callCubit.cameraOff,
-                            onTap: _callCubit.toggleCamera,
-                          ),
-                          SizedBox(width: 16.w),
-                          // End Call button
-                          GestureDetector(
-                            onTap: () {
-                              _callCubit.endCall();
-                            },
-                            child: Container(
-                              width: 114.w,
-                              height: 56.h,
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFFF4D5E),
-                                borderRadius: BorderRadius.circular(32.r),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: const Color(
-                                      0xFFFF4D5E,
-                                    ).withValues(alpha: 0.35),
-                                    blurRadius: 24,
-                                    offset: const Offset(0, 12),
-                                  ),
-                                ],
-                              ),
-                              alignment: Alignment.center,
-                              child: Text(
-                                'End Call',
-                                style: AppTextStyles.button(context).copyWith(
+              if (!isSystemPipActive)
+                SafeArea(
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16.w,
+                          vertical: 8.h,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            GestureDetector(
+                              onTap: () async {
+                                final router = context.router;
+                                final shouldPopRoute = await _callCubit
+                                    .minimizeCallToPip();
+                                if (shouldPopRoute && router.canPop()) {
+                                  router.pop();
+                                }
+                              },
+                              child: Container(
+                                width: 40.w,
+                                height: 40.w,
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withValues(alpha: 0.3),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.keyboard_arrow_down,
                                   color: Colors.white,
-                                  fontWeight: FontWeight.w600,
+                                  size: 24.sp,
                                 ),
                               ),
                             ),
-                          ),
-                        ],
+                            Text(
+                              _formatDuration(_callCubit.callDuration),
+                              style: AppTextStyles.h4(context).copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            SizedBox(width: 40.w),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                      const Spacer(),
+                      Padding(
+                        padding: EdgeInsets.only(
+                          left: 24.w,
+                          right: 24.w,
+                          bottom: 32.h,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            _buildControlButton(
+                              icon: Assets.icons.mic.path,
+                              iconOff: Assets.icons.micTurnOff.path,
+                              isActive: !_callCubit.muted,
+                              onTap: _callCubit.toggleMute,
+                            ),
+                            SizedBox(width: 16.w),
+                            _buildControlButton(
+                              icon: Assets.icons.speaker.path,
+                              iconOff: Assets.icons.volumeX.path,
+                              isActive: _callCubit.speaker,
+                              onTap: _callCubit.toggleSpeaker,
+                            ),
+                            SizedBox(width: 16.w),
+                            _buildControlButton(
+                              icon: Assets.icons.video.path,
+                              iconOff: Assets.icons.videoCut.path,
+                              isActive: !_callCubit.cameraOff,
+                              onTap: _callCubit.toggleCamera,
+                            ),
+                            SizedBox(width: 16.w),
+                            GestureDetector(
+                              onTap: () {
+                                _callCubit.endCall();
+                              },
+                              child: Container(
+                                width: 114.w,
+                                height: 56.h,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFF4D5E),
+                                  borderRadius: BorderRadius.circular(32.r),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: const Color(
+                                        0xFFFF4D5E,
+                                      ).withValues(alpha: 0.35),
+                                      blurRadius: 24,
+                                      offset: const Offset(0, 12),
+                                    ),
+                                  ],
+                                ),
+                                alignment: Alignment.center,
+                                child: Text(
+                                  'End Call',
+                                  style: AppTextStyles.button(context).copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
 
               // Small self-view in top right
-              if (showRemoteView)
+              if (showRemoteView && !isSystemPipActive)
                 Positioned(
                   top: 60.h,
                   right: 16.w,

@@ -1,22 +1,37 @@
 import 'dart:async';
 import 'dart:developer';
+import 'dart:io';
 import 'package:auto_route/auto_route.dart';
 import 'package:fennac_app/app/app.dart';
 import 'package:fennac_app/app/constants/app_constants.dart';
 import 'package:fennac_app/app/constants/app_enums.dart';
 import 'package:fennac_app/pages/call/domain/usecase/call_usecase.repository.dart';
+import 'package:fennac_app/pages/call/presentation/helpers/call_pip_overlay_controller.dart';
 import 'package:fennac_app/pages/call/presentation/bloc/state/call_state.dart';
+import 'package:fennac_app/routes/routes_imports.gr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:agora_token_service/agora_token_service.dart';
+import 'package:pip/pip.dart';
+
+import '../../../../../core/notifications/call_notification_handler.dart';
 
 class CallCubit extends Cubit<CallState> {
   final CallUsecase _callUsecase;
+  final Pip _pip = Pip();
 
-  CallCubit(this._callUsecase) : super(CallInitial());
+  CallCubit(this._callUsecase) : super(CallInitial()) {
+    unawaited(
+      _pip.registerStateChangedObserver(
+        PipStateChangedObserver(
+          onPipStateChanged: _handleSystemPipStateChanged,
+        ),
+      ),
+    );
+  }
 
   late RtcEngine engine;
   final users = <int>{};
@@ -39,9 +54,26 @@ class CallCubit extends Cubit<CallState> {
   Timer? _durationTimer;
   bool _isEngineReady = false;
   bool get isEngineReady => _isEngineReady;
+  bool isCallMinimized = false;
+  bool isSystemPipActive = false;
   bool _isEndingCall = false;
   bool _hasPoppedAfterLeave = false;
   final int localUid = DateTime.now().millisecondsSinceEpoch.remainder(1000000);
+  bool get hasOngoingCall => _isEngineReady || callId != null || joined;
+  String get callStatusLabel {
+    final isCallConnecting = !joined && loading;
+    final isCallRinging = joined && !loading && users.isEmpty;
+    if (users.isNotEmpty) {
+      return _formatDuration(callDuration);
+    }
+    if (isCallConnecting) {
+      return 'Connecting...';
+    }
+    if (isCallRinging) {
+      return 'Ringing...';
+    }
+    return 'Call';
+  }
 
   Future<Map<String, dynamic>?> startCall({
     required String mediaType,
@@ -52,6 +84,9 @@ class CallCubit extends Cubit<CallState> {
     this.callType = mediaType == 'video' ? CallType.video : CallType.audio;
     cameraOff = this.callType == CallType.audio;
     imageUrl = callerImageUrl;
+    isCallMinimized = false;
+    isSystemPipActive = false;
+    CallPipOverlayController.hide();
     isStartingCall = true;
     emit(CallLoading());
 
@@ -74,6 +109,13 @@ class CallCubit extends Cubit<CallState> {
       }
 
       emit(CallLoaded());
+      CallNotificationHandler.showOutgoingCallNotification(
+        callId: callId ?? '',
+        channelName: channelName ?? '',
+        callerName: 'Outgoing ${this.callType.name} call',
+        mediaType: mediaType,
+        imageUrl: callerImageUrl,
+      );
       return response;
     } catch (e) {
       isStartingCall = false;
@@ -96,6 +138,9 @@ class CallCubit extends Cubit<CallState> {
     this.imageUrl = imageUrl;
     callType = mediaType == 'video' ? CallType.video : CallType.audio;
     cameraOff = callType == CallType.audio;
+    isCallMinimized = false;
+    isSystemPipActive = false;
+    CallPipOverlayController.hide();
     role = ClientRoleType.clientRoleBroadcaster;
     emit(CallLoaded());
   }
@@ -108,6 +153,12 @@ class CallCubit extends Cubit<CallState> {
   }
 
   Future<void> initAgora() async {
+    if (_isEngineReady) {
+      loading = false;
+      emit(CallLoaded());
+      return;
+    }
+
     log(
       "Initializing Agora with channel: $channelName, callId: $callId, mediaType: ${callType.name}",
     );
@@ -263,9 +314,16 @@ class CallCubit extends Cubit<CallState> {
   Future<void> endCall() async {
     if (_isEndingCall) return;
     _isEndingCall = true;
+    isCallMinimized = false;
+    isSystemPipActive = false;
+    CallPipOverlayController.hide();
     emit(CallLoading());
 
     _stopTimer();
+
+    try {
+      await _pip.stop();
+    } catch (_) {}
 
     if (callId != null) {
       try {
@@ -300,6 +358,74 @@ class CallCubit extends Cubit<CallState> {
 
   bool isLocalVideoEnabled = false;
   bool isRemoteVideoEnabled = false;
+
+  Future<bool> minimizeCallToPip() async {
+    if (!hasOngoingCall || _isEndingCall) return false;
+
+    if (Platform.isAndroid) {
+      final isSupported = await _pip.isSupported();
+
+      if (isSupported) {
+        final setupSucceeded = await _pip.setup(
+          PipOptions(
+            aspectRatioX:  9,
+            aspectRatioY: 16 ,
+            seamlessResizeEnabled: true,
+          ),
+        );
+
+        final enteredSystemPip = setupSucceeded ? await _pip.start() : false;
+
+        if (enteredSystemPip) {
+          isSystemPipActive = true;
+          isCallMinimized = false;
+          CallPipOverlayController.hide();
+          emit(CallLoaded());
+          return false;
+        }
+      }
+    }
+
+    isCallMinimized = true;
+    isSystemPipActive = false;
+    CallPipOverlayController.show();
+    emit(CallLoaded());
+    return true;
+  }
+
+  void restoreCallFromPip() {
+    if (!isCallMinimized) return;
+    isCallMinimized = false;
+    isSystemPipActive = false;
+    CallPipOverlayController.hide();
+    emit(CallLoaded());
+
+    final context = navigatorKey.currentContext;
+    if (context == null) return;
+
+    context.pushRoute(const AudioCallRoute());
+  }
+
+  void handleCallScreenDisposed() {
+    if (isCallMinimized || _isEndingCall) return;
+    unawaited(endCall());
+  }
+
+  void _handleSystemPipStateChanged(PipState state, String? error) {
+    if (state == PipState.pipStateStarted) {
+      isSystemPipActive = true;
+      isCallMinimized = false;
+      CallPipOverlayController.hide();
+      emit(CallLoaded());
+      return;
+    }
+
+    if (state == PipState.pipStateStopped || state == PipState.pipStateFailed) {
+      isSystemPipActive = false;
+    }
+
+    emit(CallLoaded());
+  }
 
   void _addEventHandlers() {
     engine.registerEventHandler(
@@ -396,6 +522,13 @@ class CallCubit extends Cubit<CallState> {
     cameraOff = callType == CallType.audio;
     speaker = false;
     emit(CallLoaded());
+  }
+
+  String _formatDuration(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    final minutes = twoDigits(duration.inMinutes.remainder(60));
+    final seconds = twoDigits(duration.inSeconds.remainder(60));
+    return '$minutes:$seconds';
   }
 
   double selfViewTop = 80;

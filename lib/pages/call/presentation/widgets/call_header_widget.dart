@@ -35,7 +35,18 @@ class CallHeaderWidget extends StatelessWidget {
               Align(
                 alignment: Alignment.centerLeft,
                 child: GestureDetector(
-                  onTap: () => context.router.pop(),
+                  onTap: () async {
+                    final router = context.router;
+                    if (!callCubit.hasOngoingCall) {
+                      router.pop();
+                      return;
+                    }
+
+                    final shouldPopRoute = await callCubit.minimizeCallToPip();
+                    if (shouldPopRoute && router.canPop()) {
+                      router.pop();
+                    }
+                  },
                   child: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(

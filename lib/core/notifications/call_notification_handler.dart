@@ -240,4 +240,67 @@ class CallNotificationHandler {
     }
     return null;
   }
+
+  // if the user started the call show the outgoing call notification
+  static Future<void> showOutgoingCallNotification({
+    required String callId,
+    required String channelName,
+    required String callerName,
+    required String mediaType,
+    String? imageUrl,
+  }) async {
+    final callkitId = _uuid.v4();
+    final params = CallKitParams(
+      id: callkitId,
+      nameCaller: callerName,
+      appName: 'Fennac',
+      avatar: imageUrl,
+      handle: callerName,
+      type: mediaType == 'video' ? 1 : 0,
+      duration: 30000,
+      textAccept: 'Accept',
+      textDecline: 'Decline',
+      missedCallNotification: const NotificationParams(
+        showNotification: true,
+        isShowCallback: false,
+        subtitle: 'Missed call',
+        callbackText: 'Call back',
+      ),
+      extra: <String, dynamic>{
+        'callkitId': callkitId,
+        'channelName': channelName,
+        'callRecordId': callId,
+        'mediaType': mediaType,
+        'imageUrl': imageUrl,
+      },
+      headers: <String, dynamic>{'Content-Type': 'application/json'},
+      android: AndroidParams(
+        isCustomNotification: true,
+        isShowLogo: false,
+        ringtonePath: 'system_ringtone_default',
+        backgroundColor: ColorPalette.primary.toHex(),
+        backgroundUrl: imageUrl,
+        logoUrl: imageUrl,
+        actionColor: '#4CAF50',
+        textColor: '#ffffff',
+      ),
+      ios: IOSParams(
+        iconName: 'CallKitLogo',
+        handleType: 'generic',
+        supportsVideo: true,
+        maximumCallGroups: 2,
+        maximumCallsPerCallGroup: 1,
+        audioSessionMode: 'default',
+        audioSessionActive: true,
+        audioSessionPreferredSampleRate: 44100.0,
+        audioSessionPreferredIOBufferDuration: 0.005,
+        supportsDTMF: true,
+        supportsHolding: true,
+        supportsGrouping: true,
+        supportsUngrouping: true,
+        ringtonePath: 'system_ringtone_default',
+      ),
+    );
+    await FlutterCallkitIncoming.startCall(params);
+  }
 }

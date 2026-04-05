@@ -34,7 +34,7 @@ class _AudioCallScreenState extends State<AudioCallScreen> {
 
   @override
   void dispose() {
-    _callCubit.endCall();
+    _callCubit.handleCallScreenDisposed();
     super.dispose();
   }
 
@@ -46,54 +46,56 @@ class _AudioCallScreenState extends State<AudioCallScreen> {
         child: BlocBuilder<CallCubit, CallState>(
           bloc: _callCubit,
           builder: (context, state) {
+            final isSystemPipActive = _callCubit.isSystemPipActive;
             return Stack(
               children: [
                 if (_callCubit.callType == CallType.video) ...[
                   Positioned.fill(child: VideoCallCameraView()),
-                  AnimatedPositioned(
-                    duration: _callCubit.isSelfViewDragging
-                        ? Duration.zero
-                        : const Duration(milliseconds: 300),
-                    curve: Curves.easeOutBack,
-                    top: _callCubit.selfViewTop,
-                    left: _callCubit.selfViewLeft,
-                    child: SafeArea(
-                      child: GestureDetector(
-                        onPanStart: (details) {
-                          _callCubit.updateSelfViewPosition(
-                            left: _callCubit.selfViewLeft,
-                            top: _callCubit.selfViewTop,
-                            isDragging: true,
-                          );
-                        },
-                        onPanUpdate: (details) {
-                          _callCubit.updateSelfViewPosition(
-                            left: _callCubit.selfViewLeft + details.delta.dx,
-                            top: _callCubit.selfViewTop + details.delta.dy,
-                            isDragging: true,
-                          );
-                        },
-                        onPanEnd: (details) {
-                          _callCubit.snapToNearestCorner(
-                            screenSize: MediaQuery.of(context).size,
-                            widgetWidth: 100.w,
-                            widgetHeight: 140.h,
-                            safeAreaPadding: MediaQuery.of(context).padding,
-                          );
-                        },
-                        child: const SelfVideoWidget(),
+                  if (!isSystemPipActive)
+                    AnimatedPositioned(
+                      duration: _callCubit.isSelfViewDragging
+                          ? Duration.zero
+                          : const Duration(milliseconds: 300),
+                      curve: Curves.easeOutBack,
+                      top: _callCubit.selfViewTop,
+                      left: _callCubit.selfViewLeft,
+                      child: SafeArea(
+                        child: GestureDetector(
+                          onPanStart: (details) {
+                            _callCubit.updateSelfViewPosition(
+                              left: _callCubit.selfViewLeft,
+                              top: _callCubit.selfViewTop,
+                              isDragging: true,
+                            );
+                          },
+                          onPanUpdate: (details) {
+                            _callCubit.updateSelfViewPosition(
+                              left: _callCubit.selfViewLeft + details.delta.dx,
+                              top: _callCubit.selfViewTop + details.delta.dy,
+                              isDragging: true,
+                            );
+                          },
+                          onPanEnd: (details) {
+                            _callCubit.snapToNearestCorner(
+                              screenSize: MediaQuery.of(context).size,
+                              widgetWidth: 100.w,
+                              widgetHeight: 140.h,
+                              safeAreaPadding: MediaQuery.of(context).padding,
+                            );
+                          },
+                          child: const SelfVideoWidget(),
+                        ),
                       ),
                     ),
-                  ),
                 ],
                 SafeArea(
                   child: Column(
                     children: [
-                      const SizedBox(height: 24),
-                      // Call duration and chevron
-                      CallHeaderWidget(),
+                      if (!isSystemPipActive) ...[
+                        const SizedBox(height: 24),
+                        CallHeaderWidget(),
+                      ],
                       SizedBox(height: 200.h),
-                      // Profile picture
                       if (_callCubit.callType == CallType.audio) ...[
                         Center(
                           child: Container(
@@ -123,8 +125,10 @@ class _AudioCallScreenState extends State<AudioCallScreen> {
                         ),
                       ],
                       const Spacer(),
-                      CallActionButtons(),
-                      SizedBox(height: 20.h),
+                      if (!isSystemPipActive) ...[
+                        CallActionButtons(),
+                        SizedBox(height: 20.h),
+                      ],
                     ],
                   ),
                 ),
