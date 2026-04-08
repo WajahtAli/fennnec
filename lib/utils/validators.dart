@@ -118,7 +118,15 @@ bool isValidEmail(String email) {
 }
 
 String normalizePhone(String phone) {
-  return phone.replaceAll(RegExp(r'\s+'), '');
+  final trimmed = phone.trim();
+  if (trimmed.isEmpty) {
+    return trimmed;
+  }
+
+  // Keep digits and at most a leading '+' for E.164 compatibility.
+  final hasLeadingPlus = trimmed.startsWith('+');
+  final digitsOnly = trimmed.replaceAll(RegExp(r'[^0-9]'), '');
+  return hasLeadingPlus ? '+$digitsOnly' : digitsOnly;
 }
 
 String formatDate(String date) {

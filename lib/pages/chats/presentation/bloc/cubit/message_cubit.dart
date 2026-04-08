@@ -130,6 +130,7 @@ class MessageCubit extends Cubit<MessageState> {
         attachments: attachments,
         wave: wave,
         duration: duration,
+        receiverGroupId: _groupId,
       );
       return;
     }
@@ -198,9 +199,6 @@ class MessageCubit extends Cubit<MessageState> {
 
   /// Initialize messages (can load from local storage or backend)
   Future<void> initializeMessages(String id, {bool isGroup = true}) async {
-    // Ensure existing polling is stopped before switching chats
-    stopPolling();
-
     _groupId = id;
     _isGroup = isGroup;
     _page = 1;
@@ -315,13 +313,15 @@ class MessageCubit extends Cubit<MessageState> {
       if (normalized.isMe) {
         final optimisticIndex = messages.indexWhere(
           (m) =>
-              m.isSending &&
+              sendingMessageIds.contains(m.id) &&
               m.senderId == normalized.senderId &&
               m.content.trim() == normalized.content.trim() &&
               m.type == normalized.type,
         );
         if (optimisticIndex != -1) {
+          final optimisticId = messages[optimisticIndex].id;
           messages[optimisticIndex] = normalized;
+          sendingMessageIds.remove(optimisticId);
           emit(MessageSuccess());
           return;
         }
@@ -469,7 +469,7 @@ class MessageCubit extends Cubit<MessageState> {
   }
 
   /// Send a text message
-  Future<void> sendTextMessage() async {
+  Future<void> sendTextMessage({bool? isGroupMessage}) async {
     final content = messageController.text;
     if (content.trim().isEmpty) return;
     emit(MessageLoading());
@@ -484,7 +484,10 @@ class MessageCubit extends Cubit<MessageState> {
       sentAt: DateTime.now(),
       isMe: true,
       isSending: true,
+      reciverId: (isGroupMessage ?? false) ? _groupId : null,
     );
+
+    log("Sending message ${message.id} with content: ${message.reciverId}");
 
     _addMessage(message);
     sendingMessageIds.add(message.id);
@@ -495,22 +498,16 @@ class MessageCubit extends Cubit<MessageState> {
     if (index != -1) {
       try {
         await _sendMessageRequest(content: content, type: 'text');
-        messages[index] = message.copyWith(isSending: false);
+        // Keep optimistic message in sending state until socket confirmation
+        // arrives, so it can be replaced instead of duplicated.
         emit(MessageSuccess());
       } catch (e) {
         messages[index] = message.copyWith(isSending: false, hasFailed: true);
+        sendingMessageIds.remove(message.id);
         emit(MessageError(e.toString()));
-      } finally {
-        emit(MessageLoading());
-        Future.delayed(const Duration(seconds: 1), () {
-          messages.removeWhere((m) => m.id == message.id);
-          sendingMessageIds.remove(message.id);
-        });
-        emit(MessageSuccess());
-        log(
-          "Finished sending message ${message.id}, success: ${!message.hasFailed}, error: ${message.hasFailed ? "" : 'none'}",
-        );
       }
+
+      log('sendTextMessage completed for ${message.id}');
     }
   }
 

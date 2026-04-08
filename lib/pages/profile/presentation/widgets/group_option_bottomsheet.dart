@@ -95,6 +95,14 @@ class GroupOptionsBottomSheet extends StatelessWidget {
             },
           ),
           const SizedBox(height: 24),
+          _buildOption(
+            context,
+            title: 'Group Location',
+            textColor: Colors.white,
+            onTap: () {
+              AutoRouter.of(context).push(DistanceRoute());
+            },
+          ),
 
           _buildOption(
             context,

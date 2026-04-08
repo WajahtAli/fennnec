@@ -3099,7 +3099,7 @@ as String?,
 /// @nodoc
 mixin _$ChatAboutGroupModel {
 
- String? get bio; String? get fitsForGroup;
+ String? get title; String? get bio; String? get fitsForGroup;
 /// Create a copy of ChatAboutGroupModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -3112,16 +3112,16 @@ $ChatAboutGroupModelCopyWith<ChatAboutGroupModel> get copyWith => _$ChatAboutGro
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChatAboutGroupModel&&(identical(other.bio, bio) || other.bio == bio)&&(identical(other.fitsForGroup, fitsForGroup) || other.fitsForGroup == fitsForGroup));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChatAboutGroupModel&&(identical(other.title, title) || other.title == title)&&(identical(other.bio, bio) || other.bio == bio)&&(identical(other.fitsForGroup, fitsForGroup) || other.fitsForGroup == fitsForGroup));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,bio,fitsForGroup);
+int get hashCode => Object.hash(runtimeType,title,bio,fitsForGroup);
 
 @override
 String toString() {
-  return 'ChatAboutGroupModel(bio: $bio, fitsForGroup: $fitsForGroup)';
+  return 'ChatAboutGroupModel(title: $title, bio: $bio, fitsForGroup: $fitsForGroup)';
 }
 
 
@@ -3132,7 +3132,7 @@ abstract mixin class $ChatAboutGroupModelCopyWith<$Res>  {
   factory $ChatAboutGroupModelCopyWith(ChatAboutGroupModel value, $Res Function(ChatAboutGroupModel) _then) = _$ChatAboutGroupModelCopyWithImpl;
 @useResult
 $Res call({
- String? bio, String? fitsForGroup
+ String? title, String? bio, String? fitsForGroup
 });
 
 
@@ -3149,9 +3149,10 @@ class _$ChatAboutGroupModelCopyWithImpl<$Res>
 
 /// Create a copy of ChatAboutGroupModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? bio = freezed,Object? fitsForGroup = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? title = freezed,Object? bio = freezed,Object? fitsForGroup = freezed,}) {
   return _then(_self.copyWith(
-bio: freezed == bio ? _self.bio : bio // ignore: cast_nullable_to_non_nullable
+title: freezed == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String?,bio: freezed == bio ? _self.bio : bio // ignore: cast_nullable_to_non_nullable
 as String?,fitsForGroup: freezed == fitsForGroup ? _self.fitsForGroup : fitsForGroup // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
@@ -3238,10 +3239,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? bio,  String? fitsForGroup)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? title,  String? bio,  String? fitsForGroup)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ChatAboutGroupModel() when $default != null:
-return $default(_that.bio,_that.fitsForGroup);case _:
+return $default(_that.title,_that.bio,_that.fitsForGroup);case _:
   return orElse();
 
 }
@@ -3259,10 +3260,10 @@ return $default(_that.bio,_that.fitsForGroup);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? bio,  String? fitsForGroup)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? title,  String? bio,  String? fitsForGroup)  $default,) {final _that = this;
 switch (_that) {
 case _ChatAboutGroupModel():
-return $default(_that.bio,_that.fitsForGroup);case _:
+return $default(_that.title,_that.bio,_that.fitsForGroup);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -3279,10 +3280,10 @@ return $default(_that.bio,_that.fitsForGroup);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? bio,  String? fitsForGroup)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? title,  String? bio,  String? fitsForGroup)?  $default,) {final _that = this;
 switch (_that) {
 case _ChatAboutGroupModel() when $default != null:
-return $default(_that.bio,_that.fitsForGroup);case _:
+return $default(_that.title,_that.bio,_that.fitsForGroup);case _:
   return null;
 
 }
@@ -3294,9 +3295,10 @@ return $default(_that.bio,_that.fitsForGroup);case _:
 @JsonSerializable()
 
 class _ChatAboutGroupModel implements ChatAboutGroupModel {
-  const _ChatAboutGroupModel({this.bio, this.fitsForGroup});
+  const _ChatAboutGroupModel({this.title, this.bio, this.fitsForGroup});
   factory _ChatAboutGroupModel.fromJson(Map<String, dynamic> json) => _$ChatAboutGroupModelFromJson(json);
 
+@override final  String? title;
 @override final  String? bio;
 @override final  String? fitsForGroup;
 
@@ -3313,16 +3315,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChatAboutGroupModel&&(identical(other.bio, bio) || other.bio == bio)&&(identical(other.fitsForGroup, fitsForGroup) || other.fitsForGroup == fitsForGroup));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChatAboutGroupModel&&(identical(other.title, title) || other.title == title)&&(identical(other.bio, bio) || other.bio == bio)&&(identical(other.fitsForGroup, fitsForGroup) || other.fitsForGroup == fitsForGroup));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,bio,fitsForGroup);
+int get hashCode => Object.hash(runtimeType,title,bio,fitsForGroup);
 
 @override
 String toString() {
-  return 'ChatAboutGroupModel(bio: $bio, fitsForGroup: $fitsForGroup)';
+  return 'ChatAboutGroupModel(title: $title, bio: $bio, fitsForGroup: $fitsForGroup)';
 }
 
 
@@ -3333,7 +3335,7 @@ abstract mixin class _$ChatAboutGroupModelCopyWith<$Res> implements $ChatAboutGr
   factory _$ChatAboutGroupModelCopyWith(_ChatAboutGroupModel value, $Res Function(_ChatAboutGroupModel) _then) = __$ChatAboutGroupModelCopyWithImpl;
 @override @useResult
 $Res call({
- String? bio, String? fitsForGroup
+ String? title, String? bio, String? fitsForGroup
 });
 
 
@@ -3350,9 +3352,10 @@ class __$ChatAboutGroupModelCopyWithImpl<$Res>
 
 /// Create a copy of ChatAboutGroupModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? bio = freezed,Object? fitsForGroup = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? title = freezed,Object? bio = freezed,Object? fitsForGroup = freezed,}) {
   return _then(_ChatAboutGroupModel(
-bio: freezed == bio ? _self.bio : bio // ignore: cast_nullable_to_non_nullable
+title: freezed == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String?,bio: freezed == bio ? _self.bio : bio // ignore: cast_nullable_to_non_nullable
 as String?,fitsForGroup: freezed == fitsForGroup ? _self.fitsForGroup : fitsForGroup // ignore: cast_nullable_to_non_nullable
 as String?,
   ));

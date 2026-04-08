@@ -278,7 +278,7 @@ class Di {
     sl.registerLazySingleton<KycPromptCubit>(() => KycPromptCubit());
     sl.registerLazySingleton<ImagePickerCubit>(() => ImagePickerCubit());
     sl.registerLazySingleton<DashboardCubit>(() => DashboardCubit());
-    sl.registerLazySingleton<HomeCubit>(() => HomeCubit(sl()));
+    sl.registerLazySingleton<HomeCubit>(() => HomeCubit());
     sl.registerLazySingleton<GroupsCubit>(() => GroupsCubit(sl()));
     sl.registerLazySingleton<LoginCubit>(() => LoginCubit(sl()));
     sl.registerLazySingleton<LegalContentCubit>(() => LegalContentCubit(sl()));
@@ -316,7 +316,7 @@ class Di {
     sl.registerLazySingleton<MyGroupCubit>(() => MyGroupCubit(sl()));
     sl.registerLazySingleton<GoogleMapCubit>(() => GoogleMapCubit());
     sl.registerLazySingleton<ContactListCubit>(() => ContactListCubit(sl()));
-    sl.registerLazySingleton<PokeCubit>(() => PokeCubit(sl(), sl()));
+    sl.registerLazySingleton<PokeCubit>(() => PokeCubit(sl(), sl(), sl()));
     sl.registerLazySingleton<GetPokedDetailsCubit>(
       () => GetPokedDetailsCubit(sl()),
     );

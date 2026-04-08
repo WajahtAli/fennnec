@@ -95,7 +95,11 @@ class _FilterScreenState extends State<FilterScreen> {
                                   options: DummyConstants.categories,
                                   selectedOption:
                                       _filterCubit.selectedCategory ?? '',
-                                  onOptionChanged: _filterCubit.updateCategory,
+                                  onOptionChanged: (v) {
+                                    _filterCubit.updateCategory(
+                                      v.trim().isEmpty ? null : v,
+                                    );
+                                  },
                                   blurNotifier: _isBlurNotifier,
                                 ),
                                 CustomSizedBox(height: 12),

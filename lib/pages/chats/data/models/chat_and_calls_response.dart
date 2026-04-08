@@ -201,8 +201,11 @@ abstract class ChatGroupMemberUserModel with _$ChatGroupMemberUserModel {
 
 @freezed
 abstract class ChatAboutGroupModel with _$ChatAboutGroupModel {
-  const factory ChatAboutGroupModel({String? bio, String? fitsForGroup}) =
-      _ChatAboutGroupModel;
+  const factory ChatAboutGroupModel({
+    String? title,
+    String? bio,
+    String? fitsForGroup,
+  }) = _ChatAboutGroupModel;
 
   factory ChatAboutGroupModel.fromJson(Map<String, dynamic> json) =>
       _$ChatAboutGroupModelFromJson(json);

@@ -10,6 +10,7 @@ import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:fennac_app/helpers/gradient_toast.dart';
 import 'package:fennac_app/pages/auth/domain/usecases/login_usecase.dart';
 import 'package:fennac_app/pages/auth/data/model/login_model.dart';
+import 'package:fennac_app/pages/auth/data/datasources/login_datasource.dart';
 import 'package:fennac_app/pages/auth/presentation/bloc/cubit/auth_cubit.dart';
 import 'package:fennac_app/pages/auth/presentation/bloc/cubit/create_account_cubit.dart';
 import 'package:fennac_app/pages/auth/presentation/bloc/state/login_state.dart';
@@ -154,6 +155,13 @@ class LoginCubit extends Cubit<LoginState> {
       emit(LoginLoaded());
     } catch (e) {
       debugPrint(e.toString());
+
+      if (e is LoginException) {
+        emit(LoginError(e.message, isVerified: e.isVerified));
+        VxToast.show(message: e.message);
+        return;
+      }
+
       emit(LoginError(e.toString()));
       VxToast.show(message: e.toString());
     }

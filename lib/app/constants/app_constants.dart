@@ -20,6 +20,7 @@ class AppConstants {
   static const fetchGroupInvitations = 'auth/pending-group-invitations';
   static const groupsAll = 'groups/all';
   static const resetVerificationCode = 'auth/resend-verification-code';
+  static const sendVerificationCode = 'auth/send-verification-code';
   static const groupsMembers = 'groups/members';
   static const groupInvite = 'groups/invite';
   static const groupById = 'groups/';

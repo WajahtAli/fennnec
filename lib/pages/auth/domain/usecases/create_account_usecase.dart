@@ -2,6 +2,18 @@ import 'package:fennac_app/pages/auth/data/model/login_model.dart';
 import 'package:fennac_app/pages/auth/domain/repositories/create_account_repo.dart';
 
 class CreateAccountUsecase {
+  Future<dynamic> sendVerificationCode({
+    required String method,
+    String? phone,
+    String? email,
+  }) async {
+    return await _createAccountRepo.sendVerificationCode(
+      method: method,
+      phone: phone,
+      email: email,
+    );
+  }
+
   Future<dynamic> resetVerificationCode({
     required String method,
     String? phone,

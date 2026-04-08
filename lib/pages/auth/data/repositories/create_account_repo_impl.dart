@@ -4,6 +4,19 @@ import 'package:fennac_app/pages/auth/domain/repositories/create_account_repo.da
 
 class CreateAccountRepoImpl extends CreateAccountRepo {
   @override
+  Future<dynamic> sendVerificationCode({
+    required String method,
+    String? phone,
+    String? email,
+  }) async {
+    return await _createAccountDatasource.sendVerificationCode(
+      method: method,
+      phone: phone,
+      email: email,
+    );
+  }
+
+  @override
   Future<dynamic> resetVerificationCode({
     required String method,
     String? phone,

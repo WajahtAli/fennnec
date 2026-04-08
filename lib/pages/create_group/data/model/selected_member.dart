@@ -9,6 +9,7 @@ class SelectedMember {
   final bool isFennecUser;
   final Contact? contact;
   final String? fennecId;
+  final String? memberStatus; // "member" or "invited"
 
   SelectedMember({
     required this.id,
@@ -19,6 +20,7 @@ class SelectedMember {
     this.isFennecUser = false,
     this.contact,
     this.fennecId,
+    this.memberStatus,
   });
 
   @override

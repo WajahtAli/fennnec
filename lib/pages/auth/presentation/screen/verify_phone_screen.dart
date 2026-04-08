@@ -33,7 +33,13 @@ import '../../../../utils/validators.dart';
 @RoutePage()
 class VerifyPhoneNumberScreen extends StatefulWidget {
   final bool? isFromProfile;
-  const VerifyPhoneNumberScreen({super.key, this.isFromProfile = false});
+  final bool isEmail;
+
+  const VerifyPhoneNumberScreen({
+    super.key,
+    this.isFromProfile = false,
+    this.isEmail = false,
+  });
 
   @override
   State<VerifyPhoneNumberScreen> createState() =>
@@ -64,6 +70,17 @@ class _VerifyPhoneNumberScreenState extends State<VerifyPhoneNumberScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final verificationLabel = widget.isEmail ? 'email' : 'phone number';
+    final verificationTitle = widget.isEmail
+        ? 'Verify your email'
+        : 'Verify your phone number';
+    final verificationSuccessTitle = widget.isEmail
+        ? 'Email Verified'
+        : 'Phone Number Verified';
+    final verificationSuccessDescription = widget.isEmail
+        ? 'Your email has been verified. Continue to complete your profile.'
+        : 'Your phone number has been verified. Continue to complete your profile.';
+
     return Scaffold(
       body: Stack(
         children: [
@@ -91,7 +108,7 @@ class _VerifyPhoneNumberScreenState extends State<VerifyPhoneNumberScreen> {
                       ),
                       CustomSizedBox(height: 40),
                       AppText(
-                        text: 'Verify your phone number',
+                        text: verificationTitle,
                         style: AppTextStyles.h3(context).copyWith(
                           fontWeight: FontWeight.w600,
                           color: isLightTheme(context)
@@ -104,7 +121,7 @@ class _VerifyPhoneNumberScreenState extends State<VerifyPhoneNumberScreen> {
                       CustomSizedBox(height: 12),
                       AppText(
                         text:
-                            "We've sent you a 6-digit code, enter it below to verify your account.",
+                            "We've sent you a 6-digit code to your $verificationLabel, enter it below to verify your account.",
                         style: AppTextStyles.subHeading(context).copyWith(
                           color: isLightTheme(context)
                               ? Colors.black
@@ -155,9 +172,8 @@ class _VerifyPhoneNumberScreenState extends State<VerifyPhoneNumberScreen> {
                             CustomBottomSheet.show(
                               context: context,
                               barrierColor: Colors.transparent,
-                              title: 'Phone Number Verified',
-                              description:
-                                  "Your phone number has been verified. Continue to complete your profile.",
+                              title: verificationSuccessTitle,
+                              description: verificationSuccessDescription,
                               buttonText: 'Continue',
                               icon: AnimatedBackgroundContainer(
                                 icon: Assets.icons.checkGreen.path,
@@ -277,9 +293,9 @@ class _VerifyPhoneNumberScreenState extends State<VerifyPhoneNumberScreen> {
                                             CustomBottomSheet.show(
                                               context: context,
                                               barrierColor: Colors.transparent,
-                                              title: 'Phone Number Verified',
+                                              title: verificationSuccessTitle,
                                               description:
-                                                  "Your phone number has been verified. Continue to complete your profile.",
+                                                  verificationSuccessDescription,
                                               buttonText: 'Continue',
                                               icon: AnimatedBackgroundContainer(
                                                 icon: Assets
@@ -359,29 +375,30 @@ class _VerifyPhoneNumberScreenState extends State<VerifyPhoneNumberScreen> {
                                         _createAccountCubit.isLoading;
                                     return AppInkWell(
                                       onTap: () {
-                                        final email = _authCubit
-                                            .emailController
-                                            .text
-                                            .trim();
-                                        final phone = _authCubit
-                                            .phoneController
-                                            .text
-                                            .trim();
-                                        if (_authCubit.canResendOtp) {
-                                          _createAccountCubit
-                                              .resetVerificationCode(
-                                                method: 'email',
-                                                email: email.isNotEmpty
-                                                    ? email
-                                                    : null,
-                                                phone:
-                                                    email.isEmpty &&
-                                                        phone.isNotEmpty
-                                                    ? phone
-                                                    : null,
-                                                context: context,
-                                              );
+                                        if (!_authCubit.canResendOtp ||
+                                            isLoading) {
+                                          return;
                                         }
+
+                                        _createAccountCubit
+                                            .sendVerificationCode(
+                                              context: context,
+                                              method: widget.isEmail
+                                                  ? 'email'
+                                                  : 'phone',
+                                              phone: widget.isEmail
+                                                  ? null
+                                                  : _authCubit
+                                                        .phoneController
+                                                        .text
+                                                        .trim(),
+                                              email: widget.isEmail
+                                                  ? _authCubit
+                                                        .emailController
+                                                        .text
+                                                        .trim()
+                                                  : null,
+                                            );
                                       },
 
                                       child: isLoading

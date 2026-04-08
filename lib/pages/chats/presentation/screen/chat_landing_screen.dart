@@ -1,6 +1,5 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:fennac_app/app/constants/app_enums.dart';
-import 'package:fennac_app/app/constants/dummy_constants.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/core/di_container.dart';
@@ -11,13 +10,16 @@ import 'package:fennac_app/pages/auth/presentation/bloc/cubit/login_cubit.dart';
 import 'package:fennac_app/pages/chats/presentation/bloc/cubit/chat_landing_cubit.dart';
 import 'package:fennac_app/pages/chats/presentation/bloc/state/chat_landing_state.dart';
 import 'package:fennac_app/pages/chats/presentation/widgets/call_history_item.dart';
+import 'package:fennac_app/pages/chats/presentation/widgets/chat_explore_empty_state.dart';
 import 'package:fennac_app/pages/chats/presentation/widgets/chat_tab_selector.dart';
 import 'package:fennac_app/pages/chats/presentation/widgets/group_list_item.dart';
 import 'package:fennac_app/pages/chats/presentation/widgets/premium_card.dart';
 import 'package:fennac_app/pages/chats/presentation/widgets/subscribed_chat_widget.dart';
 import 'package:fennac_app/pages/call/presentation/bloc/cubit/call_cubit.dart';
+import 'package:fennac_app/pages/dashboard/presentation/bloc/cubit/dashboard_cubit.dart';
 import 'package:fennac_app/reusable_widgets/empty_widget.dart';
 import 'package:fennac_app/routes/routes_imports.gr.dart';
+import 'package:fennac_app/skeletons/poke_pack_skeleton.dart';
 import 'package:fennac_app/widgets/custom_search_field.dart';
 import 'package:fennac_app/widgets/custom_sized_box.dart';
 import 'package:fennac_app/widgets/movable_background.dart';
@@ -124,25 +126,19 @@ class _ChatLandingScreenState extends State<ChatLandingScreen> {
                     ),
                   ),
                   const CustomSizedBox(height: 8),
-                  if (state.chats.isNotEmpty)
+                  if (state.isLoadingData && state.chats.isEmpty)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 24),
+                      child: PokePackSkeleton(itemCount: 1),
+                    )
+                  else if (state.chats.isNotEmpty)
                     _buildChatMemberItem(state.chats.first)
                   else
-                    ...DummyConstants.groupsChat.map((group) {
-                      return AppInkWell(
-                        onTap: () {
-                          Di().sl<ChatLandingCubit>().updateSubscriptionStatus(
-                            SubscriptionStatus.subscribed,
-                          );
-                        },
-                        child: GroupListItem(
-                          names: List<String>.from(group['names']),
-                          lastMessage: group['lastMessage'],
-                          time: group['time'],
-                          unreadCount: (group['unreadCount'] as int?) ?? 0,
-                          avatars: List<String>.from(group['avatars']),
-                        ),
-                      );
-                    }),
+                    ChatExploreEmptyState(
+                      onExploreTap: () {
+                        Di().sl<DashboardCubit>().changeIndex(0);
+                      },
+                    ),
                   CustomSizedBox(height: MediaQuery.paddingOf(context).bottom),
                 ],
               ),

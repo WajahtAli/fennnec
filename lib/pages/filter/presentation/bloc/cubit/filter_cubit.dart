@@ -54,7 +54,13 @@ class FilterCubit extends Cubit<FilterState> {
   // Filter update methods
   void updateCategory(String? category) {
     emit(FilterLoading());
-    selectedCategory = category;
+
+    if (selectedCategory == category) {
+      selectedCategory = '';
+    } else {
+      selectedCategory = category;
+    }
+
     emit(FilterLoaded());
   }
 

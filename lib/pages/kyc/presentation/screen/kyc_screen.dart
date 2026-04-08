@@ -18,11 +18,13 @@ import 'package:fennac_app/routes/routes_imports.gr.dart';
 import 'package:fennac_app/widgets/custom_back_button.dart';
 import 'package:fennac_app/widgets/custom_sized_box.dart';
 import 'package:fennac_app/widgets/custom_text.dart';
+import 'package:fennac_app/widgets/custom_text_field.dart';
 import 'package:fennac_app/widgets/movable_background.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shimmer/shimmer.dart';
 
+import '../../../../app/constants/media_query_constants.dart';
 import '../../../auth/presentation/bloc/state/create_account_state.dart';
 import '../bloc/state/kyc_state.dart';
 
@@ -67,11 +69,13 @@ class _KycScreenState extends State<KycScreen> {
 
     if (user != null) {
       log('KYC init for user: ${user.gender}');
-
       _kycCubit.setSelectedDate(user.dob);
       _kycCubit.selectGender(user.gender ?? '');
       _kycCubit.selectSexualOrientations(user.sexualOrientation ?? []);
       _kycCubit.selectPronouns(user.pronouns ?? '');
+      _kycCubit.jobTitleController.text = user.jobTitle ?? '';
+      _kycCubit.educationController.text = user.education ?? '';
+      _kycCubit.shortBioController.text = user.shortBio ?? '';
     }
   }
 
@@ -233,7 +237,45 @@ class _KycScreenState extends State<KycScreen> {
                             },
                             blurNotifier: _isBlurNotifier,
                           ),
-                          CustomSizedBox(height: 40),
+                          if (widget.isEditMode == true) ...[
+                            CustomSizedBox(height: 16),
+                            CustomLabelTextField(
+                              label: 'Job Title / Occupation',
+                              labelStyle: AppTextStyles.bodyLarge(context)
+                                  .copyWith(
+                                    color: isLightTheme(context)
+                                        ? Colors.black
+                                        : Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                              controller: _kycCubit.jobTitleController,
+                              hintText: 'What do you do?',
+                              labelColor: isLightTheme(context)
+                                  ? Colors.black
+                                  : Colors.white,
+                              filled: false,
+                            ),
+                            CustomSizedBox(height: 16),
+
+                            CustomLabelTextField(
+                              label: 'Education / School',
+                              labelStyle: AppTextStyles.bodyLarge(context)
+                                  .copyWith(
+                                    color: isLightTheme(context)
+                                        ? Colors.black
+                                        : Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                              controller: _kycCubit.educationController,
+                              hintText: 'Where do/did you go to school?',
+                              labelColor: isLightTheme(context)
+                                  ? Colors.black
+                                  : Colors.white,
+                              filled: false,
+                            ),
+                          ],
+
+                          CustomSizedBox(height: 80),
                         ],
                       ),
                     );

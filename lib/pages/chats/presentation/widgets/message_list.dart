@@ -310,7 +310,6 @@ class _MessageListState extends State<MessageList> {
         if (messageCubit.isLoading) {
           return Center(child: Lottie.asset(Assets.animations.loadingSpinner));
         }
-
         final messages = messageCubit.messages;
 
         if (messageCubit.hasError && messages.isEmpty) {

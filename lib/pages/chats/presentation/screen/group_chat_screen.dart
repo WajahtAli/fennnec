@@ -47,7 +47,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                       groupId: widget.groupId,
                     ),
                   ),
-                  MessageInputField(),
+                  MessageInputField(isGroup: widget.isGroup),
                 ],
               ),
               Positioned(

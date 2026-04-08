@@ -55,6 +55,7 @@ class _SelectedMembersListState extends State<SelectedMembersList> {
               fennecId: member.id ?? "",
               isFennecUser: true,
               profileImageUrl: member.image,
+              memberStatus: member.memberStatus,
             ),
             isApiCallNeeded: false,
           );
@@ -180,7 +181,7 @@ class _MembersWrap extends StatelessWidget {
                 ? member.displayName
                 : 'Member',
             subtitle: member.phoneNumber,
-            roleLabel: 'Invited',
+            roleLabel: member.memberStatus,
             onRemove: onRemove != null ? () => onRemove!(i) : null,
           ),
         );

@@ -16,7 +16,9 @@ import 'package:flutter_svg/svg.dart';
 import 'media_selection_widget.dart';
 
 class MessageInputField extends StatefulWidget {
-  const MessageInputField({super.key});
+  final bool isGroup;
+
+  const MessageInputField({super.key, this.isGroup = false});
 
   @override
   State<MessageInputField> createState() => _MessageInputFieldState();
@@ -37,7 +39,7 @@ class _MessageInputFieldState extends State<MessageInputField> {
   }
 
   void _sendMessage() {
-    _messageCubit.sendTextMessage();
+    _messageCubit.sendTextMessage(isGroupMessage: widget.isGroup);
   }
 
   @override

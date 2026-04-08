@@ -10,6 +10,12 @@ import 'package:fennac_app/pages/create_group/presentation/bloc/cubit/create_gro
 import '../../../../core/network/api_helper.dart';
 
 abstract class CreateAccountDatasource {
+  Future<dynamic> sendVerificationCode({
+    required String method,
+    String? phone,
+    String? email,
+  });
+
   Future<dynamic> resetVerificationCode({
     required String method,
     String? phone,
@@ -68,6 +74,23 @@ class CreateAccountDatasourceImpl extends CreateAccountDatasource {
   final ApiHelper apiHelper;
 
   CreateAccountDatasourceImpl(this.apiHelper);
+
+  @override
+  Future<dynamic> sendVerificationCode({
+    required String method,
+    String? phone,
+    String? email,
+  }) async {
+    final Map<String, dynamic> body = {'method': method};
+    if (phone != null && phone.isNotEmpty) body['phone'] = phone;
+    if (email != null && email.isNotEmpty) body['email'] = email;
+
+    return await apiHelper.post(
+      AppConstants.sendVerificationCode,
+      requiresAuth: true,
+      body: body,
+    );
+  }
 
   @override
   Future<LoginUser> createAccount({

@@ -179,6 +179,7 @@ class CreatedBy {
   String? email;
   String? image;
   List<String>? bestShorts;
+  String? memberStatus;
 
   CreatedBy({
     this.id,
@@ -187,6 +188,7 @@ class CreatedBy {
     this.email,
     this.image,
     this.bestShorts,
+    this.memberStatus,
   });
 
   CreatedBy copyWith({
@@ -196,6 +198,7 @@ class CreatedBy {
     String? email,
     String? image,
     List<String>? bestShorts,
+    String? memberStatus,
   }) => CreatedBy(
     id: id ?? this.id,
     firstName: firstName ?? this.firstName,
@@ -203,6 +206,7 @@ class CreatedBy {
     email: email ?? this.email,
     image: image ?? this.image,
     bestShorts: bestShorts ?? this.bestShorts,
+    memberStatus: memberStatus ?? this.memberStatus,
   );
 
   factory CreatedBy.fromJson(Map<String, dynamic> json) {
@@ -220,6 +224,7 @@ class CreatedBy {
       email: json["email"],
       image: image,
       bestShorts: shorts,
+      memberStatus: json["memeberStatus"],
     );
   }
 
@@ -232,6 +237,7 @@ class CreatedBy {
     "bestShorts": bestShorts == null
         ? []
         : List<dynamic>.from(bestShorts!.map((x) => x)),
+    "memeberStatus": memberStatus,
   };
 }
 

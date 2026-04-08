@@ -85,7 +85,9 @@ class _FilterSelectionBottomSheetState
                         isSelected: _tempSelectedOption == option,
                         onTap: () {
                           setState(() {
-                            _tempSelectedOption = option;
+                            _tempSelectedOption = _tempSelectedOption == option
+                                ? ''
+                                : option;
                           });
                         },
                       ),

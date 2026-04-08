@@ -48,8 +48,27 @@ class LoginDatasourceImpl extends LoginDatasource {
     final data = await apiHelper.post(
       AppConstants.login,
       requiresAuth: false,
+      isLogin: true,
       body: {"email": emailOrPhone, "password": password},
     );
+
+    dev.log(
+      '📥 Raw Login Response: ${jsonEncode(data)}',
+      name: 'LoginDatasource',
+    );
+
+    // Check if response is error (when isLogin=true, 400 returns raw response)
+    if (data['success'] == false) {
+      dev.log(
+        '🔴 Login Error - isVerified: ${data['isVerified']}, message: ${data['message']}',
+        name: 'LoginDatasource',
+      );
+      throw LoginException(
+        message: data['message'] ?? 'Login failed',
+        isVerified: data['isVerified'],
+      );
+    }
+
     return LoginModel.fromJson(data);
   }
 
@@ -207,4 +226,14 @@ class LoginDatasourceImpl extends LoginDatasource {
     );
     return response;
   }
+}
+
+class LoginException implements Exception {
+  final String message;
+  final bool? isVerified;
+
+  LoginException({required this.message, this.isVerified});
+
+  @override
+  String toString() => message;
 }

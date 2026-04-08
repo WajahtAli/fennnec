@@ -297,6 +297,7 @@ Map<String, dynamic> _$ChatGroupMemberUserModelToJson(
 
 _ChatAboutGroupModel _$ChatAboutGroupModelFromJson(Map<String, dynamic> json) =>
     _ChatAboutGroupModel(
+      title: json['title'] as String?,
       bio: json['bio'] as String?,
       fitsForGroup: json['fitsForGroup'] as String?,
     );
@@ -304,6 +305,7 @@ _ChatAboutGroupModel _$ChatAboutGroupModelFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$ChatAboutGroupModelToJson(
   _ChatAboutGroupModel instance,
 ) => <String, dynamic>{
+  'title': instance.title,
   'bio': instance.bio,
   'fitsForGroup': instance.fitsForGroup,
 };

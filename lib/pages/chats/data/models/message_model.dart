@@ -12,6 +12,7 @@ abstract class MessageModel with _$MessageModel {
     required String senderId,
     required String senderName,
     String? senderAvatar,
+    String? reciverId,
     required String content,
     required MessageType type,
     String? mediaUrl,

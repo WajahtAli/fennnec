@@ -1555,12 +1555,14 @@ class VerifyPhoneNumberRoute
   VerifyPhoneNumberRoute({
     _i52.Key? key,
     bool? isFromProfile = false,
+    bool isEmail = false,
     List<_i51.PageRouteInfo>? children,
   }) : super(
          VerifyPhoneNumberRoute.name,
          args: VerifyPhoneNumberRouteArgs(
            key: key,
            isFromProfile: isFromProfile,
+           isEmail: isEmail,
          ),
          initialChildren: children,
        );
@@ -1576,21 +1578,28 @@ class VerifyPhoneNumberRoute
       return _i48.VerifyPhoneNumberScreen(
         key: args.key,
         isFromProfile: args.isFromProfile,
+        isEmail: args.isEmail,
       );
     },
   );
 }
 
 class VerifyPhoneNumberRouteArgs {
-  const VerifyPhoneNumberRouteArgs({this.key, this.isFromProfile = false});
+  const VerifyPhoneNumberRouteArgs({
+    this.key,
+    this.isFromProfile = false,
+    this.isEmail = false,
+  });
 
   final _i52.Key? key;
 
   final bool? isFromProfile;
 
+  final bool isEmail;
+
   @override
   String toString() {
-    return 'VerifyPhoneNumberRouteArgs{key: $key, isFromProfile: $isFromProfile}';
+    return 'VerifyPhoneNumberRouteArgs{key: $key, isFromProfile: $isFromProfile, isEmail: $isEmail}';
   }
 
   @override

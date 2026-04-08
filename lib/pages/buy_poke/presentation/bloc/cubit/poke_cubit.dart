@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:fennac_app/pages/auth/presentation/bloc/cubit/create_account_cubit.dart';
@@ -5,19 +7,25 @@ import 'package:fennac_app/pages/buy_poke/data/model/poke_model.dart';
 import 'package:fennac_app/pages/buy_poke/domain/usecase/fetch_pokes_usecase.dart';
 import 'package:fennac_app/pages/buy_poke/domain/usecase/purchase_pokes_usecase.dart';
 import 'package:fennac_app/helpers/gradient_toast.dart';
+import 'package:fennac_app/pages/buy_poke/domain/usecase/send_poke_usecase.dart';
 import 'package:fennac_app/pages/buy_poke/presentation/bloc/state/poke_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fennac_app/pages/buy_poke/data/datasource/iap_service.dart';
 
 class PokeCubit extends Cubit<PokeState> {
   PurchaseSubscriptionUseCase? purchaseSubscriptionUseCase;
+  final SendPokeUseCase _sendPokeUseCase;
+
   bool isSubscriptionPurchasing = false;
 
   final FetchPokesUseCase fetchPokesUseCase;
   final PurchasePokesUseCase purchasePokesUseCase;
 
-  PokeCubit(this.fetchPokesUseCase, this.purchasePokesUseCase)
-    : super(PokeInitial());
+  PokeCubit(
+    this.fetchPokesUseCase,
+    this.purchasePokesUseCase,
+    this._sendPokeUseCase,
+  ) : super(PokeInitial());
 
   PockModel? pockModel;
   bool isPurchasing = false;
@@ -102,5 +110,31 @@ class PokeCubit extends Cubit<PokeState> {
     }
     isPurchasing = false;
     purchasingProductId = null;
+  }
+
+  // ========== SEND POKE METHOD ==========
+  Future<void> sendPoke({
+    required String toUserId,
+    required String targetType,
+    String? targetId,
+    required String message,
+  }) async {
+    emit(PokeLoading());
+    try {
+      final response = await _sendPokeUseCase(
+        toUserId: toUserId,
+        targetType: targetType,
+        targetId: targetId,
+        message: message,
+      );
+      log('Poke sent successfully: $response');
+      VxToast.show(message: response['message'] ?? 'Poke sent successfully');
+      emit(PokeLoaded());
+    } catch (e) {
+      log('Error sending poke: $e');
+      VxToast.show(message: 'Failed to send poke');
+      emit(PokeError(e.toString()));
+      rethrow;
+    }
   }
 }

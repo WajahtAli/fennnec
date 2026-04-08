@@ -1,6 +1,12 @@
 import 'package:fennac_app/pages/auth/data/model/login_model.dart';
 
 abstract class CreateAccountRepo {
+  Future<dynamic> sendVerificationCode({
+    required String method,
+    String? phone,
+    String? email,
+  });
+
   Future<dynamic> resetVerificationCode({
     required String method,
     String? phone,

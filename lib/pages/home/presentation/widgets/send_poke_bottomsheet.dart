@@ -7,8 +7,9 @@ import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:fennac_app/helpers/gradient_toast.dart';
+import 'package:fennac_app/pages/home/data/models/groups_model.dart';
+import 'package:fennac_app/pages/buy_poke/presentation/bloc/state/poke_state.dart';
 import 'package:fennac_app/pages/home/presentation/bloc/cubit/home_cubit.dart';
-import 'package:fennac_app/pages/home/presentation/bloc/state/home_state.dart';
 import 'package:fennac_app/widgets/prompt_audio_row.dart';
 import 'package:fennac_app/reusable_widgets/animated_background_container.dart';
 import 'package:fennac_app/widgets/custom_bottom_sheet.dart';
@@ -20,6 +21,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:lottie/lottie.dart';
+
+import '../../../buy_poke/presentation/bloc/cubit/poke_cubit.dart';
 
 class SendPokeBottomSheet extends StatefulWidget {
   final String? image;
@@ -49,7 +52,10 @@ class SendPokeBottomSheet extends StatefulWidget {
 
 class _SendPokeBottomSheetState extends State<SendPokeBottomSheet> {
   late final TextEditingController _messageController;
+  late final Member? _selectedProfileSnapshot;
   final _homeCubit = Di().sl<HomeCubit>();
+  final _pokeCubit = Di().sl<PokeCubit>();
+
   final _formKey = GlobalKey<FormState>();
   final ValueNotifier<bool> _blurNotifier = ValueNotifier(false);
   String? _errorMessage;
@@ -58,6 +64,7 @@ class _SendPokeBottomSheetState extends State<SendPokeBottomSheet> {
   void initState() {
     super.initState();
     _messageController = TextEditingController();
+    _selectedProfileSnapshot = _cloneMember(_homeCubit.selectedProfile);
   }
 
   @override
@@ -73,7 +80,8 @@ class _SendPokeBottomSheetState extends State<SendPokeBottomSheet> {
     setState(() => _errorMessage = null);
 
     try {
-      final selectedProfile = _homeCubit.selectedProfile;
+      final selectedProfile =
+          _selectedProfileSnapshot ?? _homeCubit.selectedProfile;
       final toUserId = selectedProfile?.id;
       if (toUserId == null) {
         VxToast.show(message: 'No profile selected');
@@ -90,7 +98,7 @@ class _SendPokeBottomSheetState extends State<SendPokeBottomSheet> {
         return;
       }
 
-      await _homeCubit.sendPoke(
+      await _pokeCubit.sendPoke(
         toUserId: toUserId,
         targetType: targetType,
         targetId: targetId,
@@ -118,6 +126,30 @@ class _SendPokeBottomSheetState extends State<SendPokeBottomSheet> {
         });
       }
     }
+  }
+
+  Member? _cloneMember(Member? profile) {
+    if (profile == null) {
+      return null;
+    }
+
+    return profile.copyWith(
+      interests: profile.interests == null
+          ? null
+          : List<String>.from(profile.interests!),
+      images: profile.images == null
+          ? null
+          : List<String>.from(profile.images!),
+      bestShorts: profile.bestShorts == null
+          ? null
+          : List<String>.from(profile.bestShorts!),
+      prompts: profile.prompts == null
+          ? null
+          : List<GroupPrompt>.from(profile.prompts!),
+      lifestyle: profile.lifestyle == null
+          ? null
+          : List<String>.from(profile.lifestyle!),
+    );
   }
 
   String _resolveTargetType() {
@@ -198,12 +230,9 @@ class _SendPokeBottomSheetState extends State<SendPokeBottomSheet> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  BlocBuilder(
-                    bloc: _homeCubit,
-                    builder: (context, state) {
-                      final profile = _homeCubit.selectedProfile;
-                      return _buildPokeContent(context, profile);
-                    },
+                  _buildPokeContent(
+                    context,
+                    _selectedProfileSnapshot ?? _homeCubit.selectedProfile,
                   ),
                   const CustomSizedBox(height: 32),
                   CustomLabelTextField(
@@ -275,10 +304,10 @@ class _SendPokeBottomSheetState extends State<SendPokeBottomSheet> {
                       ),
                     ),
                   BlocBuilder(
-                    bloc: _homeCubit,
+                    bloc: _pokeCubit,
                     builder: (context, state) {
                       return CustomElevatedButton(
-                        icon: state is HomeLoading
+                        icon: state is PokeLoading
                             ? SizedBox(
                                 width: 16,
                                 height: 16,
@@ -288,7 +317,7 @@ class _SendPokeBottomSheetState extends State<SendPokeBottomSheet> {
                               )
                             : SizedBox.shrink(),
                         onTap: _sendPoke,
-                        text: state is HomeLoading ? '' : 'Send Poke',
+                        text: state is PokeLoading ? '' : 'Send Poke',
                       );
                     },
                   ),

@@ -41,9 +41,7 @@ class InterleavedMediaSection extends StatelessWidget {
           child: Center(
             child: Text(
               "No media or prompts added yet.",
-              style: AppTextStyles.h4(
-                context,
-              ).copyWith(color: ColorPalette.textGrey),
+              style: AppTextStyles.h4(context),
             ),
           ),
         ),

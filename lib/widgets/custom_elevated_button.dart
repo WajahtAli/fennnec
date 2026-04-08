@@ -31,22 +31,23 @@ class CustomElevatedButton extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(52),
         boxShadow: [
-          isLightTheme(context)
-              ? BoxShadow(
-                  color: ColorPalette.primary.withValues(alpha: 0.25),
-                  offset: const Offset(0, 8),
-                  blurRadius: 12,
-                  spreadRadius: 0,
-                )
-              : BoxShadow(),
-          isLightTheme(context)
-              ? BoxShadow(
-                  color: ColorPalette.primary.withValues(alpha: 0.25),
-                  offset: const Offset(0, -8),
-                  blurRadius: 12,
-                  spreadRadius: 0,
-                )
-              : BoxShadow(),
+          //todo shadow removed
+          // isLightTheme(context)
+          //     ? BoxShadow(
+          //         color: ColorPalette.primary.withValues(alpha: 0.25),
+          //         offset: const Offset(0, 8),
+          //         blurRadius: 12,
+          //         spreadRadius: 0,
+          //       )
+          //     : BoxShadow(),
+          // isLightTheme(context)
+          //     ? BoxShadow(
+          //         color: ColorPalette.primary.withValues(alpha: 0.25),
+          //         offset: const Offset(0, -8),
+          //         blurRadius: 12,
+          //         spreadRadius: 0,
+          //       )
+          //     : BoxShadow(),
         ],
       ),
       child: ElevatedButton(

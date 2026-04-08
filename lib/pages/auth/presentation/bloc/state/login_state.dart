@@ -24,11 +24,12 @@ class LoginValidation extends LoginState {
 
 class LoginError extends LoginState {
   final String message;
+  final bool? isVerified;
 
-  LoginError(this.message);
+  LoginError(this.message, {this.isVerified});
 
   @override
-  List<Object?> get props => [message];
+  List<Object?> get props => [message, isVerified];
 }
 
 class PasswordResetSuccessState extends LoginState {

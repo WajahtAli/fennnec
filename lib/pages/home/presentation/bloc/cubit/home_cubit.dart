@@ -3,7 +3,6 @@ import 'dart:developer';
 import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/helpers/gradient_toast.dart';
 import 'package:fennac_app/pages/auth/presentation/bloc/cubit/login_cubit.dart';
-import 'package:fennac_app/pages/buy_poke/domain/usecase/send_poke_usecase.dart';
 import 'package:fennac_app/pages/home/data/models/groups_model.dart';
 import 'package:fennac_app/pages/home/presentation/bloc/state/home_state.dart';
 import 'package:flutter/material.dart';
@@ -14,9 +13,7 @@ import '../../../../../app/constants/app_enums.dart';
 import '../../widgets/group_gallery_widget.dart';
 
 class HomeCubit extends Cubit<HomeState> {
-  final SendPokeUseCase _sendPokeUseCase;
-
-  HomeCubit(this._sendPokeUseCase) : super(HomeInitial());
+  HomeCubit() : super(HomeInitial());
 
   // ========== BOOLEAN VARIABLES ==========
   final bool isGroupAudioAvailable = true;
@@ -214,30 +211,5 @@ class HomeCubit extends Cubit<HomeState> {
     }
 
     return true;
-  }
-
-  // ========== SEND POKE METHOD ==========
-  Future<void> sendPoke({
-    required String toUserId,
-    required String targetType,
-    String? targetId,
-    required String message,
-  }) async {
-    emit(HomeLoading());
-    try {
-      final response = await _sendPokeUseCase(
-        toUserId: toUserId,
-        targetType: targetType,
-        targetId: targetId,
-        message: message,
-      );
-      log('Poke sent successfully: $response');
-      VxToast.show(message: response['message'] ?? 'Poke sent successfully');
-      emit(HomeLoaded());
-    } catch (e) {
-      log('Error sending poke: $e');
-      emit(HomeLoaded());
-      rethrow;
-    }
   }
 }

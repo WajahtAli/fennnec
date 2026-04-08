@@ -62,6 +62,7 @@ class ApiHelper {
     Object? body,
     bool requiresAuth = true,
     bool isRefreshToken = false,
+    bool isLogin = false,
   }) async {
     final String? token = sharedPreferencesHelper.getAuthToken();
     final String url = "${AppConstants.baseUrl}$endpoint";
@@ -90,7 +91,11 @@ class ApiHelper {
           .timeout(timeout);
 
       _printResponseLog(url, response);
-      return _handleResponse(response, isRefreshToken: isRefreshToken);
+      return _handleResponse(
+        response,
+        isRefreshToken: isRefreshToken,
+        isLogin: isLogin,
+      );
     } catch (e) {
       log('🔥 API ERROR: ${e.toString()}');
       if (e is ApiException) {
@@ -256,7 +261,11 @@ class ApiHelper {
   }
 
   // ========================= RESPONSE HANDLER =========================
-  dynamic _handleResponse(http.Response res, {bool isRefreshToken = false}) {
+  dynamic _handleResponse(
+    http.Response res, {
+    bool isRefreshToken = false,
+    bool isLogin = false,
+  }) {
     log("STATUS CODE: ${res.statusCode}");
 
     if (res.statusCode >= 200 && res.statusCode < 300) {
@@ -272,7 +281,15 @@ class ApiHelper {
     //   ).replaceAll([OnBoardingRoute()]);
     // }
     else {
+      log("RAW ERROR BODY: ${res.body}");
       Map raw = jsonDecode(res.body);
+      // For login endpoint on 400, return raw response so cubit can extract isVerified
+      if (isLogin && res.statusCode == 400) {
+        log(
+          '📥 isLogin=true & 400 status → returning raw response: ${jsonEncode(raw)}',
+        );
+        return raw;
+      }
       final message = raw["message"];
       if (message is List) {
         for (final x in message.reversed) {

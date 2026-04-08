@@ -368,8 +368,8 @@ class CallCubit extends Cubit<CallState> {
       if (isSupported) {
         final setupSucceeded = await _pip.setup(
           PipOptions(
-            aspectRatioX:  9,
-            aspectRatioY: 16 ,
+            aspectRatioX: 9,
+            aspectRatioY: 16,
             seamlessResizeEnabled: true,
           ),
         );

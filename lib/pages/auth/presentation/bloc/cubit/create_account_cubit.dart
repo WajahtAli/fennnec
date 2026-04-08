@@ -19,6 +19,7 @@ import '../../../../../generated/assets.gen.dart';
 import '../../../../../helpers/gradient_toast.dart';
 import '../../../../../routes/routes_imports.gr.dart';
 import '../../../data/model/login_model.dart';
+import '../../widgets/verification_method_bottom_sheet.dart';
 
 class CreateAccountCubit extends Cubit<CreateAccountState> {
   final CreateAccountUsecase _createAccountUsecase;
@@ -48,7 +49,7 @@ class CreateAccountCubit extends Cubit<CreateAccountState> {
     emit(CreateAccountLoading());
 
     try {
-      LoginUser user = await _createAccountUsecase.createAccount(
+      await _createAccountUsecase.createAccount(
         firstName: firstName,
         lastName: lastName,
         email: email,
@@ -59,7 +60,18 @@ class CreateAccountCubit extends Cubit<CreateAccountState> {
       // createdUser = user;
       isLoading = false;
 
-      AutoRouter.of(context).replace(VerifyPhoneNumberRoute());
+      showBottomSheet(
+        context: context,
+        builder: (sheetContext) {
+          return VerificationMethodBottomSheet(
+            parentContext: context,
+            phone: phone,
+            email: email,
+          );
+        },
+      );
+
+      // AutoRouter.of(context).replace(VerifyPhoneNumberRoute());
 
       emit(CreateAccountLoaded());
     } catch (e) {
@@ -186,6 +198,45 @@ class CreateAccountCubit extends Cubit<CreateAccountState> {
     return null;
   }
 
+  Future<void> sendVerificationCode({
+    required String method,
+    String? phone,
+    String? email,
+    required BuildContext context,
+  }) async {
+    isLoading = true;
+    emit(CreateAccountLoading());
+
+    try {
+      final normalizedPhone = method == 'phone' && phone != null
+          ? normalizePhone(phone)
+          : phone;
+
+      final response = await _createAccountUsecase.sendVerificationCode(
+        method: method,
+        phone: normalizedPhone,
+        email: email,
+      );
+
+      final message = response is Map<String, dynamic>
+          ? (response['message']?.toString() ??
+                'Verification code sent successfully')
+          : 'Verification code sent successfully';
+      AutoRouter.of(context).replace(
+        VerifyPhoneNumberRoute(isEmail: method.toLowerCase() == 'email'),
+      );
+
+      VxToast.show(message: message, icon: Assets.icons.checkGreen.path);
+      isLoading = false;
+
+      emit(CreateAccountLoaded());
+    } catch (e) {
+      isLoading = false;
+      VxToast.show(message: e.toString());
+      emit(CreateAccountError(e.toString()));
+    }
+  }
+
   Future<void> resetVerificationCode({
     required String method,
     String? phone,
@@ -196,9 +247,13 @@ class CreateAccountCubit extends Cubit<CreateAccountState> {
 
     emit(CreateAccountLoading());
     try {
-      final response = await _createAccountUsecase.resetVerificationCode(
+      final normalizedPhone = method == 'phone' && phone != null
+          ? normalizePhone(phone)
+          : phone;
+
+      await _createAccountUsecase.resetVerificationCode(
         method: method,
-        phone: phone,
+        phone: normalizedPhone,
         email: email,
       );
       VxToast.show(
@@ -258,7 +313,7 @@ class CreateAccountCubit extends Cubit<CreateAccountState> {
 
       String? shortBio;
       if (kycCubit.shortBioController.text.isNotEmpty) {
-        shortBio = kycCubit.shortBioController.text ?? user?.shortBio;
+        shortBio = kycCubit.shortBioController.text;
       }
 
       List<String>? transformedLifestyles;
@@ -270,12 +325,12 @@ class CreateAccountCubit extends Cubit<CreateAccountState> {
 
       String? jobTitle;
       if (kycCubit.jobTitleController.text.isNotEmpty) {
-        jobTitle = kycCubit.jobTitleController.text ?? user?.jobTitle;
+        jobTitle = kycCubit.jobTitleController.text;
       }
 
       String? education;
       if (kycCubit.educationController.text.isNotEmpty) {
-        education = kycCubit.educationController.text ?? user?.education;
+        education = kycCubit.educationController.text;
       }
 
       Map<String, List<String>>? vibesMap;

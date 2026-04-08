@@ -41,6 +41,7 @@ class PokeDatasourceImpl extends PokeDatasource {
       AppConstants.fetchPokeProducts,
       requiresAuth: true,
     );
+    {}
     return PockModel.fromJson(response);
   }
 
