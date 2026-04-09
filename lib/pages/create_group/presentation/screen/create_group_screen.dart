@@ -146,7 +146,10 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                       );
                     } else {
                       AutoRouter.of(context).push(
-                        CreateGroupGalleryRoute(isEditMode: widget.isEditMode),
+                        DistanceRoute(
+                          isEditMode: widget.isEditMode,
+                          needPickLocation: true,
+                        ),
                       );
                     }
                   }

@@ -1,3 +1,4 @@
+import '../../../my_group/data/model/my_group_model.dart';
 import '../../data/model/create_group_model.dart';
 import '../../data/model/get_members_model.dart';
 import '../repository/create_group_repository.dart';
@@ -14,6 +15,7 @@ class CreateGroupUsecase {
     required String fitsForGroup,
     required Map<String, dynamic> groupSettings,
     required List<String> photosVideos,
+    required GroupLocation location,
   }) async {
     return await _repository.createGroup(
       title: title,
@@ -22,6 +24,7 @@ class CreateGroupUsecase {
       fitsForGroup: fitsForGroup,
       groupSettings: groupSettings,
       photosVideos: photosVideos,
+      location: location,
     );
   }
 

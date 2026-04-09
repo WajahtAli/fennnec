@@ -1,6 +1,7 @@
 import 'package:fennac_app/app/constants/app_constants.dart';
 
 import '../../../../core/network/api_helper.dart';
+import '../../../my_group/data/model/my_group_model.dart';
 import '../model/create_group_model.dart';
 import '../model/get_members_model.dart';
 
@@ -12,6 +13,7 @@ abstract class CreateGroupDatasource {
     required String fitsForGroup,
     required Map<String, dynamic> groupSettings,
     required List<String> photosVideos,
+    required GroupLocation location,
   });
 
   Future<GetMembersModel> getAllMembers({required List<String> contacts});
@@ -35,6 +37,7 @@ class CreateGroupDatasourceImpl extends CreateGroupDatasource {
     required String fitsForGroup,
     required Map<String, dynamic> groupSettings,
     required List<String> photosVideos,
+    required GroupLocation location,
   }) async {
     final data = await apiHelper.post(
       'groups',
@@ -46,6 +49,7 @@ class CreateGroupDatasourceImpl extends CreateGroupDatasource {
         "fitsForGroup": fitsForGroup,
         "groupSettings": groupSettings,
         "photosVideos": photosVideos,
+        "location": location.toJson(),
       },
     );
     return CreateGroupResponseModel.fromJson(data);

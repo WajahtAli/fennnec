@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
@@ -15,14 +17,20 @@ import 'package:fennac_app/widgets/custom_text.dart';
 import 'package:fennac_app/widgets/movable_background.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../routes/routes_imports.gr.dart';
 import '../../../my_group/data/model/my_group_model.dart';
 
 @RoutePage()
 class DistanceScreen extends StatelessWidget {
   final bool isEditMode;
   final String? groupId;
-
-  const DistanceScreen({super.key, this.isEditMode = false, this.groupId});
+  final bool needPickLocation;
+  const DistanceScreen({
+    super.key,
+    this.isEditMode = false,
+    this.groupId,
+    this.needPickLocation = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -57,6 +65,7 @@ class DistanceScreen extends StatelessWidget {
                   child: _DistanceContent(
                     isEditMode: isEditMode,
                     groupId: groupId,
+                    needPickLocation: needPickLocation,
                   ),
                 ),
               ),
@@ -71,8 +80,12 @@ class DistanceScreen extends StatelessWidget {
 class _DistanceContent extends StatefulWidget {
   final bool isEditMode;
   final String? groupId;
-
-  const _DistanceContent({this.isEditMode = false, this.groupId});
+  final bool? needPickLocation;
+  const _DistanceContent({
+    this.isEditMode = false,
+    this.groupId,
+    this.needPickLocation,
+  });
 
   @override
   State<_DistanceContent> createState() => _DistanceContentState();
@@ -152,35 +165,53 @@ class _DistanceContentState extends State<_DistanceContent> {
             },
           ),
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            AppText(
-              text: _current.toString(),
-              style: AppTextStyles.h1Large(
-                context,
-              ).copyWith(fontWeight: FontWeight.w700, fontSize: 48),
-            ),
-            const CustomSizedBox(width: 8),
-            AppText(
-              text: 'miles',
-              style: AppTextStyles.bodyLarge(
-                context,
-              ).copyWith(fontWeight: FontWeight.w600, fontSize: 20),
-            ),
-          ],
-        ),
+        if (widget.needPickLocation == false)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              AppText(
+                text: _current.toString(),
+                style: AppTextStyles.h1Large(
+                  context,
+                ).copyWith(fontWeight: FontWeight.w700, fontSize: 48),
+              ),
+              const CustomSizedBox(width: 8),
+              AppText(
+                text: 'miles',
+                style: AppTextStyles.bodyLarge(
+                  context,
+                ).copyWith(fontWeight: FontWeight.w600, fontSize: 20),
+              ),
+            ],
+          ),
         const CustomSizedBox(height: 24),
-        _HorizontalPillSlider(
-          min: _min,
-          max: _max,
-          value: _current,
-          onChanged: (v) => setState(() => _current = v),
-        ),
+        if (widget.needPickLocation == false)
+          _HorizontalPillSlider(
+            min: _min,
+            max: _max,
+            value: _current,
+            onChanged: (v) => setState(() => _current = v),
+          ),
         const Spacer(),
         CustomElevatedButton(
           text: 'Done',
           onTap: () {
+            if (widget.needPickLocation == true) {
+              _createGroupCubit.addLocation(
+                GroupLocation(
+                  latitude: _selectedLatitude,
+                  longitude: _selectedLongitude,
+                  address: _selectedAddress ?? '',
+                  city: _selectedCity ?? '',
+                  state: _selectedState ?? '',
+                ),
+              );
+              log("data ${widget.isEditMode}");
+              AutoRouter.of(
+                context,
+              ).push(CreateGroupGalleryRoute(isEditMode: widget.isEditMode));
+              return;
+            }
             if (widget.isEditMode && widget.groupId != null) {
               _createGroupCubit.updateGroupWithChangedFields(
                 groupId: widget.groupId!,

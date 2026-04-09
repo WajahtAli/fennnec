@@ -1,3 +1,4 @@
+import '../../../my_group/data/model/my_group_model.dart';
 import '../../domain/repository/create_group_repository.dart';
 import '../datasource/create_group_datasource.dart';
 import '../model/create_group_model.dart';
@@ -16,6 +17,7 @@ class CreateGroupRepositoryImpl extends CreateGroupRepository {
     required String fitsForGroup,
     required Map<String, dynamic> groupSettings,
     required List<String> photosVideos,
+    required GroupLocation location,
   }) async {
     return await _datasource.createGroup(
       title: title,
@@ -24,6 +26,7 @@ class CreateGroupRepositoryImpl extends CreateGroupRepository {
       fitsForGroup: fitsForGroup,
       groupSettings: groupSettings,
       photosVideos: photosVideos,
+      location: location,
     );
   }
 

@@ -419,6 +419,7 @@ class DistanceRoute extends _i52.PageRouteInfo<DistanceRouteArgs> {
     _i53.Key? key,
     bool isEditMode = false,
     String? groupId,
+    bool needPickLocation = false,
     List<_i52.PageRouteInfo>? children,
   }) : super(
          DistanceRoute.name,
@@ -426,6 +427,7 @@ class DistanceRoute extends _i52.PageRouteInfo<DistanceRouteArgs> {
            key: key,
            isEditMode: isEditMode,
            groupId: groupId,
+           needPickLocation: needPickLocation,
          ),
          initialChildren: children,
        );
@@ -442,13 +444,19 @@ class DistanceRoute extends _i52.PageRouteInfo<DistanceRouteArgs> {
         key: args.key,
         isEditMode: args.isEditMode,
         groupId: args.groupId,
+        needPickLocation: args.needPickLocation,
       );
     },
   );
 }
 
 class DistanceRouteArgs {
-  const DistanceRouteArgs({this.key, this.isEditMode = false, this.groupId});
+  const DistanceRouteArgs({
+    this.key,
+    this.isEditMode = false,
+    this.groupId,
+    this.needPickLocation = false,
+  });
 
   final _i53.Key? key;
 
@@ -456,9 +464,11 @@ class DistanceRouteArgs {
 
   final String? groupId;
 
+  final bool needPickLocation;
+
   @override
   String toString() {
-    return 'DistanceRouteArgs{key: $key, isEditMode: $isEditMode, groupId: $groupId}';
+    return 'DistanceRouteArgs{key: $key, isEditMode: $isEditMode, groupId: $groupId, needPickLocation: $needPickLocation}';
   }
 
   @override
@@ -467,11 +477,16 @@ class DistanceRouteArgs {
     if (other is! DistanceRouteArgs) return false;
     return key == other.key &&
         isEditMode == other.isEditMode &&
-        groupId == other.groupId;
+        groupId == other.groupId &&
+        needPickLocation == other.needPickLocation;
   }
 
   @override
-  int get hashCode => key.hashCode ^ isEditMode.hashCode ^ groupId.hashCode;
+  int get hashCode =>
+      key.hashCode ^
+      isEditMode.hashCode ^
+      groupId.hashCode ^
+      needPickLocation.hashCode;
 }
 
 /// generated route for

@@ -135,6 +135,8 @@ class CreateGroupCubit extends Cubit<CreateGroupState> {
         bio: groupBio,
         fitsForGroup: fitsForGroup,
         groupSettings: groupSettings,
+        location: groupLocation!,
+
         photosVideos: Di()
             .sl<ImagePickerCubit>()
             .mediaList
@@ -169,6 +171,11 @@ class CreateGroupCubit extends Cubit<CreateGroupState> {
   }
 
   String groupId = "";
+  GroupLocation? groupLocation;
+
+  void addLocation(GroupLocation location) {
+    groupLocation = location;
+  }
 
   Future<void> createGroup({required BuildContext context}) async {
     final createAccountCubit = Di().sl<CreateAccountCubit>();
@@ -231,6 +238,7 @@ class CreateGroupCubit extends Cubit<CreateGroupState> {
         fitsForGroup: fitsForGroup,
         groupSettings: groupSettings,
         photosVideos: meadiaLinks,
+        location: groupLocation!,
       );
       groupId = response.data?.id ?? "";
       meadiaLinks.clear();
