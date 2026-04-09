@@ -4,6 +4,7 @@ import 'package:fennac_app/pages/chats/data/models/chat_and_calls_response.dart'
 
 class ChatLandingState extends Equatable {
   final List<ChatModel> chats;
+  final List<ChatPokeModel> pokes;
   final List<CallModel> calls;
   final List<MemberModel> members;
   final bool isLoadingData;
@@ -15,6 +16,7 @@ class ChatLandingState extends Equatable {
 
   const ChatLandingState({
     this.chats = const [],
+    this.pokes = const [],
     this.calls = const [],
     this.members = const [],
     this.isLoadingData = false,
@@ -27,6 +29,7 @@ class ChatLandingState extends Equatable {
 
   ChatLandingState copyWith({
     List<ChatModel>? chats,
+    List<ChatPokeModel>? pokes,
     List<CallModel>? calls,
     List<MemberModel>? members,
     bool? isLoadingData,
@@ -38,6 +41,7 @@ class ChatLandingState extends Equatable {
   }) {
     return ChatLandingState(
       chats: chats ?? this.chats,
+      pokes: pokes ?? this.pokes,
       calls: calls ?? this.calls,
       members: members ?? this.members,
       isLoadingData: isLoadingData ?? this.isLoadingData,
@@ -52,6 +56,7 @@ class ChatLandingState extends Equatable {
   @override
   List<Object?> get props => [
     chats,
+    pokes,
     calls,
     members,
     isLoadingData,
@@ -68,6 +73,7 @@ class ChatLandingInitial extends ChatLandingState {}
 class ChatLandingLoading extends ChatLandingState {
   const ChatLandingLoading({
     super.chats,
+    super.pokes,
     super.calls,
     super.members,
     super.selectedTab,
@@ -78,6 +84,7 @@ class ChatLandingLoading extends ChatLandingState {
 class ChatLandingLoaded extends ChatLandingState {
   const ChatLandingLoaded({
     super.chats,
+    super.pokes,
     super.calls,
     super.members,
     super.selectedTab,
@@ -89,6 +96,7 @@ class ChatLandingError extends ChatLandingState {
   const ChatLandingError({
     super.errorMessage,
     super.chats,
+    super.pokes,
     super.calls,
     super.members,
     super.selectedTab,

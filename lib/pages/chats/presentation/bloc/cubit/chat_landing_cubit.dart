@@ -50,6 +50,7 @@ class ChatLandingCubit extends Cubit<ChatLandingState> {
         final nextState = state.copyWith(
           isLoadingData: false,
           chats: response.data.chats,
+          pokes: response.data.pokes,
           calls: response.data.calls,
           members: response.data.members,
         );

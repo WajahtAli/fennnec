@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:auto_route/auto_route.dart';
+import 'package:fennac_app/app/constants/media_query_constants.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/core/di_container.dart';
@@ -56,6 +57,23 @@ class DistanceScreen extends StatelessWidget {
                     ),
                     const SizedBox(width: 48),
                   ],
+                ),
+              ),
+              const CustomSizedBox(height: 14),
+
+              Center(
+                child: SizedBox(
+                  width: 360,
+                  child: AppText(
+                    text:
+                        "Selecting a location for your group can help you find and connect with nearby members, this helps other users were yo're located",
+                    style: AppTextStyles.body(context).copyWith(
+                      color: isLightTheme(context)
+                          ? ColorPalette.black
+                          : ColorPalette.textSecondary,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
               ),
               const CustomSizedBox(height: 24),

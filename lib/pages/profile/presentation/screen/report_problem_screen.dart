@@ -7,6 +7,7 @@ import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/bloc/cubit/imagepicker_cubit.dart';
 import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
+import 'package:fennac_app/pages/auth/presentation/bloc/cubit/create_account_cubit.dart';
 import 'package:fennac_app/pages/kyc/presentation/widgets/gallery_upload_widget.dart';
 import 'package:fennac_app/pages/profile/presentation/bloc/cubit/report_problem_cubit.dart';
 import 'package:fennac_app/pages/profile/presentation/bloc/state/report_problem_state.dart';
@@ -72,6 +73,10 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
             description:
                 'Thanks for letting us know. We will investigate and get back to you.',
             buttonText: 'Done',
+            onButtonPressed: () {
+              context.router.pop();
+              context.router.pop();
+            },
             blurNotifier: _isBlurNotifier,
           );
 
@@ -235,14 +240,16 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
   }
 
   Future<void> _submitReport() async {
-    final attachments = <String>{
-      ..._imagePickerCubit.mediaList.map((item) => item.path),
-    }.toList();
+    if (_imagePickerCubit.mediaList.isNotEmpty) {
+      await Di().sl<CreateAccountCubit>().uploadMedia(
+        filePath: _imagePickerCubit.mediaList.first.path,
+      );
+    }
 
     await _reportProblemCubit.submitReport(
       subject: _subjectController.text,
       description: _descriptionController.text,
-      attachments: attachments,
+      attachments: Di().sl<CreateAccountCubit>().mediaLinks,
     );
   }
 }

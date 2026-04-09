@@ -151,7 +151,7 @@ class _ChatLandingScreenState extends State<ChatLandingScreen> {
   }
 
   Widget _buildPokesContent(ChatLandingState state) {
-    final pokeChats = state.chats.where((chat) => chat.type == 'poke').toList();
+    final pokeItems = state.pokes;
 
     return RefreshIndicator(
       color: ColorPalette.primary,
@@ -171,12 +171,12 @@ class _ChatLandingScreenState extends State<ChatLandingScreen> {
             ),
           ),
           const CustomSizedBox(height: 8),
-          if (state.isLoadingData && pokeChats.isEmpty)
+          if (state.isLoadingData && pokeItems.isEmpty)
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 24),
               child: PokePackSkeleton(itemCount: 1),
             )
-          else if (pokeChats.isEmpty)
+          else if (pokeItems.isEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: EmptyWidget(
@@ -192,43 +192,25 @@ class _ChatLandingScreenState extends State<ChatLandingScreen> {
               ),
             )
           else
-            ...pokeChats.map((chat) {
+            ...pokeItems.map((poke) {
               return AppInkWell(
                 onTap: () async {
-                  final pokeId = _resolvePokeId(chat);
-
-                  if ((pokeId == null || pokeId.isEmpty) &&
-                      chat.meta.hasStartedChat &&
-                      (chat.meta.directChat?.otherUserId?.isNotEmpty ??
-                          false)) {
-                    context.router.push(
-                      GroupChatRoute(
-                        isGroup: false,
-                        groupId: chat.meta.directChat!.otherUserId!,
-                        contactAvatar: chat.image,
-                        contactName: chat.name,
-                        isOnline: chat.status.toLowerCase() == 'online',
-                      ),
-                    );
-                    return;
-                  }
-
-                  await _openPokeDetailIfAllowed(context, pokeId);
+                  await _openPokeDetailIfAllowed(context, poke.id);
                 },
                 child: CallHistoryItem(
-                  name: chat.name,
-                  avatar: chat.image,
-                  unreadCount: chat.unreadCount,
-                  timeAgo: chat.lastMessageAt != null
-                      ? _getTimeAgo(chat.lastMessageAt!)
+                  name: _getPokeSenderName(poke),
+                  avatar: poke.fromUser?.image ?? '',
+                  unreadCount: 0,
+                  timeAgo: poke.createdAt != null
+                      ? _getTimeAgo(poke.createdAt!)
                       : '',
                   isPoked: true,
-                  lastMessage: chat.lastMessage,
+                  lastMessage: poke.message,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 12,
                   ),
-                  showBorder: chat != pokeChats.last,
+                  showBorder: poke != pokeItems.last,
                 ),
               );
             }),
@@ -307,14 +289,15 @@ class _ChatLandingScreenState extends State<ChatLandingScreen> {
     }
   }
 
-  String? _resolvePokeId(ChatModel chat) {
-    final fromMeta = chat.meta.latestPoke?.pokeId;
-    if (fromMeta != null && fromMeta.isNotEmpty) return fromMeta;
+  String _getPokeSenderName(ChatPokeModel poke) {
+    final firstName = poke.fromUser?.firstName?.trim() ?? '';
+    final lastName = poke.fromUser?.lastName?.trim() ?? '';
+    final fullName = [
+      firstName,
+      lastName,
+    ].where((part) => part.isNotEmpty).join(' ').trim();
 
-    final fromMetaId = chat.meta.latestPoke?.id;
-    if (fromMetaId != null && fromMetaId.isNotEmpty) return fromMetaId;
-
-    return null;
+    return fullName.isNotEmpty ? fullName : 'Unknown user';
   }
 
   Widget _buildCallsContent() {

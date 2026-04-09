@@ -189,6 +189,10 @@ class _ContactSupportScreenState extends State<ContactSupportScreen> {
                                                   description:
                                                       'Thanks for contacting Fennec Support. Our team will review your message and respond shortly.',
                                                   buttonText: 'Done',
+                                                  onButtonPressed: () {
+                                                    context.pop();
+                                                    context.pop();
+                                                  },
                                                   blurNotifier: _isBlurNotifier,
                                                 );
                                               }
