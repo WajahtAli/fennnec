@@ -1,3 +1,4 @@
+import 'package:fennac_app/app/constants/media_query_constants.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
@@ -49,7 +50,9 @@ class ChatExploreEmptyState extends StatelessWidget {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: ColorPalette.primary.withValues(alpha: 0.15),
+                  color: isLightTheme(context)
+                      ? ColorPalette.textGrey
+                      : ColorPalette.primary.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Center(
@@ -78,9 +81,7 @@ class ChatExploreEmptyState extends StatelessWidget {
                     const SizedBox(height: 2),
                     AppText(
                       text: description,
-                      style: AppTextStyles.description(
-                        context,
-                      ).copyWith(color: Colors.white.withValues(alpha: 0.75)),
+                      style: AppTextStyles.description(context),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),

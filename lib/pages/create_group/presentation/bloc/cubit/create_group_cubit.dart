@@ -251,7 +251,10 @@ class CreateGroupCubit extends Cubit<CreateGroupState> {
     }
   }
 
-  Future<void> updateGroupWithChangedFields({required String groupId}) async {
+  Future<void> updateGroupWithChangedFields({
+    required String groupId,
+    GroupLocation? location,
+  }) async {
     emit(CreateGroupLoading());
 
     try {
@@ -290,6 +293,7 @@ class CreateGroupCubit extends Cubit<CreateGroupState> {
       final updatedGroupData = groupData?.copyWith(
         titleMembers: groupTitle.isEmpty ? groupData.titleMembers : groupTitle,
         bio: groupBio.isEmpty ? groupData.bio : groupBio,
+        location: location ?? groupData.location,
         members: contactListCubit.selectedMembers
             .where((m) => m.isFennecUser && m.fennecId != null)
             .map(
@@ -368,6 +372,10 @@ class CreateGroupCubit extends Cubit<CreateGroupState> {
       if (canEditMembers) {
         updateBody['members'] = selectedApiMemberIds;
       }
+
+      if (location != null) {
+        updateBody['location'] = location.toJson();
+      }
       // }
 
       // If nothing changed, just show success
@@ -376,7 +384,7 @@ class CreateGroupCubit extends Cubit<CreateGroupState> {
           VxToast.show(
             message: 'You do not have permission to update photos/videos.',
           );
-        } else {
+        } else if (location == null) {
           VxToast.show(message: 'No changes to update');
         }
         emit(CreateGroupLoaded());
@@ -388,7 +396,6 @@ class CreateGroupCubit extends Cubit<CreateGroupState> {
       // Call MyGroupCubit update method
       await myGroupCubit.updateGroupById(groupId, updateBody);
       createAccountCubit.mediaLinks.clear();
-      Di().sl<MyGroupCubit>().updateMyGroupDataLocal(updatedGroupData!);
       VxToast.show(message: 'Group updated successfully');
       emit(CreateGroupLoaded());
     } catch (e) {

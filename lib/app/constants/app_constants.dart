@@ -53,6 +53,7 @@ class AppConstants {
 
   static const googleClientId =
       "317592885652-v764tpb76ddus1rof26t55upqm7pamgm.apps.googleusercontent.com";
+  static const googleApiKey = "AIzaSyB5c3HBdHGkH3zckdX6dK_6gps2AlMVVkU";
 
   //!Notification Constants
   static const String remindMeLater = "remind_me_later";

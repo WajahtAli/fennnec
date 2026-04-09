@@ -141,7 +141,7 @@ class _FilterScreenState extends State<FilterScreen> {
                                   onTap: () {
                                     AutoRouter.of(
                                       context,
-                                    ).push(const DistanceRoute());
+                                    ).push(DistanceRoute());
                                   },
                                 ),
 

@@ -4,6 +4,8 @@
 
 import 'dart:convert';
 
+import 'package:fennac_app/utils/validators.dart';
+
 MyGroupModel myGroupModelFromJson(String str) =>
     MyGroupModel.fromJson(json.decode(str));
 
@@ -61,6 +63,7 @@ class MyGroupData {
   String? qrCode;
   String? titleMembers;
   String? bio;
+  GroupLocation? location;
   String? fitsForGroup;
   GroupSettings? groupSettings;
   List<String>? photosVideos;
@@ -76,6 +79,7 @@ class MyGroupData {
     this.qrCode,
     this.titleMembers,
     this.bio,
+    this.location,
     this.fitsForGroup,
     this.groupSettings,
     this.photosVideos,
@@ -92,6 +96,7 @@ class MyGroupData {
     String? qrCode,
     String? titleMembers,
     String? bio,
+    GroupLocation? location,
     String? fitsForGroup,
     GroupSettings? groupSettings,
     List<String>? photosVideos,
@@ -106,6 +111,7 @@ class MyGroupData {
     qrCode: qrCode ?? this.qrCode,
     titleMembers: titleMembers ?? this.titleMembers,
     bio: bio ?? this.bio,
+    location: location ?? this.location,
     fitsForGroup: fitsForGroup ?? this.fitsForGroup,
     groupSettings: groupSettings ?? this.groupSettings,
     photosVideos: photosVideos ?? this.photosVideos,
@@ -128,6 +134,9 @@ class MyGroupData {
     qrCode: json["qrCode"],
     titleMembers: json["title_members"] ?? json["title"],
     bio: json["bio"],
+    location: json["location"] == null
+        ? null
+        : GroupLocation.fromJson(json["location"]),
     fitsForGroup: json["fitsForGroup"],
     groupSettings: json["groupSettings"] == null
         ? null
@@ -158,6 +167,7 @@ class MyGroupData {
     "qrCode": qrCode,
     "title_members": titleMembers,
     "bio": bio,
+    "location": location?.toJson(),
     "fitsForGroup": fitsForGroup,
     "groupSettings": groupSettings?.toJson(),
     "photosVideos": photosVideos == null
@@ -169,6 +179,52 @@ class MyGroupData {
     "createdAt": createdAt?.toIso8601String(),
     "updatedAt": updatedAt?.toIso8601String(),
     "__v": v,
+  };
+}
+
+class GroupLocation {
+  String? state;
+  String? city;
+  String? address;
+  double? latitude;
+  double? longitude;
+
+  GroupLocation({
+    this.state,
+    this.city,
+    this.address,
+    this.latitude,
+    this.longitude,
+  });
+
+  GroupLocation copyWith({
+    String? state,
+    String? city,
+    String? address,
+    double? latitude,
+    double? longitude,
+  }) => GroupLocation(
+    state: state ?? this.state,
+    city: city ?? this.city,
+    address: address ?? this.address,
+    latitude: latitude ?? this.latitude,
+    longitude: longitude ?? this.longitude,
+  );
+
+  factory GroupLocation.fromJson(Map<String, dynamic> json) => GroupLocation(
+    state: validateString(json["state"]),
+    city: validateString(json["city"]),
+    address: validateString(json["address"]),
+    latitude: (json["latitude"] as num?)?.toDouble(),
+    longitude: (json["longitude"] as num?)?.toDouble(),
+  );
+
+  Map<String, dynamic> toJson() => {
+    "state": state,
+    "city": city,
+    "address": address,
+    "latitude": latitude,
+    "longitude": longitude,
   };
 }
 

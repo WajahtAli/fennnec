@@ -1,4 +1,3 @@
-import 'package:fennac_app/app/constants/media_query_constants.dart';
 import 'package:fennac_app/widgets/custom_sized_box.dart';
 import 'package:fennac_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';

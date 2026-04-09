@@ -19,8 +19,14 @@ import 'package:lottie/lottie.dart';
 class MessageList extends StatefulWidget {
   final bool isGroup;
   final String groupId;
+  final String? otherGroupId;
 
-  const MessageList({super.key, required this.isGroup, required this.groupId});
+  const MessageList({
+    super.key,
+    required this.isGroup,
+    required this.groupId,
+    this.otherGroupId,
+  });
 
   @override
   State<MessageList> createState() => _MessageListState();
@@ -35,7 +41,11 @@ class _MessageListState extends State<MessageList> {
   @override
   void initState() {
     super.initState();
-    messageCubit.initializeMessages(widget.groupId, isGroup: widget.isGroup);
+    messageCubit.initializeMessages(
+      widget.groupId,
+      isGroup: widget.isGroup,
+      otherGroupId: widget.otherGroupId,
+    );
     _scrollController.addListener(_onScroll);
   }
 

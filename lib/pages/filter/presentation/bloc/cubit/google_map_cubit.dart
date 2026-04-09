@@ -22,6 +22,7 @@ class GoogleMapCubit extends Cubit<GoogleMapState> {
 
   // Location related variables
   Position? currentLocation;
+  LatLng? selectedMapCenter;
   geocoding.Placemark? address;
   StreamSubscription<Position>? positionStreamSubscription;
   LocationPermission? locationStatus;
@@ -86,7 +87,7 @@ class GoogleMapCubit extends Cubit<GoogleMapState> {
   }
 
   Future<void> _checkAndRequestService() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    await Geolocator.isLocationServiceEnabled();
     // if (!serviceEnabled) {
     //   serviceEnabled = await Geolocator.servi();
     //   if (!serviceEnabled) {
@@ -97,10 +98,7 @@ class GoogleMapCubit extends Cubit<GoogleMapState> {
 
   Future<void> _getAddressFromLatLng(Position position) async {
     List<geocoding.Placemark> placemarks = await geocoding
-        .placemarkFromCoordinates(
-          position.latitude ?? 0,
-          position.longitude ?? 0,
-        );
+        .placemarkFromCoordinates(position.latitude, position.longitude);
     address = placemarks[0];
   }
 
@@ -135,6 +133,25 @@ class GoogleMapCubit extends Cubit<GoogleMapState> {
         ),
       );
     }
+    emit(GoogleMapStateCameraMoved());
+  }
+
+  Future<void> moveToSelectedLocation({
+    required double latitude,
+    required double longitude,
+  }) async {
+    emit(GoogleMapStateMovingCamera());
+    selectedMapCenter = LatLng(latitude, longitude);
+
+    if (mapController.isCompleted) {
+      final GoogleMapController controller = await mapController.future;
+      await controller.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(target: selectedMapCenter!, zoom: 14.5),
+        ),
+      );
+    }
+
     emit(GoogleMapStateCameraMoved());
   }
 

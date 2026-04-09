@@ -366,5 +366,12 @@ class AppRouter extends RootStackRouter {
       opaque: true,
       duration: const Duration(milliseconds: 500),
     ),
+    CustomRoute(
+      customRouteBuilder: AppTransitions.platformRouteBuilder,
+      page: CreateGroupLocationRoute.page,
+      transitionsBuilder: AppTransitions.slideRight,
+      opaque: true,
+      duration: const Duration(milliseconds: 500),
+    ),
   ];
 }

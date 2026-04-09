@@ -10,8 +10,9 @@ import 'package:lottie/lottie.dart';
 
 class MapWidget extends StatelessWidget {
   final int distanceMiles;
+  final Widget? overlayWidget;
 
-  const MapWidget({super.key, required this.distanceMiles});
+  const MapWidget({super.key, required this.distanceMiles, this.overlayWidget});
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +30,15 @@ class MapWidget extends StatelessWidget {
                 child: Stack(
                   children: [
                     GoogleMapWidget(distanceMiles: distanceMiles),
+
+                    // Search overlay
+                    if (overlayWidget != null)
+                      Positioned(
+                        top: 12,
+                        left: 0,
+                        right: 0,
+                        child: overlayWidget!,
+                      ),
 
                     // Subtle loading overlay
                     if (state is GoogleMapStateLoading)

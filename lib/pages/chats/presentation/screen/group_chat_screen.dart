@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 class GroupChatScreen extends StatefulWidget {
   final bool isGroup;
   final String groupId;
+  final String? otherGroupId;
   final String? contactName;
   final String? contactAvatar;
   final bool isOnline;
@@ -18,6 +19,7 @@ class GroupChatScreen extends StatefulWidget {
     super.key,
     this.isGroup = true,
     required this.groupId,
+    this.otherGroupId,
     this.contactName,
     this.contactAvatar,
     this.isOnline = false,
@@ -45,9 +47,17 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                     child: MessageList(
                       isGroup: widget.isGroup,
                       groupId: widget.groupId,
+                      otherGroupId: widget.isGroup
+                          ? widget.otherGroupId
+                          : widget.groupId,
                     ),
                   ),
-                  MessageInputField(isGroup: widget.isGroup),
+                  MessageInputField(
+                    isGroup: widget.isGroup,
+                    otherGroupId: widget.isGroup
+                        ? widget.otherGroupId
+                        : widget.groupId,
+                  ),
                 ],
               ),
               Positioned(

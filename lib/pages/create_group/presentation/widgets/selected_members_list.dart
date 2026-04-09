@@ -181,7 +181,7 @@ class _MembersWrap extends StatelessWidget {
                 ? member.displayName
                 : 'Member',
             subtitle: member.phoneNumber,
-            roleLabel: member.memberStatus,
+            roleLabel: member.memberStatus ?? 'Invited',
             onRemove: onRemove != null ? () => onRemove!(i) : null,
           ),
         );

@@ -89,6 +89,7 @@ class MessageCubit extends Cubit<MessageState> {
   final int _limit = 20;
   bool _hasMore = true;
   String? _groupId;
+  String? _otherGroupId;
   bool _isGroup = true;
   bool isFetchingMore = false;
 
@@ -113,6 +114,7 @@ class MessageCubit extends Cubit<MessageState> {
   Future<void> _sendMessageRequest({
     required String content,
     required String type,
+    String? receiverGroupId,
     List<String>? attachments,
     List<double>? wave,
     String? duration,
@@ -123,6 +125,14 @@ class MessageCubit extends Cubit<MessageState> {
     }
 
     if (_isGroup) {
+      final effectiveReceiverGroupId = _resolveEffectiveOtherGroupId(
+        receiverGroupId,
+      );
+
+      if (_isInvalidGroupReceiverId(effectiveReceiverGroupId)) {
+        throw Exception('Invalid receiver group id for group message');
+      }
+
       await _myGroupRepository.sendGroupMessage(
         chatId,
         content: content,
@@ -130,7 +140,7 @@ class MessageCubit extends Cubit<MessageState> {
         attachments: attachments,
         wave: wave,
         duration: duration,
-        receiverGroupId: _groupId,
+        receiverGroupId: effectiveReceiverGroupId,
       );
       return;
     }
@@ -143,6 +153,27 @@ class MessageCubit extends Cubit<MessageState> {
       wave: wave,
       duration: duration,
     );
+  }
+
+  String? _resolveEffectiveOtherGroupId(String? otherGroupId) {
+    final normalizedParam = otherGroupId?.trim();
+    if (normalizedParam != null && normalizedParam.isNotEmpty) {
+      return normalizedParam;
+    }
+
+    final normalizedStored = _otherGroupId?.trim();
+    if (normalizedStored != null && normalizedStored.isNotEmpty) {
+      return normalizedStored;
+    }
+
+    return null;
+  }
+
+  bool _isInvalidGroupReceiverId(String? receiverGroupId) {
+    return _isGroup &&
+        (receiverGroupId == null ||
+            receiverGroupId.isEmpty ||
+            receiverGroupId == _groupId);
   }
 
   Future<void> _reactToMessageRequest({
@@ -198,9 +229,14 @@ class MessageCubit extends Cubit<MessageState> {
   }
 
   /// Initialize messages (can load from local storage or backend)
-  Future<void> initializeMessages(String id, {bool isGroup = true}) async {
+  Future<void> initializeMessages(
+    String id, {
+    bool isGroup = true,
+    String? otherGroupId,
+  }) async {
     _groupId = id;
     _isGroup = isGroup;
+    _otherGroupId = isGroup ? otherGroupId : null;
     _page = 1;
     _hasMore = true;
     messages.clear();
@@ -469,10 +505,23 @@ class MessageCubit extends Cubit<MessageState> {
   }
 
   /// Send a text message
-  Future<void> sendTextMessage({bool? isGroupMessage}) async {
+  Future<void> sendTextMessage({
+    bool? isGroupMessage,
+    String? otherGroupId,
+  }) async {
     final content = messageController.text;
     if (content.trim().isEmpty) return;
     emit(MessageLoading());
+
+    final effectiveOtherGroupId = (isGroupMessage ?? false)
+        ? _resolveEffectiveOtherGroupId(otherGroupId)
+        : null;
+
+    if ((isGroupMessage ?? false) &&
+        _isInvalidGroupReceiverId(effectiveOtherGroupId)) {
+      emit(MessageError('Invalid receiver group id for group message'));
+      return;
+    }
 
     final message = MessageModel(
       id: _uuid.v4(),
@@ -484,7 +533,8 @@ class MessageCubit extends Cubit<MessageState> {
       sentAt: DateTime.now(),
       isMe: true,
       isSending: true,
-      reciverId: (isGroupMessage ?? false) ? _groupId : null,
+      isGroup: isGroupMessage ?? false,
+      reciverId: effectiveOtherGroupId,
     );
 
     log("Sending message ${message.id} with content: ${message.reciverId}");
@@ -497,7 +547,11 @@ class MessageCubit extends Cubit<MessageState> {
     final index = messages.indexWhere((m) => m.id == message.id);
     if (index != -1) {
       try {
-        await _sendMessageRequest(content: content, type: 'text');
+        await _sendMessageRequest(
+          content: content,
+          type: 'text',
+          receiverGroupId: effectiveOtherGroupId,
+        );
         // Keep optimistic message in sending state until socket confirmation
         // arrives, so it can be replaced instead of duplicated.
         emit(MessageSuccess());
@@ -513,6 +567,7 @@ class MessageCubit extends Cubit<MessageState> {
 
   /// Send a media message (image, video, audio, file)
   Future<void> sendMediaMessage({
+    String? otherGroupId,
     required List<String> mediaPath,
     List<double>? waveformData,
     required MessageType type,
@@ -520,6 +575,13 @@ class MessageCubit extends Cubit<MessageState> {
     String? duration,
   }) async {
     emit(MessageLoading());
+
+    final effectiveOtherGroupId = _resolveEffectiveOtherGroupId(otherGroupId);
+    if (_isGroup && _isInvalidGroupReceiverId(effectiveOtherGroupId)) {
+      emit(MessageError('Invalid receiver group id for group message'));
+      return;
+    }
+
     final message = MessageModel(
       id: _uuid.v4(),
       senderId: currentUserId,
@@ -534,6 +596,8 @@ class MessageCubit extends Cubit<MessageState> {
       sentAt: DateTime.now(),
       isMe: true,
       isSending: true,
+      isGroup: _isGroup,
+      reciverId: _isGroup ? effectiveOtherGroupId : null,
     );
 
     _addMessage(message);
@@ -565,6 +629,7 @@ class MessageCubit extends Cubit<MessageState> {
         await _sendMessageRequest(
           content: effectiveContent,
           type: type.name,
+          receiverGroupId: effectiveOtherGroupId,
           attachments: uploadedUrls,
           wave: type == MessageType.audio ? null : waveformData,
           duration: type == MessageType.audio ? null : duration,

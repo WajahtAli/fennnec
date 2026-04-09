@@ -90,6 +90,15 @@ class _SubscribedChatWidgetState extends State<SubscribedChatWidget> {
                         contactAvatar: member.image,
                         contactName: member.name,
                         isOnline: isOnline,
+                        otherGroupId: chat.type == 'group'
+                            ? (chat.meta.receiverGroupId ??
+                                  chat
+                                      .meta
+                                      .groupsDetails
+                                      ?.matchedGroupMembers
+                                      .firstOrNull
+                                      ?.groupId)
+                            : null,
                       ),
                     );
                   },
@@ -145,6 +154,15 @@ class _SubscribedChatWidgetState extends State<SubscribedChatWidget> {
                                 contactAvatar: chat.image,
                                 contactName: chat.name,
                                 isOnline: isOnline,
+                                otherGroupId: chat.type == 'group'
+                                    ? (chat.meta.receiverGroupId ??
+                                          chat
+                                              .meta
+                                              .groupsDetails
+                                              ?.matchedGroupMembers
+                                              .firstOrNull
+                                              ?.groupId)
+                                    : null,
                               ),
                             );
                             return;
@@ -163,6 +181,15 @@ class _SubscribedChatWidgetState extends State<SubscribedChatWidget> {
                                 contactAvatar: chat.image,
                                 contactName: chat.name,
                                 isOnline: isOnline,
+                                otherGroupId: chat.type == 'group'
+                                    ? (chat.meta.receiverGroupId ??
+                                          chat
+                                              .meta
+                                              .groupsDetails
+                                              ?.matchedGroupMembers
+                                              .firstOrNull
+                                              ?.groupId)
+                                    : null,
                               ),
                             );
                             return;
@@ -178,6 +205,15 @@ class _SubscribedChatWidgetState extends State<SubscribedChatWidget> {
                             contactAvatar: chat.image,
                             contactName: chat.name,
                             isOnline: isOnline,
+                            otherGroupId: chat.type == 'group'
+                                ? (chat.meta.receiverGroupId ??
+                                      chat
+                                          .meta
+                                          .groupsDetails
+                                          ?.matchedGroupMembers
+                                          .firstOrNull
+                                          ?.groupId)
+                                : null,
                           ),
                         );
                       },

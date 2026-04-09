@@ -78,6 +78,18 @@ class MyGroupCubit extends Cubit<MyGroupState> {
     try {
       final result = await _myGroupUsecase.updateGroupById(groupId, body);
       myGroupModel = result;
+      final updatedData = result.data;
+      if (updatedData != null && myGroupList?.groupList != null) {
+        final updatedList = myGroupList!.groupList!
+            .map((group) => group.id == groupId ? updatedData : group)
+            .toList();
+        myGroupList = MyGroupModel(
+          success: myGroupList?.success,
+          message: myGroupList?.message,
+          groupList: updatedList,
+          data: myGroupModel?.data,
+        );
+      }
       log('Updated Group: ${result.data?.titleMembers}');
       emit(MyGroupLoaded());
     } catch (e) {

@@ -130,7 +130,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                     final contactListCubit = Di().sl<ContactListCubit>();
                     final createGroupCubit = Di().sl<CreateGroupCubit>();
 
-                    if (contactListCubit.selectedMembers.length < 2) {
+                    if (contactListCubit.selectedMembers.length < 1) {
                       VxToast.show(
                         message:
                             'Please select at least 2 members to create a group.',

@@ -18,6 +18,9 @@ class FilterCubit extends Cubit<FilterState> {
   int? selectedAgeMax;
   List<String>? selectedSexualOrientations;
   String? selectedPronoun;
+  double? selectedLatitude;
+  double? selectedLongitude;
+  String? selectedLocationAddress;
 
   // Helper to check if any filter is applied
   bool get hasActiveFilters {
@@ -25,6 +28,8 @@ class FilterCubit extends Cubit<FilterState> {
         selectedGender != null ||
         selectedGroupSize != null ||
         selectedDistance != null ||
+        selectedLatitude != null ||
+        selectedLongitude != null ||
         selectedAgeRange != null ||
         (selectedSexualOrientations != null &&
             selectedSexualOrientations!.isNotEmpty) ||
@@ -160,6 +165,18 @@ class FilterCubit extends Cubit<FilterState> {
     emit(FilterLoaded());
   }
 
+  void updateSelectedLocation({
+    double? latitude,
+    double? longitude,
+    String? address,
+  }) {
+    emit(FilterLoading());
+    selectedLatitude = latitude;
+    selectedLongitude = longitude;
+    selectedLocationAddress = address;
+    emit(FilterLoaded());
+  }
+
   // Reset all filters
   void resetFilters() {
     emit(FilterLoading());
@@ -175,6 +192,9 @@ class FilterCubit extends Cubit<FilterState> {
     selectedAgeMax = null;
     selectedSexualOrientations = null;
     selectedPronoun = null;
+    selectedLatitude = null;
+    selectedLongitude = null;
+    selectedLocationAddress = null;
 
     // Fetch groups without any filter parameters
     Di().sl<GroupsCubit>().fetchAllGroups(
@@ -230,6 +250,16 @@ class FilterCubit extends Cubit<FilterState> {
     // Add distance only if explicitly selected
     if (selectedDistanceValue != null && selectedDistanceValue! > 0) {
       params['maxDistance'] = selectedDistanceValue;
+    }
+
+    if (selectedLatitude != null && selectedLongitude != null) {
+      params['latitude'] = selectedLatitude;
+      params['longitude'] = selectedLongitude;
+    }
+
+    if (selectedLocationAddress != null &&
+        selectedLocationAddress!.isNotEmpty) {
+      params['address'] = selectedLocationAddress;
     }
 
     // Add age range only if both min and max are set

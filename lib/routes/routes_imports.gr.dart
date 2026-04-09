@@ -9,21 +9,21 @@
 // coverage:ignore-file
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:auto_route/auto_route.dart' as _i51;
-import 'package:collection/collection.dart' as _i56;
-import 'package:fennac_app/app/constants/app_enums.dart' as _i53;
+import 'package:auto_route/auto_route.dart' as _i52;
+import 'package:collection/collection.dart' as _i57;
+import 'package:fennac_app/app/constants/app_enums.dart' as _i54;
 import 'package:fennac_app/pages/auth/presentation/screen/create_account_screen.dart'
     as _i10;
 import 'package:fennac_app/pages/auth/presentation/screen/login_screen.dart'
-    as _i34;
+    as _i35;
 import 'package:fennac_app/pages/auth/presentation/screen/otp_verification_screen.dart'
-    as _i41;
+    as _i42;
 import 'package:fennac_app/pages/auth/presentation/screen/reset_password_screen.dart'
-    as _i45;
-import 'package:fennac_app/pages/auth/presentation/screen/set_new_password_screen.dart'
     as _i46;
+import 'package:fennac_app/pages/auth/presentation/screen/set_new_password_screen.dart'
+    as _i47;
 import 'package:fennac_app/pages/auth/presentation/screen/verify_phone_screen.dart'
-    as _i48;
+    as _i49;
 import 'package:fennac_app/pages/buy_poke/presentation/screen/buy_poke_screen.dart'
     as _i4;
 import 'package:fennac_app/pages/call/presentation/screen/audio_call_screen.dart'
@@ -31,59 +31,61 @@ import 'package:fennac_app/pages/call/presentation/screen/audio_call_screen.dart
 import 'package:fennac_app/pages/call/presentation/screen/call_screen.dart'
     as _i5;
 import 'package:fennac_app/pages/call/presentation/screen/group_audio_call_screen.dart'
-    as _i21;
+    as _i22;
 import 'package:fennac_app/pages/call/presentation/screen/video_call_screen.dart'
-    as _i49;
-import 'package:fennac_app/pages/chats/data/models/message_model.dart' as _i55;
+    as _i50;
+import 'package:fennac_app/pages/chats/data/models/message_model.dart' as _i56;
 import 'package:fennac_app/pages/chats/presentation/screen/chat_landing_screen.dart'
     as _i8;
 import 'package:fennac_app/pages/chats/presentation/screen/group_chat_screen.dart'
-    as _i22;
-import 'package:fennac_app/pages/chats/presentation/screen/group_detail_screen.dart'
     as _i23;
+import 'package:fennac_app/pages/chats/presentation/screen/group_detail_screen.dart'
+    as _i24;
 import 'package:fennac_app/pages/chats/presentation/screen/media_preview_screen.dart'
-    as _i36;
+    as _i37;
 import 'package:fennac_app/pages/create_group/presentation/screen/add_member_screen.dart'
     as _i1;
 import 'package:fennac_app/pages/create_group/presentation/screen/create_group_gallery_screen.dart'
     as _i11;
-import 'package:fennac_app/pages/create_group/presentation/screen/create_group_screen.dart'
+import 'package:fennac_app/pages/create_group/presentation/screen/create_group_location_screen.dart'
     as _i12;
-import 'package:fennac_app/pages/dashboard/presentation/screen/dashboard_screen.dart'
+import 'package:fennac_app/pages/create_group/presentation/screen/create_group_screen.dart'
     as _i13;
-import 'package:fennac_app/pages/edit_profile/presentation/screen/edit_public_profile_screen.dart'
-    as _i16;
-import 'package:fennac_app/pages/filter/presentation/screen/distance_screen.dart'
+import 'package:fennac_app/pages/dashboard/presentation/screen/dashboard_screen.dart'
     as _i14;
-import 'package:fennac_app/pages/filter/presentation/screen/filter_screen.dart'
-    as _i18;
-import 'package:fennac_app/pages/find_group/presentation/screen/find_group_screen.dart'
-    as _i19;
-import 'package:fennac_app/pages/get_poked/presentation/screen/get_pocked_screen.dart'
-    as _i20;
-import 'package:fennac_app/pages/home/data/models/groups_model.dart' as _i54;
-import 'package:fennac_app/pages/home/presentation/screen/home_screen.dart'
-    as _i26;
-import 'package:fennac_app/pages/homelanding/presentation/screen/home_landing_screen.dart'
-    as _i25;
-import 'package:fennac_app/pages/kyc/presentation/screen/kyc_details_screen.dart'
-    as _i27;
-import 'package:fennac_app/pages/kyc/presentation/screen/kyc_gallery_screen.dart'
-    as _i28;
-import 'package:fennac_app/pages/kyc/presentation/screen/kyc_match_screen.dart'
-    as _i29;
-import 'package:fennac_app/pages/kyc/presentation/screen/kyc_prompt_screen.dart'
-    as _i30;
-import 'package:fennac_app/pages/kyc/presentation/screen/kyc_screen.dart'
-    as _i31;
-import 'package:fennac_app/pages/landing/presentation/screen/landing_screen.dart'
-    as _i32;
-import 'package:fennac_app/pages/liked_groups/presentation/screen/liked_groups_screen.dart'
-    as _i33;
-import 'package:fennac_app/pages/my_group/presentation/screen/edit_group_screen.dart'
+import 'package:fennac_app/pages/edit_profile/presentation/screen/edit_public_profile_screen.dart'
+    as _i17;
+import 'package:fennac_app/pages/filter/presentation/screen/distance_screen.dart'
     as _i15;
+import 'package:fennac_app/pages/filter/presentation/screen/filter_screen.dart'
+    as _i19;
+import 'package:fennac_app/pages/find_group/presentation/screen/find_group_screen.dart'
+    as _i20;
+import 'package:fennac_app/pages/get_poked/presentation/screen/get_pocked_screen.dart'
+    as _i21;
+import 'package:fennac_app/pages/home/data/models/groups_model.dart' as _i55;
+import 'package:fennac_app/pages/home/presentation/screen/home_screen.dart'
+    as _i27;
+import 'package:fennac_app/pages/homelanding/presentation/screen/home_landing_screen.dart'
+    as _i26;
+import 'package:fennac_app/pages/kyc/presentation/screen/kyc_details_screen.dart'
+    as _i28;
+import 'package:fennac_app/pages/kyc/presentation/screen/kyc_gallery_screen.dart'
+    as _i29;
+import 'package:fennac_app/pages/kyc/presentation/screen/kyc_match_screen.dart'
+    as _i30;
+import 'package:fennac_app/pages/kyc/presentation/screen/kyc_prompt_screen.dart'
+    as _i31;
+import 'package:fennac_app/pages/kyc/presentation/screen/kyc_screen.dart'
+    as _i32;
+import 'package:fennac_app/pages/landing/presentation/screen/landing_screen.dart'
+    as _i33;
+import 'package:fennac_app/pages/liked_groups/presentation/screen/liked_groups_screen.dart'
+    as _i34;
+import 'package:fennac_app/pages/my_group/presentation/screen/edit_group_screen.dart'
+    as _i16;
 import 'package:fennac_app/pages/my_group/presentation/screen/my_group_screen.dart'
-    as _i37;
+    as _i38;
 import 'package:fennac_app/pages/profile/presentation/screen/appearence_screen.dart'
     as _i2;
 import 'package:fennac_app/pages/profile/presentation/screen/change_email_phone_screen.dart'
@@ -93,38 +95,38 @@ import 'package:fennac_app/pages/profile/presentation/screen/change_password.dar
 import 'package:fennac_app/pages/profile/presentation/screen/contact_support_screen.dart'
     as _i9;
 import 'package:fennac_app/pages/profile/presentation/screen/faq_screen.dart'
-    as _i17;
+    as _i18;
 import 'package:fennac_app/pages/profile/presentation/screen/help_support_screen.dart'
-    as _i24;
+    as _i25;
 import 'package:fennac_app/pages/profile/presentation/screen/manage_subscriptions_screen.dart'
-    as _i35;
+    as _i36;
 import 'package:fennac_app/pages/profile/presentation/screen/notification_settings_screen.dart'
-    as _i38;
-import 'package:fennac_app/pages/profile/presentation/screen/privacy_permissions_screen.dart'
-    as _i42;
-import 'package:fennac_app/pages/profile/presentation/screen/profile_screen.dart'
-    as _i43;
-import 'package:fennac_app/pages/profile/presentation/screen/report_problem_screen.dart'
-    as _i44;
-import 'package:fennac_app/pages/profile/presentation/screen/your_groups_screen.dart'
-    as _i50;
-import 'package:fennac_app/pages/splash/presentation/screen/onboarding_screen.dart'
     as _i39;
-import 'package:fennac_app/pages/splash/presentation/screen/onboarding_screen1.dart'
+import 'package:fennac_app/pages/profile/presentation/screen/privacy_permissions_screen.dart'
+    as _i43;
+import 'package:fennac_app/pages/profile/presentation/screen/profile_screen.dart'
+    as _i44;
+import 'package:fennac_app/pages/profile/presentation/screen/report_problem_screen.dart'
+    as _i45;
+import 'package:fennac_app/pages/profile/presentation/screen/your_groups_screen.dart'
+    as _i51;
+import 'package:fennac_app/pages/splash/presentation/screen/onboarding_screen.dart'
     as _i40;
+import 'package:fennac_app/pages/splash/presentation/screen/onboarding_screen1.dart'
+    as _i41;
 import 'package:fennac_app/pages/splash/presentation/screen/splash_screen.dart'
-    as _i47;
-import 'package:flutter/material.dart' as _i52;
+    as _i48;
+import 'package:flutter/material.dart' as _i53;
 
 /// generated route for
 /// [_i1.AddMemberScreen]
-class AddMemberRoute extends _i51.PageRouteInfo<void> {
-  const AddMemberRoute({List<_i51.PageRouteInfo>? children})
+class AddMemberRoute extends _i52.PageRouteInfo<void> {
+  const AddMemberRoute({List<_i52.PageRouteInfo>? children})
     : super(AddMemberRoute.name, initialChildren: children);
 
   static const String name = 'AddMemberRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
       return const _i1.AddMemberScreen();
@@ -134,13 +136,13 @@ class AddMemberRoute extends _i51.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i2.AppearenceScreen]
-class AppearenceRoute extends _i51.PageRouteInfo<void> {
-  const AppearenceRoute({List<_i51.PageRouteInfo>? children})
+class AppearenceRoute extends _i52.PageRouteInfo<void> {
+  const AppearenceRoute({List<_i52.PageRouteInfo>? children})
     : super(AppearenceRoute.name, initialChildren: children);
 
   static const String name = 'AppearenceRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
       return const _i2.AppearenceScreen();
@@ -150,13 +152,13 @@ class AppearenceRoute extends _i51.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i3.AudioCallScreen]
-class AudioCallRoute extends _i51.PageRouteInfo<void> {
-  const AudioCallRoute({List<_i51.PageRouteInfo>? children})
+class AudioCallRoute extends _i52.PageRouteInfo<void> {
+  const AudioCallRoute({List<_i52.PageRouteInfo>? children})
     : super(AudioCallRoute.name, initialChildren: children);
 
   static const String name = 'AudioCallRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
       return const _i3.AudioCallScreen();
@@ -166,13 +168,13 @@ class AudioCallRoute extends _i51.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i4.BuyPokeScreen]
-class BuyPokeRoute extends _i51.PageRouteInfo<void> {
-  const BuyPokeRoute({List<_i51.PageRouteInfo>? children})
+class BuyPokeRoute extends _i52.PageRouteInfo<void> {
+  const BuyPokeRoute({List<_i52.PageRouteInfo>? children})
     : super(BuyPokeRoute.name, initialChildren: children);
 
   static const String name = 'BuyPokeRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
       return const _i4.BuyPokeScreen();
@@ -182,13 +184,13 @@ class BuyPokeRoute extends _i51.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i5.CallScreen]
-class CallRoute extends _i51.PageRouteInfo<void> {
-  const CallRoute({List<_i51.PageRouteInfo>? children})
+class CallRoute extends _i52.PageRouteInfo<void> {
+  const CallRoute({List<_i52.PageRouteInfo>? children})
     : super(CallRoute.name, initialChildren: children);
 
   static const String name = 'CallRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
       return const _i5.CallScreen();
@@ -198,13 +200,13 @@ class CallRoute extends _i51.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i6.ChangeEmailPhoneScreen]
-class ChangeEmailPhoneRoute extends _i51.PageRouteInfo<void> {
-  const ChangeEmailPhoneRoute({List<_i51.PageRouteInfo>? children})
+class ChangeEmailPhoneRoute extends _i52.PageRouteInfo<void> {
+  const ChangeEmailPhoneRoute({List<_i52.PageRouteInfo>? children})
     : super(ChangeEmailPhoneRoute.name, initialChildren: children);
 
   static const String name = 'ChangeEmailPhoneRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
       return const _i6.ChangeEmailPhoneScreen();
@@ -214,13 +216,13 @@ class ChangeEmailPhoneRoute extends _i51.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i7.ChangePasswordScreen]
-class ChangePasswordRoute extends _i51.PageRouteInfo<void> {
-  const ChangePasswordRoute({List<_i51.PageRouteInfo>? children})
+class ChangePasswordRoute extends _i52.PageRouteInfo<void> {
+  const ChangePasswordRoute({List<_i52.PageRouteInfo>? children})
     : super(ChangePasswordRoute.name, initialChildren: children);
 
   static const String name = 'ChangePasswordRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
       return const _i7.ChangePasswordScreen();
@@ -230,13 +232,13 @@ class ChangePasswordRoute extends _i51.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i8.ChatLandingScreen]
-class ChatLandingRoute extends _i51.PageRouteInfo<void> {
-  const ChatLandingRoute({List<_i51.PageRouteInfo>? children})
+class ChatLandingRoute extends _i52.PageRouteInfo<void> {
+  const ChatLandingRoute({List<_i52.PageRouteInfo>? children})
     : super(ChatLandingRoute.name, initialChildren: children);
 
   static const String name = 'ChatLandingRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
       return const _i8.ChatLandingScreen();
@@ -246,13 +248,13 @@ class ChatLandingRoute extends _i51.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i9.ContactSupportScreen]
-class ContactSupportRoute extends _i51.PageRouteInfo<void> {
-  const ContactSupportRoute({List<_i51.PageRouteInfo>? children})
+class ContactSupportRoute extends _i52.PageRouteInfo<void> {
+  const ContactSupportRoute({List<_i52.PageRouteInfo>? children})
     : super(ContactSupportRoute.name, initialChildren: children);
 
   static const String name = 'ContactSupportRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
       return const _i9.ContactSupportScreen();
@@ -262,13 +264,13 @@ class ContactSupportRoute extends _i51.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i10.CreateAccountScreen]
-class CreateAccountRoute extends _i51.PageRouteInfo<void> {
-  const CreateAccountRoute({List<_i51.PageRouteInfo>? children})
+class CreateAccountRoute extends _i52.PageRouteInfo<void> {
+  const CreateAccountRoute({List<_i52.PageRouteInfo>? children})
     : super(CreateAccountRoute.name, initialChildren: children);
 
   static const String name = 'CreateAccountRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
       return const _i10.CreateAccountScreen();
@@ -279,11 +281,11 @@ class CreateAccountRoute extends _i51.PageRouteInfo<void> {
 /// generated route for
 /// [_i11.CreateGroupGalleryScreen]
 class CreateGroupGalleryRoute
-    extends _i51.PageRouteInfo<CreateGroupGalleryRouteArgs> {
+    extends _i52.PageRouteInfo<CreateGroupGalleryRouteArgs> {
   CreateGroupGalleryRoute({
-    _i52.Key? key,
+    _i53.Key? key,
     bool isEditMode = false,
-    List<_i51.PageRouteInfo>? children,
+    List<_i52.PageRouteInfo>? children,
   }) : super(
          CreateGroupGalleryRoute.name,
          args: CreateGroupGalleryRouteArgs(key: key, isEditMode: isEditMode),
@@ -292,7 +294,7 @@ class CreateGroupGalleryRoute
 
   static const String name = 'CreateGroupGalleryRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<CreateGroupGalleryRouteArgs>(
@@ -309,7 +311,7 @@ class CreateGroupGalleryRoute
 class CreateGroupGalleryRouteArgs {
   const CreateGroupGalleryRouteArgs({this.key, this.isEditMode = false});
 
-  final _i52.Key? key;
+  final _i53.Key? key;
 
   final bool isEditMode;
 
@@ -330,12 +332,28 @@ class CreateGroupGalleryRouteArgs {
 }
 
 /// generated route for
-/// [_i12.CreateGroupScreen]
-class CreateGroupRoute extends _i51.PageRouteInfo<CreateGroupRouteArgs> {
+/// [_i12.CreateGroupLocationScreen]
+class CreateGroupLocationRoute extends _i52.PageRouteInfo<void> {
+  const CreateGroupLocationRoute({List<_i52.PageRouteInfo>? children})
+    : super(CreateGroupLocationRoute.name, initialChildren: children);
+
+  static const String name = 'CreateGroupLocationRoute';
+
+  static _i52.PageInfo page = _i52.PageInfo(
+    name,
+    builder: (data) {
+      return const _i12.CreateGroupLocationScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [_i13.CreateGroupScreen]
+class CreateGroupRoute extends _i52.PageRouteInfo<CreateGroupRouteArgs> {
   CreateGroupRoute({
-    _i52.Key? key,
+    _i53.Key? key,
     bool isEditMode = false,
-    List<_i51.PageRouteInfo>? children,
+    List<_i52.PageRouteInfo>? children,
   }) : super(
          CreateGroupRoute.name,
          args: CreateGroupRouteArgs(key: key, isEditMode: isEditMode),
@@ -344,13 +362,13 @@ class CreateGroupRoute extends _i51.PageRouteInfo<CreateGroupRouteArgs> {
 
   static const String name = 'CreateGroupRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<CreateGroupRouteArgs>(
         orElse: () => const CreateGroupRouteArgs(),
       );
-      return _i12.CreateGroupScreen(key: args.key, isEditMode: args.isEditMode);
+      return _i13.CreateGroupScreen(key: args.key, isEditMode: args.isEditMode);
     },
   );
 }
@@ -358,7 +376,7 @@ class CreateGroupRoute extends _i51.PageRouteInfo<CreateGroupRouteArgs> {
 class CreateGroupRouteArgs {
   const CreateGroupRouteArgs({this.key, this.isEditMode = false});
 
-  final _i52.Key? key;
+  final _i53.Key? key;
 
   final bool isEditMode;
 
@@ -379,44 +397,90 @@ class CreateGroupRouteArgs {
 }
 
 /// generated route for
-/// [_i13.DashboardScreen]
-class DashboardRoute extends _i51.PageRouteInfo<void> {
-  const DashboardRoute({List<_i51.PageRouteInfo>? children})
+/// [_i14.DashboardScreen]
+class DashboardRoute extends _i52.PageRouteInfo<void> {
+  const DashboardRoute({List<_i52.PageRouteInfo>? children})
     : super(DashboardRoute.name, initialChildren: children);
 
   static const String name = 'DashboardRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
-      return const _i13.DashboardScreen();
+      return const _i14.DashboardScreen();
     },
   );
 }
 
 /// generated route for
-/// [_i14.DistanceScreen]
-class DistanceRoute extends _i51.PageRouteInfo<void> {
-  const DistanceRoute({List<_i51.PageRouteInfo>? children})
-    : super(DistanceRoute.name, initialChildren: children);
+/// [_i15.DistanceScreen]
+class DistanceRoute extends _i52.PageRouteInfo<DistanceRouteArgs> {
+  DistanceRoute({
+    _i53.Key? key,
+    bool isEditMode = false,
+    String? groupId,
+    List<_i52.PageRouteInfo>? children,
+  }) : super(
+         DistanceRoute.name,
+         args: DistanceRouteArgs(
+           key: key,
+           isEditMode: isEditMode,
+           groupId: groupId,
+         ),
+         initialChildren: children,
+       );
 
   static const String name = 'DistanceRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
-      return const _i14.DistanceScreen();
+      final args = data.argsAs<DistanceRouteArgs>(
+        orElse: () => const DistanceRouteArgs(),
+      );
+      return _i15.DistanceScreen(
+        key: args.key,
+        isEditMode: args.isEditMode,
+        groupId: args.groupId,
+      );
     },
   );
 }
 
+class DistanceRouteArgs {
+  const DistanceRouteArgs({this.key, this.isEditMode = false, this.groupId});
+
+  final _i53.Key? key;
+
+  final bool isEditMode;
+
+  final String? groupId;
+
+  @override
+  String toString() {
+    return 'DistanceRouteArgs{key: $key, isEditMode: $isEditMode, groupId: $groupId}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! DistanceRouteArgs) return false;
+    return key == other.key &&
+        isEditMode == other.isEditMode &&
+        groupId == other.groupId;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ isEditMode.hashCode ^ groupId.hashCode;
+}
+
 /// generated route for
-/// [_i15.EditGroupScreen]
-class EditGroupRoute extends _i51.PageRouteInfo<EditGroupRouteArgs> {
+/// [_i16.EditGroupScreen]
+class EditGroupRoute extends _i52.PageRouteInfo<EditGroupRouteArgs> {
   EditGroupRoute({
-    _i52.Key? key,
+    _i53.Key? key,
     required String groupId,
-    List<_i51.PageRouteInfo>? children,
+    List<_i52.PageRouteInfo>? children,
   }) : super(
          EditGroupRoute.name,
          args: EditGroupRouteArgs(key: key, groupId: groupId),
@@ -425,11 +489,11 @@ class EditGroupRoute extends _i51.PageRouteInfo<EditGroupRouteArgs> {
 
   static const String name = 'EditGroupRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<EditGroupRouteArgs>();
-      return _i15.EditGroupScreen(key: args.key, groupId: args.groupId);
+      return _i16.EditGroupScreen(key: args.key, groupId: args.groupId);
     },
   );
 }
@@ -437,7 +501,7 @@ class EditGroupRoute extends _i51.PageRouteInfo<EditGroupRouteArgs> {
 class EditGroupRouteArgs {
   const EditGroupRouteArgs({this.key, required this.groupId});
 
-  final _i52.Key? key;
+  final _i53.Key? key;
 
   final String groupId;
 
@@ -458,62 +522,62 @@ class EditGroupRouteArgs {
 }
 
 /// generated route for
-/// [_i16.EditPublicProfileScreen]
-class EditPublicProfileRoute extends _i51.PageRouteInfo<void> {
-  const EditPublicProfileRoute({List<_i51.PageRouteInfo>? children})
+/// [_i17.EditPublicProfileScreen]
+class EditPublicProfileRoute extends _i52.PageRouteInfo<void> {
+  const EditPublicProfileRoute({List<_i52.PageRouteInfo>? children})
     : super(EditPublicProfileRoute.name, initialChildren: children);
 
   static const String name = 'EditPublicProfileRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
-      return const _i16.EditPublicProfileScreen();
+      return const _i17.EditPublicProfileScreen();
     },
   );
 }
 
 /// generated route for
-/// [_i17.FaqScreen]
-class FaqRoute extends _i51.PageRouteInfo<void> {
-  const FaqRoute({List<_i51.PageRouteInfo>? children})
+/// [_i18.FaqScreen]
+class FaqRoute extends _i52.PageRouteInfo<void> {
+  const FaqRoute({List<_i52.PageRouteInfo>? children})
     : super(FaqRoute.name, initialChildren: children);
 
   static const String name = 'FaqRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
-      return const _i17.FaqScreen();
+      return const _i18.FaqScreen();
     },
   );
 }
 
 /// generated route for
-/// [_i18.FilterScreen]
-class FilterRoute extends _i51.PageRouteInfo<void> {
-  const FilterRoute({List<_i51.PageRouteInfo>? children})
+/// [_i19.FilterScreen]
+class FilterRoute extends _i52.PageRouteInfo<void> {
+  const FilterRoute({List<_i52.PageRouteInfo>? children})
     : super(FilterRoute.name, initialChildren: children);
 
   static const String name = 'FilterRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
-      return const _i18.FilterScreen();
+      return const _i19.FilterScreen();
     },
   );
 }
 
 /// generated route for
-/// [_i19.FindGroupScreen]
-class FindGroupRoute extends _i51.PageRouteInfo<FindGroupRouteArgs> {
+/// [_i20.FindGroupScreen]
+class FindGroupRoute extends _i52.PageRouteInfo<FindGroupRouteArgs> {
   FindGroupRoute({
-    _i52.Key? key,
+    _i53.Key? key,
     String? qrCode,
-    _i53.FindGroupScreenType? findGroupScreenType,
+    _i54.FindGroupScreenType? findGroupScreenType,
     bool isFromCreateGroup = false,
-    List<_i51.PageRouteInfo>? children,
+    List<_i52.PageRouteInfo>? children,
   }) : super(
          FindGroupRoute.name,
          args: FindGroupRouteArgs(
@@ -527,13 +591,13 @@ class FindGroupRoute extends _i51.PageRouteInfo<FindGroupRouteArgs> {
 
   static const String name = 'FindGroupRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<FindGroupRouteArgs>(
         orElse: () => const FindGroupRouteArgs(),
       );
-      return _i19.FindGroupScreen(
+      return _i20.FindGroupScreen(
         key: args.key,
         qrCode: args.qrCode,
         findGroupScreenType: args.findGroupScreenType,
@@ -551,11 +615,11 @@ class FindGroupRouteArgs {
     this.isFromCreateGroup = false,
   });
 
-  final _i52.Key? key;
+  final _i53.Key? key;
 
   final String? qrCode;
 
-  final _i53.FindGroupScreenType? findGroupScreenType;
+  final _i54.FindGroupScreenType? findGroupScreenType;
 
   final bool isFromCreateGroup;
 
@@ -583,13 +647,13 @@ class FindGroupRouteArgs {
 }
 
 /// generated route for
-/// [_i20.GetPockedScreen]
-class GetPockedRoute extends _i51.PageRouteInfo<GetPockedRouteArgs> {
+/// [_i21.GetPockedScreen]
+class GetPockedRoute extends _i52.PageRouteInfo<GetPockedRouteArgs> {
   GetPockedRoute({
-    _i52.Key? key,
-    _i54.Group? group,
+    _i53.Key? key,
+    _i55.Group? group,
     String? pokeId,
-    List<_i51.PageRouteInfo>? children,
+    List<_i52.PageRouteInfo>? children,
   }) : super(
          GetPockedRoute.name,
          args: GetPockedRouteArgs(key: key, group: group, pokeId: pokeId),
@@ -598,13 +662,13 @@ class GetPockedRoute extends _i51.PageRouteInfo<GetPockedRouteArgs> {
 
   static const String name = 'GetPockedRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<GetPockedRouteArgs>(
         orElse: () => const GetPockedRouteArgs(),
       );
-      return _i20.GetPockedScreen(
+      return _i21.GetPockedScreen(
         key: args.key,
         group: args.group,
         pokeId: args.pokeId,
@@ -616,9 +680,9 @@ class GetPockedRoute extends _i51.PageRouteInfo<GetPockedRouteArgs> {
 class GetPockedRouteArgs {
   const GetPockedRouteArgs({this.key, this.group, this.pokeId});
 
-  final _i52.Key? key;
+  final _i53.Key? key;
 
-  final _i54.Group? group;
+  final _i55.Group? group;
 
   final String? pokeId;
 
@@ -639,13 +703,13 @@ class GetPockedRouteArgs {
 }
 
 /// generated route for
-/// [_i21.GroupAudioCallScreen]
-class GroupAudioCallRoute extends _i51.PageRouteInfo<GroupAudioCallRouteArgs> {
+/// [_i22.GroupAudioCallScreen]
+class GroupAudioCallRoute extends _i52.PageRouteInfo<GroupAudioCallRouteArgs> {
   GroupAudioCallRoute({
-    _i52.Key? key,
-    required _i54.Group group,
+    _i53.Key? key,
+    required _i55.Group group,
     bool isVideoCall = false,
-    List<_i51.PageRouteInfo>? children,
+    List<_i52.PageRouteInfo>? children,
   }) : super(
          GroupAudioCallRoute.name,
          args: GroupAudioCallRouteArgs(
@@ -658,11 +722,11 @@ class GroupAudioCallRoute extends _i51.PageRouteInfo<GroupAudioCallRouteArgs> {
 
   static const String name = 'GroupAudioCallRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<GroupAudioCallRouteArgs>();
-      return _i21.GroupAudioCallScreen(
+      return _i22.GroupAudioCallScreen(
         key: args.key,
         group: args.group,
         isVideoCall: args.isVideoCall,
@@ -678,9 +742,9 @@ class GroupAudioCallRouteArgs {
     this.isVideoCall = false,
   });
 
-  final _i52.Key? key;
+  final _i53.Key? key;
 
-  final _i54.Group group;
+  final _i55.Group group;
 
   final bool isVideoCall;
 
@@ -703,22 +767,24 @@ class GroupAudioCallRouteArgs {
 }
 
 /// generated route for
-/// [_i22.GroupChatScreen]
-class GroupChatRoute extends _i51.PageRouteInfo<GroupChatRouteArgs> {
+/// [_i23.GroupChatScreen]
+class GroupChatRoute extends _i52.PageRouteInfo<GroupChatRouteArgs> {
   GroupChatRoute({
-    _i52.Key? key,
+    _i53.Key? key,
     bool isGroup = true,
     required String groupId,
+    String? otherGroupId,
     String? contactName,
     String? contactAvatar,
     bool isOnline = false,
-    List<_i51.PageRouteInfo>? children,
+    List<_i52.PageRouteInfo>? children,
   }) : super(
          GroupChatRoute.name,
          args: GroupChatRouteArgs(
            key: key,
            isGroup: isGroup,
            groupId: groupId,
+           otherGroupId: otherGroupId,
            contactName: contactName,
            contactAvatar: contactAvatar,
            isOnline: isOnline,
@@ -728,14 +794,15 @@ class GroupChatRoute extends _i51.PageRouteInfo<GroupChatRouteArgs> {
 
   static const String name = 'GroupChatRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<GroupChatRouteArgs>();
-      return _i22.GroupChatScreen(
+      return _i23.GroupChatScreen(
         key: args.key,
         isGroup: args.isGroup,
         groupId: args.groupId,
+        otherGroupId: args.otherGroupId,
         contactName: args.contactName,
         contactAvatar: args.contactAvatar,
         isOnline: args.isOnline,
@@ -749,16 +816,19 @@ class GroupChatRouteArgs {
     this.key,
     this.isGroup = true,
     required this.groupId,
+    this.otherGroupId,
     this.contactName,
     this.contactAvatar,
     this.isOnline = false,
   });
 
-  final _i52.Key? key;
+  final _i53.Key? key;
 
   final bool isGroup;
 
   final String groupId;
+
+  final String? otherGroupId;
 
   final String? contactName;
 
@@ -768,7 +838,7 @@ class GroupChatRouteArgs {
 
   @override
   String toString() {
-    return 'GroupChatRouteArgs{key: $key, isGroup: $isGroup, groupId: $groupId, contactName: $contactName, contactAvatar: $contactAvatar, isOnline: $isOnline}';
+    return 'GroupChatRouteArgs{key: $key, isGroup: $isGroup, groupId: $groupId, otherGroupId: $otherGroupId, contactName: $contactName, contactAvatar: $contactAvatar, isOnline: $isOnline}';
   }
 
   @override
@@ -778,6 +848,7 @@ class GroupChatRouteArgs {
     return key == other.key &&
         isGroup == other.isGroup &&
         groupId == other.groupId &&
+        otherGroupId == other.otherGroupId &&
         contactName == other.contactName &&
         contactAvatar == other.contactAvatar &&
         isOnline == other.isOnline;
@@ -788,21 +859,22 @@ class GroupChatRouteArgs {
       key.hashCode ^
       isGroup.hashCode ^
       groupId.hashCode ^
+      otherGroupId.hashCode ^
       contactName.hashCode ^
       contactAvatar.hashCode ^
       isOnline.hashCode;
 }
 
 /// generated route for
-/// [_i23.GroupDetailScreen]
-class GroupDetailRoute extends _i51.PageRouteInfo<GroupDetailRouteArgs> {
+/// [_i24.GroupDetailScreen]
+class GroupDetailRoute extends _i52.PageRouteInfo<GroupDetailRouteArgs> {
   GroupDetailRoute({
-    _i52.Key? key,
+    _i53.Key? key,
     bool isGroup = true,
     String? contactName,
     String? contactAvatar,
     bool isOnline = false,
-    List<_i51.PageRouteInfo>? children,
+    List<_i52.PageRouteInfo>? children,
   }) : super(
          GroupDetailRoute.name,
          args: GroupDetailRouteArgs(
@@ -817,13 +889,13 @@ class GroupDetailRoute extends _i51.PageRouteInfo<GroupDetailRouteArgs> {
 
   static const String name = 'GroupDetailRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<GroupDetailRouteArgs>(
         orElse: () => const GroupDetailRouteArgs(),
       );
-      return _i23.GroupDetailScreen(
+      return _i24.GroupDetailScreen(
         key: args.key,
         isGroup: args.isGroup,
         contactName: args.contactName,
@@ -843,7 +915,7 @@ class GroupDetailRouteArgs {
     this.isOnline = false,
   });
 
-  final _i52.Key? key;
+  final _i53.Key? key;
 
   final bool isGroup;
 
@@ -879,45 +951,45 @@ class GroupDetailRouteArgs {
 }
 
 /// generated route for
-/// [_i24.HelpSupportScreen]
-class HelpSupportRoute extends _i51.PageRouteInfo<void> {
-  const HelpSupportRoute({List<_i51.PageRouteInfo>? children})
+/// [_i25.HelpSupportScreen]
+class HelpSupportRoute extends _i52.PageRouteInfo<void> {
+  const HelpSupportRoute({List<_i52.PageRouteInfo>? children})
     : super(HelpSupportRoute.name, initialChildren: children);
 
   static const String name = 'HelpSupportRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
-      return const _i24.HelpSupportScreen();
+      return const _i25.HelpSupportScreen();
     },
   );
 }
 
 /// generated route for
-/// [_i25.HomeLandingScreen]
-class HomeLandingRoute extends _i51.PageRouteInfo<void> {
-  const HomeLandingRoute({List<_i51.PageRouteInfo>? children})
+/// [_i26.HomeLandingScreen]
+class HomeLandingRoute extends _i52.PageRouteInfo<void> {
+  const HomeLandingRoute({List<_i52.PageRouteInfo>? children})
     : super(HomeLandingRoute.name, initialChildren: children);
 
   static const String name = 'HomeLandingRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
-      return const _i25.HomeLandingScreen();
+      return const _i26.HomeLandingScreen();
     },
   );
 }
 
 /// generated route for
-/// [_i26.HomeScreen]
-class HomeRoute extends _i51.PageRouteInfo<HomeRouteArgs> {
+/// [_i27.HomeScreen]
+class HomeRoute extends _i52.PageRouteInfo<HomeRouteArgs> {
   HomeRoute({
-    _i52.Key? key,
+    _i53.Key? key,
     bool isLikedGroups = false,
     int? idFromDeepLink,
-    List<_i51.PageRouteInfo>? children,
+    List<_i52.PageRouteInfo>? children,
   }) : super(
          HomeRoute.name,
          args: HomeRouteArgs(
@@ -930,13 +1002,13 @@ class HomeRoute extends _i51.PageRouteInfo<HomeRouteArgs> {
 
   static const String name = 'HomeRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<HomeRouteArgs>(
         orElse: () => const HomeRouteArgs(),
       );
-      return _i26.HomeScreen(
+      return _i27.HomeScreen(
         key: args.key,
         isLikedGroups: args.isLikedGroups,
         idFromDeepLink: args.idFromDeepLink,
@@ -952,7 +1024,7 @@ class HomeRouteArgs {
     this.idFromDeepLink,
   });
 
-  final _i52.Key? key;
+  final _i53.Key? key;
 
   final bool isLikedGroups;
 
@@ -978,28 +1050,28 @@ class HomeRouteArgs {
 }
 
 /// generated route for
-/// [_i27.KycDetailsScreen]
-class KycDetailsRoute extends _i51.PageRouteInfo<void> {
-  const KycDetailsRoute({List<_i51.PageRouteInfo>? children})
+/// [_i28.KycDetailsScreen]
+class KycDetailsRoute extends _i52.PageRouteInfo<void> {
+  const KycDetailsRoute({List<_i52.PageRouteInfo>? children})
     : super(KycDetailsRoute.name, initialChildren: children);
 
   static const String name = 'KycDetailsRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
-      return const _i27.KycDetailsScreen();
+      return const _i28.KycDetailsScreen();
     },
   );
 }
 
 /// generated route for
-/// [_i28.KycGalleryScreen]
-class KycGalleryRoute extends _i51.PageRouteInfo<KycGalleryRouteArgs> {
+/// [_i29.KycGalleryScreen]
+class KycGalleryRoute extends _i52.PageRouteInfo<KycGalleryRouteArgs> {
   KycGalleryRoute({
-    _i52.Key? key,
+    _i53.Key? key,
     bool? isEditMode = false,
-    List<_i51.PageRouteInfo>? children,
+    List<_i52.PageRouteInfo>? children,
   }) : super(
          KycGalleryRoute.name,
          args: KycGalleryRouteArgs(key: key, isEditMode: isEditMode),
@@ -1008,13 +1080,13 @@ class KycGalleryRoute extends _i51.PageRouteInfo<KycGalleryRouteArgs> {
 
   static const String name = 'KycGalleryRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<KycGalleryRouteArgs>(
         orElse: () => const KycGalleryRouteArgs(),
       );
-      return _i28.KycGalleryScreen(key: args.key, isEditMode: args.isEditMode);
+      return _i29.KycGalleryScreen(key: args.key, isEditMode: args.isEditMode);
     },
   );
 }
@@ -1022,7 +1094,7 @@ class KycGalleryRoute extends _i51.PageRouteInfo<KycGalleryRouteArgs> {
 class KycGalleryRouteArgs {
   const KycGalleryRouteArgs({this.key, this.isEditMode = false});
 
-  final _i52.Key? key;
+  final _i53.Key? key;
 
   final bool? isEditMode;
 
@@ -1043,31 +1115,31 @@ class KycGalleryRouteArgs {
 }
 
 /// generated route for
-/// [_i29.KycMatchScreen]
-class KycMatchRoute extends _i51.PageRouteInfo<void> {
-  const KycMatchRoute({List<_i51.PageRouteInfo>? children})
+/// [_i30.KycMatchScreen]
+class KycMatchRoute extends _i52.PageRouteInfo<void> {
+  const KycMatchRoute({List<_i52.PageRouteInfo>? children})
     : super(KycMatchRoute.name, initialChildren: children);
 
   static const String name = 'KycMatchRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
-      return const _i29.KycMatchScreen();
+      return const _i30.KycMatchScreen();
     },
   );
 }
 
 /// generated route for
-/// [_i30.KycPromptScreen]
-class KycPromptRoute extends _i51.PageRouteInfo<KycPromptRouteArgs> {
+/// [_i31.KycPromptScreen]
+class KycPromptRoute extends _i52.PageRouteInfo<KycPromptRouteArgs> {
   KycPromptRoute({
-    _i52.Key? key,
+    _i53.Key? key,
     required bool showSkipButton,
     String? title,
     String? subtitle,
     bool? isEditMode = false,
-    List<_i51.PageRouteInfo>? children,
+    List<_i52.PageRouteInfo>? children,
   }) : super(
          KycPromptRoute.name,
          args: KycPromptRouteArgs(
@@ -1082,11 +1154,11 @@ class KycPromptRoute extends _i51.PageRouteInfo<KycPromptRouteArgs> {
 
   static const String name = 'KycPromptRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<KycPromptRouteArgs>();
-      return _i30.KycPromptScreen(
+      return _i31.KycPromptScreen(
         key: args.key,
         showSkipButton: args.showSkipButton,
         title: args.title,
@@ -1106,7 +1178,7 @@ class KycPromptRouteArgs {
     this.isEditMode = false,
   });
 
-  final _i52.Key? key;
+  final _i53.Key? key;
 
   final bool showSkipButton;
 
@@ -1142,12 +1214,12 @@ class KycPromptRouteArgs {
 }
 
 /// generated route for
-/// [_i31.KycScreen]
-class KycRoute extends _i51.PageRouteInfo<KycRouteArgs> {
+/// [_i32.KycScreen]
+class KycRoute extends _i52.PageRouteInfo<KycRouteArgs> {
   KycRoute({
-    _i52.Key? key,
+    _i53.Key? key,
     bool? isEditMode = false,
-    List<_i51.PageRouteInfo>? children,
+    List<_i52.PageRouteInfo>? children,
   }) : super(
          KycRoute.name,
          args: KycRouteArgs(key: key, isEditMode: isEditMode),
@@ -1156,13 +1228,13 @@ class KycRoute extends _i51.PageRouteInfo<KycRouteArgs> {
 
   static const String name = 'KycRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<KycRouteArgs>(
         orElse: () => const KycRouteArgs(),
       );
-      return _i31.KycScreen(key: args.key, isEditMode: args.isEditMode);
+      return _i32.KycScreen(key: args.key, isEditMode: args.isEditMode);
     },
   );
 }
@@ -1170,7 +1242,7 @@ class KycRoute extends _i51.PageRouteInfo<KycRouteArgs> {
 class KycRouteArgs {
   const KycRouteArgs({this.key, this.isEditMode = false});
 
-  final _i52.Key? key;
+  final _i53.Key? key;
 
   final bool? isEditMode;
 
@@ -1191,77 +1263,77 @@ class KycRouteArgs {
 }
 
 /// generated route for
-/// [_i32.LandingScreen]
-class LandingRoute extends _i51.PageRouteInfo<void> {
-  const LandingRoute({List<_i51.PageRouteInfo>? children})
+/// [_i33.LandingScreen]
+class LandingRoute extends _i52.PageRouteInfo<void> {
+  const LandingRoute({List<_i52.PageRouteInfo>? children})
     : super(LandingRoute.name, initialChildren: children);
 
   static const String name = 'LandingRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
-      return const _i32.LandingScreen();
+      return const _i33.LandingScreen();
     },
   );
 }
 
 /// generated route for
-/// [_i33.LikedGroupsScreen]
-class LikedGroupsRoute extends _i51.PageRouteInfo<void> {
-  const LikedGroupsRoute({List<_i51.PageRouteInfo>? children})
+/// [_i34.LikedGroupsScreen]
+class LikedGroupsRoute extends _i52.PageRouteInfo<void> {
+  const LikedGroupsRoute({List<_i52.PageRouteInfo>? children})
     : super(LikedGroupsRoute.name, initialChildren: children);
 
   static const String name = 'LikedGroupsRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
-      return const _i33.LikedGroupsScreen();
+      return const _i34.LikedGroupsScreen();
     },
   );
 }
 
 /// generated route for
-/// [_i34.LoginScreen]
-class LoginRoute extends _i51.PageRouteInfo<void> {
-  const LoginRoute({List<_i51.PageRouteInfo>? children})
+/// [_i35.LoginScreen]
+class LoginRoute extends _i52.PageRouteInfo<void> {
+  const LoginRoute({List<_i52.PageRouteInfo>? children})
     : super(LoginRoute.name, initialChildren: children);
 
   static const String name = 'LoginRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
-      return const _i34.LoginScreen();
+      return const _i35.LoginScreen();
     },
   );
 }
 
 /// generated route for
-/// [_i35.ManageSubscriptionsScreen]
-class ManageSubscriptionsRoute extends _i51.PageRouteInfo<void> {
-  const ManageSubscriptionsRoute({List<_i51.PageRouteInfo>? children})
+/// [_i36.ManageSubscriptionsScreen]
+class ManageSubscriptionsRoute extends _i52.PageRouteInfo<void> {
+  const ManageSubscriptionsRoute({List<_i52.PageRouteInfo>? children})
     : super(ManageSubscriptionsRoute.name, initialChildren: children);
 
   static const String name = 'ManageSubscriptionsRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
-      return const _i35.ManageSubscriptionsScreen();
+      return const _i36.ManageSubscriptionsScreen();
     },
   );
 }
 
 /// generated route for
-/// [_i36.MediaPreviewScreen]
-class MediaPreviewRoute extends _i51.PageRouteInfo<MediaPreviewRouteArgs> {
+/// [_i37.MediaPreviewScreen]
+class MediaPreviewRoute extends _i52.PageRouteInfo<MediaPreviewRouteArgs> {
   MediaPreviewRoute({
-    _i52.Key? key,
-    required List<_i55.MessageModel> messages,
+    _i53.Key? key,
+    required List<_i56.MessageModel> messages,
     required int initialIndex,
-    List<_i51.PageRouteInfo>? children,
+    List<_i52.PageRouteInfo>? children,
   }) : super(
          MediaPreviewRoute.name,
          args: MediaPreviewRouteArgs(
@@ -1274,11 +1346,11 @@ class MediaPreviewRoute extends _i51.PageRouteInfo<MediaPreviewRouteArgs> {
 
   static const String name = 'MediaPreviewRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<MediaPreviewRouteArgs>();
-      return _i36.MediaPreviewScreen(
+      return _i37.MediaPreviewScreen(
         key: args.key,
         messages: args.messages,
         initialIndex: args.initialIndex,
@@ -1294,9 +1366,9 @@ class MediaPreviewRouteArgs {
     required this.initialIndex,
   });
 
-  final _i52.Key? key;
+  final _i53.Key? key;
 
-  final List<_i55.MessageModel> messages;
+  final List<_i56.MessageModel> messages;
 
   final int initialIndex;
 
@@ -1310,7 +1382,7 @@ class MediaPreviewRouteArgs {
     if (identical(this, other)) return true;
     if (other is! MediaPreviewRouteArgs) return false;
     return key == other.key &&
-        const _i56.ListEquality<_i55.MessageModel>().equals(
+        const _i57.ListEquality<_i56.MessageModel>().equals(
           messages,
           other.messages,
         ) &&
@@ -1320,162 +1392,162 @@ class MediaPreviewRouteArgs {
   @override
   int get hashCode =>
       key.hashCode ^
-      const _i56.ListEquality<_i55.MessageModel>().hash(messages) ^
+      const _i57.ListEquality<_i56.MessageModel>().hash(messages) ^
       initialIndex.hashCode;
 }
 
 /// generated route for
-/// [_i37.MyGroupScreen]
-class MyGroupRoute extends _i51.PageRouteInfo<void> {
-  const MyGroupRoute({List<_i51.PageRouteInfo>? children})
+/// [_i38.MyGroupScreen]
+class MyGroupRoute extends _i52.PageRouteInfo<void> {
+  const MyGroupRoute({List<_i52.PageRouteInfo>? children})
     : super(MyGroupRoute.name, initialChildren: children);
 
   static const String name = 'MyGroupRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
-      return const _i37.MyGroupScreen();
+      return const _i38.MyGroupScreen();
     },
   );
 }
 
 /// generated route for
-/// [_i38.NotificationSettingsScreen]
-class NotificationSettingsRoute extends _i51.PageRouteInfo<void> {
-  const NotificationSettingsRoute({List<_i51.PageRouteInfo>? children})
+/// [_i39.NotificationSettingsScreen]
+class NotificationSettingsRoute extends _i52.PageRouteInfo<void> {
+  const NotificationSettingsRoute({List<_i52.PageRouteInfo>? children})
     : super(NotificationSettingsRoute.name, initialChildren: children);
 
   static const String name = 'NotificationSettingsRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
-      return const _i38.NotificationSettingsScreen();
+      return const _i39.NotificationSettingsScreen();
     },
   );
 }
 
 /// generated route for
-/// [_i39.OnBoardingScreen]
-class OnBoardingRoute extends _i51.PageRouteInfo<void> {
-  const OnBoardingRoute({List<_i51.PageRouteInfo>? children})
+/// [_i40.OnBoardingScreen]
+class OnBoardingRoute extends _i52.PageRouteInfo<void> {
+  const OnBoardingRoute({List<_i52.PageRouteInfo>? children})
     : super(OnBoardingRoute.name, initialChildren: children);
 
   static const String name = 'OnBoardingRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
-      return const _i39.OnBoardingScreen();
+      return const _i40.OnBoardingScreen();
     },
   );
 }
 
 /// generated route for
-/// [_i40.OnBoardingScreen1]
-class OnBoardingRoute1 extends _i51.PageRouteInfo<void> {
-  const OnBoardingRoute1({List<_i51.PageRouteInfo>? children})
+/// [_i41.OnBoardingScreen1]
+class OnBoardingRoute1 extends _i52.PageRouteInfo<void> {
+  const OnBoardingRoute1({List<_i52.PageRouteInfo>? children})
     : super(OnBoardingRoute1.name, initialChildren: children);
 
   static const String name = 'OnBoardingRoute1';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
-      return const _i40.OnBoardingScreen1();
+      return const _i41.OnBoardingScreen1();
     },
   );
 }
 
 /// generated route for
-/// [_i41.OtpVerificationScreen]
-class OtpVerificationRoute extends _i51.PageRouteInfo<void> {
-  const OtpVerificationRoute({List<_i51.PageRouteInfo>? children})
+/// [_i42.OtpVerificationScreen]
+class OtpVerificationRoute extends _i52.PageRouteInfo<void> {
+  const OtpVerificationRoute({List<_i52.PageRouteInfo>? children})
     : super(OtpVerificationRoute.name, initialChildren: children);
 
   static const String name = 'OtpVerificationRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
-      return const _i41.OtpVerificationScreen();
+      return const _i42.OtpVerificationScreen();
     },
   );
 }
 
 /// generated route for
-/// [_i42.PrivacyPermissionsScreen]
-class PrivacyPermissionsRoute extends _i51.PageRouteInfo<void> {
-  const PrivacyPermissionsRoute({List<_i51.PageRouteInfo>? children})
+/// [_i43.PrivacyPermissionsScreen]
+class PrivacyPermissionsRoute extends _i52.PageRouteInfo<void> {
+  const PrivacyPermissionsRoute({List<_i52.PageRouteInfo>? children})
     : super(PrivacyPermissionsRoute.name, initialChildren: children);
 
   static const String name = 'PrivacyPermissionsRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
-      return const _i42.PrivacyPermissionsScreen();
+      return const _i43.PrivacyPermissionsScreen();
     },
   );
 }
 
 /// generated route for
-/// [_i43.ProfileScreen]
-class ProfileRoute extends _i51.PageRouteInfo<void> {
-  const ProfileRoute({List<_i51.PageRouteInfo>? children})
+/// [_i44.ProfileScreen]
+class ProfileRoute extends _i52.PageRouteInfo<void> {
+  const ProfileRoute({List<_i52.PageRouteInfo>? children})
     : super(ProfileRoute.name, initialChildren: children);
 
   static const String name = 'ProfileRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
-      return const _i43.ProfileScreen();
+      return const _i44.ProfileScreen();
     },
   );
 }
 
 /// generated route for
-/// [_i44.ReportProblemScreen]
-class ReportProblemRoute extends _i51.PageRouteInfo<void> {
-  const ReportProblemRoute({List<_i51.PageRouteInfo>? children})
+/// [_i45.ReportProblemScreen]
+class ReportProblemRoute extends _i52.PageRouteInfo<void> {
+  const ReportProblemRoute({List<_i52.PageRouteInfo>? children})
     : super(ReportProblemRoute.name, initialChildren: children);
 
   static const String name = 'ReportProblemRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
-      return const _i44.ReportProblemScreen();
+      return const _i45.ReportProblemScreen();
     },
   );
 }
 
 /// generated route for
-/// [_i45.ResetPasswordScreen]
-class ResetPasswordRoute extends _i51.PageRouteInfo<void> {
-  const ResetPasswordRoute({List<_i51.PageRouteInfo>? children})
+/// [_i46.ResetPasswordScreen]
+class ResetPasswordRoute extends _i52.PageRouteInfo<void> {
+  const ResetPasswordRoute({List<_i52.PageRouteInfo>? children})
     : super(ResetPasswordRoute.name, initialChildren: children);
 
   static const String name = 'ResetPasswordRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
-      return const _i45.ResetPasswordScreen();
+      return const _i46.ResetPasswordScreen();
     },
   );
 }
 
 /// generated route for
-/// [_i46.SetNewPasswordScreen]
-class SetNewPasswordRoute extends _i51.PageRouteInfo<SetNewPasswordRouteArgs> {
+/// [_i47.SetNewPasswordScreen]
+class SetNewPasswordRoute extends _i52.PageRouteInfo<SetNewPasswordRouteArgs> {
   SetNewPasswordRoute({
-    _i52.Key? key,
+    _i53.Key? key,
     required String email,
     required String resetCode,
-    List<_i51.PageRouteInfo>? children,
+    List<_i52.PageRouteInfo>? children,
   }) : super(
          SetNewPasswordRoute.name,
          args: SetNewPasswordRouteArgs(
@@ -1488,11 +1560,11 @@ class SetNewPasswordRoute extends _i51.PageRouteInfo<SetNewPasswordRouteArgs> {
 
   static const String name = 'SetNewPasswordRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<SetNewPasswordRouteArgs>();
-      return _i46.SetNewPasswordScreen(
+      return _i47.SetNewPasswordScreen(
         key: args.key,
         email: args.email,
         resetCode: args.resetCode,
@@ -1508,7 +1580,7 @@ class SetNewPasswordRouteArgs {
     required this.resetCode,
   });
 
-  final _i52.Key? key;
+  final _i53.Key? key;
 
   final String email;
 
@@ -1533,30 +1605,30 @@ class SetNewPasswordRouteArgs {
 }
 
 /// generated route for
-/// [_i47.SplashScreen]
-class SplashRoute extends _i51.PageRouteInfo<void> {
-  const SplashRoute({List<_i51.PageRouteInfo>? children})
+/// [_i48.SplashScreen]
+class SplashRoute extends _i52.PageRouteInfo<void> {
+  const SplashRoute({List<_i52.PageRouteInfo>? children})
     : super(SplashRoute.name, initialChildren: children);
 
   static const String name = 'SplashRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
-      return const _i47.SplashScreen();
+      return const _i48.SplashScreen();
     },
   );
 }
 
 /// generated route for
-/// [_i48.VerifyPhoneNumberScreen]
+/// [_i49.VerifyPhoneNumberScreen]
 class VerifyPhoneNumberRoute
-    extends _i51.PageRouteInfo<VerifyPhoneNumberRouteArgs> {
+    extends _i52.PageRouteInfo<VerifyPhoneNumberRouteArgs> {
   VerifyPhoneNumberRoute({
-    _i52.Key? key,
+    _i53.Key? key,
     bool? isFromProfile = false,
     bool isEmail = false,
-    List<_i51.PageRouteInfo>? children,
+    List<_i52.PageRouteInfo>? children,
   }) : super(
          VerifyPhoneNumberRoute.name,
          args: VerifyPhoneNumberRouteArgs(
@@ -1569,13 +1641,13 @@ class VerifyPhoneNumberRoute
 
   static const String name = 'VerifyPhoneNumberRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<VerifyPhoneNumberRouteArgs>(
         orElse: () => const VerifyPhoneNumberRouteArgs(),
       );
-      return _i48.VerifyPhoneNumberScreen(
+      return _i49.VerifyPhoneNumberScreen(
         key: args.key,
         isFromProfile: args.isFromProfile,
         isEmail: args.isEmail,
@@ -1591,7 +1663,7 @@ class VerifyPhoneNumberRouteArgs {
     this.isEmail = false,
   });
 
-  final _i52.Key? key;
+  final _i53.Key? key;
 
   final bool? isFromProfile;
 
@@ -1606,41 +1678,43 @@ class VerifyPhoneNumberRouteArgs {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other is! VerifyPhoneNumberRouteArgs) return false;
-    return key == other.key && isFromProfile == other.isFromProfile;
+    return key == other.key &&
+        isFromProfile == other.isFromProfile &&
+        isEmail == other.isEmail;
   }
 
   @override
-  int get hashCode => key.hashCode ^ isFromProfile.hashCode;
+  int get hashCode => key.hashCode ^ isFromProfile.hashCode ^ isEmail.hashCode;
 }
 
 /// generated route for
-/// [_i49.VideoCallScreen]
-class VideoCallRoute extends _i51.PageRouteInfo<void> {
-  const VideoCallRoute({List<_i51.PageRouteInfo>? children})
+/// [_i50.VideoCallScreen]
+class VideoCallRoute extends _i52.PageRouteInfo<void> {
+  const VideoCallRoute({List<_i52.PageRouteInfo>? children})
     : super(VideoCallRoute.name, initialChildren: children);
 
   static const String name = 'VideoCallRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
-      return const _i49.VideoCallScreen();
+      return const _i50.VideoCallScreen();
     },
   );
 }
 
 /// generated route for
-/// [_i50.YourGroupsScreen]
-class YourGroupsRoute extends _i51.PageRouteInfo<void> {
-  const YourGroupsRoute({List<_i51.PageRouteInfo>? children})
+/// [_i51.YourGroupsScreen]
+class YourGroupsRoute extends _i52.PageRouteInfo<void> {
+  const YourGroupsRoute({List<_i52.PageRouteInfo>? children})
     : super(YourGroupsRoute.name, initialChildren: children);
 
   static const String name = 'YourGroupsRoute';
 
-  static _i51.PageInfo page = _i51.PageInfo(
+  static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
-      return const _i50.YourGroupsScreen();
+      return const _i51.YourGroupsScreen();
     },
   );
 }

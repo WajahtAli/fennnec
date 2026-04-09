@@ -17,8 +17,9 @@ import 'media_selection_widget.dart';
 
 class MessageInputField extends StatefulWidget {
   final bool isGroup;
+  final String? otherGroupId;
 
-  const MessageInputField({super.key, this.isGroup = false});
+  const MessageInputField({super.key, this.isGroup = false, this.otherGroupId});
 
   @override
   State<MessageInputField> createState() => _MessageInputFieldState();
@@ -39,7 +40,10 @@ class _MessageInputFieldState extends State<MessageInputField> {
   }
 
   void _sendMessage() {
-    _messageCubit.sendTextMessage(isGroupMessage: widget.isGroup);
+    _messageCubit.sendTextMessage(
+      isGroupMessage: widget.isGroup,
+      otherGroupId: widget.otherGroupId,
+    );
   }
 
   @override

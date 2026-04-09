@@ -2,8 +2,12 @@ import 'package:auto_route/auto_route.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/core/di_container.dart';
+import 'package:fennac_app/pages/create_group/presentation/bloc/cubit/create_group_cubit.dart';
 import 'package:fennac_app/pages/filter/presentation/bloc/cubit/filter_cubit.dart';
+import 'package:fennac_app/pages/filter/presentation/bloc/cubit/google_map_cubit.dart';
+import 'package:fennac_app/pages/filter/presentation/widgets/google_map_search_field.dart';
 import 'package:fennac_app/pages/filter/presentation/widgets/map_widget.dart';
+import 'package:fennac_app/pages/my_group/presentation/bloc/cubit/my_group_cubit.dart';
 import 'package:fennac_app/widgets/custom_back_button.dart';
 import 'package:fennac_app/widgets/custom_elevated_button.dart';
 import 'package:fennac_app/widgets/custom_sized_box.dart';
@@ -11,9 +15,14 @@ import 'package:fennac_app/widgets/custom_text.dart';
 import 'package:fennac_app/widgets/movable_background.dart';
 import 'package:flutter/material.dart';
 
+import '../../../my_group/data/model/my_group_model.dart';
+
 @RoutePage()
 class DistanceScreen extends StatelessWidget {
-  const DistanceScreen({super.key});
+  final bool isEditMode;
+  final String? groupId;
+
+  const DistanceScreen({super.key, this.isEditMode = false, this.groupId});
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +41,7 @@ class DistanceScreen extends StatelessWidget {
                   children: [
                     const CustomBackButton(),
                     AppText(
-                      text: 'Distance',
+                      text: isEditMode ? 'Group Location' : 'Distance',
                       style: AppTextStyles.h1Large(
                         context,
                       ).copyWith(fontWeight: FontWeight.bold),
@@ -45,7 +54,10 @@ class DistanceScreen extends StatelessWidget {
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: const _DistanceContent(),
+                  child: _DistanceContent(
+                    isEditMode: isEditMode,
+                    groupId: groupId,
+                  ),
                 ),
               ),
             ],
@@ -57,7 +69,10 @@ class DistanceScreen extends StatelessWidget {
 }
 
 class _DistanceContent extends StatefulWidget {
-  const _DistanceContent();
+  final bool isEditMode;
+  final String? groupId;
+
+  const _DistanceContent({this.isEditMode = false, this.groupId});
 
   @override
   State<_DistanceContent> createState() => _DistanceContentState();
@@ -67,7 +82,31 @@ class _DistanceContentState extends State<_DistanceContent> {
   static const int _min = 1;
   static const int _max = 50;
   late int _current;
+  double? _selectedLatitude;
+  double? _selectedLongitude;
+  String? _selectedAddress;
+  String? _selectedCity;
+  String? _selectedState;
   final FilterCubit _filterCubit = Di().sl<FilterCubit>();
+  final GoogleMapCubit _googleMapCubit = Di().sl<GoogleMapCubit>();
+  final CreateGroupCubit _createGroupCubit = Di().sl<CreateGroupCubit>();
+  final MyGroupCubit _myGroupCubit = Di().sl<MyGroupCubit>();
+
+  GroupLocation? _resolveExistingGroupLocation() {
+    if (widget.groupId == null || widget.groupId!.isEmpty) return null;
+
+    final fromDetail = _myGroupCubit.myGroupModel?.data;
+    if (fromDetail?.id == widget.groupId) {
+      return fromDetail?.location;
+    }
+
+    final groupList = _myGroupCubit.myGroupList?.groupList;
+    if (groupList == null || groupList.isEmpty) return null;
+
+    final match = groupList.where((g) => g.id == widget.groupId).toList();
+    if (match.isEmpty) return null;
+    return match.first.location;
+  }
 
   @override
   void initState() {
@@ -76,13 +115,43 @@ class _DistanceContentState extends State<_DistanceContent> {
       _filterCubit.selectedDistance?.replaceAll(RegExp(r'[^0-9]'), '') ?? '0',
     );
     _current = (parsed ?? 15).clamp(_min, _max);
+    _selectedLatitude = _filterCubit.selectedLatitude;
+    _selectedLongitude = _filterCubit.selectedLongitude;
+    _selectedAddress = _filterCubit.selectedLocationAddress;
+
+    if (widget.isEditMode) {
+      final existingLocation = _resolveExistingGroupLocation();
+      _selectedLatitude = existingLocation?.latitude;
+      _selectedLongitude = existingLocation?.longitude;
+      _selectedAddress = existingLocation?.address;
+      _selectedCity = existingLocation?.city;
+      _selectedState = existingLocation?.state;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        MapWidget(distanceMiles: _current),
+        MapWidget(
+          distanceMiles: _current,
+          overlayWidget: GoogleMapSearchPlacesApi(
+            initialAddress: _selectedAddress,
+            onPlaceSelected: (latitude, longitude, address, city, state) {
+              setState(() {
+                _selectedLatitude = latitude;
+                _selectedLongitude = longitude;
+                _selectedAddress = address;
+                _selectedCity = city;
+                _selectedState = state;
+              });
+              _googleMapCubit.moveToSelectedLocation(
+                latitude: latitude,
+                longitude: longitude,
+              );
+            },
+          ),
+        ),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -112,7 +181,25 @@ class _DistanceContentState extends State<_DistanceContent> {
         CustomElevatedButton(
           text: 'Done',
           onTap: () {
-            _filterCubit.updateDistance('Max $_current miles');
+            if (widget.isEditMode && widget.groupId != null) {
+              _createGroupCubit.updateGroupWithChangedFields(
+                groupId: widget.groupId!,
+                location: GroupLocation(
+                  latitude: _selectedLatitude,
+                  longitude: _selectedLongitude,
+                  address: _selectedAddress ?? '',
+                  city: _selectedCity ?? '',
+                  state: _selectedState ?? '',
+                ),
+              );
+            } else {
+              _filterCubit.updateDistance('Max $_current miles');
+              _filterCubit.updateSelectedLocation(
+                latitude: _selectedLatitude,
+                longitude: _selectedLongitude,
+                address: _selectedAddress,
+              );
+            }
             Navigator.of(context).pop();
           },
           width: double.infinity,
@@ -165,7 +252,7 @@ class _HorizontalPillSlider extends StatelessWidget {
               AnimatedContainer(
                 duration: const Duration(milliseconds: 120),
                 height: 64,
-                width: fillWidth.clamp(16.0, trackWidth),
+                width: fillWidth.clamp(48.0, trackWidth),
                 margin: const EdgeInsets.symmetric(horizontal: 4),
                 decoration: BoxDecoration(
                   color: primary,

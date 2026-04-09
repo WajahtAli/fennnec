@@ -21,6 +21,7 @@ class GoogleMapWidget extends StatefulWidget {
 }
 
 class GoogleMapWidgetState extends State<GoogleMapWidget> {
+  static const double _metersPerMile = 1609.344;
   final GoogleMapCubit _googleMapCubit = Di().sl<GoogleMapCubit>();
   GoogleMapController? mapController;
 
@@ -77,6 +78,7 @@ class GoogleMapWidgetState extends State<GoogleMapWidget> {
           initialCameraPosition: _getInitialCameraPosition(),
           onMapCreated: _onMapCreated,
           onCameraMove: _onCameraMove,
+          markers: _buildMarkers(),
           circles: _buildDistanceCircle(),
         );
       },
@@ -84,10 +86,13 @@ class GoogleMapWidgetState extends State<GoogleMapWidget> {
   }
 
   CameraPosition _getInitialCameraPosition() {
+    final selected = _googleMapCubit.selectedMapCenter;
     return CameraPosition(
       target: LatLng(
-        _googleMapCubit.currentLocation?.latitude ?? 0.0,
-        _googleMapCubit.currentLocation?.longitude ?? 0.0,
+        selected?.latitude ?? _googleMapCubit.currentLocation?.latitude ?? 0.0,
+        selected?.longitude ??
+            _googleMapCubit.currentLocation?.longitude ??
+            0.0,
       ),
       zoom: 14.5,
     );
@@ -97,6 +102,14 @@ class GoogleMapWidgetState extends State<GoogleMapWidget> {
     _googleMapCubit.mapController.complete(controller);
     mapController = controller;
     setMapStyle();
+    final selected = _googleMapCubit.selectedMapCenter;
+    if (selected != null) {
+      controller.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(target: selected, zoom: 14.5),
+        ),
+      );
+    }
   }
 
   void _onCameraMove(CameraPosition position) {
@@ -104,18 +117,19 @@ class GoogleMapWidgetState extends State<GoogleMapWidget> {
   }
 
   Set<Circle> _buildDistanceCircle() {
+    final selected = _googleMapCubit.selectedMapCenter;
     final location = _googleMapCubit.currentLocation;
-    if (location == null) {
+    if (selected == null && location == null) {
       return {};
     }
 
     final primary = ColorPalette.primary;
-    final radiusMeters = widget.distanceMiles * 20.34;
+    final radiusMeters = widget.distanceMiles * _metersPerMile;
 
     return {
       Circle(
         circleId: const CircleId('distance_range'),
-        center: LatLng(location.latitude, location.longitude),
+        center: selected ?? LatLng(location!.latitude, location.longitude),
         radius: radiusMeters,
         fillColor: isDarkTheme(context)
             ? ColorPalette.textGrey.withValues(alpha: 0.28)
@@ -124,6 +138,20 @@ class GoogleMapWidgetState extends State<GoogleMapWidget> {
             ? ColorPalette.textGrey.withValues(alpha: 0.75)
             : primary.withValues(alpha: 0.75),
         strokeWidth: 2,
+      ),
+    };
+  }
+
+  Set<Marker> _buildMarkers() {
+    final selected = _googleMapCubit.selectedMapCenter;
+    if (selected == null) {
+      return {};
+    }
+
+    return {
+      Marker(
+        markerId: const MarkerId('selected_location_marker'),
+        position: selected,
       ),
     };
   }
