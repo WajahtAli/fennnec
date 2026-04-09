@@ -3,6 +3,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:fennac_app/app/app.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/core/di_container.dart';
+import 'package:fennac_app/core/notifications/voip_bridge.dart';
 import 'package:fennac_app/pages/call/presentation/bloc/cubit/call_cubit.dart';
 import 'package:fennac_app/routes/routes_imports.gr.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -115,12 +116,14 @@ class CallNotificationHandler {
         Di().sl<CallCubit>().callId = event.body['callRecordId'];
         Di().sl<CallCubit>().endCall();
         FlutterCallkitIncoming.endAllCalls();
+        VoipBridge.endCall();
         break;
       case Event.actionCallEnded:
         log('Call Ended: ${event.body}');
         _isNavigating = false;
         Di().sl<CallCubit>().endCall();
         FlutterCallkitIncoming.endAllCalls();
+        VoipBridge.endCall();
         break;
       case Event.actionCallTimeout:
         log('Call Timeout: ${event.body}');
@@ -128,6 +131,7 @@ class CallNotificationHandler {
         Di().sl<CallCubit>().callId = event.body['callRecordId'];
         Di().sl<CallCubit>().endCall();
         FlutterCallkitIncoming.endAllCalls();
+        VoipBridge.endCall();
         break;
       default:
         break;
