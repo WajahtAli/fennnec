@@ -52,7 +52,8 @@ class _GenderSelectionWidgetState extends State<GenderSelectionWidget> {
       itemCount: genderOptions.length,
       itemBuilder: (context, index) {
         final gender = genderOptions[index];
-        final isSelected = _selectedGender == gender;
+        final isSelected =
+            _selectedGender?.toLowerCase() == gender.toLowerCase();
 
         return AppInkWell(
           borderRadius: BorderRadius.circular(16),

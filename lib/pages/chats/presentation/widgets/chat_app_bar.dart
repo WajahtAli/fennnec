@@ -496,6 +496,7 @@ class ChatAppBar extends StatelessWidget {
   }
 
   List<String>? _resolveParticipantId() {
+    List<String> participantIds = [];
     final targetChatId = chatId;
     if (targetChatId == null || targetChatId.isEmpty) return null;
 
@@ -506,8 +507,16 @@ class ChatAppBar extends StatelessWidget {
       if (chat.id != targetChatId) continue;
 
       final members = chat.members;
+      final otherGroupMembers = chat.matchedGroupDetails?.members;
       if (members != null && members.isNotEmpty) {
-        return members
+        participantIds = members
+            .map((m) => m.id)
+            .toList()
+            .where((id) => id != currentUserId)
+            .toList();
+      }
+      if (otherGroupMembers != null && otherGroupMembers.isNotEmpty) {
+        participantIds = otherGroupMembers
             .map((m) => m.id)
             .toList()
             .where((id) => id != currentUserId)
@@ -515,6 +524,6 @@ class ChatAppBar extends StatelessWidget {
       }
     }
 
-    return [targetChatId];
+    return participantIds;
   }
 }

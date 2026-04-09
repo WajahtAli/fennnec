@@ -134,9 +134,45 @@ _SharedMediaModel _$SharedMediaModelFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$SharedMediaModelToJson(_SharedMediaModel instance) =>
     <String, dynamic>{'url': instance.url, 'type': instance.type};
 
-_ChatPokeModel _$ChatPokeModelFromJson(
+_ChatPokeModel _$ChatPokeModelFromJson(Map<String, dynamic> json) =>
+    _ChatPokeModel(
+      id: json['id'] as String,
+      type: json['type'] as String? ?? 'poke',
+      fromUserId: json['fromUserId'] as String?,
+      name: json['name'] as String,
+      image: json['image'] as String? ?? '',
+      lastMessage: json['lastMessage'] as String? ?? '',
+      lastMessageAt: _dateTimeFromJsonNullable(json['lastMessageAt']),
+      unreadCount: (json['unreadCount'] as num).toInt(),
+      pokes:
+          (json['pokes'] as List<dynamic>?)
+              ?.map(
+                (e) => IndividualPokeModel.fromJson(e as Map<String, dynamic>),
+              )
+              .toList() ??
+          const [],
+      meta: json['meta'] == null
+          ? const ChatMetaModel()
+          : ChatMetaModel.fromJson(json['meta'] as Map<String, dynamic>),
+    );
+
+Map<String, dynamic> _$ChatPokeModelToJson(_ChatPokeModel instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'type': instance.type,
+      'fromUserId': instance.fromUserId,
+      'name': instance.name,
+      'image': instance.image,
+      'lastMessage': instance.lastMessage,
+      'lastMessageAt': _dateTimeToJsonNullable(instance.lastMessageAt),
+      'unreadCount': instance.unreadCount,
+      'pokes': instance.pokes,
+      'meta': instance.meta,
+    };
+
+_IndividualPokeModel _$IndividualPokeModelFromJson(
   Map<String, dynamic> json,
-) => _ChatPokeModel(
+) => _IndividualPokeModel(
   id: json['id'] as String,
   fromUser: json['fromUser'] == null
       ? null
@@ -158,20 +194,21 @@ _ChatPokeModel _$ChatPokeModelFromJson(
         ),
 );
 
-Map<String, dynamic> _$ChatPokeModelToJson(_ChatPokeModel instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'fromUser': instance.fromUser,
-      'toUserId': instance.toUserId,
-      'message': instance.message,
-      'createdAt': _dateTimeToJsonNullable(instance.createdAt),
-      'status': instance.status,
-      'targetType': instance.targetType,
-      'targetId': instance.targetId,
-      'direction': instance.direction,
-      'targetPhoto': instance.targetPhoto,
-      'targetPrompt': instance.targetPrompt,
-    };
+Map<String, dynamic> _$IndividualPokeModelToJson(
+  _IndividualPokeModel instance,
+) => <String, dynamic>{
+  'id': instance.id,
+  'fromUser': instance.fromUser,
+  'toUserId': instance.toUserId,
+  'message': instance.message,
+  'createdAt': _dateTimeToJsonNullable(instance.createdAt),
+  'status': instance.status,
+  'targetType': instance.targetType,
+  'targetId': instance.targetId,
+  'direction': instance.direction,
+  'targetPhoto': instance.targetPhoto,
+  'targetPrompt': instance.targetPrompt,
+};
 
 _ChatPokeUserModel _$ChatPokeUserModelFromJson(Map<String, dynamic> json) =>
     _ChatPokeUserModel(

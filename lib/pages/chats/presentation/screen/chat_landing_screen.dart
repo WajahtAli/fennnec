@@ -195,17 +195,17 @@ class _ChatLandingScreenState extends State<ChatLandingScreen> {
             ...pokeItems.map((poke) {
               return AppInkWell(
                 onTap: () async {
-                  await _openPokeDetailIfAllowed(context, poke.id);
+                  await _openPokeDetailIfAllowed(context, poke.pokes.first.id);
                 },
                 child: CallHistoryItem(
                   name: _getPokeSenderName(poke),
-                  avatar: poke.fromUser?.image ?? '',
+                  avatar: poke.image ?? '',
                   unreadCount: 0,
-                  timeAgo: poke.createdAt != null
-                      ? _getTimeAgo(poke.createdAt!)
+                  timeAgo: poke.lastMessageAt != null
+                      ? _getTimeAgo(poke.lastMessageAt!)
                       : '',
                   isPoked: true,
-                  lastMessage: poke.message,
+                  lastMessage: poke.lastMessage,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 12,
@@ -290,11 +290,9 @@ class _ChatLandingScreenState extends State<ChatLandingScreen> {
   }
 
   String _getPokeSenderName(ChatPokeModel poke) {
-    final firstName = poke.fromUser?.firstName?.trim() ?? '';
-    final lastName = poke.fromUser?.lastName?.trim() ?? '';
+    final firstName = poke.name;
     final fullName = [
       firstName,
-      lastName,
     ].where((part) => part.isNotEmpty).join(' ').trim();
 
     return fullName.isNotEmpty ? fullName : 'Unknown user';

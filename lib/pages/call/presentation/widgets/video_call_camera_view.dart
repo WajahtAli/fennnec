@@ -87,12 +87,51 @@ class _VideoCallCameraViewState extends State<VideoCallCameraView> {
   }
 
   Widget _buildVideo(int uid, CallCubit callCubit) {
-    return AgoraVideoView(
-      controller: VideoViewController.remote(
-        rtcEngine: callCubit.engine,
-        canvas: VideoCanvas(uid: uid),
-        connection: RtcConnection(channelId: callCubit.channelName ?? 'test'),
-      ),
+    final isMuted = callCubit.remoteAudioState[uid] == false;
+
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: AgoraVideoView(
+            controller: VideoViewController.remote(
+              rtcEngine: callCubit.engine,
+              canvas: VideoCanvas(uid: uid),
+              connection:
+                  RtcConnection(channelId: callCubit.channelName ?? 'test'),
+            ),
+          ),
+        ),
+        if (isMuted)
+          Positioned(
+            bottom: 12,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.5),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.mic_off_rounded, color: Colors.white, size: 14),
+                    SizedBox(width: 4),
+                    Text(
+                      'Muted',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

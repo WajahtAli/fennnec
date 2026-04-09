@@ -49,166 +49,173 @@ class _HomeCardDesignState extends State<HomeCardDesign> {
         },
         bloc: _homeCubit,
         builder: (context, state) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              HeroSection(
-                imagePath: widget.group?.coverImage?.isNotEmpty == true
-                    ? widget.group!.coverImage!
-                    : Assets.dummy.groupNight.path,
-                avatarPaths:
-                    widget.group?.members
-                        ?.map((member) => member.coverImage ?? '')
-                        .toList() ??
-                    [],
-                firstNames:
-                    widget.group?.members?.map((member) {
-                      final fullName = (member.name ?? '').trim();
-                      if (fullName.isEmpty) return '';
-                      return fullName.split(' ').first;
-                    }).toList() ??
-                    [],
-              ),
-              const SizedBox(height: 32),
-              if (_homeCubit.selectedProfile == null) ...[
-                //todo client req to add group name
-                // Padding(
-                //   padding: const EdgeInsets.symmetric(horizontal: 12),
-                //   child: Text(
-                //     widget.group?.members
-                //             ?.map((e) => e.name ?? "")
-                //             .join(", ") ??
-                //         '',
-                //     textAlign: TextAlign.center,
-                //     style: AppTextStyles.h1Large(
-                //       context,
-                //     ).copyWith(fontWeight: FontWeight.bold, fontSize: 24),
-                //   ),
-                // ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: Text(
-                    widget.group?.name ?? '',
-                    textAlign: TextAlign.center,
-                    style: AppTextStyles.h1Large(
-                      context,
-                    ).copyWith(fontWeight: FontWeight.bold, fontSize: 24),
+          return GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTap: () {
+              _homeCubit.selectProfileIndex(null);
+              _homeCubit.selectProfileById(null);
+            },
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                HeroSection(
+                  imagePath: widget.group?.coverImage?.isNotEmpty == true
+                      ? widget.group!.coverImage!
+                      : Assets.dummy.groupNight.path,
+                  avatarPaths:
+                      widget.group?.members
+                          ?.map((member) => member.coverImage ?? '')
+                          .toList() ??
+                      [],
+                  firstNames:
+                      widget.group?.members?.map((member) {
+                        final fullName = (member.name ?? '').trim();
+                        if (fullName.isEmpty) return '';
+                        return fullName.split(' ').first;
+                      }).toList() ??
+                      [],
+                ),
+                const SizedBox(height: 32),
+                if (_homeCubit.selectedProfile == null) ...[
+                  //todo client req to add group name
+                  // Padding(
+                  //   padding: const EdgeInsets.symmetric(horizontal: 12),
+                  //   child: Text(
+                  //     widget.group?.members
+                  //             ?.map((e) => e.name ?? "")
+                  //             .join(", ") ??
+                  //         '',
+                  //     textAlign: TextAlign.center,
+                  //     style: AppTextStyles.h1Large(
+                  //       context,
+                  //     ).copyWith(fontWeight: FontWeight.bold, fontSize: 24),
+                  //   ),
+                  // ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Text(
+                      widget.group?.name ?? '',
+                      textAlign: TextAlign.center,
+                      style: AppTextStyles.h1Large(
+                        context,
+                      ).copyWith(fontWeight: FontWeight.bold, fontSize: 24),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 12),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Text(
-                    widget.group?.description ?? '',
-                    textAlign: TextAlign.center,
-                    style: AppTextStyles.bodyRegular(context),
+                  const SizedBox(height: 12),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Text(
+                      widget.group?.description ?? '',
+                      textAlign: TextAlign.center,
+                      style: AppTextStyles.bodyRegular(context),
+                    ),
                   ),
+                  const CustomSizedBox(height: 20),
+                  CategoryPill(
+                    iconPath: Assets.icons.navigation.path,
+                    label: widget.group?.groupTag ?? '',
+                  ),
+                ],
+
+                if (_homeCubit.selectedProfile != null) ...[
+                  // Profile name with verified badge
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          '${_homeCubit.selectedProfile?.name}, ${_homeCubit.selectedProfile?.age ?? ''}',
+                          style: AppTextStyles.h3(
+                            context,
+                          ).copyWith(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(width: 8),
+                        SvgPicture.asset(
+                          Assets.icons.verified.path,
+                          height: 20,
+                          width: 20,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  // Profile tags/chips
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      alignment: WrapAlignment.center,
+                      children: [
+                        if (_homeCubit.selectedProfile?.orientation != null &&
+                            _homeCubit.selectedProfile!.orientation!.isNotEmpty)
+                          CustomChips(
+                            height: 28,
+                            label: _homeCubit.selectedProfile!.orientation!,
+                            textStyle: AppTextStyles.description(context),
+                          ),
+                        if (_homeCubit.selectedProfile?.pronouns != null &&
+                            _homeCubit.selectedProfile!.pronouns!.isNotEmpty)
+                          CustomChips(
+                            height: 28,
+                            label: _homeCubit.selectedProfile!.pronouns!,
+                            textStyle: AppTextStyles.description(context),
+                          ),
+                        if (_homeCubit.selectedProfile?.location != null)
+                          CustomChips(
+                            height: 28,
+
+                            label: '📍 ${_homeCubit.selectedProfile!.location}',
+                            textStyle: AppTextStyles.description(context),
+                          ),
+                        if (_homeCubit.selectedProfile?.distance != null)
+                          CustomChips(
+                            height: 28,
+                            textStyle: AppTextStyles.description(context),
+
+                            label: _homeCubit.selectedProfile!.distance
+                                .toString(),
+                          ),
+                        if (_homeCubit.selectedProfile?.education != null &&
+                            _homeCubit.selectedProfile!.education!.isNotEmpty)
+                          CustomChips(
+                            height: 28,
+                            textStyle: AppTextStyles.description(context),
+
+                            label: _homeCubit.selectedProfile!.education!,
+                          ),
+                        if (_homeCubit.selectedProfile?.promptTitle != null)
+                          CustomChips(
+                            height: 28,
+                            textStyle: AppTextStyles.description(context),
+
+                            label: _homeCubit.selectedProfile!.promptTitle
+                                .toString(),
+                          ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Text(
+                      _homeCubit.selectedProfile?.bio ?? '',
+                      textAlign: TextAlign.center,
+                      style: AppTextStyles.body(
+                        context,
+                      ).copyWith(color: Colors.white70),
+                    ),
+                  ),
+                ],
+                const CustomSizedBox(height: 10),
+                GroupGalleryWidget(
+                  onTapRight: widget.onTapRight,
+                  onTapLeft: widget.onTapLeft,
                 ),
-                const CustomSizedBox(height: 20),
-                CategoryPill(
-                  iconPath: Assets.icons.navigation.path,
-                  label: widget.group?.groupTag ?? '',
-                ),
+                const CustomSizedBox(height: 80),
               ],
-
-              if (_homeCubit.selectedProfile != null) ...[
-                // Profile name with verified badge
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        '${_homeCubit.selectedProfile?.name}, ${_homeCubit.selectedProfile?.age ?? ''}',
-                        style: AppTextStyles.h3(
-                          context,
-                        ).copyWith(fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(width: 8),
-                      SvgPicture.asset(
-                        Assets.icons.verified.path,
-                        height: 20,
-                        width: 20,
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-                // Profile tags/chips
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    alignment: WrapAlignment.center,
-                    children: [
-                      if (_homeCubit.selectedProfile?.orientation != null &&
-                          _homeCubit.selectedProfile!.orientation!.isNotEmpty)
-                        CustomChips(
-                          height: 28,
-                          label: _homeCubit.selectedProfile!.orientation!,
-                          textStyle: AppTextStyles.description(context),
-                        ),
-                      if (_homeCubit.selectedProfile?.pronouns != null &&
-                          _homeCubit.selectedProfile!.pronouns!.isNotEmpty)
-                        CustomChips(
-                          height: 28,
-                          label: _homeCubit.selectedProfile!.pronouns!,
-                          textStyle: AppTextStyles.description(context),
-                        ),
-                      if (_homeCubit.selectedProfile?.location != null)
-                        CustomChips(
-                          height: 28,
-
-                          label: '📍 ${_homeCubit.selectedProfile!.location}',
-                          textStyle: AppTextStyles.description(context),
-                        ),
-                      if (_homeCubit.selectedProfile?.distance != null)
-                        CustomChips(
-                          height: 28,
-                          textStyle: AppTextStyles.description(context),
-
-                          label: _homeCubit.selectedProfile!.distance
-                              .toString(),
-                        ),
-                      if (_homeCubit.selectedProfile?.education != null &&
-                          _homeCubit.selectedProfile!.education!.isNotEmpty)
-                        CustomChips(
-                          height: 28,
-                          textStyle: AppTextStyles.description(context),
-
-                          label: _homeCubit.selectedProfile!.education!,
-                        ),
-                      if (_homeCubit.selectedProfile?.promptTitle != null)
-                        CustomChips(
-                          height: 28,
-                          textStyle: AppTextStyles.description(context),
-
-                          label: _homeCubit.selectedProfile!.promptTitle
-                              .toString(),
-                        ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: Text(
-                    _homeCubit.selectedProfile?.bio ?? '',
-                    textAlign: TextAlign.center,
-                    style: AppTextStyles.body(
-                      context,
-                    ).copyWith(color: Colors.white70),
-                  ),
-                ),
-              ],
-              const CustomSizedBox(height: 10),
-              GroupGalleryWidget(
-                onTapRight: widget.onTapRight,
-                onTapLeft: widget.onTapLeft,
-              ),
-              const CustomSizedBox(height: 80),
-            ],
+            ),
           );
         },
       ),

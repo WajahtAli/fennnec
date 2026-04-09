@@ -267,18 +267,29 @@ class CallCubit extends Cubit<CallState> {
     emit(CallLoaded());
   }
 
-  Future<void> switchToVideoCall() async {
-    if (callType == CallType.video) return;
+  Future<void> switchToVideoCall({bool turnCameraOn = true}) async {
+    if (callType == CallType.video) {
+      if (turnCameraOn && cameraOff) {
+        await toggleCamera();
+      }
+      return;
+    }
 
     emit(CallLoading());
 
     callType = CallType.video;
-    cameraOff = false;
 
     if (_isEngineReady) {
       await engine.enableVideo();
-      await engine.startPreview();
-      await engine.muteLocalVideoStream(false);
+      if (turnCameraOn) {
+        cameraOff = false;
+        await engine.startPreview();
+        await engine.muteLocalVideoStream(false);
+      } else {
+        cameraOff = true;
+        await engine.muteLocalVideoStream(true);
+        await engine.stopPreview();
+      }
     }
 
     emit(CallLoaded());
@@ -427,6 +438,9 @@ class CallCubit extends Cubit<CallState> {
     emit(CallLoaded());
   }
 
+  Map<int, bool> remoteVideoState = {};
+  Map<int, bool> remoteAudioState = {};
+
   void _addEventHandlers() {
     engine.registerEventHandler(
       RtcEngineEventHandler(
@@ -448,26 +462,57 @@ class CallCubit extends Cubit<CallState> {
           _startTimer();
           debugPrint("👤 Remote user joined: $remoteUid");
           users.add(remoteUid);
+          remoteAudioState[remoteUid] = true;
+          remoteVideoState[remoteUid] = false;
+          emit(CallLoaded());
+        },
+        onUserMuteAudio: (connection, remoteUid, muted) {
+          emit(CallLoading());
+          debugPrint("🎙️ Remote user muted audio: $remoteUid, $muted");
+          remoteAudioState[remoteUid] = !muted;
+          emit(CallLoaded());
+        },
+        onUserEnableVideo: (connection, remoteUid, enabled) {
+          emit(CallLoading());
+          log("📹 Remote user enabled video: $remoteUid, $enabled");
+          if (enabled) {
+            remoteVideoState[remoteUid] = true;
+            switchToVideoCall(turnCameraOn: false);
+          } else {
+            remoteVideoState[remoteUid] = false;
+            switchToAudioCall();
+          }
           emit(CallLoaded());
         },
         onRemoteVideoStateChanged:
             (connection, remoteUid, state, reason, elapsed) async {
+              emit(CallLoading());
+              log(
+                "📹 Remote video state changed: uid=$remoteUid, state=$state, reason=$reason",
+              );
               final isVideoActive =
                   state == RemoteVideoState.remoteVideoStateStarting ||
                   state == RemoteVideoState.remoteVideoStateDecoding;
 
+              remoteVideoState[remoteUid] = isVideoActive;
               isRemoteVideoEnabled = isVideoActive;
 
               if (isVideoActive && callType == CallType.audio) {
-                debugPrint("📹 Remote enabled video → upgrading call");
-                await switchToVideoCall();
+                debugPrint("📹 Remote enabled video → upgrading call view");
+                await switchToVideoCall(turnCameraOn: false);
               }
 
               if (!isVideoActive && callType == CallType.video) {
-                debugPrint("📵 Remote disabled video → switching to audio");
-                await switchToAudioCall();
+                // Only switch back to audio if NO remote video is active anymore
+                final anyRemoteVideo = remoteVideoState.values.any((v) => v);
+                if (!anyRemoteVideo) {
+                  debugPrint("📵 No remote video active → switching to audio");
+                  await switchToAudioCall();
+                }
               }
+              emit(CallLoaded());
             },
+
         onUserOffline:
             (RtcConnection conn, int remoteUid, UserOfflineReasonType reason) {
               emit(CallLoading());

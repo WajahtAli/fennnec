@@ -125,6 +125,32 @@ abstract class SharedMediaModel with _$SharedMediaModel {
 abstract class ChatPokeModel with _$ChatPokeModel {
   const factory ChatPokeModel({
     required String id,
+    @Default('poke') String type,
+    String? fromUserId,
+    required String name,
+    @Default('') String image,
+    @Default('') String lastMessage,
+    @JsonKey(
+      fromJson: _dateTimeFromJsonNullable,
+      toJson: _dateTimeToJsonNullable,
+    )
+    DateTime? lastMessageAt,
+    required int unreadCount,
+    @Default([]) List<IndividualPokeModel> pokes,
+    @Default(ChatMetaModel()) ChatMetaModel meta,
+  }) = _ChatPokeModel;
+
+  factory ChatPokeModel.fromJson(Map<String, dynamic> json) =>
+      _$ChatPokeModelFromJson({
+        ...json,
+        'id': json['id'] ?? json['_id'] ?? '',
+      });
+}
+
+@freezed
+abstract class IndividualPokeModel with _$IndividualPokeModel {
+  const factory IndividualPokeModel({
+    required String id,
     ChatPokeUserModel? fromUser,
     String? toUserId,
     @Default('') String message,
@@ -139,13 +165,15 @@ abstract class ChatPokeModel with _$ChatPokeModel {
     String? direction,
     PokePhotoDetail? targetPhoto,
     ChatPokePromptModel? targetPrompt,
-  }) = _ChatPokeModel;
+  }) = _IndividualPokeModel;
 
-  factory ChatPokeModel.fromJson(Map<String, dynamic> json) =>
-      _$ChatPokeModelFromJson({
+  factory IndividualPokeModel.fromJson(Map<String, dynamic> json) =>
+      _$IndividualPokeModelFromJson({
         ...json,
         'id': json['id'] ?? json['_id'] ?? '',
-        'fromUser': json['fromUser'] ?? json['fromUserId'],
+        'fromUser': json['fromUserId'] is Map<String, dynamic>
+            ? json['fromUserId']
+            : null,
       });
 }
 

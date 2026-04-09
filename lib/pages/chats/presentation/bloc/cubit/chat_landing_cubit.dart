@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:fennac_app/app/constants/app_enums.dart';
 import 'package:fennac_app/pages/chats/data/models/chat_and_calls_response.dart';
 import 'package:fennac_app/pages/chats/presentation/bloc/state/chat_landing_state.dart';
@@ -47,6 +49,7 @@ class ChatLandingCubit extends Cubit<ChatLandingState> {
         limit: limit,
       );
       if (response.success) {
+        log("Pokes ${response.data.pokes.length}");
         final nextState = state.copyWith(
           isLoadingData: false,
           chats: response.data.chats,

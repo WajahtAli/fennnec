@@ -1544,7 +1544,7 @@ as String?,
 /// @nodoc
 mixin _$ChatPokeModel {
 
- String get id; ChatPokeUserModel? get fromUser; String? get toUserId; String get message;@JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable) DateTime? get createdAt; String? get status; String? get targetType; String? get targetId; String? get direction; PokePhotoDetail? get targetPhoto; ChatPokePromptModel? get targetPrompt;
+ String get id; String get type; String? get fromUserId; String get name; String get image; String get lastMessage;@JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable) DateTime? get lastMessageAt; int get unreadCount; List<IndividualPokeModel> get pokes; ChatMetaModel get meta;
 /// Create a copy of ChatPokeModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1557,16 +1557,16 @@ $ChatPokeModelCopyWith<ChatPokeModel> get copyWith => _$ChatPokeModelCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChatPokeModel&&(identical(other.id, id) || other.id == id)&&(identical(other.fromUser, fromUser) || other.fromUser == fromUser)&&(identical(other.toUserId, toUserId) || other.toUserId == toUserId)&&(identical(other.message, message) || other.message == message)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.status, status) || other.status == status)&&(identical(other.targetType, targetType) || other.targetType == targetType)&&(identical(other.targetId, targetId) || other.targetId == targetId)&&(identical(other.direction, direction) || other.direction == direction)&&(identical(other.targetPhoto, targetPhoto) || other.targetPhoto == targetPhoto)&&(identical(other.targetPrompt, targetPrompt) || other.targetPrompt == targetPrompt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChatPokeModel&&(identical(other.id, id) || other.id == id)&&(identical(other.type, type) || other.type == type)&&(identical(other.fromUserId, fromUserId) || other.fromUserId == fromUserId)&&(identical(other.name, name) || other.name == name)&&(identical(other.image, image) || other.image == image)&&(identical(other.lastMessage, lastMessage) || other.lastMessage == lastMessage)&&(identical(other.lastMessageAt, lastMessageAt) || other.lastMessageAt == lastMessageAt)&&(identical(other.unreadCount, unreadCount) || other.unreadCount == unreadCount)&&const DeepCollectionEquality().equals(other.pokes, pokes)&&(identical(other.meta, meta) || other.meta == meta));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,fromUser,toUserId,message,createdAt,status,targetType,targetId,direction,targetPhoto,targetPrompt);
+int get hashCode => Object.hash(runtimeType,id,type,fromUserId,name,image,lastMessage,lastMessageAt,unreadCount,const DeepCollectionEquality().hash(pokes),meta);
 
 @override
 String toString() {
-  return 'ChatPokeModel(id: $id, fromUser: $fromUser, toUserId: $toUserId, message: $message, createdAt: $createdAt, status: $status, targetType: $targetType, targetId: $targetId, direction: $direction, targetPhoto: $targetPhoto, targetPrompt: $targetPrompt)';
+  return 'ChatPokeModel(id: $id, type: $type, fromUserId: $fromUserId, name: $name, image: $image, lastMessage: $lastMessage, lastMessageAt: $lastMessageAt, unreadCount: $unreadCount, pokes: $pokes, meta: $meta)';
 }
 
 
@@ -1577,11 +1577,11 @@ abstract mixin class $ChatPokeModelCopyWith<$Res>  {
   factory $ChatPokeModelCopyWith(ChatPokeModel value, $Res Function(ChatPokeModel) _then) = _$ChatPokeModelCopyWithImpl;
 @useResult
 $Res call({
- String id, ChatPokeUserModel? fromUser, String? toUserId, String message,@JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable) DateTime? createdAt, String? status, String? targetType, String? targetId, String? direction, PokePhotoDetail? targetPhoto, ChatPokePromptModel? targetPrompt
+ String id, String type, String? fromUserId, String name, String image, String lastMessage,@JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable) DateTime? lastMessageAt, int unreadCount, List<IndividualPokeModel> pokes, ChatMetaModel meta
 });
 
 
-$ChatPokeUserModelCopyWith<$Res>? get fromUser;$PokePhotoDetailCopyWith<$Res>? get targetPhoto;$ChatPokePromptModelCopyWith<$Res>? get targetPrompt;
+$ChatMetaModelCopyWith<$Res> get meta;
 
 }
 /// @nodoc
@@ -1594,57 +1594,29 @@ class _$ChatPokeModelCopyWithImpl<$Res>
 
 /// Create a copy of ChatPokeModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? fromUser = freezed,Object? toUserId = freezed,Object? message = null,Object? createdAt = freezed,Object? status = freezed,Object? targetType = freezed,Object? targetId = freezed,Object? direction = freezed,Object? targetPhoto = freezed,Object? targetPrompt = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? type = null,Object? fromUserId = freezed,Object? name = null,Object? image = null,Object? lastMessage = null,Object? lastMessageAt = freezed,Object? unreadCount = null,Object? pokes = null,Object? meta = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,fromUser: freezed == fromUser ? _self.fromUser : fromUser // ignore: cast_nullable_to_non_nullable
-as ChatPokeUserModel?,toUserId: freezed == toUserId ? _self.toUserId : toUserId // ignore: cast_nullable_to_non_nullable
-as String?,message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
-as String,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
-as DateTime?,status: freezed == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as String?,targetType: freezed == targetType ? _self.targetType : targetType // ignore: cast_nullable_to_non_nullable
-as String?,targetId: freezed == targetId ? _self.targetId : targetId // ignore: cast_nullable_to_non_nullable
-as String?,direction: freezed == direction ? _self.direction : direction // ignore: cast_nullable_to_non_nullable
-as String?,targetPhoto: freezed == targetPhoto ? _self.targetPhoto : targetPhoto // ignore: cast_nullable_to_non_nullable
-as PokePhotoDetail?,targetPrompt: freezed == targetPrompt ? _self.targetPrompt : targetPrompt // ignore: cast_nullable_to_non_nullable
-as ChatPokePromptModel?,
+as String,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
+as String,fromUserId: freezed == fromUserId ? _self.fromUserId : fromUserId // ignore: cast_nullable_to_non_nullable
+as String?,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,image: null == image ? _self.image : image // ignore: cast_nullable_to_non_nullable
+as String,lastMessage: null == lastMessage ? _self.lastMessage : lastMessage // ignore: cast_nullable_to_non_nullable
+as String,lastMessageAt: freezed == lastMessageAt ? _self.lastMessageAt : lastMessageAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,unreadCount: null == unreadCount ? _self.unreadCount : unreadCount // ignore: cast_nullable_to_non_nullable
+as int,pokes: null == pokes ? _self.pokes : pokes // ignore: cast_nullable_to_non_nullable
+as List<IndividualPokeModel>,meta: null == meta ? _self.meta : meta // ignore: cast_nullable_to_non_nullable
+as ChatMetaModel,
   ));
 }
 /// Create a copy of ChatPokeModel
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$ChatPokeUserModelCopyWith<$Res>? get fromUser {
-    if (_self.fromUser == null) {
-    return null;
-  }
-
-  return $ChatPokeUserModelCopyWith<$Res>(_self.fromUser!, (value) {
-    return _then(_self.copyWith(fromUser: value));
-  });
-}/// Create a copy of ChatPokeModel
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$PokePhotoDetailCopyWith<$Res>? get targetPhoto {
-    if (_self.targetPhoto == null) {
-    return null;
-  }
-
-  return $PokePhotoDetailCopyWith<$Res>(_self.targetPhoto!, (value) {
-    return _then(_self.copyWith(targetPhoto: value));
-  });
-}/// Create a copy of ChatPokeModel
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$ChatPokePromptModelCopyWith<$Res>? get targetPrompt {
-    if (_self.targetPrompt == null) {
-    return null;
-  }
-
-  return $ChatPokePromptModelCopyWith<$Res>(_self.targetPrompt!, (value) {
-    return _then(_self.copyWith(targetPrompt: value));
+$ChatMetaModelCopyWith<$Res> get meta {
+  
+  return $ChatMetaModelCopyWith<$Res>(_self.meta, (value) {
+    return _then(_self.copyWith(meta: value));
   });
 }
 }
@@ -1728,9 +1700,351 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  ChatPokeUserModel? fromUser,  String? toUserId,  String message, @JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable)  DateTime? createdAt,  String? status,  String? targetType,  String? targetId,  String? direction,  PokePhotoDetail? targetPhoto,  ChatPokePromptModel? targetPrompt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String type,  String? fromUserId,  String name,  String image,  String lastMessage, @JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable)  DateTime? lastMessageAt,  int unreadCount,  List<IndividualPokeModel> pokes,  ChatMetaModel meta)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ChatPokeModel() when $default != null:
+return $default(_that.id,_that.type,_that.fromUserId,_that.name,_that.image,_that.lastMessage,_that.lastMessageAt,_that.unreadCount,_that.pokes,_that.meta);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String type,  String? fromUserId,  String name,  String image,  String lastMessage, @JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable)  DateTime? lastMessageAt,  int unreadCount,  List<IndividualPokeModel> pokes,  ChatMetaModel meta)  $default,) {final _that = this;
+switch (_that) {
+case _ChatPokeModel():
+return $default(_that.id,_that.type,_that.fromUserId,_that.name,_that.image,_that.lastMessage,_that.lastMessageAt,_that.unreadCount,_that.pokes,_that.meta);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String type,  String? fromUserId,  String name,  String image,  String lastMessage, @JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable)  DateTime? lastMessageAt,  int unreadCount,  List<IndividualPokeModel> pokes,  ChatMetaModel meta)?  $default,) {final _that = this;
+switch (_that) {
+case _ChatPokeModel() when $default != null:
+return $default(_that.id,_that.type,_that.fromUserId,_that.name,_that.image,_that.lastMessage,_that.lastMessageAt,_that.unreadCount,_that.pokes,_that.meta);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _ChatPokeModel implements ChatPokeModel {
+  const _ChatPokeModel({required this.id, this.type = 'poke', this.fromUserId, required this.name, this.image = '', this.lastMessage = '', @JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable) this.lastMessageAt, required this.unreadCount, final  List<IndividualPokeModel> pokes = const [], this.meta = const ChatMetaModel()}): _pokes = pokes;
+  factory _ChatPokeModel.fromJson(Map<String, dynamic> json) => _$ChatPokeModelFromJson(json);
+
+@override final  String id;
+@override@JsonKey() final  String type;
+@override final  String? fromUserId;
+@override final  String name;
+@override@JsonKey() final  String image;
+@override@JsonKey() final  String lastMessage;
+@override@JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable) final  DateTime? lastMessageAt;
+@override final  int unreadCount;
+ final  List<IndividualPokeModel> _pokes;
+@override@JsonKey() List<IndividualPokeModel> get pokes {
+  if (_pokes is EqualUnmodifiableListView) return _pokes;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_pokes);
+}
+
+@override@JsonKey() final  ChatMetaModel meta;
+
+/// Create a copy of ChatPokeModel
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$ChatPokeModelCopyWith<_ChatPokeModel> get copyWith => __$ChatPokeModelCopyWithImpl<_ChatPokeModel>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$ChatPokeModelToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChatPokeModel&&(identical(other.id, id) || other.id == id)&&(identical(other.type, type) || other.type == type)&&(identical(other.fromUserId, fromUserId) || other.fromUserId == fromUserId)&&(identical(other.name, name) || other.name == name)&&(identical(other.image, image) || other.image == image)&&(identical(other.lastMessage, lastMessage) || other.lastMessage == lastMessage)&&(identical(other.lastMessageAt, lastMessageAt) || other.lastMessageAt == lastMessageAt)&&(identical(other.unreadCount, unreadCount) || other.unreadCount == unreadCount)&&const DeepCollectionEquality().equals(other._pokes, _pokes)&&(identical(other.meta, meta) || other.meta == meta));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,type,fromUserId,name,image,lastMessage,lastMessageAt,unreadCount,const DeepCollectionEquality().hash(_pokes),meta);
+
+@override
+String toString() {
+  return 'ChatPokeModel(id: $id, type: $type, fromUserId: $fromUserId, name: $name, image: $image, lastMessage: $lastMessage, lastMessageAt: $lastMessageAt, unreadCount: $unreadCount, pokes: $pokes, meta: $meta)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$ChatPokeModelCopyWith<$Res> implements $ChatPokeModelCopyWith<$Res> {
+  factory _$ChatPokeModelCopyWith(_ChatPokeModel value, $Res Function(_ChatPokeModel) _then) = __$ChatPokeModelCopyWithImpl;
+@override @useResult
+$Res call({
+ String id, String type, String? fromUserId, String name, String image, String lastMessage,@JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable) DateTime? lastMessageAt, int unreadCount, List<IndividualPokeModel> pokes, ChatMetaModel meta
+});
+
+
+@override $ChatMetaModelCopyWith<$Res> get meta;
+
+}
+/// @nodoc
+class __$ChatPokeModelCopyWithImpl<$Res>
+    implements _$ChatPokeModelCopyWith<$Res> {
+  __$ChatPokeModelCopyWithImpl(this._self, this._then);
+
+  final _ChatPokeModel _self;
+  final $Res Function(_ChatPokeModel) _then;
+
+/// Create a copy of ChatPokeModel
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? type = null,Object? fromUserId = freezed,Object? name = null,Object? image = null,Object? lastMessage = null,Object? lastMessageAt = freezed,Object? unreadCount = null,Object? pokes = null,Object? meta = null,}) {
+  return _then(_ChatPokeModel(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
+as String,fromUserId: freezed == fromUserId ? _self.fromUserId : fromUserId // ignore: cast_nullable_to_non_nullable
+as String?,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,image: null == image ? _self.image : image // ignore: cast_nullable_to_non_nullable
+as String,lastMessage: null == lastMessage ? _self.lastMessage : lastMessage // ignore: cast_nullable_to_non_nullable
+as String,lastMessageAt: freezed == lastMessageAt ? _self.lastMessageAt : lastMessageAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,unreadCount: null == unreadCount ? _self.unreadCount : unreadCount // ignore: cast_nullable_to_non_nullable
+as int,pokes: null == pokes ? _self._pokes : pokes // ignore: cast_nullable_to_non_nullable
+as List<IndividualPokeModel>,meta: null == meta ? _self.meta : meta // ignore: cast_nullable_to_non_nullable
+as ChatMetaModel,
+  ));
+}
+
+/// Create a copy of ChatPokeModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ChatMetaModelCopyWith<$Res> get meta {
+  
+  return $ChatMetaModelCopyWith<$Res>(_self.meta, (value) {
+    return _then(_self.copyWith(meta: value));
+  });
+}
+}
+
+
+/// @nodoc
+mixin _$IndividualPokeModel {
+
+ String get id; ChatPokeUserModel? get fromUser; String? get toUserId; String get message;@JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable) DateTime? get createdAt; String? get status; String? get targetType; String? get targetId; String? get direction; PokePhotoDetail? get targetPhoto; ChatPokePromptModel? get targetPrompt;
+/// Create a copy of IndividualPokeModel
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$IndividualPokeModelCopyWith<IndividualPokeModel> get copyWith => _$IndividualPokeModelCopyWithImpl<IndividualPokeModel>(this as IndividualPokeModel, _$identity);
+
+  /// Serializes this IndividualPokeModel to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is IndividualPokeModel&&(identical(other.id, id) || other.id == id)&&(identical(other.fromUser, fromUser) || other.fromUser == fromUser)&&(identical(other.toUserId, toUserId) || other.toUserId == toUserId)&&(identical(other.message, message) || other.message == message)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.status, status) || other.status == status)&&(identical(other.targetType, targetType) || other.targetType == targetType)&&(identical(other.targetId, targetId) || other.targetId == targetId)&&(identical(other.direction, direction) || other.direction == direction)&&(identical(other.targetPhoto, targetPhoto) || other.targetPhoto == targetPhoto)&&(identical(other.targetPrompt, targetPrompt) || other.targetPrompt == targetPrompt));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,fromUser,toUserId,message,createdAt,status,targetType,targetId,direction,targetPhoto,targetPrompt);
+
+@override
+String toString() {
+  return 'IndividualPokeModel(id: $id, fromUser: $fromUser, toUserId: $toUserId, message: $message, createdAt: $createdAt, status: $status, targetType: $targetType, targetId: $targetId, direction: $direction, targetPhoto: $targetPhoto, targetPrompt: $targetPrompt)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $IndividualPokeModelCopyWith<$Res>  {
+  factory $IndividualPokeModelCopyWith(IndividualPokeModel value, $Res Function(IndividualPokeModel) _then) = _$IndividualPokeModelCopyWithImpl;
+@useResult
+$Res call({
+ String id, ChatPokeUserModel? fromUser, String? toUserId, String message,@JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable) DateTime? createdAt, String? status, String? targetType, String? targetId, String? direction, PokePhotoDetail? targetPhoto, ChatPokePromptModel? targetPrompt
+});
+
+
+$ChatPokeUserModelCopyWith<$Res>? get fromUser;$PokePhotoDetailCopyWith<$Res>? get targetPhoto;$ChatPokePromptModelCopyWith<$Res>? get targetPrompt;
+
+}
+/// @nodoc
+class _$IndividualPokeModelCopyWithImpl<$Res>
+    implements $IndividualPokeModelCopyWith<$Res> {
+  _$IndividualPokeModelCopyWithImpl(this._self, this._then);
+
+  final IndividualPokeModel _self;
+  final $Res Function(IndividualPokeModel) _then;
+
+/// Create a copy of IndividualPokeModel
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? fromUser = freezed,Object? toUserId = freezed,Object? message = null,Object? createdAt = freezed,Object? status = freezed,Object? targetType = freezed,Object? targetId = freezed,Object? direction = freezed,Object? targetPhoto = freezed,Object? targetPrompt = freezed,}) {
+  return _then(_self.copyWith(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,fromUser: freezed == fromUser ? _self.fromUser : fromUser // ignore: cast_nullable_to_non_nullable
+as ChatPokeUserModel?,toUserId: freezed == toUserId ? _self.toUserId : toUserId // ignore: cast_nullable_to_non_nullable
+as String?,message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
+as String,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,status: freezed == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as String?,targetType: freezed == targetType ? _self.targetType : targetType // ignore: cast_nullable_to_non_nullable
+as String?,targetId: freezed == targetId ? _self.targetId : targetId // ignore: cast_nullable_to_non_nullable
+as String?,direction: freezed == direction ? _self.direction : direction // ignore: cast_nullable_to_non_nullable
+as String?,targetPhoto: freezed == targetPhoto ? _self.targetPhoto : targetPhoto // ignore: cast_nullable_to_non_nullable
+as PokePhotoDetail?,targetPrompt: freezed == targetPrompt ? _self.targetPrompt : targetPrompt // ignore: cast_nullable_to_non_nullable
+as ChatPokePromptModel?,
+  ));
+}
+/// Create a copy of IndividualPokeModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ChatPokeUserModelCopyWith<$Res>? get fromUser {
+    if (_self.fromUser == null) {
+    return null;
+  }
+
+  return $ChatPokeUserModelCopyWith<$Res>(_self.fromUser!, (value) {
+    return _then(_self.copyWith(fromUser: value));
+  });
+}/// Create a copy of IndividualPokeModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$PokePhotoDetailCopyWith<$Res>? get targetPhoto {
+    if (_self.targetPhoto == null) {
+    return null;
+  }
+
+  return $PokePhotoDetailCopyWith<$Res>(_self.targetPhoto!, (value) {
+    return _then(_self.copyWith(targetPhoto: value));
+  });
+}/// Create a copy of IndividualPokeModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ChatPokePromptModelCopyWith<$Res>? get targetPrompt {
+    if (_self.targetPrompt == null) {
+    return null;
+  }
+
+  return $ChatPokePromptModelCopyWith<$Res>(_self.targetPrompt!, (value) {
+    return _then(_self.copyWith(targetPrompt: value));
+  });
+}
+}
+
+
+/// Adds pattern-matching-related methods to [IndividualPokeModel].
+extension IndividualPokeModelPatterns on IndividualPokeModel {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _IndividualPokeModel value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _IndividualPokeModel() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _IndividualPokeModel value)  $default,){
+final _that = this;
+switch (_that) {
+case _IndividualPokeModel():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _IndividualPokeModel value)?  $default,){
+final _that = this;
+switch (_that) {
+case _IndividualPokeModel() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  ChatPokeUserModel? fromUser,  String? toUserId,  String message, @JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable)  DateTime? createdAt,  String? status,  String? targetType,  String? targetId,  String? direction,  PokePhotoDetail? targetPhoto,  ChatPokePromptModel? targetPrompt)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _IndividualPokeModel() when $default != null:
 return $default(_that.id,_that.fromUser,_that.toUserId,_that.message,_that.createdAt,_that.status,_that.targetType,_that.targetId,_that.direction,_that.targetPhoto,_that.targetPrompt);case _:
   return orElse();
 
@@ -1751,7 +2065,7 @@ return $default(_that.id,_that.fromUser,_that.toUserId,_that.message,_that.creat
 
 @optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  ChatPokeUserModel? fromUser,  String? toUserId,  String message, @JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable)  DateTime? createdAt,  String? status,  String? targetType,  String? targetId,  String? direction,  PokePhotoDetail? targetPhoto,  ChatPokePromptModel? targetPrompt)  $default,) {final _that = this;
 switch (_that) {
-case _ChatPokeModel():
+case _IndividualPokeModel():
 return $default(_that.id,_that.fromUser,_that.toUserId,_that.message,_that.createdAt,_that.status,_that.targetType,_that.targetId,_that.direction,_that.targetPhoto,_that.targetPrompt);case _:
   throw StateError('Unexpected subclass');
 
@@ -1771,7 +2085,7 @@ return $default(_that.id,_that.fromUser,_that.toUserId,_that.message,_that.creat
 
 @optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  ChatPokeUserModel? fromUser,  String? toUserId,  String message, @JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable)  DateTime? createdAt,  String? status,  String? targetType,  String? targetId,  String? direction,  PokePhotoDetail? targetPhoto,  ChatPokePromptModel? targetPrompt)?  $default,) {final _that = this;
 switch (_that) {
-case _ChatPokeModel() when $default != null:
+case _IndividualPokeModel() when $default != null:
 return $default(_that.id,_that.fromUser,_that.toUserId,_that.message,_that.createdAt,_that.status,_that.targetType,_that.targetId,_that.direction,_that.targetPhoto,_that.targetPrompt);case _:
   return null;
 
@@ -1783,9 +2097,9 @@ return $default(_that.id,_that.fromUser,_that.toUserId,_that.message,_that.creat
 /// @nodoc
 @JsonSerializable()
 
-class _ChatPokeModel implements ChatPokeModel {
-  const _ChatPokeModel({required this.id, this.fromUser, this.toUserId, this.message = '', @JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable) this.createdAt, this.status, this.targetType, this.targetId, this.direction, this.targetPhoto, this.targetPrompt});
-  factory _ChatPokeModel.fromJson(Map<String, dynamic> json) => _$ChatPokeModelFromJson(json);
+class _IndividualPokeModel implements IndividualPokeModel {
+  const _IndividualPokeModel({required this.id, this.fromUser, this.toUserId, this.message = '', @JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable) this.createdAt, this.status, this.targetType, this.targetId, this.direction, this.targetPhoto, this.targetPrompt});
+  factory _IndividualPokeModel.fromJson(Map<String, dynamic> json) => _$IndividualPokeModelFromJson(json);
 
 @override final  String id;
 @override final  ChatPokeUserModel? fromUser;
@@ -1799,20 +2113,20 @@ class _ChatPokeModel implements ChatPokeModel {
 @override final  PokePhotoDetail? targetPhoto;
 @override final  ChatPokePromptModel? targetPrompt;
 
-/// Create a copy of ChatPokeModel
+/// Create a copy of IndividualPokeModel
 /// with the given fields replaced by the non-null parameter values.
 @override @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-_$ChatPokeModelCopyWith<_ChatPokeModel> get copyWith => __$ChatPokeModelCopyWithImpl<_ChatPokeModel>(this, _$identity);
+_$IndividualPokeModelCopyWith<_IndividualPokeModel> get copyWith => __$IndividualPokeModelCopyWithImpl<_IndividualPokeModel>(this, _$identity);
 
 @override
 Map<String, dynamic> toJson() {
-  return _$ChatPokeModelToJson(this, );
+  return _$IndividualPokeModelToJson(this, );
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChatPokeModel&&(identical(other.id, id) || other.id == id)&&(identical(other.fromUser, fromUser) || other.fromUser == fromUser)&&(identical(other.toUserId, toUserId) || other.toUserId == toUserId)&&(identical(other.message, message) || other.message == message)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.status, status) || other.status == status)&&(identical(other.targetType, targetType) || other.targetType == targetType)&&(identical(other.targetId, targetId) || other.targetId == targetId)&&(identical(other.direction, direction) || other.direction == direction)&&(identical(other.targetPhoto, targetPhoto) || other.targetPhoto == targetPhoto)&&(identical(other.targetPrompt, targetPrompt) || other.targetPrompt == targetPrompt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _IndividualPokeModel&&(identical(other.id, id) || other.id == id)&&(identical(other.fromUser, fromUser) || other.fromUser == fromUser)&&(identical(other.toUserId, toUserId) || other.toUserId == toUserId)&&(identical(other.message, message) || other.message == message)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.status, status) || other.status == status)&&(identical(other.targetType, targetType) || other.targetType == targetType)&&(identical(other.targetId, targetId) || other.targetId == targetId)&&(identical(other.direction, direction) || other.direction == direction)&&(identical(other.targetPhoto, targetPhoto) || other.targetPhoto == targetPhoto)&&(identical(other.targetPrompt, targetPrompt) || other.targetPrompt == targetPrompt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1821,15 +2135,15 @@ int get hashCode => Object.hash(runtimeType,id,fromUser,toUserId,message,created
 
 @override
 String toString() {
-  return 'ChatPokeModel(id: $id, fromUser: $fromUser, toUserId: $toUserId, message: $message, createdAt: $createdAt, status: $status, targetType: $targetType, targetId: $targetId, direction: $direction, targetPhoto: $targetPhoto, targetPrompt: $targetPrompt)';
+  return 'IndividualPokeModel(id: $id, fromUser: $fromUser, toUserId: $toUserId, message: $message, createdAt: $createdAt, status: $status, targetType: $targetType, targetId: $targetId, direction: $direction, targetPhoto: $targetPhoto, targetPrompt: $targetPrompt)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class _$ChatPokeModelCopyWith<$Res> implements $ChatPokeModelCopyWith<$Res> {
-  factory _$ChatPokeModelCopyWith(_ChatPokeModel value, $Res Function(_ChatPokeModel) _then) = __$ChatPokeModelCopyWithImpl;
+abstract mixin class _$IndividualPokeModelCopyWith<$Res> implements $IndividualPokeModelCopyWith<$Res> {
+  factory _$IndividualPokeModelCopyWith(_IndividualPokeModel value, $Res Function(_IndividualPokeModel) _then) = __$IndividualPokeModelCopyWithImpl;
 @override @useResult
 $Res call({
  String id, ChatPokeUserModel? fromUser, String? toUserId, String message,@JsonKey(fromJson: _dateTimeFromJsonNullable, toJson: _dateTimeToJsonNullable) DateTime? createdAt, String? status, String? targetType, String? targetId, String? direction, PokePhotoDetail? targetPhoto, ChatPokePromptModel? targetPrompt
@@ -1840,17 +2154,17 @@ $Res call({
 
 }
 /// @nodoc
-class __$ChatPokeModelCopyWithImpl<$Res>
-    implements _$ChatPokeModelCopyWith<$Res> {
-  __$ChatPokeModelCopyWithImpl(this._self, this._then);
+class __$IndividualPokeModelCopyWithImpl<$Res>
+    implements _$IndividualPokeModelCopyWith<$Res> {
+  __$IndividualPokeModelCopyWithImpl(this._self, this._then);
 
-  final _ChatPokeModel _self;
-  final $Res Function(_ChatPokeModel) _then;
+  final _IndividualPokeModel _self;
+  final $Res Function(_IndividualPokeModel) _then;
 
-/// Create a copy of ChatPokeModel
+/// Create a copy of IndividualPokeModel
 /// with the given fields replaced by the non-null parameter values.
 @override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? fromUser = freezed,Object? toUserId = freezed,Object? message = null,Object? createdAt = freezed,Object? status = freezed,Object? targetType = freezed,Object? targetId = freezed,Object? direction = freezed,Object? targetPhoto = freezed,Object? targetPrompt = freezed,}) {
-  return _then(_ChatPokeModel(
+  return _then(_IndividualPokeModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,fromUser: freezed == fromUser ? _self.fromUser : fromUser // ignore: cast_nullable_to_non_nullable
 as ChatPokeUserModel?,toUserId: freezed == toUserId ? _self.toUserId : toUserId // ignore: cast_nullable_to_non_nullable
@@ -1866,7 +2180,7 @@ as ChatPokePromptModel?,
   ));
 }
 
-/// Create a copy of ChatPokeModel
+/// Create a copy of IndividualPokeModel
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
@@ -1878,7 +2192,7 @@ $ChatPokeUserModelCopyWith<$Res>? get fromUser {
   return $ChatPokeUserModelCopyWith<$Res>(_self.fromUser!, (value) {
     return _then(_self.copyWith(fromUser: value));
   });
-}/// Create a copy of ChatPokeModel
+}/// Create a copy of IndividualPokeModel
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
@@ -1890,7 +2204,7 @@ $PokePhotoDetailCopyWith<$Res>? get targetPhoto {
   return $PokePhotoDetailCopyWith<$Res>(_self.targetPhoto!, (value) {
     return _then(_self.copyWith(targetPhoto: value));
   });
-}/// Create a copy of ChatPokeModel
+}/// Create a copy of IndividualPokeModel
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
