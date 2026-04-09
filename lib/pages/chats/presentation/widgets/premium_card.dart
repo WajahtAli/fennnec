@@ -4,7 +4,6 @@ import 'package:fennac_app/app/theme/app_emojis.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
-import 'package:fennac_app/helpers/gradient_toast.dart';
 import 'package:fennac_app/pages/buy_poke/presentation/bloc/cubit/poke_cubit.dart';
 import 'package:fennac_app/pages/chats/presentation/bloc/cubit/chat_landing_cubit.dart';
 import 'package:fennac_app/pages/chats/presentation/bloc/state/chat_landing_state.dart';
@@ -14,6 +13,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:lottie/lottie.dart';
+
+import '../../../buy_poke/presentation/bloc/state/poke_state.dart';
 
 class PremiumCard extends StatelessWidget {
   final bool? isGradientTitle;
@@ -173,8 +174,9 @@ class PremiumCard extends StatelessWidget {
                       ],
                     ),
                     const CustomSizedBox(height: 20),
-                    Builder(
-                      builder: (context) {
+                    BlocBuilder<PokeCubit, PokeState>(
+                      bloc: Di().sl<PokeCubit>(),
+                      builder: (context, state) {
                         final pokeCubit = Di().sl<PokeCubit>();
                         return Column(
                           children: [
@@ -191,11 +193,10 @@ class PremiumCard extends StatelessWidget {
                                   : const SizedBox.shrink(),
                               isLoading: pokeCubit.isSubscriptionPurchasing,
                               onTap: () {
-                                VxToast.show(
-                                  message: 'Upgrade feature coming soon!',
-                                );
-                                // todo
-                                // pokeCubit.purchaseSubscription('monthly');
+                                // VxToast.show(
+                                //   message: 'Upgrade feature coming soon!',
+                                // );
+                                pokeCubit.purchaseSubscription('monthly');
                               },
                             ),
                             // const CustomSizedBox(height: 12),

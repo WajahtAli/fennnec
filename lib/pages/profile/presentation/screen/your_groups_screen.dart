@@ -74,10 +74,9 @@ class _YourGroupsScreenState extends State<YourGroupsScreen> {
                           .sl<LoginCubit>()
                           .userData
                           ?.user
-                          ?.accountStatus
-                          ?.toLowerCase() ==
-                      'active'.toLowerCase())
-                    PremiumCard(isGradientTitle: true),
+                          ?.subscriptionActive ==
+                      false)
+                    const PremiumCard(),
                   CustomSizedBox(height: 10),
                   Align(
                     alignment: Alignment.centerLeft,

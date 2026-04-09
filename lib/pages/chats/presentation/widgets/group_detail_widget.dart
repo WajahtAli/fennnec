@@ -1,25 +1,29 @@
 import 'package:fennac_app/app/constants/media_query_constants.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
-import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../bloc/cubit/chat_landing_cubit.dart';
-import '../bloc/state/chat_landing_state.dart';
+import '../bloc/cubit/group_details_tab_cubit.dart';
+import '../bloc/state/group_details_tab_state.dart';
 
-class ChatTabSelector extends StatelessWidget {
+class GroupDetailWidget extends StatelessWidget {
   final String? title1;
   final String? title2;
-  final bool? isChatTab;
+  final GroupDetailsTabCubit tabCubit;
 
-  const ChatTabSelector({super.key, this.title1, this.title2, this.isChatTab});
+  const GroupDetailWidget({
+    super.key,
+    this.title1,
+    this.title2,
+    required this.tabCubit,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ChatLandingCubit, ChatLandingState>(
-      bloc: _chatLandingCubit,
+    return BlocBuilder<GroupDetailsTabCubit, GroupDetailsTabState>(
+      bloc: tabCubit,
       builder: (context, state) {
         return Container(
           height: 36,
@@ -36,7 +40,7 @@ class ChatTabSelector extends StatelessWidget {
             children: [
               Expanded(
                 child: GestureDetector(
-                  onTap: () => _chatLandingCubit.selectTab(0),
+                  onTap: () => tabCubit.selectTab(0),
                   child: Container(
                     decoration: BoxDecoration(
                       color: state.selectedTab == 0
@@ -46,7 +50,7 @@ class ChatTabSelector extends StatelessWidget {
                     ),
                     alignment: Alignment.center,
                     child: AppText(
-                      text: title1 ?? 'Pokes',
+                      text: title1 ?? '',
                       style: AppTextStyles.subHeading(context).copyWith(
                         color: state.selectedTab == 0
                             ? ColorPalette.white
@@ -58,36 +62,13 @@ class ChatTabSelector extends StatelessWidget {
                   ),
                 ),
               ),
+
               Expanded(
                 child: GestureDetector(
-                  onTap: () => _chatLandingCubit.selectTab(1),
+                  onTap: () => tabCubit.selectTab(1),
                   child: Container(
                     decoration: BoxDecoration(
                       color: state.selectedTab == 1
-                          ? ColorPalette.primary
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(100),
-                    ),
-                    alignment: Alignment.center,
-                    child: AppText(
-                      text: title1 ?? 'Chats',
-                      style: AppTextStyles.subHeading(context).copyWith(
-                        color: state.selectedTab == 1
-                            ? ColorPalette.white
-                            : isLightTheme(context)
-                            ? ColorPalette.black
-                            : ColorPalette.white,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: GestureDetector(
-                  onTap: () => _chatLandingCubit.selectTab(2),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: state.selectedTab == 2
                           ? ColorPalette.primary
                           : isLightTheme(context)
                           ? ColorPalette.textSecondary
@@ -96,9 +77,9 @@ class ChatTabSelector extends StatelessWidget {
                     ),
                     alignment: Alignment.center,
                     child: AppText(
-                      text: title2 ?? 'Calls',
+                      text: title2 ?? '',
                       style: AppTextStyles.subHeading(context).copyWith(
-                        color: state.selectedTab == 2
+                        color: state.selectedTab == 1
                             ? ColorPalette.white
                             : isLightTheme(context)
                             ? ColorPalette.black
@@ -115,5 +96,3 @@ class ChatTabSelector extends StatelessWidget {
     );
   }
 }
-
-final ChatLandingCubit _chatLandingCubit = Di().sl<ChatLandingCubit>();

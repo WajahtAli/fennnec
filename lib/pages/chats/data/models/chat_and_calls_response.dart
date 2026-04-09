@@ -24,6 +24,10 @@ DateTime _dateTimeFromJson(dynamic value) {
 
 String _dateTimeToJson(DateTime dateTime) => dateTime.toIso8601String();
 
+// ─────────────────────────────────────────────
+// TOP-LEVEL RESPONSE
+// ─────────────────────────────────────────────
+
 @freezed
 abstract class ChatAndCallsResponse with _$ChatAndCallsResponse {
   const factory ChatAndCallsResponse({
@@ -41,13 +45,18 @@ abstract class ChatAndCallsData with _$ChatAndCallsData {
   const factory ChatAndCallsData({
     required List<ChatModel> chats,
     required List<CallModel> calls,
-    @Default([]) List<MemberModel> members, // added
+    @Default([]) List<MemberModel> members,
+    @Default([]) List<ChatPokeModel> pokes, // moved from ChatModel to top-level
     required PaginationModel pagination,
   }) = _ChatAndCallsData;
 
   factory ChatAndCallsData.fromJson(Map<String, dynamic> json) =>
       _$ChatAndCallsDataFromJson(json);
 }
+
+// ─────────────────────────────────────────────
+// CHAT MODELS
+// ─────────────────────────────────────────────
 
 @freezed
 abstract class ChatModel with _$ChatModel {
@@ -65,14 +74,52 @@ abstract class ChatModel with _$ChatModel {
     DateTime? lastMessageAt,
     String? fromUserId,
     required int unreadCount,
-    @Default([]) List<ChatPokeModel> pokes,
     @Default(ChatMetaModel()) ChatMetaModel meta,
     List<MemberModel>? members,
+    MatchedGroupDetailsModel? matchedGroupDetails, // new field from JSON
   }) = _ChatModel;
 
   factory ChatModel.fromJson(Map<String, dynamic> json) =>
       _$ChatModelFromJson(json);
 }
+
+// ─────────────────────────────────────────────
+// MATCHED GROUP DETAILS (new model)
+// ─────────────────────────────────────────────
+
+@freezed
+abstract class MatchedGroupDetailsModel with _$MatchedGroupDetailsModel {
+  const factory MatchedGroupDetailsModel({
+    String? id,
+    String? title,
+    @Default([]) List<ChatGroupMemberUserModel> members,
+    ChatAboutGroupModel? about,
+    @Default([]) List<SharedMediaModel> sharedMedia,
+  }) = _MatchedGroupDetailsModel;
+
+  factory MatchedGroupDetailsModel.fromJson(Map<String, dynamic> json) =>
+      _$MatchedGroupDetailsModelFromJson({
+        ...json,
+        'id': json['id'] ?? json['_id'] ?? '',
+      });
+}
+
+// ─────────────────────────────────────────────
+// SHARED MEDIA (new model — was List<String>, now object)
+// ─────────────────────────────────────────────
+
+@freezed
+abstract class SharedMediaModel with _$SharedMediaModel {
+  const factory SharedMediaModel({required String url, String? type}) =
+      _SharedMediaModel;
+
+  factory SharedMediaModel.fromJson(Map<String, dynamic> json) =>
+      _$SharedMediaModelFromJson(json);
+}
+
+// ─────────────────────────────────────────────
+// POKE MODELS
+// ─────────────────────────────────────────────
 
 @freezed
 abstract class ChatPokeModel with _$ChatPokeModel {
@@ -134,6 +181,10 @@ abstract class ChatPokePromptModel with _$ChatPokePromptModel {
       });
 }
 
+// ─────────────────────────────────────────────
+// CHAT META
+// ─────────────────────────────────────────────
+
 @freezed
 abstract class ChatMetaModel with _$ChatMetaModel {
   const factory ChatMetaModel({
@@ -163,7 +214,8 @@ abstract class ChatGroupsDetailsModel with _$ChatGroupsDetailsModel {
     @Default([]) List<ChatGroupMemberUserModel> userGroupMembers,
     @Default([]) List<MatchedGroupMembersModel> matchedGroupMembers,
     ChatAboutGroupModel? aboutThisGroup,
-    @Default([]) List<String> sharedMedia,
+    @Default([])
+    List<SharedMediaModel> sharedMedia, // updated: was List<String>
     @Default([]) List<String> commonInterests,
     bool? isMatched,
   }) = _ChatGroupsDetailsModel;
@@ -249,6 +301,10 @@ abstract class ChatDirectChatMetaModel with _$ChatDirectChatMetaModel {
       _$ChatDirectChatMetaModelFromJson(json);
 }
 
+// ─────────────────────────────────────────────
+// MEMBER MODEL
+// ─────────────────────────────────────────────
+
 @freezed
 abstract class MemberModel with _$MemberModel {
   const factory MemberModel({
@@ -260,6 +316,10 @@ abstract class MemberModel with _$MemberModel {
   factory MemberModel.fromJson(Map<String, dynamic> json) =>
       _$MemberModelFromJson({...json, 'id': json['id'] ?? json['_id'] ?? ''});
 }
+
+// ─────────────────────────────────────────────
+// CALL MODELS
+// ─────────────────────────────────────────────
 
 @freezed
 abstract class CallUserInfo with _$CallUserInfo {
@@ -285,21 +345,25 @@ abstract class CallModel with _$CallModel {
     String? duration,
     String? timeAgo,
     String? status,
-    String? channelName, // added
-    String? mediaType, // added
-    String? callType, // added
+    String? channelName,
+    String? mediaType,
+    String? callType,
     @JsonKey(
       fromJson: _dateTimeFromJsonNullable,
       toJson: _dateTimeToJsonNullable,
     )
-    DateTime? startedAt, // added
-    CallUserInfo? callerId, // added
-    List<CallUserInfo>? participantIds, // added
+    DateTime? startedAt,
+    CallUserInfo? callerId,
+    List<CallUserInfo>? participantIds,
   }) = _CallModel;
 
   factory CallModel.fromJson(Map<String, dynamic> json) =>
       _$CallModelFromJson({...json, 'id': json['id'] ?? json['_id'] ?? ''});
 }
+
+// ─────────────────────────────────────────────
+// PAGINATION
+// ─────────────────────────────────────────────
 
 @freezed
 abstract class PaginationModel with _$PaginationModel {
@@ -308,11 +372,16 @@ abstract class PaginationModel with _$PaginationModel {
     required int limit,
     required int totalChats,
     required int totalCalls,
+    @Default(0) int totalPokes, // new field
   }) = _PaginationModel;
 
   factory PaginationModel.fromJson(Map<String, dynamic> json) =>
       _$PaginationModelFromJson(json);
 }
+
+// ─────────────────────────────────────────────
+// POKE DETAIL RESPONSE
+// ─────────────────────────────────────────────
 
 @freezed
 abstract class PokeDetailResponse with _$PokeDetailResponse {
@@ -419,6 +488,10 @@ abstract class PokeAudioDetail with _$PokeAudioDetail {
   factory PokeAudioDetail.fromJson(Map<String, dynamic> json) =>
       _$PokeAudioDetailFromJson(json);
 }
+
+// ─────────────────────────────────────────────
+// POKE START CHAT
+// ─────────────────────────────────────────────
 
 @freezed
 abstract class PokeStartChatResponse with _$PokeStartChatResponse {

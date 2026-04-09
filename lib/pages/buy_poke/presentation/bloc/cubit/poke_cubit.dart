@@ -13,7 +13,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fennac_app/pages/buy_poke/data/datasource/iap_service.dart';
 
 class PokeCubit extends Cubit<PokeState> {
-  PurchaseSubscriptionUseCase? purchaseSubscriptionUseCase;
+  final PurchaseSubscriptionUseCase purchaseSubscriptionUseCase;
   final SendPokeUseCase _sendPokeUseCase;
 
   bool isSubscriptionPurchasing = false;
@@ -24,6 +24,7 @@ class PokeCubit extends Cubit<PokeState> {
   PokeCubit(
     this.fetchPokesUseCase,
     this.purchasePokesUseCase,
+    this.purchaseSubscriptionUseCase,
     this._sendPokeUseCase,
   ) : super(PokeInitial());
 
@@ -50,17 +51,31 @@ class PokeCubit extends Cubit<PokeState> {
     isSubscriptionPurchasing = true;
     emit(PokeLoading());
     try {
-      final isSuccess = await IAPService.purchaseProduct(productId);
-      if (isSuccess) {
-        final response = await purchaseSubscriptionUseCase?.call(
-          productId: productId,
-        );
-        final message = response?['message'] ?? 'Subscription purchased';
-        VxToast.show(message: message, icon: Assets.icons.checkGreen.path);
-        emit(PokeLoaded());
+      final response = await purchaseSubscriptionUseCase.call(
+        productId: productId,
+      );
+      log('Subscription purchase response: ${response.toString()}');
+      if (response['success'] == true) {
+        final message =
+            response['message'] ?? 'Subscription purchased successfully';
+        final data = response['data'] as Map<String, dynamic>?;
+        final isActive = data?['subscriptionActive'] == true;
+
+        if (isActive) {
+          Di().sl<CreateAccountCubit>().updateProfile();
+          isSubscriptionPurchasing = false;
+          VxToast.show(message: message, icon: Assets.icons.checkGreen.path);
+          emit(PokeLoaded());
+        } else {
+          isSubscriptionPurchasing = false;
+          VxToast.show(message: 'Subscription not activated');
+          emit(PokeError('Subscription not activated'));
+        }
       } else {
-        VxToast.show(message: 'Purchase cancelled or failed');
-        emit(PokeError('Purchase cancelled or failed'));
+        final message = response['message'] ?? 'Subscription failed';
+        VxToast.show(message: message);
+        isSubscriptionPurchasing = false;
+        emit(PokeError(message));
       }
     } catch (e) {
       VxToast.show(message: 'Subscription failed.');
@@ -76,7 +91,7 @@ class PokeCubit extends Cubit<PokeState> {
       final isSuccess = await IAPService.restorePurchases();
       if (isSuccess) {
         // Assume restoring also gives premium monthly for now.
-        await purchaseSubscriptionUseCase?.call(productId: 'monthly');
+        await purchaseSubscriptionUseCase.call(productId: 'monthly');
         VxToast.show(
           message: 'Purchases restored successfully',
           icon: Assets.icons.checkGreen.path,

@@ -35,6 +35,11 @@ _ChatAndCallsData _$ChatAndCallsDataFromJson(Map<String, dynamic> json) =>
               ?.map((e) => MemberModel.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
+      pokes:
+          (json['pokes'] as List<dynamic>?)
+              ?.map((e) => ChatPokeModel.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
       pagination: PaginationModel.fromJson(
         json['pagination'] as Map<String, dynamic>,
       ),
@@ -45,6 +50,7 @@ Map<String, dynamic> _$ChatAndCallsDataToJson(_ChatAndCallsData instance) =>
       'chats': instance.chats,
       'calls': instance.calls,
       'members': instance.members,
+      'pokes': instance.pokes,
       'pagination': instance.pagination,
     };
 
@@ -58,17 +64,17 @@ _ChatModel _$ChatModelFromJson(Map<String, dynamic> json) => _ChatModel(
   lastMessageAt: _dateTimeFromJsonNullable(json['lastMessageAt']),
   fromUserId: json['fromUserId'] as String?,
   unreadCount: (json['unreadCount'] as num).toInt(),
-  pokes:
-      (json['pokes'] as List<dynamic>?)
-          ?.map((e) => ChatPokeModel.fromJson(e as Map<String, dynamic>))
-          .toList() ??
-      const [],
   meta: json['meta'] == null
       ? const ChatMetaModel()
       : ChatMetaModel.fromJson(json['meta'] as Map<String, dynamic>),
   members: (json['members'] as List<dynamic>?)
       ?.map((e) => MemberModel.fromJson(e as Map<String, dynamic>))
       .toList(),
+  matchedGroupDetails: json['matchedGroupDetails'] == null
+      ? null
+      : MatchedGroupDetailsModel.fromJson(
+          json['matchedGroupDetails'] as Map<String, dynamic>,
+        ),
 );
 
 Map<String, dynamic> _$ChatModelToJson(_ChatModel instance) =>
@@ -82,10 +88,51 @@ Map<String, dynamic> _$ChatModelToJson(_ChatModel instance) =>
       'lastMessageAt': _dateTimeToJsonNullable(instance.lastMessageAt),
       'fromUserId': instance.fromUserId,
       'unreadCount': instance.unreadCount,
-      'pokes': instance.pokes,
       'meta': instance.meta,
       'members': instance.members,
+      'matchedGroupDetails': instance.matchedGroupDetails,
     };
+
+_MatchedGroupDetailsModel _$MatchedGroupDetailsModelFromJson(
+  Map<String, dynamic> json,
+) => _MatchedGroupDetailsModel(
+  id: json['id'] as String?,
+  title: json['title'] as String?,
+  members:
+      (json['members'] as List<dynamic>?)
+          ?.map(
+            (e) => ChatGroupMemberUserModel.fromJson(e as Map<String, dynamic>),
+          )
+          .toList() ??
+      const [],
+  about: json['about'] == null
+      ? null
+      : ChatAboutGroupModel.fromJson(json['about'] as Map<String, dynamic>),
+  sharedMedia:
+      (json['sharedMedia'] as List<dynamic>?)
+          ?.map((e) => SharedMediaModel.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+      const [],
+);
+
+Map<String, dynamic> _$MatchedGroupDetailsModelToJson(
+  _MatchedGroupDetailsModel instance,
+) => <String, dynamic>{
+  'id': instance.id,
+  'title': instance.title,
+  'members': instance.members,
+  'about': instance.about,
+  'sharedMedia': instance.sharedMedia,
+};
+
+_SharedMediaModel _$SharedMediaModelFromJson(Map<String, dynamic> json) =>
+    _SharedMediaModel(
+      url: json['url'] as String,
+      type: json['type'] as String?,
+    );
+
+Map<String, dynamic> _$SharedMediaModelToJson(_SharedMediaModel instance) =>
+    <String, dynamic>{'url': instance.url, 'type': instance.type};
 
 _ChatPokeModel _$ChatPokeModelFromJson(
   Map<String, dynamic> json,
@@ -235,7 +282,7 @@ _ChatGroupsDetailsModel _$ChatGroupsDetailsModelFromJson(
         ),
   sharedMedia:
       (json['sharedMedia'] as List<dynamic>?)
-          ?.map((e) => e as String)
+          ?.map((e) => SharedMediaModel.fromJson(e as Map<String, dynamic>))
           .toList() ??
       const [],
   commonInterests:
@@ -433,6 +480,7 @@ _PaginationModel _$PaginationModelFromJson(Map<String, dynamic> json) =>
       limit: (json['limit'] as num).toInt(),
       totalChats: (json['totalChats'] as num).toInt(),
       totalCalls: (json['totalCalls'] as num).toInt(),
+      totalPokes: (json['totalPokes'] as num?)?.toInt() ?? 0,
     );
 
 Map<String, dynamic> _$PaginationModelToJson(_PaginationModel instance) =>
@@ -441,6 +489,7 @@ Map<String, dynamic> _$PaginationModelToJson(_PaginationModel instance) =>
       'limit': instance.limit,
       'totalChats': instance.totalChats,
       'totalCalls': instance.totalCalls,
+      'totalPokes': instance.totalPokes,
     };
 
 _PokeDetailResponse _$PokeDetailResponseFromJson(Map<String, dynamic> json) =>

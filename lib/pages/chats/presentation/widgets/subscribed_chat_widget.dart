@@ -132,6 +132,7 @@ class _SubscribedChatWidgetState extends State<SubscribedChatWidget> {
                   itemCount: activeChats.length,
                   itemBuilder: (context, index) {
                     final chat = activeChats[index];
+
                     final isHighlighted = _tappedIndex == index;
                     final isGroup = chat.type == 'group';
                     final isOnline = chat.status.toLowerCase() == 'online';
@@ -167,33 +168,33 @@ class _SubscribedChatWidgetState extends State<SubscribedChatWidget> {
                             );
                             return;
                           }
-                          if (chat.pokes.isNotEmpty &&
-                              chat.pokes.first.status?.toLowerCase() ==
-                                  'started_chat') {
-                            final otherUserId =
-                                chat.meta.directChat?.otherUserId;
-                            context.router.push(
-                              GroupChatRoute(
-                                isGroup: false,
-                                groupId: otherUserId?.isNotEmpty == true
-                                    ? otherUserId!
-                                    : chat.id,
-                                contactAvatar: chat.image,
-                                contactName: chat.name,
-                                isOnline: isOnline,
-                                otherGroupId: chat.type == 'group'
-                                    ? (chat.meta.receiverGroupId ??
-                                          chat
-                                              .meta
-                                              .groupsDetails
-                                              ?.matchedGroupMembers
-                                              .firstOrNull
-                                              ?.groupId)
-                                    : null,
-                              ),
-                            );
-                            return;
-                          }
+                          // if (chat.pokes.isNotEmpty &&
+                          //     chat.pokes.first.status?.toLowerCase() ==
+                          //         'started_chat') {
+                          //   final otherUserId =
+                          //       chat.meta.directChat?.otherUserId;
+                          //   context.router.push(
+                          //     GroupChatRoute(
+                          //       isGroup: false,
+                          //       groupId: otherUserId?.isNotEmpty == true
+                          //           ? otherUserId!
+                          //           : chat.id,
+                          //       contactAvatar: chat.image,
+                          //       contactName: chat.name,
+                          //       isOnline: isOnline,
+                          //       otherGroupId: chat.type == 'group'
+                          //           ? (chat.meta.receiverGroupId ??
+                          //                 chat
+                          //                     .meta
+                          //                     .groupsDetails
+                          //                     ?.matchedGroupMembers
+                          //                     .firstOrNull
+                          //                     ?.groupId)
+                          //           : null,
+                          //     ),
+                          //   );
+                          //   return;
+                          // }
                           await _openPokeDetailIfAllowed(context, pokeId);
                           return;
                         }
@@ -312,10 +313,10 @@ class _SubscribedChatWidgetState extends State<SubscribedChatWidget> {
     final fromMetaId = chat.meta.latestPoke?.id;
     if (fromMetaId != null && fromMetaId.isNotEmpty) return fromMetaId;
 
-    if (chat.pokes.isNotEmpty) {
-      final fromPokes = chat.pokes.first.id;
-      if (fromPokes.isNotEmpty) return fromPokes;
-    }
+    // if (chat.pokes.isNotEmpty) {
+    //   final fromPokes = chat.pokes.first.id;
+    //   if (fromPokes.isNotEmpty) return fromPokes;
+    // }
 
     return null;
   }

@@ -11,10 +11,11 @@ import 'package:fennac_app/pages/chats/data/models/chat_and_calls_response.dart'
 import 'package:fennac_app/pages/chats/data/models/message_model.dart';
 import 'package:fennac_app/pages/chats/data/models/message_type_enum.dart';
 import 'package:fennac_app/pages/chats/presentation/bloc/cubit/chat_landing_cubit.dart';
+import 'package:fennac_app/pages/chats/presentation/bloc/cubit/group_details_tab_cubit.dart';
 import 'package:fennac_app/pages/chats/presentation/bloc/cubit/message_cubit.dart';
-import 'package:fennac_app/pages/chats/presentation/bloc/state/chat_landing_state.dart';
-import 'package:fennac_app/pages/chats/presentation/widgets/chat_tab_selector.dart';
+import 'package:fennac_app/pages/chats/presentation/bloc/state/group_details_tab_state.dart';
 import 'package:fennac_app/pages/chats/presentation/widgets/group_detail_members_avatar.dart';
+import 'package:fennac_app/pages/chats/presentation/widgets/group_detail_widget.dart';
 import 'package:fennac_app/pages/my_group/data/model/my_group_model.dart';
 import 'package:fennac_app/pages/my_group/presentation/bloc/state/my_group_state.dart';
 import 'package:fennac_app/pages/dashboard/presentation/bloc/cubit/dashboard_cubit.dart';
@@ -58,12 +59,14 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
 
   late final MyGroupCubit _myGroupCubit;
   late final ChatLandingCubit _chatLandingCubit;
+  late final GroupDetailsTabCubit _groupDetailsTabCubit;
 
   @override
   void initState() {
     super.initState();
     _myGroupCubit = Di().sl<MyGroupCubit>();
     _chatLandingCubit = Di().sl<ChatLandingCubit>();
+    _groupDetailsTabCubit = GroupDetailsTabCubit();
     if ((widget.contactName ?? '').isNotEmpty) {
       _nameController.text = widget.contactName!;
     }
@@ -73,6 +76,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
   void dispose() {
     _blurNotifier.dispose();
     _nameController.dispose();
+    _groupDetailsTabCubit.close();
     super.dispose();
   }
 
@@ -224,10 +228,14 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
             ),
           ),
           const CustomSizedBox(height: 20),
-          ChatTabSelector(title1: 'About This Group', title2: 'Shared Media'),
+          GroupDetailWidget(
+            title1: 'About This Group',
+            title2: 'Shared Media',
+            tabCubit: _groupDetailsTabCubit,
+          ),
           const CustomSizedBox(height: 20),
-          BlocBuilder<ChatLandingCubit, ChatLandingState>(
-            bloc: _chatLandingCubit,
+          BlocBuilder<GroupDetailsTabCubit, GroupDetailsTabState>(
+            bloc: _groupDetailsTabCubit,
             builder: (context, state) {
               final selectedTab = state.selectedTab;
               return selectedTab == 0

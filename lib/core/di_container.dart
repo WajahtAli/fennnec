@@ -264,6 +264,9 @@ class Di {
     sl.registerLazySingleton<PurchasePokesUseCase>(
       () => PurchasePokesUseCase(sl()),
     );
+    sl.registerLazySingleton<PurchaseSubscriptionUseCase>(
+      () => PurchaseSubscriptionUseCase(sl()),
+    );
     sl.registerLazySingleton<LikedGroupsUsecase>(
       () => LikedGroupsUsecase(sl()),
     );
@@ -316,7 +319,9 @@ class Di {
     sl.registerLazySingleton<MyGroupCubit>(() => MyGroupCubit(sl()));
     sl.registerLazySingleton<GoogleMapCubit>(() => GoogleMapCubit());
     sl.registerLazySingleton<ContactListCubit>(() => ContactListCubit(sl()));
-    sl.registerLazySingleton<PokeCubit>(() => PokeCubit(sl(), sl(), sl()));
+    sl.registerLazySingleton<PokeCubit>(
+      () => PokeCubit(sl(), sl(), sl(), sl()),
+    );
     sl.registerLazySingleton<GetPokedDetailsCubit>(
       () => GetPokedDetailsCubit(sl()),
     );

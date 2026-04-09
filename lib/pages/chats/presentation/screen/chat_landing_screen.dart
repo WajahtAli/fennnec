@@ -7,6 +7,7 @@ import 'package:fennac_app/core/sockets/sockets_service.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:fennac_app/helpers/gradient_toast.dart';
 import 'package:fennac_app/pages/auth/presentation/bloc/cubit/login_cubit.dart';
+import 'package:fennac_app/pages/chats/data/repository/chat_repository.dart';
 import 'package:fennac_app/pages/chats/presentation/bloc/cubit/chat_landing_cubit.dart';
 import 'package:fennac_app/pages/chats/presentation/bloc/state/chat_landing_state.dart';
 import 'package:fennac_app/pages/chats/presentation/widgets/call_history_item.dart';
@@ -39,6 +40,7 @@ class ChatLandingScreen extends StatefulWidget {
 
 class _ChatLandingScreenState extends State<ChatLandingScreen> {
   final ChatLandingCubit _chatLandingCubit = Di().sl<ChatLandingCubit>();
+  bool _isCheckingPokeAccess = false;
 
   @override
   void initState() {
@@ -69,10 +71,12 @@ class _ChatLandingScreenState extends State<ChatLandingScreen> {
               child: Column(
                 children: [
                   const CustomSizedBox(height: 16),
-                  ChatTabSelector(),
+                  ChatTabSelector(isChatTab: true),
                   const CustomSizedBox(height: 8),
                   Expanded(
                     child: state.selectedTab == 0
+                        ? _buildPokesContent(state)
+                        : state.selectedTab == 1
                         ? _buildChatsContent(state)
                         : _buildCallsContent(),
                   ),
@@ -146,6 +150,94 @@ class _ChatLandingScreenState extends State<ChatLandingScreen> {
     );
   }
 
+  Widget _buildPokesContent(ChatLandingState state) {
+    final pokeChats = state.chats.where((chat) => chat.type == 'poke').toList();
+
+    return RefreshIndicator(
+      color: ColorPalette.primary,
+      backgroundColor: Colors.white,
+      onRefresh: () => _chatLandingCubit.fetchChatsAndCalls(),
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: [
+          const CustomSizedBox(height: 16),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Text(
+              'Pokes',
+              style: AppTextStyles.subHeading(
+                context,
+              ).copyWith(fontWeight: FontWeight.w600),
+            ),
+          ),
+          const CustomSizedBox(height: 8),
+          if (state.isLoadingData && pokeChats.isEmpty)
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 24),
+              child: PokePackSkeleton(itemCount: 1),
+            )
+          else if (pokeChats.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: EmptyWidget(
+                title: 'No pokes yet',
+                description:
+                    'Pokes you receive will show up here so you can review them.',
+                imagePath: Assets.icons.noLikes.path,
+                showButton: true,
+                buttonText: 'Refresh',
+                onButtonTap: () {
+                  _chatLandingCubit.fetchChatsAndCalls();
+                },
+              ),
+            )
+          else
+            ...pokeChats.map((chat) {
+              return AppInkWell(
+                onTap: () async {
+                  final pokeId = _resolvePokeId(chat);
+
+                  if ((pokeId == null || pokeId.isEmpty) &&
+                      chat.meta.hasStartedChat &&
+                      (chat.meta.directChat?.otherUserId?.isNotEmpty ??
+                          false)) {
+                    context.router.push(
+                      GroupChatRoute(
+                        isGroup: false,
+                        groupId: chat.meta.directChat!.otherUserId!,
+                        contactAvatar: chat.image,
+                        contactName: chat.name,
+                        isOnline: chat.status.toLowerCase() == 'online',
+                      ),
+                    );
+                    return;
+                  }
+
+                  await _openPokeDetailIfAllowed(context, pokeId);
+                },
+                child: CallHistoryItem(
+                  name: chat.name,
+                  avatar: chat.image,
+                  unreadCount: chat.unreadCount,
+                  timeAgo: chat.lastMessageAt != null
+                      ? _getTimeAgo(chat.lastMessageAt!)
+                      : '',
+                  isPoked: true,
+                  lastMessage: chat.lastMessage,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  showBorder: chat != pokeChats.last,
+                ),
+              );
+            }),
+          CustomSizedBox(height: MediaQuery.paddingOf(context).bottom + 30),
+        ],
+      ),
+    );
+  }
+
   Widget _buildChatMemberItem(ChatModel chat) {
     final isGroup = chat.type == 'group';
     return AppInkWell(
@@ -181,6 +273,48 @@ class _ChatLandingScreenState extends State<ChatLandingScreen> {
     } else {
       return 'just now';
     }
+  }
+
+  Future<void> _openPokeDetailIfAllowed(
+    BuildContext context,
+    String? pokeId,
+  ) async {
+    if (_isCheckingPokeAccess) return;
+
+    if (pokeId == null || pokeId.isEmpty) {
+      VxToast.show(message: 'Poke details are unavailable right now.');
+      return;
+    }
+
+    _isCheckingPokeAccess = true;
+    try {
+      final response = await Di().sl<ChatRepository>().getPokeDetail(pokeId);
+      if (!context.mounted) return;
+
+      if (response.success) {
+        context.router.push(GetPockedRoute(pokeId: pokeId));
+      } else {
+        VxToast.show(message: response.message);
+      }
+    } catch (e) {
+      if (!context.mounted) return;
+      final message = e.toString().replaceFirst('Exception: ', '').trim();
+      VxToast.show(
+        message: message.isNotEmpty ? message : 'Unable to open poke details.',
+      );
+    } finally {
+      _isCheckingPokeAccess = false;
+    }
+  }
+
+  String? _resolvePokeId(ChatModel chat) {
+    final fromMeta = chat.meta.latestPoke?.pokeId;
+    if (fromMeta != null && fromMeta.isNotEmpty) return fromMeta;
+
+    final fromMetaId = chat.meta.latestPoke?.id;
+    if (fromMetaId != null && fromMetaId.isNotEmpty) return fromMetaId;
+
+    return null;
   }
 
   Widget _buildCallsContent() {
