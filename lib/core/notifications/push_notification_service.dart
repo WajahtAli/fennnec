@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/pages/auth/presentation/bloc/cubit/create_account_cubit.dart';
@@ -16,7 +17,9 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     'Background message received: ${message.notification?.title}, ${message.notification?.body}',
   );
   if (message.data['type'] == 'call_incoming') {
-    await CallNotificationHandler.handleCallNotification(message);
+    if (Platform.isAndroid) {
+      await CallNotificationHandler.handleCallNotification(message);
+    }
   } else if (message.data['type'] == 'call_ended') {
     FlutterCallkitIncoming.endAllCalls();
   } else {
@@ -83,7 +86,9 @@ class PushNotificationService {
     );
 
     if (message.data['type'] == 'call_incoming') {
-      CallNotificationHandler.handleCallNotification(message);
+      if (Platform.isAndroid) {
+        CallNotificationHandler.handleCallNotification(message);
+      }
     } else if (message.data['type'] == 'call_ended') {
       FlutterCallkitIncoming.endAllCalls();
     } else if (message.notification != null) {
