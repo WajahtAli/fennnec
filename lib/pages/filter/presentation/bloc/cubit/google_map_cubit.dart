@@ -155,6 +155,13 @@ class GoogleMapCubit extends Cubit<GoogleMapState> {
     emit(GoogleMapStateCameraMoved());
   }
 
+  void setInitialSelectedLocation({
+    required double latitude,
+    required double longitude,
+  }) {
+    selectedMapCenter = LatLng(latitude, longitude);
+  }
+
   void changeIndex(int index) {
     emit(GoogleMapStateChangingRideIndex());
     selectedRideIndex = index;

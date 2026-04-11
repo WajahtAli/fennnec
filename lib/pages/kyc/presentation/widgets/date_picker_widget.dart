@@ -221,21 +221,33 @@ class _DatePickerWidgetState extends State<DatePickerWidget> {
       right: 0,
       height: getWidth(context) > 500 ? 90 : 70,
       child: IgnorePointer(
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: isTop ? Alignment.topCenter : Alignment.bottomCenter,
-              end: isTop ? Alignment.bottomCenter : Alignment.topCenter,
-              colors: [
-                isLightTheme(context)
-                    ? ColorPalette.textGrey
-                    : ColorPalette.secondary,
-                isLightTheme(context)
-                    ? ColorPalette.textGrey.withValues(alpha: 0)
-                    : ColorPalette.secondary.withValues(alpha: 0),
-              ],
-            ),
-          ),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            int steps = 60;
+            return Stack(
+              children: List.generate(steps, (index) {
+                double fraction = index / (steps);
+                // Both top and bottom now use the same pattern
+                double effectiveFraction = 1 - fraction;
+                double sigmaY = 0.5 + effectiveFraction * 10;
+                double sigmaX = 0.3 + effectiveFraction * 6;
+
+                return Positioned(
+                  top: isTop ? (constraints.maxHeight * fraction) : null,
+                  bottom: isTop ? null : (constraints.maxHeight * fraction),
+                  left: 0,
+                  right: 0,
+                  height: constraints.maxHeight / steps,
+                  child: ClipRect(
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: sigmaX, sigmaY: sigmaY),
+                      child: Container(color: Colors.transparent),
+                    ),
+                  ),
+                );
+              }),
+            );
+          },
         ),
       ),
     );
@@ -248,38 +260,34 @@ class _DatePickerWidgetState extends State<DatePickerWidget> {
     required String Function(dynamic) formatter,
     required VoidCallback onChanged,
   }) {
-    return ListWheelScrollView.useDelegate(
-      controller: controller,
-      itemExtent: 55,
-      physics: const FixedExtentScrollPhysics(),
-      onSelectedItemChanged: (_) => onChanged(),
-      perspective: 0.002,
-      diameterRatio: 2,
-      squeeze: 1.25,
-      useMagnifier: true,
-      magnification: 1.2,
-      childDelegate: ListWheelChildBuilderDelegate(
-        builder: (context, index) {
-          return ListenableBuilder(
-            listenable: controller,
-            builder: (context, _) {
+    return AnimatedBuilder(
+      animation: controller,
+      builder: (context, _) {
+        return ListWheelScrollView.useDelegate(
+          controller: controller,
+          itemExtent: 55,
+          physics: const FixedExtentScrollPhysics(),
+          onSelectedItemChanged: (_) => onChanged(),
+          perspective: 0.002,
+          diameterRatio: 2,
+          squeeze: 1.25,
+          useMagnifier: false,
+          magnification: 1.0,
+          childDelegate: ListWheelChildBuilderDelegate(
+            builder: (context, index) {
               final dynamic item;
+
               if (items != null) {
                 item = items[index % items.length];
               } else if (maxItems != null) {
-                item = (index % maxItems) + 1;
+                final actualIndex = index % maxItems;
+                item = actualIndex + 1;
               } else {
                 return const SizedBox.shrink();
               }
 
-              // Simple distance calculation for opacity
-              late int selectedItem;
-              try {
-                selectedItem = controller.selectedItem;
-              } catch (_) {
-                selectedItem = 0;
-              }
-
+              // Simple distance calculation that works for all columns
+              final selectedItem = controller.selectedItem;
               final distance = (index - selectedItem).abs();
               final opacity = distance == 0 ? 1.0 : (distance == 1 ? 0.3 : 0.2);
 
@@ -298,10 +306,10 @@ class _DatePickerWidgetState extends State<DatePickerWidget> {
                 ),
               );
             },
-          );
-        },
-        childCount: 10000,
-      ),
+            childCount: 10000,
+          ),
+        );
+      },
     );
   }
 }

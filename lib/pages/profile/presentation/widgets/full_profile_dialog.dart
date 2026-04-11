@@ -17,6 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
+import 'package:geocoding/geocoding.dart' as geocoding;
 import '../../../edit_profile/presentation/widgets/interleaved_media_section.dart';
 
 class FullProfileDialog extends StatefulWidget {
@@ -35,6 +36,35 @@ class FullProfileDialog extends StatefulWidget {
 
 class _FullProfileDialogState extends State<FullProfileDialog> {
   final LoginCubit _loginCubit = Di().sl<LoginCubit>();
+
+  Future<String> _getLocationFromLatLng(
+    String? latitude,
+    String? longitude,
+  ) async {
+    if (latitude == null || longitude == null) return '';
+    try {
+      final lat = double.tryParse(latitude);
+      final lng = double.tryParse(longitude);
+      if (lat == null || lng == null) return '';
+
+      final placemarks = await geocoding.placemarkFromCoordinates(lat, lng);
+      if (placemarks.isNotEmpty) {
+        final place = placemarks.first;
+        final city = place.locality ?? '';
+        final state = place.administrativeArea ?? '';
+        if (city.isNotEmpty && state.isNotEmpty) {
+          return '$city, $state';
+        } else if (city.isNotEmpty) {
+          return city;
+        } else if (state.isNotEmpty) {
+          return state;
+        }
+      }
+    } catch (e) {
+      debugPrint('Error getting location: $e');
+    }
+    return '';
+  }
 
   @override
   void initState() {
@@ -122,20 +152,27 @@ class _FullProfileDialogState extends State<FullProfileDialog> {
                                     .user!
                                     .sexualOrientation!
                                     .first
-                              : 'Straight',
+                              : '',
                         ),
                         ProfileChip(
-                          label:
-                              _loginCubit.userData?.user?.pronouns ?? 'He/Him',
+                          label: _loginCubit.userData?.user?.pronouns ?? '',
                         ),
-                        ProfileChip(
-                          icon: Assets.icons.mapPin.path,
-                          label:
-                              '${_loginCubit.userData?.user?.v ?? 'Austin, TX'}',
+                        FutureBuilder<String>(
+                          future: _getLocationFromLatLng(
+                            _loginCubit.userData?.user?.latitude,
+                            _loginCubit.userData?.user?.longitude,
+                          ),
+                          builder: (context, snapshot) {
+                            final location = snapshot.data ?? '';
+                            return ProfileChip(
+                              icon: Assets.icons.mapPin.path,
+                              label: location,
+                            );
+                          },
                         ),
                         ProfileChip(
                           icon: Assets.icons.navigation.path,
-                          label: 'Distance',
+                          label: user?.address ?? '',
                         ),
                       ],
                     ),
@@ -146,16 +183,17 @@ class _FullProfileDialogState extends State<FullProfileDialog> {
                       children: [
                         ProfileChip(
                           icon: Assets.icons.bag.path,
-                          label:
-                              _loginCubit.userData?.user?.education ??
-                              'Stanford University',
+                          label: _loginCubit.userData?.user?.education ?? '',
                         ),
                         ProfileChip(
                           icon: Assets.icons.cap.path,
-                          label:
-                              _loginCubit.userData?.user?.jobTitle ??
-                              'Software Engineer',
+                          label: _loginCubit.userData?.user?.jobTitle ?? '',
                         ),
+                        if (user?.groupLocation?.address != null)
+                          ProfileChip(
+                            icon: Assets.icons.navigation.path,
+                            label: user?.groupLocation?.address ?? '',
+                          ),
                       ],
                     ),
                     const CustomSizedBox(height: 12),

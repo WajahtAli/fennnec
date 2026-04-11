@@ -22,6 +22,7 @@ import 'package:fennac_app/widgets/custom_text_field.dart';
 import 'package:fennac_app/widgets/movable_background.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../../../app/constants/media_query_constants.dart';
@@ -57,11 +58,39 @@ class _KycScreenState extends State<KycScreen> {
     _isInitialized = ValueNotifier(widget.isEditMode != true);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Future.delayed(const Duration(seconds: 1), () {
+      Future.delayed(const Duration(seconds: 1), () async {
         _initializeFromUser();
+        await _setCurrentLocation();
         _isInitialized.value = true;
       });
     });
+  }
+
+  Future<void> _setCurrentLocation() async {
+    if (widget.isEditMode == true) return;
+    if (_kycCubit.latitudeController.text.isNotEmpty &&
+        _kycCubit.longitudeController.text.isNotEmpty) {
+      return;
+    }
+
+    try {
+      final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) return;
+
+      var permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        return;
+      }
+
+      final position = await Geolocator.getCurrentPosition();
+      _kycCubit.latitudeController.text = position.latitude.toString();
+      _kycCubit.longitudeController.text = position.longitude.toString();
+    } catch (_) {}
   }
 
   void _initializeFromUser() {
@@ -75,6 +104,9 @@ class _KycScreenState extends State<KycScreen> {
       _kycCubit.selectPronouns(user.pronouns ?? '');
       _kycCubit.jobTitleController.text = user.jobTitle ?? '';
       _kycCubit.educationController.text = user.education ?? '';
+      _kycCubit.homeTownController.text = user.address ?? '';
+      _kycCubit.latitudeController.text = user.latitude ?? '';
+      _kycCubit.longitudeController.text = user.longitude ?? '';
       _kycCubit.shortBioController.text = user.shortBio ?? '';
     }
   }
@@ -268,6 +300,23 @@ class _KycScreenState extends State<KycScreen> {
                                   ),
                               controller: _kycCubit.educationController,
                               hintText: 'Where do/did you go to school?',
+                              labelColor: isLightTheme(context)
+                                  ? Colors.black
+                                  : Colors.white,
+                              filled: false,
+                            ),
+                            CustomSizedBox(height: 16),
+                            CustomLabelTextField(
+                              label: 'Hometown',
+                              labelStyle: AppTextStyles.bodyLarge(context)
+                                  .copyWith(
+                                    color: isLightTheme(context)
+                                        ? Colors.black
+                                        : Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                              controller: _kycCubit.homeTownController,
+                              hintText: 'Where are you from?',
                               labelColor: isLightTheme(context)
                                   ? Colors.black
                                   : Colors.white,

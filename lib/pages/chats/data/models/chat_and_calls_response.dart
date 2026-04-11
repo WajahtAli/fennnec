@@ -141,10 +141,7 @@ abstract class ChatPokeModel with _$ChatPokeModel {
   }) = _ChatPokeModel;
 
   factory ChatPokeModel.fromJson(Map<String, dynamic> json) =>
-      _$ChatPokeModelFromJson({
-        ...json,
-        'id': json['id'] ?? json['_id'] ?? '',
-      });
+      _$ChatPokeModelFromJson({...json, 'id': json['id'] ?? json['_id'] ?? ''});
 }
 
 @freezed

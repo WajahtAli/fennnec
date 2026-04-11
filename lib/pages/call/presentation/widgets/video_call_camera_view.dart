@@ -96,8 +96,9 @@ class _VideoCallCameraViewState extends State<VideoCallCameraView> {
             controller: VideoViewController.remote(
               rtcEngine: callCubit.engine,
               canvas: VideoCanvas(uid: uid),
-              connection:
-                  RtcConnection(channelId: callCubit.channelName ?? 'test'),
+              connection: RtcConnection(
+                channelId: callCubit.channelName ?? 'test',
+              ),
             ),
           ),
         ),

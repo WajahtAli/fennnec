@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:fennac_app/app/constants/app_enums.dart';
+import 'package:fennac_app/app/constants/socket_constants.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/core/di_container.dart';
@@ -41,20 +42,38 @@ class ChatLandingScreen extends StatefulWidget {
 class _ChatLandingScreenState extends State<ChatLandingScreen> {
   final ChatLandingCubit _chatLandingCubit = Di().sl<ChatLandingCubit>();
   bool _isCheckingPokeAccess = false;
+  late final List<String> _chatUpdateEvents;
+
+  void _handleChatRelatedUpdate(dynamic _) {
+    if (!mounted) return;
+    _chatLandingCubit.fetchChatsAndCalls();
+  }
 
   @override
   void initState() {
     super.initState();
     _chatLandingCubit.fetchChatsAndCalls();
-    SocketService.onChatRelatedUpdate(() {
-      if (!mounted) return;
-      _chatLandingCubit.fetchChatsAndCalls();
-    });
+    _chatUpdateEvents = [
+      SocketEvents.chatUpdated1,
+      SocketEvents.chatUpdated2,
+      SocketEvents.chatUpdated3,
+      SocketEvents.unifiedChatsUpdated,
+      SocketEvents.unifiedChatsList,
+      SocketEvents.callUpdated1,
+      SocketEvents.callUpdated2,
+      SocketEvents.pokeStartedChatIndividual,
+      SocketEvents.groupsAllNew,
+    ];
+    for (final event in _chatUpdateEvents) {
+      SocketService.on(event, _handleChatRelatedUpdate);
+    }
   }
 
   @override
   void dispose() {
-    SocketService.offChatRelatedUpdate();
+    for (final event in _chatUpdateEvents) {
+      SocketService.off(event);
+    }
     super.dispose();
   }
 
@@ -199,7 +218,7 @@ class _ChatLandingScreenState extends State<ChatLandingScreen> {
                 },
                 child: CallHistoryItem(
                   name: _getPokeSenderName(poke),
-                  avatar: poke.image ?? '',
+                  avatar: poke.image,
                   unreadCount: 0,
                   timeAgo: poke.lastMessageAt != null
                       ? _getTimeAgo(poke.lastMessageAt!)

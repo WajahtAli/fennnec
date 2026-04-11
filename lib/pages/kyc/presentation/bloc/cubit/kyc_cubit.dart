@@ -10,6 +10,9 @@ class KycCubit extends Cubit<KycState> {
     shortBioController = TextEditingController();
     jobTitleController = TextEditingController();
     educationController = TextEditingController();
+    homeTownController = TextEditingController();
+    latitudeController = TextEditingController();
+    longitudeController = TextEditingController();
   }
   DateTime? selectedDate;
   String? selectedGender;
@@ -22,6 +25,9 @@ class KycCubit extends Cubit<KycState> {
   late final TextEditingController shortBioController;
   late final TextEditingController jobTitleController;
   late final TextEditingController educationController;
+  late final TextEditingController homeTownController;
+  late final TextEditingController latitudeController;
+  late final TextEditingController longitudeController;
 
   FixedExtentScrollController? dayController;
   FixedExtentScrollController? monthController;
@@ -138,6 +144,9 @@ class KycCubit extends Cubit<KycState> {
     shortBioController.dispose();
     jobTitleController.dispose();
     educationController.dispose();
+    homeTownController.dispose();
+    latitudeController.dispose();
+    longitudeController.dispose();
     dayController?.dispose();
     monthController?.dispose();
     yearController?.dispose();

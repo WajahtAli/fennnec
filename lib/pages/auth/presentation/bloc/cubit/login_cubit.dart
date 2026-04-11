@@ -27,6 +27,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:lottie/lottie.dart';
 
 import '../../../../../helpers/shared_pref_helper.dart';
+import '../../../../../reusable_widgets/session_dialog.dart';
 import '../../../../home/presentation/screen/home_screen.dart';
 
 class LoginCubit extends Cubit<LoginState> {
@@ -526,7 +527,7 @@ class LoginCubit extends Cubit<LoginState> {
           shouldOpenDashboard = true;
         } else {
           if (context.mounted) {
-            _showSessionExpiredDialog(context);
+            showSessionExpiredDialog(context);
           }
         }
       } else {
@@ -547,114 +548,6 @@ class LoginCubit extends Cubit<LoginState> {
         logout(context);
       }
     }
-  }
-
-  /// Show session expired dialog with theme support
-  void _showSessionExpiredDialog(BuildContext context) {
-    final isLight = isLightTheme(context);
-
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext dialogContext) => Dialog(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        child: Container(
-          width: double.infinity,
-          margin: const EdgeInsets.symmetric(horizontal: 24),
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-          decoration: BoxDecoration(
-            gradient: isDarkTheme(context)
-                ? LinearGradient(
-                    colors: [ColorPalette.secondary, ColorPalette.black],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                  )
-                : null,
-            color: isLight ? Colors.white : null,
-            borderRadius: BorderRadius.circular(24),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Handle bar
-              Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: isLight
-                      ? Colors.black.withValues(alpha: 0.2)
-                      : Colors.white.withValues(alpha: 0.3),
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // Title
-              Text(
-                'Session Expired',
-                style: AppTextStyles.h2(context).copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: isLight ? Colors.black : Colors.white,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 12),
-
-              // Description
-              Text(
-                'Your session has expired. Please login again to continue.',
-                textAlign: TextAlign.center,
-                style: AppTextStyles.subHeading(context).copyWith(
-                  color: isLight
-                      ? ColorPalette.black
-                      : ColorPalette.textPrimary.withValues(alpha: 0.8),
-                ),
-              ),
-              const SizedBox(height: 32),
-
-              // Login Again Button
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: ColorPalette.primary,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  onPressed: () {
-                    Navigator.pop(dialogContext);
-                    // Clear user data
-                    loginModel = null;
-                    userData = null;
-                    email.clear();
-                    phone.clear();
-                    password.clear();
-                    // Clear shared preferences
-                    sharedPreferencesHelper.clearUserData();
-                    // Navigate to onboarding
-                    if (context.mounted) {
-                      AutoRouter.of(
-                        context,
-                      ).replaceAll([const OnBoardingRoute()]);
-                    }
-                  },
-                  child: Text(
-                    'Login Again',
-                    style: AppTextStyles.body(context).copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 
   @override

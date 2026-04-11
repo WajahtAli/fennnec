@@ -121,6 +121,22 @@ class KycDetailsScreen extends StatelessWidget {
                             : Colors.white,
                         filled: false,
                       ),
+                      CustomSizedBox(height: 16),
+                      CustomLabelTextField(
+                        label: 'Hometown',
+                        labelStyle: AppTextStyles.bodyLarge(context).copyWith(
+                          color: isLightTheme(context)
+                              ? Colors.black
+                              : Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        controller: _kycCubit.homeTownController,
+                        hintText: 'Where are you from?',
+                        labelColor: isLightTheme(context)
+                            ? Colors.black
+                            : Colors.white,
+                        filled: false,
+                      ),
                       CustomSizedBox(height: 80),
                     ],
                   ),

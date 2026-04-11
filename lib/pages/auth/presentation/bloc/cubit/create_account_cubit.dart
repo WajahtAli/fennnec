@@ -42,6 +42,7 @@ class CreateAccountCubit extends Cubit<CreateAccountState> {
     final String? email,
     final String? phone,
     final String? countryCode,
+    final String? homeTown,
     final String? password,
     required BuildContext context,
   }) async {
@@ -55,6 +56,7 @@ class CreateAccountCubit extends Cubit<CreateAccountState> {
         email: email,
         phone: normalizePhone(phone ?? ''),
         countryCode: countryCode,
+        homeTown: homeTown,
         password: password,
       );
       // createdUser = user;
@@ -333,6 +335,21 @@ class CreateAccountCubit extends Cubit<CreateAccountState> {
         education = kycCubit.educationController.text;
       }
 
+      String? homeTown;
+      if (kycCubit.homeTownController.text.isNotEmpty) {
+        homeTown = kycCubit.homeTownController.text;
+      }
+
+      String? latitude;
+      if (kycCubit.latitudeController.text.isNotEmpty) {
+        latitude = kycCubit.latitudeController.text;
+      }
+
+      String? longitude;
+      if (kycCubit.longitudeController.text.isNotEmpty) {
+        longitude = kycCubit.longitudeController.text;
+      }
+
       Map<String, List<String>>? vibesMap;
       final selectedVibes = kycCubit.getSelectedVibes();
       if (selectedVibes.isNotEmpty) {
@@ -371,6 +388,9 @@ class CreateAccountCubit extends Cubit<CreateAccountState> {
             lifestyleLikes: transformedLifestyles,
             jobTitle: jobTitle,
             education: education,
+            homeTown: homeTown,
+            latitude: latitude,
+            longitude: longitude,
             bestShorts: bestShortsToSend,
             vibes: vibesMap,
             mediaLinks: mediaLinksToSend,

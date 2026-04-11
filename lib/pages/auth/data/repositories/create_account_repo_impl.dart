@@ -40,6 +40,7 @@ class CreateAccountRepoImpl extends CreateAccountRepo {
     final String? email,
     final String? phone,
     final String? countryCode,
+    final String? homeTown,
     final String? password,
   }) async {
     return await _createAccountDatasource.createAccount(
@@ -48,6 +49,7 @@ class CreateAccountRepoImpl extends CreateAccountRepo {
       email: email,
       phone: phone,
       countryCode: countryCode,
+      homeTown: homeTown,
       password: password,
     );
   }
@@ -73,6 +75,9 @@ class CreateAccountRepoImpl extends CreateAccountRepo {
     final List<String>? lifestyleLikes,
     final String? jobTitle,
     final String? education,
+    final String? homeTown,
+    final String? latitude,
+    final String? longitude,
     final List<String>? bestShorts,
     final Map<String, List<String>>? vibes,
     final List<String>? mediaLinks,
@@ -88,6 +93,9 @@ class CreateAccountRepoImpl extends CreateAccountRepo {
       lifestyleLikes: lifestyleLikes,
       jobTitle: jobTitle,
       education: education,
+      homeTown: homeTown,
+      latitude: latitude,
+      longitude: longitude,
       bestShorts: bestShorts,
       vibes: vibes,
       countryCode: countryCode,

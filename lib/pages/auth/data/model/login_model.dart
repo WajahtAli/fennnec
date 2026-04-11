@@ -172,6 +172,7 @@ class LoginUser {
   NotificationSettings? notificationSettings;
   PrivacyPermissions? privacyPermissions;
   String? subscriptionExpiresAt;
+  GroupLocation? groupLocation;
 
   LoginUser({
     this.authType,
@@ -211,6 +212,7 @@ class LoginUser {
     this.notificationSettings,
     this.privacyPermissions,
     this.subscriptionExpiresAt,
+    this.groupLocation,
   });
 
   LoginUser copyWith({
@@ -251,6 +253,7 @@ class LoginUser {
     NotificationSettings? notificationSettings,
     PrivacyPermissions? privacyPermissions,
     String? subscriptionExpiresAt,
+    GroupLocation? groupLocation,
   }) => LoginUser(
     authType: authType ?? this.authType,
     isVerified: isVerified ?? this.isVerified,
@@ -289,6 +292,7 @@ class LoginUser {
     notificationSettings: notificationSettings ?? this.notificationSettings,
     privacyPermissions: privacyPermissions ?? this.privacyPermissions,
     subscriptionExpiresAt: subscriptionExpiresAt ?? this.subscriptionExpiresAt,
+    groupLocation: groupLocation ?? this.groupLocation,
   );
 
   factory LoginUser.fromJson(Map<String, dynamic> json) => LoginUser(
@@ -345,6 +349,9 @@ class LoginUser {
         ? null
         : PrivacyPermissions.fromJson(json["privacyPermissions"]),
     subscriptionExpiresAt: json["subscriptionExpiresAt"]?.toString(),
+    groupLocation: json["groupLocation"] == null
+        ? null
+        : GroupLocation.fromJson(json["groupLocation"]),
   );
 
   Map<String, dynamic> toJson() => {
@@ -387,6 +394,53 @@ class LoginUser {
     "notificationSettings": notificationSettings?.toJson(),
     "privacyPermissions": privacyPermissions?.toJson(),
     "subscriptionExpiresAt": subscriptionExpiresAt,
+    "groupLocation": groupLocation?.toJson(),
+  };
+}
+
+class GroupLocation {
+  String? state;
+  String? city;
+  String? address;
+  double? latitude;
+  double? longitude;
+
+  GroupLocation({
+    this.state,
+    this.city,
+    this.address,
+    this.latitude,
+    this.longitude,
+  });
+
+  GroupLocation copyWith({
+    String? state,
+    String? city,
+    String? address,
+    double? latitude,
+    double? longitude,
+  }) => GroupLocation(
+    state: state ?? this.state,
+    city: city ?? this.city,
+    address: address ?? this.address,
+    latitude: latitude ?? this.latitude,
+    longitude: longitude ?? this.longitude,
+  );
+
+  factory GroupLocation.fromJson(Map<String, dynamic> json) => GroupLocation(
+    state: json["state"]?.toString(),
+    city: json["city"]?.toString(),
+    address: json["address"]?.toString(),
+    latitude: (json["latitude"] as num?)?.toDouble(),
+    longitude: (json["longitude"] as num?)?.toDouble(),
+  );
+
+  Map<String, dynamic> toJson() => {
+    "state": state,
+    "city": city,
+    "address": address,
+    "latitude": latitude,
+    "longitude": longitude,
   };
 }
 

@@ -18,6 +18,7 @@ abstract class CreateAccountRepo {
     final String? email,
     final String? phone,
     final String? countryCode,
+    final String? homeTown,
     final String? password,
   });
 
@@ -35,6 +36,9 @@ abstract class CreateAccountRepo {
     final List<String>? lifestyleLikes,
     final String? jobTitle,
     final String? education,
+    final String? homeTown,
+    final String? latitude,
+    final String? longitude,
     final List<String>? bestShorts,
     final Map<String, List<String>>? vibes,
     final List<String>? mediaLinks,

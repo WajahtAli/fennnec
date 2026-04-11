@@ -34,6 +34,17 @@ class _GenderSelectionWidgetState extends State<GenderSelectionWidget> {
     _selectedGender = widget.selectedGender ?? _kycCubit.selectedGender;
   }
 
+  @override
+  void didUpdateWidget(covariant GenderSelectionWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    final nextSelectedGender =
+        widget.selectedGender ?? _kycCubit.selectedGender;
+    if (nextSelectedGender != _selectedGender) {
+      _selectedGender = nextSelectedGender;
+    }
+  }
+
   bool get _usesKycCubit => widget.genders == null;
 
   @override

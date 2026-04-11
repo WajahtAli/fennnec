@@ -36,6 +36,7 @@ class CreateAccountUsecase {
     final String? email,
     final String? phone,
     final String? countryCode,
+    final String? homeTown,
     final String? password,
   }) async {
     return await _createAccountRepo.createAccount(
@@ -44,6 +45,7 @@ class CreateAccountUsecase {
       email: email,
       phone: phone,
       countryCode: countryCode,
+      homeTown: homeTown,
       password: password,
     );
   }
@@ -67,6 +69,9 @@ class CreateAccountUsecase {
     final List<String>? lifestyleLikes,
     final String? jobTitle,
     final String? education,
+    final String? homeTown,
+    final String? latitude,
+    final String? longitude,
     final List<String>? bestShorts,
     final Map<String, List<String>>? vibes,
     final List<String>? mediaLinks,
@@ -82,6 +87,9 @@ class CreateAccountUsecase {
       lifestyleLikes: lifestyleLikes,
       jobTitle: jobTitle,
       education: education,
+      homeTown: homeTown,
+      latitude: latitude,
+      longitude: longitude,
       bestShorts: bestShorts,
       vibes: vibes,
       mediaLinks: mediaLinks,

@@ -322,6 +322,11 @@ class _SubscribedChatWidgetState extends State<SubscribedChatWidget> {
   }
 
   List<String> _resolveGroupNames(ChatModel chat) {
+    final matchedGroupTitle = chat.matchedGroupDetails?.title?.trim() ?? '';
+    if (matchedGroupTitle.isNotEmpty) {
+      return [matchedGroupTitle];
+    }
+
     final groupTitle = chat.name.trim();
     if (groupTitle.isNotEmpty) {
       return [groupTitle];

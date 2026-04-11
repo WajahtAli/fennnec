@@ -1,8 +1,13 @@
 import 'dart:ui';
+import 'package:fennac_app/pages/chats/presentation/bloc/cubit/chat_landing_cubit.dart';
+import 'package:fennac_app/pages/chats/presentation/bloc/state/chat_landing_state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
+
+import '../core/di_container.dart';
 
 class CustomBottomNavigationBar extends StatefulWidget {
   final List<BottomNavItem> items;
@@ -92,18 +97,69 @@ class CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
                                 mainAxisSize: MainAxisSize.max,
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  SvgPicture.asset(
-                                    item.iconPath,
-                                    width: 22,
-                                    height: 22,
-                                    colorFilter: ColorFilter.mode(
-                                      isSelected
-                                          ? ColorPalette.white
-                                          : isLight
-                                          ? ColorPalette.primary
-                                          : ColorPalette.white,
-                                      BlendMode.srcIn,
-                                    ),
+                                  Stack(
+                                    clipBehavior: Clip.none,
+                                    children: [
+                                      SvgPicture.asset(
+                                        item.iconPath,
+                                        width: 22,
+                                        height: 22,
+                                        colorFilter: ColorFilter.mode(
+                                          isSelected
+                                              ? ColorPalette.white
+                                              : isLight
+                                              ? ColorPalette.primary
+                                              : ColorPalette.white,
+                                          BlendMode.srcIn,
+                                        ),
+                                      ),
+
+                                      if (item.badgeCount > 0)
+                                        Positioned(
+                                          right: -8,
+                                          top: -8,
+                                          child:
+                                              BlocBuilder<
+                                                ChatLandingCubit,
+                                                ChatLandingState
+                                              >(
+                                                bloc: Di()
+                                                    .sl<ChatLandingCubit>(),
+                                                builder: (context, state) {
+                                                  return Container(
+                                                    alignment: Alignment.center,
+                                                    constraints:
+                                                        const BoxConstraints(
+                                                          minWidth: 20,
+                                                          minHeight: 20,
+                                                        ),
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.red,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            20,
+                                                          ),
+                                                    ),
+                                                    child: Center(
+                                                      child: Text(
+                                                        item.badgeCount > 99
+                                                            ? '99+'
+                                                            : item.badgeCount
+                                                                  .toString(),
+                                                        style:
+                                                            AppTextStyles.inputLabel(
+                                                              context,
+                                                            ).copyWith(
+                                                              color:
+                                                                  Colors.white,
+                                                            ),
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                        ),
+                                    ],
                                   ),
 
                                   AnimatedSize(
@@ -163,6 +219,7 @@ class CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
 class BottomNavItem {
   final String iconPath;
   final String? label;
+  final int badgeCount;
 
-  BottomNavItem({required this.iconPath, this.label});
+  BottomNavItem({required this.iconPath, this.label, this.badgeCount = 0});
 }

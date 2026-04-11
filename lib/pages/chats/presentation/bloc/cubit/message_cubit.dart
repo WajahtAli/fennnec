@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 import 'package:equatable/equatable.dart';
 
+import 'package:fennac_app/app/constants/socket_constants.dart';
 import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/helpers/shared_pref_helper.dart';
 import 'package:fennac_app/pages/auth/presentation/bloc/cubit/create_account_cubit.dart';
@@ -26,6 +27,7 @@ class MessageCubit extends Cubit<MessageState> {
   bool showAttachmentPanel = false;
   bool fieldHaveText = false;
   bool isRecordingAudio = false;
+  bool otherUserIsTyping = false;
   Timer? _pollingTimer;
 
   void _emitLoadingSuccess(void Function() action) {
@@ -49,6 +51,7 @@ class MessageCubit extends Cubit<MessageState> {
   void updateFieldHaveText(bool haveText) {
     _emitLoadingSuccess(() {
       fieldHaveText = haveText;
+      sendTypingStatus(haveText);
     });
   }
 
@@ -103,6 +106,7 @@ class MessageCubit extends Cubit<MessageState> {
             chatId,
             page: page,
             limit: limit,
+            receiverGroupId: _otherGroupId,
           )
         : _myGroupRepository.fetchDirectMessages(
             chatId,
@@ -234,9 +238,11 @@ class MessageCubit extends Cubit<MessageState> {
     bool isGroup = true,
     String? otherGroupId,
   }) async {
+    _detachSocketListeners();
     _groupId = id;
     _isGroup = isGroup;
     _otherGroupId = isGroup ? otherGroupId : null;
+    otherUserIsTyping = false;
     _page = 1;
     _hasMore = true;
     messages.clear();
@@ -251,8 +257,7 @@ class MessageCubit extends Cubit<MessageState> {
       hasError = false;
       emit(MessageSuccess());
 
-      // Register real-time socket listener for new messages
-      SocketService.onNewMessage(onMessage: _handleIncomingMessage);
+      _attachSocketListeners();
     } catch (e) {
       isLoading = false;
       hasError = true;
@@ -309,8 +314,73 @@ class MessageCubit extends Cubit<MessageState> {
   @override
   Future<void> close() {
     stopPolling();
-    SocketService.offNewMessage();
+    _detachSocketListeners();
     return super.close();
+  }
+
+  void _attachSocketListeners() {
+    SocketService.on(SocketEvents.newGroupMessage, _handleIncomingMessage);
+    SocketService.on(SocketEvents.newDirectMessage, _handleIncomingMessage);
+
+    if (_isGroup) {
+      SocketService.on(SocketEvents.groupTyping, _handleTypingEvent);
+      SocketService.off(SocketEvents.directTyping);
+      return;
+    }
+
+    SocketService.on(SocketEvents.directTyping, _handleTypingEvent);
+    SocketService.off(SocketEvents.groupTyping);
+  }
+
+  void _detachSocketListeners() {
+    SocketService.off(SocketEvents.newGroupMessage);
+    SocketService.off(SocketEvents.newDirectMessage);
+    SocketService.off(SocketEvents.groupTyping);
+    SocketService.off(SocketEvents.directTyping);
+  }
+
+  void _handleTypingEvent(dynamic data) {
+    try {
+      if (data is! Map) return;
+
+      final payload = Map<String, dynamic>.from(data);
+      final typingChatId =
+          payload['chatId'] ?? payload['groupId'] ?? payload['directChatId'];
+      final senderId = payload['senderId'];
+      final isTyping = payload['isTyping'] == true;
+
+      if (typingChatId == null || senderId == null) return;
+
+      final sameChat = typingChatId.toString() == _groupId;
+      final isOtherUser = senderId.toString() != currentUserId;
+
+      if (!sameChat || !isOtherUser) return;
+
+      if (otherUserIsTyping != isTyping) {
+        otherUserIsTyping = isTyping;
+        emit(MessageSuccess());
+      }
+    } catch (e) {
+      log('Error handling typing event: $e');
+    }
+  }
+
+  void sendTypingStatus(bool isTyping) {
+    if (_groupId == null || _groupId!.isEmpty) return;
+
+    final payload = <String, dynamic>{
+      'chatId': _groupId,
+      'senderId': currentUserId,
+      'isTyping': isTyping,
+    };
+
+    if (_isGroup) {
+      payload['groupId'] = _groupId;
+      SocketService.emit(SocketEvents.groupTyping, payload);
+      return;
+    }
+
+    SocketService.emit(SocketEvents.directTyping, payload);
   }
 
   /// Handle incoming real-time messages from socket events.
@@ -543,6 +613,7 @@ class MessageCubit extends Cubit<MessageState> {
     sendingMessageIds.add(message.id);
 
     messageController.clear();
+    sendTypingStatus(false);
 
     final index = messages.indexWhere((m) => m.id == message.id);
     if (index != -1) {

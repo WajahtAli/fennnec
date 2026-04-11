@@ -157,6 +157,13 @@ class _DistanceContentState extends State<_DistanceContent> {
       _selectedAddress = existingLocation?.address;
       _selectedCity = existingLocation?.city;
       _selectedState = existingLocation?.state;
+
+      if (_selectedLatitude != null && _selectedLongitude != null) {
+        _googleMapCubit.setInitialSelectedLocation(
+          latitude: _selectedLatitude!,
+          longitude: _selectedLongitude!,
+        );
+      }
     }
   }
 

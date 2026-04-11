@@ -5,14 +5,16 @@ import 'dart:io';
 
 import 'package:http/http.dart' as http;
 
+import 'package:fennac_app/app/app.dart';
 import 'package:fennac_app/core/di_container.dart';
-import 'package:fennac_app/helpers/gradient_toast.dart';
 import 'package:fennac_app/helpers/shared_pref_helper.dart';
+import 'package:fennac_app/reusable_widgets/session_dialog.dart';
 import '../../app/constants/app_constants.dart';
 
 class ApiHelper {
   final SharedPreferencesHelper sharedPreferencesHelper = Di()
       .sl<SharedPreferencesHelper>();
+  static bool _isDeactivatedDialogVisible = false;
 
   final Duration timeout = const Duration(seconds: 15);
 
@@ -282,15 +284,21 @@ class ApiHelper {
     // }
     else {
       log("RAW ERROR BODY: ${res.body}");
-      Map raw = jsonDecode(res.body);
+      final raw = _safeDecodeJson(res.body);
+
+      if (res.statusCode == 401) {
+        _handleDeactivated401(raw);
+      }
+
       // For login endpoint on 400, return raw response so cubit can extract isVerified
       if (isLogin && res.statusCode == 400) {
         log(
-          '📥 isLogin=true & 400 status → returning raw response: ${jsonEncode(raw)}',
+          '📥 isLogin=true & 400 status → returning raw response: ${jsonEncode(raw ?? {})}',
         );
-        return raw;
+        return raw ?? {};
       }
-      final message = raw["message"];
+
+      final message = raw?["message"];
       if (message is List) {
         for (final x in message.reversed) {
           throw ApiException('${x ?? "Something went wrong"}', res.statusCode);
@@ -300,6 +308,36 @@ class ApiHelper {
       }
       throw ApiException("Something went wrong", res.statusCode);
     }
+  }
+
+  Map<String, dynamic>? _safeDecodeJson(String body) {
+    try {
+      final decoded = jsonDecode(body);
+      if (decoded is Map<String, dynamic>) return decoded;
+      if (decoded is Map) return Map<String, dynamic>.from(decoded);
+    } catch (_) {}
+    return null;
+  }
+
+  void _handleDeactivated401(Map<String, dynamic>? raw) {
+    final message = raw?['message'];
+    final normalizedMessage = message is List
+        ? message.join(' ').toLowerCase()
+        : (message?.toString().toLowerCase() ?? '');
+
+    if (!normalizedMessage.contains('deactivated')) return;
+    if (_isDeactivatedDialogVisible) return;
+
+    final context = navigatorKey.currentContext;
+    if (context == null || !context.mounted) return;
+
+    _isDeactivatedDialogVisible = true;
+    showAccountDeactivatedDialog(
+      context,
+      onDialogClosed: () {
+        _isDeactivatedDialogVisible = false;
+      },
+    );
   }
 
   // ========================= ERROR HANDLER =========================
@@ -318,8 +356,6 @@ class ApiHelper {
       return "Unexpected error";
     }
   }
-
-  void _toast(String msg) => VxToast.show(message: msg);
 
   // ========================= LOGGING =========================
   void _printRequestLog({
@@ -346,16 +382,6 @@ STATUS: ${res.statusCode}
 ========================================================
 ''');
     // BODY: ${_prettyJson(res.body)}
-  }
-
-  String _prettyJson(String source) {
-    try {
-      final jsonObj = json.decode(source);
-      const encoder = JsonEncoder.withIndent('  ');
-      return encoder.convert(jsonObj);
-    } catch (_) {
-      return source;
-    }
   }
 
   void printWrapped(String text, {int width = 300}) {

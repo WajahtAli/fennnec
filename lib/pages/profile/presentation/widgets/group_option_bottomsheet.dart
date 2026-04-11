@@ -101,7 +101,11 @@ class GroupOptionsBottomSheet extends StatelessWidget {
             textColor: Colors.white,
             onTap: () {
               AutoRouter.of(context).push(
-                DistanceRoute(isEditMode: true, groupId: groupData.id ?? ''),
+                DistanceRoute(
+                  isEditMode: true,
+                  groupId: groupData.id ?? '',
+                  needPickLocation: true,
+                ),
               );
             },
           ),

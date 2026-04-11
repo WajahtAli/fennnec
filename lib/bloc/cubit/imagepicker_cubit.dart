@@ -1,4 +1,5 @@
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
+import 'package:photo_manager/photo_manager.dart';
 import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
@@ -72,6 +73,14 @@ class ImagePickerCubit extends Cubit<ImagePickerState> {
 
     try {
       List<MediaItem> pickedItems = [];
+
+      // Pre-request permission so AssetPicker receives an already-resolved
+      // state — avoids the first-grant exception on iOS/Android.
+      final permissionState = await PhotoManager.requestPermissionExtend();
+      if (!permissionState.hasAccess) {
+        _emitLoaded();
+        return;
+      }
 
       final List<AssetEntity>? assets = await AssetPicker.pickAssets(
         context,

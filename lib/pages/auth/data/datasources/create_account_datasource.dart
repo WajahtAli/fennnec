@@ -27,6 +27,7 @@ abstract class CreateAccountDatasource {
     final String? email,
     final String? phone,
     final String? countryCode,
+    final String? homeTown,
     final String? password,
   });
 
@@ -44,6 +45,9 @@ abstract class CreateAccountDatasource {
     final List<String>? lifestyleLikes,
     final String? jobTitle,
     final String? education,
+    final String? homeTown,
+    final String? latitude,
+    final String? longitude,
     final List<String>? bestShorts,
     final Map<String, List<String>>? vibes,
     final String? countryCode,
@@ -99,6 +103,7 @@ class CreateAccountDatasourceImpl extends CreateAccountDatasource {
     final String? email,
     final String? phone,
     final String? countryCode,
+    final String? homeTown,
     final String? password,
   }) async {
     final data = await apiHelper.post(
@@ -110,6 +115,7 @@ class CreateAccountDatasourceImpl extends CreateAccountDatasource {
         "email": email,
         "phone": phone,
         "countryCode": countryCode,
+        if (homeTown != null) "address": homeTown,
         "password": password,
       },
     );
@@ -139,6 +145,9 @@ class CreateAccountDatasourceImpl extends CreateAccountDatasource {
     final List<String>? lifestyleLikes,
     final String? jobTitle,
     final String? education,
+    final String? homeTown,
+    final String? latitude,
+    final String? longitude,
     final List<String>? bestShorts,
     final Map<String, List<String>>? vibes,
     final String? countryCode,
@@ -149,13 +158,18 @@ class CreateAccountDatasourceImpl extends CreateAccountDatasource {
       requiresAuth: true,
       body: {
         if (dob != null) "dob": dob,
-        if (gender != null) "gender": gender,
+        if (gender != null && gender.trim().isNotEmpty) "gender": gender,
         if (sexualOrientation != null) "sexualOrientation": sexualOrientation,
-        if (pronouns != null) "pronouns": pronouns,
+        if (pronouns != null && pronouns.trim().isNotEmpty)
+          "pronouns": pronouns,
         if (shortBio != null) "shortBio": shortBio,
         if (lifestyleLikes != null) "lifestyleLikes": lifestyleLikes,
         if (jobTitle != null) "jobTitle": jobTitle,
         if (education != null) "education": education,
+        if (homeTown != null) "address": homeTown,
+        if (latitude != null) "latitude": double.tryParse(latitude) ?? latitude,
+        if (longitude != null)
+          "longitude": double.tryParse(longitude) ?? longitude,
         if (bestShorts != null) "bestShorts": bestShorts,
         if (vibes != null) "vibes": vibes,
         if (countryCode != null) "countryCode": countryCode,

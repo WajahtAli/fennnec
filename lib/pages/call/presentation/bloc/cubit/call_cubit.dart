@@ -96,6 +96,7 @@ class CallCubit extends Cubit<CallState> {
         callType: callType,
         participantIds: participantIds,
       );
+
       isStartingCall = false;
 
       final data = response['data'] as Map<String, dynamic>?;

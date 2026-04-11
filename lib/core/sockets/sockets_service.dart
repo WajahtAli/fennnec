@@ -1,18 +1,18 @@
 import 'dart:developer';
-import 'package:fennac_app/core/di_container.dart';
-import 'package:fennac_app/helpers/shared_pref_helper.dart';
-import 'package:flutter/widgets.dart';
 import 'package:socket_io_client/socket_io_client.dart' as io;
 
+import '../../helpers/shared_pref_helper.dart';
+import '../di_container.dart';
 import '../../app/constants/app_constants.dart';
 
-final class SocketService with WidgetsBindingObserver {
+class SocketService {
   SocketService._();
 
   static late io.Socket _socket;
   static bool _isConnected = false;
   static bool _isInitialized = false;
 
+  /// 🔐 Get Token
   static String? get _authToken {
     try {
       return Di().sl<SharedPreferencesHelper>().getAuthToken();
@@ -21,32 +21,22 @@ final class SocketService with WidgetsBindingObserver {
     }
   }
 
-  static String get _socketBaseUrl => AppConstants.baseUrl.endsWith('/')
+  /// 🌐 Base URL Fix
+  static String get _baseUrl => AppConstants.baseUrl.endsWith('/')
       ? AppConstants.baseUrl.substring(0, AppConstants.baseUrl.length - 1)
       : AppConstants.baseUrl;
 
-  static const List<String> _chatEvents = [
-    'chatAndCallsUpdated',
-    'chat-updated',
-    'chat-updates',
-    'unified:chats:updated',
-    'unified:chats:list',
-    'call-updated',
-    'call-updates',
-    'poke-chat-started',
-  ];
-
-  static const String _groupMessageEvent = 'group:message:new';
-  static const String _directMessageEvent = 'direct:message:new';
-
+  /// 🔌 CONNECT
   static void connect() {
-    if (_isInitialized) {
-      if (!_isConnected) {
-        _socket.dispose();
-        _isInitialized = false;
-      } else {
-        return;
-      }
+    if (_isInitialized && _socket.connected) {
+      log('⚡ Socket already connected');
+      return;
+    }
+
+    if (_isInitialized && !_isConnected) {
+      // Socket exists but disconnected, just reconnect
+      _socket.connect();
+      return;
     }
 
     final token = _authToken;
@@ -67,9 +57,10 @@ final class SocketService with WidgetsBindingObserver {
         .enableAutoConnect()
         .build();
 
-    _socket = io.io(_socketBaseUrl, options);
+    _socket = io.io(_baseUrl, options);
     _isInitialized = true;
 
+    /// ✅ CONNECTION EVENTS
     _socket.onConnect((_) {
       _isConnected = true;
       log('✅ Socket connected');
@@ -80,21 +71,9 @@ final class SocketService with WidgetsBindingObserver {
       log('⚠️ Socket disconnected');
     });
 
-    _socket.onReconnect((_) {
-      log('🔄 Socket reconnected');
-    });
-
-    _socket.onReconnectAttempt((attempt) {
-      log('Reconnection attempt: $attempt');
-    });
-
-    _socket.onReconnectError((err) {
-      log('Reconnect error: $err');
-    });
-
     _socket.onConnectError((err) {
       _isConnected = false;
-      log('❌ Socket connect error: $err');
+      log('❌ Connect error: $err');
     });
 
     _socket.onError((err) {
@@ -102,117 +81,65 @@ final class SocketService with WidgetsBindingObserver {
       log('❌ Socket error: $err');
     });
 
+    _socket.onReconnect((_) {
+      log('🔄 Reconnected');
+    });
+
     _socket.onAny((event, data) {
       log('📩 [$event] => $data');
     });
-
-    WidgetsBinding.instance.addObserver(_lifecycleObserver);
   }
 
-  static void connectIfNeeded() {
-    connect();
-  }
-
-  static bool get isConnected => _isConnected;
-
-  static final _lifecycleObserver = _SocketLifecycleHandler();
-
-  // Listen to NEW MESSAGES
-  static void onNewMessage({required Function(dynamic data) onMessage}) {
-    if (!_isInitialized) connect();
-
-    /// remove old listeners (avoid duplicates)
-    _socket.off(_groupMessageEvent);
-    _socket.off(_directMessageEvent);
-
-    _socket.on(_groupMessageEvent, (data) {
-      log("📨 Group message received");
-      onMessage(data);
-    });
-
-    _socket.on(_directMessageEvent, (data) {
-      log("📨 Direct message received");
-      onMessage(data);
-    });
-  }
-
-  /// Stop listening messages
-  static void offNewMessage() {
-    if (!_isInitialized) return;
-    _socket.off(_groupMessageEvent);
-    _socket.off(_directMessageEvent);
-  }
-
-  /// 🔄 Fallback updates (if backend doesn't send full message)
-  static void onChatRelatedUpdate(VoidCallback onUpdate) {
-    if (!_isInitialized) connect();
-
-    for (final event in _chatEvents) {
-      _socket.off(event);
-      _socket.on(event, (_) {
-        log("🔄 Chat update event: $event");
-        onUpdate();
-      });
-    }
-  }
-
-  static void offChatRelatedUpdate() {
-    if (!_isInitialized) return;
-    for (final event in _chatEvents) {
-      _socket.off(event);
-    }
-  }
-
-  static void userLocation(Map<String, dynamic> data) {
-    if (_isInitialized && _isConnected) {
-      _socket.emit('userLocation', data);
-    } else {
-      log("🚫 Cannot emit userLocation: socket not connected");
-    }
-  }
-
-  static void riderLocation(Function(Map<String, dynamic>) onData) {
-    if (!_isInitialized) return;
-    _socket.off('riderLocation');
-    _socket.on('riderLocation', (data) {
-      onData(data);
-    });
-  }
-
-  static void rideRequest(Function(Map<String, dynamic>) onData) {
-    if (!_isInitialized) return;
-    _socket.off('rideRequest');
-    _socket.on('rideRequest', (data) {
-      onData(data);
-    });
-  }
-
+  /// ❌ DISCONNECT
   static void disconnect() {
     if (!_isInitialized) return;
 
     log("🧹 Disconnecting socket...");
-    WidgetsBinding.instance.removeObserver(_lifecycleObserver);
-
     _socket.dispose();
 
     _isInitialized = false;
     _isConnected = false;
   }
-}
 
-class _SocketLifecycleHandler extends WidgetsBindingObserver {
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (!SocketService._isInitialized) return;
+  /// 📡 CONNECTION STATUS
+  static bool get isConnected => _isConnected;
 
-    if (state == AppLifecycleState.resumed) {
-      if (!SocketService._isConnected) {
-        log('▶️ App resumed → reconnect socket');
-        SocketService.connect();
-      }
-    } else if (state == AppLifecycleState.detached) {
-      log('⏹ App detached → disconnect socket');
-      SocketService.disconnect();
+  /// 🎧 GENERIC LISTENER
+  static void on(String event, Function(dynamic data) handler) {
+    if (!_isInitialized) connect();
+
+    _socket.off(event); // avoid duplicates
+    _socket.on(event, handler);
+  }
+
+  /// 🔕 REMOVE LISTENER
+  static void off(String event) {
+    if (!_isInitialized) return;
+    _socket.off(event);
+  }
+
+  /// 📤 EMIT EVENT
+  static void emit(String event, dynamic data) {
+    if (_isConnected) {
+      _socket.emit(event, data);
+    } else {
+      log("❌ Cannot emit, socket not connected");
     }
+  }
+
+  /// 🧹 CLEAR ALL LISTENERS
+  static void clearAllListeners() {
+    if (!_isInitialized) return;
+    _socket.clearListeners();
+  }
+
+  /// 🔄 RECONNECT WITH NEW TOKEN
+  static void reconnectWithNewToken(String token) {
+    if (!_isInitialized) return;
+
+    _socket.io.options?['extraHeaders'] = {'Authorization': 'Bearer $token'};
+
+    _socket.disconnect();
+    _socket.connect();
   }
 }

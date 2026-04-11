@@ -3,6 +3,7 @@ import 'package:fennac_app/app/constants/app_enums.dart';
 import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:fennac_app/pages/auth/presentation/bloc/cubit/create_account_cubit.dart';
+import 'package:fennac_app/pages/chats/presentation/bloc/cubit/chat_landing_cubit.dart';
 import 'package:fennac_app/pages/dashboard/presentation/bloc/cubit/dashboard_cubit.dart';
 import 'package:fennac_app/pages/home/presentation/screen/home_screen.dart';
 import 'package:fennac_app/pages/homelanding/presentation/bloc/cubit/home_landing_cubit.dart';
@@ -12,6 +13,9 @@ import 'package:fennac_app/skeletons/home/home_landing_skeleton.dart';
 import 'package:fennac_app/utils/custom_bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../../utils/validators.dart';
+import '../../../liked_groups/presentation/bloc/cubit/liked_groups_cubit.dart';
 
 @RoutePage()
 class DashboardScreen extends StatefulWidget {
@@ -94,12 +98,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   child: CustomBottomNavigationBar(
                     items: [
                       BottomNavItem(iconPath: Assets.icons.home.path),
-                      BottomNavItem(iconPath: Assets.icons.messageCircle.path),
-                      BottomNavItem(iconPath: Assets.icons.user.path),
+                      BottomNavItem(
+                        iconPath: Assets.icons.messageCircle.path,
+                        badgeCount: Di()
+                            .sl<ChatLandingCubit>()
+                            .state
+                            .chats
+                            .length,
+                      ),
+                      BottomNavItem(
+                        iconPath: Assets.icons.user.path,
+                        badgeCount: validateInt(
+                          Di()
+                                  .sl<LikedGroupsCubit>()
+                                  .groupsModel
+                                  ?.data
+                                  ?.groups
+                                  ?.length ??
+                              '0',
+                        ),
+                      ),
                     ],
                     currentIndex: _dashboardCubit.selectedIndex,
                     onTap: _isResolvingDashboardEntryFlow
-                        ? (_) {} // disable taps while loading
+                        ? (_) {}
                         : _dashboardCubit.changeIndex,
                   ),
                 ),

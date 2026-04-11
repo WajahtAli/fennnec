@@ -294,10 +294,11 @@ class _ProfileHeaderState extends State<ProfileHeader> {
                               icon: Assets.icons.mapPin.path,
                               label: '${user.v}',
                             ),
-                          ProfileChip(
-                            icon: Assets.icons.navigation.path,
-                            label: 'Distance',
-                          ),
+                          if (user.groupLocation?.address != null)
+                            ProfileChip(
+                              icon: Assets.icons.navigation.path,
+                              label: user.groupLocation?.address ?? '',
+                            ),
                         ],
                       ),
 
@@ -318,6 +319,11 @@ class _ProfileHeaderState extends State<ProfileHeader> {
                                 icon: Assets.icons.cap.path,
                                 label: user.jobTitle!,
                               ),
+                            if (user.address != null)
+                              ProfileChip(
+                                icon: Assets.icons.home.path,
+                                label: user.address ?? '',
+                              ),
                           ],
                         ),
                       ],
@@ -329,9 +335,7 @@ class _ProfileHeaderState extends State<ProfileHeader> {
               const CustomSizedBox(height: 20),
               if (widget.showAvatar == false)
                 AppText(
-                  text:
-                      _loginCubit.userData?.user?.shortBio ??
-                      'Code, climb, repeat. Always up for a challenge — unless it\'s karaoke.',
+                  text: _loginCubit.userData?.user?.shortBio ?? '',
 
                   textAlign: TextAlign.center,
                   style: AppTextStyles.body(context).copyWith(),

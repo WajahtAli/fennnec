@@ -155,44 +155,82 @@ class ChatAppBar extends StatelessWidget {
               ),
             ),
           ),
-          // Phone Button
-          CircleIconButton(
-            customChild: SvgPicture.asset(
-              Assets.icons.phone.path,
-              colorFilter: ColorFilter.mode(
-                isLightTheme(context) ? ColorPalette.black : Colors.white,
-                BlendMode.srcIn,
-              ),
-              width: 20,
-              height: 20,
-            ),
-            onTap: () {
-              _startCallFromHeader(
-                context,
-                isVideoCall: false,
-                isGroup: isGroup,
-                group: group,
-              );
-            },
-          ),
-          const CustomSizedBox(width: 8),
-          // Video Button
-          CircleIconButton(
-            customChild: SvgPicture.asset(
-              Assets.icons.video.path,
-              colorFilter: ColorFilter.mode(
-                isLightTheme(context) ? ColorPalette.black : Colors.white,
-                BlendMode.srcIn,
-              ),
-              width: 20,
-              height: 20,
-            ),
-            onTap: () {
-              _startCallFromHeader(
-                context,
-                isVideoCall: true,
-                isGroup: isGroup,
-                group: group,
+          BlocBuilder<CallCubit, CallState>(
+            bloc: Di().sl<CallCubit>(),
+            builder: (context, state) {
+              final callCubit = Di().sl<CallCubit>();
+              final isStartingCall = callCubit.isStartingCall;
+              final isStartingAudioCall = callCubit.isStartingAudioCall;
+              final isStartingVideoCall = callCubit.isStartingVideoCall;
+
+              return Row(
+                children: [
+                  CircleIconButton(
+                    customChild: isStartingAudioCall
+                        ? SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: Lottie.asset(
+                              Assets.animations.loadingSpinner,
+                              fit: BoxFit.cover,
+                            ),
+                          )
+                        : SvgPicture.asset(
+                            Assets.icons.phone.path,
+                            colorFilter: ColorFilter.mode(
+                              isLightTheme(context)
+                                  ? ColorPalette.black
+                                  : Colors.white,
+                              BlendMode.srcIn,
+                            ),
+                            width: 20,
+                            height: 20,
+                          ),
+                    onTap: isStartingCall
+                        ? null
+                        : () {
+                            _startCallFromHeader(
+                              context,
+                              isVideoCall: false,
+                              isGroup: isGroup,
+                              group: group,
+                            );
+                          },
+                  ),
+                  const CustomSizedBox(width: 8),
+                  CircleIconButton(
+                    customChild: isStartingVideoCall
+                        ? SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: Lottie.asset(
+                              Assets.animations.loadingSpinner,
+                              fit: BoxFit.cover,
+                            ),
+                          )
+                        : SvgPicture.asset(
+                            Assets.icons.video.path,
+                            colorFilter: ColorFilter.mode(
+                              isLightTheme(context)
+                                  ? ColorPalette.black
+                                  : Colors.white,
+                              BlendMode.srcIn,
+                            ),
+                            width: 20,
+                            height: 20,
+                          ),
+                    onTap: isStartingCall
+                        ? null
+                        : () {
+                            _startCallFromHeader(
+                              context,
+                              isVideoCall: true,
+                              isGroup: isGroup,
+                              group: group,
+                            );
+                          },
+                  ),
+                ],
               );
             },
           ),
@@ -509,19 +547,17 @@ class ChatAppBar extends StatelessWidget {
       final members = chat.members;
       final otherGroupMembers = chat.matchedGroupDetails?.members;
       if (members != null && members.isNotEmpty) {
-        participantIds = members
-            .map((m) => m.id)
-            .toList()
-            .where((id) => id != currentUserId)
-            .toList();
+        participantIds.addAll(
+          members.map((m) => m.id).where((id) => id != currentUserId),
+        );
       }
       if (otherGroupMembers != null && otherGroupMembers.isNotEmpty) {
-        participantIds = otherGroupMembers
-            .map((m) => m.id)
-            .toList()
-            .where((id) => id != currentUserId)
-            .toList();
+        participantIds.addAll(
+          otherGroupMembers.map((m) => m.id).where((id) => id != currentUserId),
+        );
       }
+
+      participantIds = participantIds.toSet().toList();
     }
 
     return participantIds;
