@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 
-import '../../../../app/constants/app_enums.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/text_styles.dart';
 import '../../../../core/di_container.dart';
@@ -47,13 +46,7 @@ class CallActionButtons extends StatelessWidget {
               isActive: !callCubit.cameraOff,
               activeColor: ColorPalette.primary,
               inactiveColor: ColorPalette.secondary,
-              onTap: () {
-                if (callCubit.callType == CallType.audio) {
-                  callCubit.switchToVideoCall();
-                } else {
-                  callCubit.switchToAudioCall();
-                }
-              },
+              onTap: callCubit.handleVideoActionTap,
             ),
             SizedBox(width: 16.w),
             GestureDetector(

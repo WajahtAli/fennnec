@@ -60,6 +60,10 @@ class CallCubit extends Cubit<CallState> {
   bool _hasPoppedAfterLeave = false;
   final int localUid = DateTime.now().millisecondsSinceEpoch.remainder(1000000);
   bool get hasOngoingCall => _isEngineReady || callId != null || joined;
+  bool get hasActiveRemoteVideo =>
+      remoteVideoState.values.any((isActive) => isActive);
+  bool get isVideoCallActive => callType == CallType.video;
+  bool get isLocalVideoActive => isVideoCallActive && !cameraOff;
   String get callStatusLabel {
     final isCallConnecting = !joined && loading;
     final isCallRinging = joined && !loading && users.isEmpty;
@@ -83,6 +87,12 @@ class CallCubit extends Cubit<CallState> {
   }) async {
     this.callType = mediaType == 'video' ? CallType.video : CallType.audio;
     cameraOff = this.callType == CallType.audio;
+    users.clear();
+    joined = false;
+    remoteAudioState.clear();
+    remoteVideoState.clear();
+    isLocalVideoEnabled = isLocalVideoActive;
+    isRemoteVideoEnabled = false;
     imageUrl = callerImageUrl;
     isCallMinimized = false;
     isSystemPipActive = false;
@@ -96,7 +106,6 @@ class CallCubit extends Cubit<CallState> {
         callType: callType,
         participantIds: participantIds,
       );
-
       isStartingCall = false;
 
       final data = response['data'] as Map<String, dynamic>?;
@@ -139,6 +148,12 @@ class CallCubit extends Cubit<CallState> {
     this.imageUrl = imageUrl;
     callType = mediaType == 'video' ? CallType.video : CallType.audio;
     cameraOff = callType == CallType.audio;
+    users.clear();
+    joined = false;
+    remoteAudioState.clear();
+    remoteVideoState.clear();
+    isLocalVideoEnabled = isLocalVideoActive;
+    isRemoteVideoEnabled = false;
     isCallMinimized = false;
     isSystemPipActive = false;
     CallPipOverlayController.hide();
@@ -165,6 +180,8 @@ class CallCubit extends Cubit<CallState> {
     );
     emit(CallLoading());
     users.clear();
+    remoteAudioState.clear();
+    remoteVideoState.clear();
     joined = false;
     loading = true;
     _hasPoppedAfterLeave = false;
@@ -179,11 +196,13 @@ class CallCubit extends Cubit<CallState> {
 
     if (callType == CallType.video) {
       cameraOff = false;
+      isLocalVideoEnabled = true;
       await engine.enableVideo();
       await engine.startPreview();
       await engine.muteLocalVideoStream(false);
     } else {
       cameraOff = true;
+      isLocalVideoEnabled = false;
       await engine.muteLocalVideoStream(true);
       await engine.stopPreview();
       await engine.disableVideo();
@@ -254,6 +273,7 @@ class CallCubit extends Cubit<CallState> {
     emit(CallLoading());
 
     cameraOff = !cameraOff;
+    isLocalVideoEnabled = isLocalVideoActive;
 
     if (_isEngineReady) {
       await engine.muteLocalVideoStream(cameraOff);
@@ -268,6 +288,15 @@ class CallCubit extends Cubit<CallState> {
     emit(CallLoaded());
   }
 
+  Future<void> handleVideoActionTap() async {
+    if (callType == CallType.audio) {
+      await switchToVideoCall();
+      return;
+    }
+
+    await toggleCamera();
+  }
+
   Future<void> switchToVideoCall({bool turnCameraOn = true}) async {
     if (callType == CallType.video) {
       if (turnCameraOn && cameraOff) {
@@ -279,15 +308,15 @@ class CallCubit extends Cubit<CallState> {
     emit(CallLoading());
 
     callType = CallType.video;
+    cameraOff = !turnCameraOn;
+    isLocalVideoEnabled = isLocalVideoActive;
 
     if (_isEngineReady) {
       await engine.enableVideo();
       if (turnCameraOn) {
-        cameraOff = false;
         await engine.startPreview();
         await engine.muteLocalVideoStream(false);
       } else {
-        cameraOff = true;
         await engine.muteLocalVideoStream(true);
         await engine.stopPreview();
       }
@@ -303,6 +332,7 @@ class CallCubit extends Cubit<CallState> {
 
     callType = CallType.audio;
     cameraOff = true;
+    isLocalVideoEnabled = false;
 
     if (_isEngineReady) {
       await engine.muteLocalVideoStream(true);
@@ -351,6 +381,10 @@ class CallCubit extends Cubit<CallState> {
     }
     joined = false;
     users.clear();
+    remoteAudioState.clear();
+    remoteVideoState.clear();
+    isLocalVideoEnabled = false;
+    isRemoteVideoEnabled = false;
     emit(CallLoaded());
     _isEndingCall = false;
   }
@@ -465,6 +499,7 @@ class CallCubit extends Cubit<CallState> {
           users.add(remoteUid);
           remoteAudioState[remoteUid] = true;
           remoteVideoState[remoteUid] = false;
+          isRemoteVideoEnabled = hasActiveRemoteVideo;
           emit(CallLoaded());
         },
         onUserMuteAudio: (connection, remoteUid, muted) {
@@ -474,20 +509,19 @@ class CallCubit extends Cubit<CallState> {
           emit(CallLoaded());
         },
         onUserEnableVideo: (connection, remoteUid, enabled) {
-          emit(CallLoading());
           log("📹 Remote user enabled video: $remoteUid, $enabled");
-          if (enabled) {
-            remoteVideoState[remoteUid] = true;
-            switchToVideoCall(turnCameraOn: false);
-          } else {
-            remoteVideoState[remoteUid] = false;
-            switchToAudioCall();
+          remoteVideoState[remoteUid] = enabled;
+          isRemoteVideoEnabled = hasActiveRemoteVideo;
+
+          if (enabled && callType == CallType.audio) {
+            unawaited(switchToVideoCall(turnCameraOn: false));
+            return;
           }
+
           emit(CallLoaded());
         },
         onRemoteVideoStateChanged:
             (connection, remoteUid, state, reason, elapsed) async {
-              emit(CallLoading());
               log(
                 "📹 Remote video state changed: uid=$remoteUid, state=$state, reason=$reason",
               );
@@ -496,21 +530,14 @@ class CallCubit extends Cubit<CallState> {
                   state == RemoteVideoState.remoteVideoStateDecoding;
 
               remoteVideoState[remoteUid] = isVideoActive;
-              isRemoteVideoEnabled = isVideoActive;
+              isRemoteVideoEnabled = hasActiveRemoteVideo;
 
               if (isVideoActive && callType == CallType.audio) {
                 debugPrint("📹 Remote enabled video → upgrading call view");
                 await switchToVideoCall(turnCameraOn: false);
+                return;
               }
 
-              if (!isVideoActive && callType == CallType.video) {
-                // Only switch back to audio if NO remote video is active anymore
-                final anyRemoteVideo = remoteVideoState.values.any((v) => v);
-                if (!anyRemoteVideo) {
-                  debugPrint("📵 No remote video active → switching to audio");
-                  await switchToAudioCall();
-                }
-              }
               emit(CallLoaded());
             },
 
@@ -520,6 +547,9 @@ class CallCubit extends Cubit<CallState> {
 
               debugPrint("👤 Remote user offline: $remoteUid");
               users.remove(remoteUid);
+              remoteAudioState.remove(remoteUid);
+              remoteVideoState.remove(remoteUid);
+              isRemoteVideoEnabled = hasActiveRemoteVideo;
               emit(CallLoaded());
               if (users.isEmpty) {
                 endCall();
@@ -530,6 +560,10 @@ class CallCubit extends Cubit<CallState> {
           debugPrint("🚪 Left channel: ${conn.channelId}");
           joined = false;
           users.clear();
+          remoteAudioState.clear();
+          remoteVideoState.clear();
+          isLocalVideoEnabled = false;
+          isRemoteVideoEnabled = false;
           _stopTimer();
           emit(CallLoaded());
           _popCallScreen();
@@ -567,6 +601,8 @@ class CallCubit extends Cubit<CallState> {
     muted = false;
     cameraOff = callType == CallType.audio;
     speaker = false;
+    isLocalVideoEnabled = isLocalVideoActive;
+    isRemoteVideoEnabled = hasActiveRemoteVideo;
     emit(CallLoaded());
   }
 

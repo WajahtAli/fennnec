@@ -170,7 +170,7 @@ class _CallPipOverlayState extends State<CallPipOverlay> {
           ? _callCubit.users.first
           : null;
 
-      if (remoteUid != null) {
+      if (remoteUid != null && _callCubit.remoteVideoState[remoteUid] == true) {
         return AgoraVideoView(
           controller: VideoViewController.remote(
             rtcEngine: _callCubit.engine,
@@ -182,7 +182,7 @@ class _CallPipOverlayState extends State<CallPipOverlay> {
         );
       }
 
-      if (!_callCubit.cameraOff && _localController != null) {
+      if (_callCubit.isLocalVideoActive && _localController != null) {
         return AgoraVideoView(controller: _localController!);
       }
     }
@@ -196,6 +196,13 @@ class _CallPipOverlayState extends State<CallPipOverlay> {
               width: double.infinity,
               height: double.infinity,
               fit: BoxFit.cover,
+              errorBuilder: (_, _, _) => Icon(
+                _callCubit.callType == CallType.video
+                    ? Icons.videocam_off_rounded
+                    : Icons.call_rounded,
+                color: Colors.white54,
+                size: 34,
+              ),
             )
           : Icon(
               _callCubit.callType == CallType.video

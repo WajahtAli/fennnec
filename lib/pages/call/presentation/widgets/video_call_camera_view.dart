@@ -46,26 +46,30 @@ class _VideoCallCameraViewState extends State<VideoCallCameraView> {
       bloc: _callCubit,
       builder: (context, state) {
         _initLocalController();
-        final users = _callCubit.users;
+        final users = _callCubit.users.toList(growable: false);
 
         if (users.isEmpty) {
           if (!_callCubit.isEngineReady ||
-              _callCubit.cameraOff ||
+              !_callCubit.isLocalVideoActive ||
               _localController == null) {
-            return Container(color: Colors.black87);
+            return _buildVideoFallback(
+              message: _callCubit.isVideoCallActive
+                  ? 'Waiting for video...'
+                  : 'Connecting call...',
+            );
           }
 
           return AgoraVideoView(controller: _localController!);
         }
 
         if (users.length == 1) {
-          return _buildVideo(users.first, _callCubit);
+          return _buildParticipantView(users.first, _callCubit);
         }
 
         if (users.length == 2) {
           return Column(
             children: users.map((uid) {
-              return Expanded(child: _buildVideo(uid, _callCubit));
+              return Expanded(child: _buildParticipantView(uid, _callCubit));
             }).toList(),
           );
         }
@@ -79,28 +83,31 @@ class _VideoCallCameraViewState extends State<VideoCallCameraView> {
             childAspectRatio: 1,
           ),
           itemBuilder: (context, index) {
-            return _buildVideo(users.elementAt(index), _callCubit);
+            return _buildParticipantView(users[index], _callCubit);
           },
         );
       },
     );
   }
 
-  Widget _buildVideo(int uid, CallCubit callCubit) {
+  Widget _buildParticipantView(int uid, CallCubit callCubit) {
     final isMuted = callCubit.remoteAudioState[uid] == false;
+    final isRemoteVideoActive = callCubit.remoteVideoState[uid] == true;
 
     return Stack(
       children: [
         Positioned.fill(
-          child: AgoraVideoView(
-            controller: VideoViewController.remote(
-              rtcEngine: callCubit.engine,
-              canvas: VideoCanvas(uid: uid),
-              connection: RtcConnection(
-                channelId: callCubit.channelName ?? 'test',
-              ),
-            ),
-          ),
+          child: isRemoteVideoActive
+              ? AgoraVideoView(
+                  controller: VideoViewController.remote(
+                    rtcEngine: callCubit.engine,
+                    canvas: VideoCanvas(uid: uid),
+                    connection: RtcConnection(
+                      channelId: callCubit.channelName ?? 'test',
+                    ),
+                  ),
+                )
+              : _buildVideoFallback(message: 'Camera is off'),
         ),
         if (isMuted)
           Positioned(
@@ -132,6 +139,46 @@ class _VideoCallCameraViewState extends State<VideoCallCameraView> {
               ),
             ),
           ),
+      ],
+    );
+  }
+
+  Widget _buildVideoFallback({required String message}) {
+    final imageUrl = _callCubit.imageUrl;
+
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        if (imageUrl?.isNotEmpty == true)
+          Image.network(
+            imageUrl!,
+            fit: BoxFit.cover,
+            errorBuilder: (_, _, _) => Container(color: Colors.black87),
+          )
+        else
+          Container(color: Colors.black87),
+        Container(color: Colors.black.withValues(alpha: 0.5)),
+        Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.videocam_off_rounded,
+                color: Colors.white70,
+                size: 34,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                message,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }
