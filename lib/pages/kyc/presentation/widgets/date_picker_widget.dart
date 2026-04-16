@@ -25,6 +25,7 @@ class _DatePickerWidgetState extends State<DatePickerWidget> {
   DateTime? _currentDate;
   List<String> _months = [];
   int _previousDaysInMonth = 31;
+  int get _maxSelectableYear => DateTime.now().year - 18;
 
   @override
   void initState() {
@@ -33,7 +34,7 @@ class _DatePickerWidgetState extends State<DatePickerWidget> {
   }
 
   void _initializeWidget() {
-    _currentDate = widget.initialDate ?? DateTime(2003, 4, 16);
+    _currentDate = widget.initialDate ?? DateTime(2001, 5, 5);
     _kycCubit.selectedDate = _currentDate;
     _months = DummyConstants.months;
     _previousDaysInMonth = DateTime(
@@ -60,7 +61,7 @@ class _DatePickerWidgetState extends State<DatePickerWidget> {
       initialItem: _currentDate!.month - 1,
     );
     _yearController = FixedExtentScrollController(
-      initialItem: DateTime.now().year - _currentDate!.year,
+      initialItem: _maxSelectableYear - _currentDate!.year,
     );
   }
 
@@ -99,8 +100,7 @@ class _DatePickerWidgetState extends State<DatePickerWidget> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    final currentYear = DateTime.now().year;
-    final years = List.generate(100, (i) => currentYear - i);
+    final years = List.generate(100, (i) => _maxSelectableYear - i);
 
     return Container(
       height: getWidth(context) > 500 ? 250 : 200,
@@ -174,7 +174,7 @@ class _DatePickerWidgetState extends State<DatePickerWidget> {
 
     final day = _dayController!.selectedItem + 1;
     final month = _monthController!.selectedItem + 1;
-    final year = DateTime.now().year - _yearController!.selectedItem;
+    final year = _maxSelectableYear - _yearController!.selectedItem;
 
     try {
       // Calculate days in the new month/year
@@ -221,33 +221,21 @@ class _DatePickerWidgetState extends State<DatePickerWidget> {
       right: 0,
       height: getWidth(context) > 500 ? 90 : 70,
       child: IgnorePointer(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            int steps = 60;
-            return Stack(
-              children: List.generate(steps, (index) {
-                double fraction = index / (steps);
-                // Both top and bottom now use the same pattern
-                double effectiveFraction = 1 - fraction;
-                double sigmaY = 0.5 + effectiveFraction * 10;
-                double sigmaX = 0.3 + effectiveFraction * 6;
-
-                return Positioned(
-                  top: isTop ? (constraints.maxHeight * fraction) : null,
-                  bottom: isTop ? null : (constraints.maxHeight * fraction),
-                  left: 0,
-                  right: 0,
-                  height: constraints.maxHeight / steps,
-                  child: ClipRect(
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: sigmaX, sigmaY: sigmaY),
-                      child: Container(color: Colors.transparent),
-                    ),
-                  ),
-                );
-              }),
-            );
-          },
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: isTop ? Alignment.topCenter : Alignment.bottomCenter,
+              end: isTop ? Alignment.bottomCenter : Alignment.topCenter,
+              colors: [
+                isLightTheme(context)
+                    ? ColorPalette.textGrey
+                    : ColorPalette.secondary,
+                isLightTheme(context)
+                    ? ColorPalette.textGrey.withValues(alpha: 0)
+                    : ColorPalette.secondary.withValues(alpha: 0),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -260,34 +248,38 @@ class _DatePickerWidgetState extends State<DatePickerWidget> {
     required String Function(dynamic) formatter,
     required VoidCallback onChanged,
   }) {
-    return AnimatedBuilder(
-      animation: controller,
-      builder: (context, _) {
-        return ListWheelScrollView.useDelegate(
-          controller: controller,
-          itemExtent: 55,
-          physics: const FixedExtentScrollPhysics(),
-          onSelectedItemChanged: (_) => onChanged(),
-          perspective: 0.002,
-          diameterRatio: 2,
-          squeeze: 1.25,
-          useMagnifier: false,
-          magnification: 1.0,
-          childDelegate: ListWheelChildBuilderDelegate(
-            builder: (context, index) {
+    return ListWheelScrollView.useDelegate(
+      controller: controller,
+      itemExtent: 55,
+      physics: const FixedExtentScrollPhysics(),
+      onSelectedItemChanged: (_) => onChanged(),
+      perspective: 0.002,
+      diameterRatio: 2,
+      squeeze: 1.25,
+      useMagnifier: true,
+      magnification: 1.2,
+      childDelegate: ListWheelChildBuilderDelegate(
+        builder: (context, index) {
+          return ListenableBuilder(
+            listenable: controller,
+            builder: (context, _) {
               final dynamic item;
-
               if (items != null) {
                 item = items[index % items.length];
               } else if (maxItems != null) {
-                final actualIndex = index % maxItems;
-                item = actualIndex + 1;
+                item = (index % maxItems) + 1;
               } else {
                 return const SizedBox.shrink();
               }
 
-              // Simple distance calculation that works for all columns
-              final selectedItem = controller.selectedItem;
+              // Simple distance calculation for opacity
+              late int selectedItem;
+              try {
+                selectedItem = controller.selectedItem;
+              } catch (_) {
+                selectedItem = 0;
+              }
+
               final distance = (index - selectedItem).abs();
               final opacity = distance == 0 ? 1.0 : (distance == 1 ? 0.3 : 0.2);
 
@@ -306,10 +298,10 @@ class _DatePickerWidgetState extends State<DatePickerWidget> {
                 ),
               );
             },
-            childCount: 10000,
-          ),
-        );
-      },
+          );
+        },
+        childCount: 10000,
+      ),
     );
   }
 }

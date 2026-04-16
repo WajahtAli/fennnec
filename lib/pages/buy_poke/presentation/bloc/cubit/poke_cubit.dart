@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
+import 'package:fennac_app/pages/auth/presentation/bloc/cubit/login_cubit.dart';
 import 'package:fennac_app/pages/auth/presentation/bloc/cubit/create_account_cubit.dart';
 import 'package:fennac_app/pages/buy_poke/data/model/poke_model.dart';
 import 'package:fennac_app/pages/buy_poke/domain/usecase/fetch_pokes_usecase.dart';
@@ -14,6 +15,7 @@ import 'package:fennac_app/pages/buy_poke/data/datasource/iap_service.dart';
 
 class PokeCubit extends Cubit<PokeState> {
   final PurchaseSubscriptionUseCase purchaseSubscriptionUseCase;
+  final CancelSubscriptionUseCase cancelSubscriptionUseCase;
   final SendPokeUseCase _sendPokeUseCase;
 
   bool isSubscriptionPurchasing = false;
@@ -25,6 +27,7 @@ class PokeCubit extends Cubit<PokeState> {
     this.fetchPokesUseCase,
     this.purchasePokesUseCase,
     this.purchaseSubscriptionUseCase,
+    this.cancelSubscriptionUseCase,
     this._sendPokeUseCase,
   ) : super(PokeInitial());
 
@@ -103,6 +106,54 @@ class PokeCubit extends Cubit<PokeState> {
       }
     } catch (e) {
       VxToast.show(message: 'Failed to restore purchases');
+      emit(PokeError(e.toString()));
+    }
+    isSubscriptionPurchasing = false;
+  }
+
+  Future<void> cancelSubscription({required String userId}) async {
+    if (userId.trim().isEmpty) {
+      VxToast.show(message: 'Unable to cancel subscription right now.');
+      emit(PokeError('User id is missing'));
+      return;
+    }
+
+    isSubscriptionPurchasing = true;
+    emit(PokeLoading());
+    try {
+      final response = await cancelSubscriptionUseCase.call(userId: userId);
+      final message =
+          response['message']?.toString() ??
+          'Subscription canceled successfully';
+      if (response['success'] != true) {
+        VxToast.show(message: message);
+        emit(PokeError(message));
+        isSubscriptionPurchasing = false;
+        return;
+      }
+
+      final data = response['data'] is Map<String, dynamic>
+          ? Map<String, dynamic>.from(response['data'])
+          : <String, dynamic>{};
+
+      final loginCubit = Di().sl<LoginCubit>();
+      final currentUser = loginCubit.userData?.user;
+      if (currentUser != null) {
+        loginCubit.updateUserFromProfileModel(
+          currentUser.copyWith(
+            subscriptionActive: data['subscriptionActive'] == true,
+            subscriptionExpiresAt: data['subscriptionExpiresAt']?.toString(),
+          ),
+        );
+      }
+
+      VxToast.show(message: message, icon: Assets.icons.checkGreen.path);
+      emit(PokeLoaded());
+    } catch (e) {
+      final message = e.toString().replaceFirst('Exception: ', '').trim();
+      VxToast.show(
+        message: message.isNotEmpty ? message : 'Failed to cancel subscription',
+      );
       emit(PokeError(e.toString()));
     }
     isSubscriptionPurchasing = false;

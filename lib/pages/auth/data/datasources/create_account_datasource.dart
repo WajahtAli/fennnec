@@ -59,6 +59,8 @@ abstract class CreateAccountDatasource {
 
   Future<dynamic> uploadMedia({required final String filePath});
 
+  Future<dynamic> uploadMediaMultiple({required final List<String> filePaths});
+
   Future<dynamic> customPrompt({
     required final String promptTitle,
     required final String type,
@@ -185,6 +187,19 @@ class CreateAccountDatasourceImpl extends CreateAccountDatasource {
       AppConstants.uploadSingle,
       fileFieldName: 'file',
       filePath: filePath,
+      requiresAuth: true,
+    );
+    return data;
+  }
+
+  @override
+  Future<dynamic> uploadMediaMultiple({
+    required final List<String> filePaths,
+  }) async {
+    final data = await apiHelper.uploadFiles(
+      AppConstants.uploadMultiple,
+      fileFieldName: 'files',
+      filePaths: filePaths,
       requiresAuth: true,
     );
     return data;

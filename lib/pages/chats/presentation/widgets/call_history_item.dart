@@ -93,10 +93,9 @@ class CallHistoryItem extends StatelessWidget {
                     if (unreadCount > 0)
                       Text(
                         unreadCount.toString(),
-                        style: AppTextStyles.bodyRegular(context).copyWith(
-                          color: ColorPalette.secondary,
-                          fontWeight: FontWeight.w700,
-                        ),
+                        style: AppTextStyles.bodyRegular(
+                          context,
+                        ).copyWith(fontWeight: FontWeight.w700),
                       ),
                   ],
                 ),
@@ -145,7 +144,8 @@ class CallHistoryItem extends StatelessWidget {
     if (isCallItem) {
       return '$callType • $duration';
     } else {
-      return lastMessage ?? '';
+      final preview = lastMessage?.trim() ?? '';
+      return preview.isEmpty ? 'Photo' : preview;
     }
   }
 
@@ -193,27 +193,29 @@ class CallHistoryItem extends StatelessWidget {
   }
 
   Widget _buildGroupAvatars() {
-    return SizedBox(
-      width: 48,
-      height: 48,
-      child: Stack(
-        children: [
-          // Top-left
-          if (avatars!.isNotEmpty)
-            Positioned(left: 0, top: 0, child: _buildAvatar(avatars![0])),
-          // Top-right
-          if (avatars!.length > 1)
-            Positioned(left: 24, top: 0, child: _buildAvatar(avatars![1])),
-          // Bottom-left
-          if (avatars!.length > 3)
-            Positioned(left: 0, top: 24, child: _buildAvatar(avatars![3])),
-          // Bottom-right
-          if (avatars!.length > 4)
-            Positioned(left: 24, top: 24, child: _buildAvatar(avatars![4])),
-          // Center on top
-          if (avatars!.length > 2)
-            Positioned(left: 12, top: 12, child: _buildAvatar(avatars![2])),
-        ],
+    return Center(
+      child: SizedBox(
+        width: 48,
+        height: 48,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            if (avatars!.isNotEmpty)
+              Positioned(left: 0, top: 0, child: _buildAvatar(avatars![0])),
+
+            if (avatars!.length > 1)
+              Positioned(right: 0, top: 0, child: _buildAvatar(avatars![1])),
+
+            if (avatars!.length > 2)
+              Positioned(left: 12, top: 12, child: _buildAvatar(avatars![2])),
+
+            if (avatars!.length > 3)
+              Positioned(left: 0, bottom: 0, child: _buildAvatar(avatars![3])),
+
+            if (avatars!.length > 4)
+              Positioned(right: 0, bottom: 0, child: _buildAvatar(avatars![4])),
+          ],
+        ),
       ),
     );
   }

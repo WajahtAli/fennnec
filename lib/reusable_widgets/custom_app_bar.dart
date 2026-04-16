@@ -1,6 +1,5 @@
 import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/widgets/custom_back_button.dart';
-import 'package:fennac_app/widgets/custom_sized_box.dart';
 import 'package:fennac_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
 
@@ -23,36 +22,41 @@ class CustomAppBar extends StatelessWidget {
     return SafeArea(
       child: SizedBox(
         height: 48,
-        child: Row(
+        child: Stack(
+          alignment: Alignment.center,
           children: [
-            if (allowSpace ?? false) CustomSizedBox(width: 14),
-            const SizedBox(
-              width: 58,
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: CustomBackButton(),
-              ),
-            ),
-
-            Expanded(
-              child: Center(
-                child: AppText(
-                  text: title ?? 'Find a Group',
-                  style:
-                      titleStyle ??
-                      AppTextStyles.h4(context).copyWith(letterSpacing: 0.2),
+            // ── Row for left & right ──
+            Row(
+              children: [
+                // Left (back button)
+                Padding(
+                  padding: EdgeInsets.only(
+                    left: (allowSpace ?? false) ? 14 : 8,
+                  ),
+                  child: const CustomBackButton(),
                 ),
-              ),
-            ),
 
-            SizedBox(
-              width: 58,
-              child: Align(
-                alignment: Alignment.centerRight,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                const Spacer(),
+
+                // Right (action)
+                Padding(
+                  padding: const EdgeInsets.only(right: 8),
                   child: action ?? const SizedBox(),
                 ),
+              ],
+            ),
+
+            // ── Center Title (absolute center) ──
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 60),
+              child: AppText(
+                text: title ?? 'Find a Group',
+                style:
+                    titleStyle ??
+                    AppTextStyles.h4(context).copyWith(letterSpacing: 0.2),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
               ),
             ),
           ],

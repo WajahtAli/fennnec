@@ -112,7 +112,7 @@ class GroupOptionsBottomSheet extends StatelessWidget {
 
           _buildOption(
             context,
-            title: 'Edit Group',
+            title: 'View / Edit Group',
             textColor: Colors.white,
             onTap: () {
               final isAdmin =

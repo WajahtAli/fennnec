@@ -12,7 +12,9 @@ final GlobalKey<ScaffoldMessengerState> snackbarKey =
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+  const MyApp({super.key, this.initialThemeMode});
+
+  final ThemeMode? initialThemeMode;
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -20,6 +22,20 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final _appRouter = AppRouter(navigatorKey: navigatorKey);
+
+  ThemeData _themeFromMode(BuildContext context, ThemeMode themeMode) {
+    switch (themeMode) {
+      case ThemeMode.dark:
+        return darkTheme(context);
+      case ThemeMode.light:
+        return lightTheme(context);
+      case ThemeMode.system:
+        final brightness = MediaQuery.platformBrightnessOf(context);
+        return brightness == Brightness.dark
+            ? darkTheme(context)
+            : lightTheme(context);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,12 +45,14 @@ class _MyAppState extends State<MyApp> {
       splitScreenMode: true,
       builder: (context, child) {
         return ThemeProvider(
-          initTheme: lightTheme(context),
+          initTheme: _themeFromMode(
+            context,
+            widget.initialThemeMode ?? ThemeMode.light,
+          ),
           child: Builder(
             builder: (context) {
               final theme = ThemeModelInheritedNotifier.of(context).theme;
               final isLightTheme = theme.brightness == Brightness.light;
-
               return AnnotatedRegion<SystemUiOverlayStyle>(
                 value: SystemUiOverlayStyle(
                   statusBarIconBrightness: isLightTheme

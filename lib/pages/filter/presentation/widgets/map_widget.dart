@@ -31,7 +31,6 @@ class MapWidget extends StatelessWidget {
                   children: [
                     GoogleMapWidget(distanceMiles: distanceMiles),
 
-                    // Search overlay
                     if (overlayWidget != null)
                       Positioned(
                         top: 12,
@@ -40,12 +39,16 @@ class MapWidget extends StatelessWidget {
                         child: overlayWidget!,
                       ),
 
-                    // Subtle loading overlay
                     if (state is GoogleMapStateLoading)
-                      Container(
-                        color: Colors.black.withOpacity(0.1),
-                        child: Center(
-                          child: Lottie.asset(Assets.animations.loadingSpinner),
+                      IgnorePointer(
+                        ignoring: true,
+                        child: Container(
+                          color: Colors.black.withOpacity(0.1),
+                          child: Center(
+                            child: Lottie.asset(
+                              Assets.animations.loadingSpinner,
+                            ),
+                          ),
                         ),
                       ),
                   ],

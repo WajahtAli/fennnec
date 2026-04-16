@@ -4,6 +4,13 @@ import 'package:fennac_app/pages/buy_poke/domain/repository/poke_repository.dart
 
 class PokeRepositoryImpl extends PokeRepository {
   @override
+  Future<Map<String, dynamic>> cancelSubscription({
+    required String userId,
+  }) async {
+    return await _datasource.cancelSubscription(userId: userId);
+  }
+
+  @override
   Future<Map<String, dynamic>> purchaseSubscription({
     required String productId,
   }) async {

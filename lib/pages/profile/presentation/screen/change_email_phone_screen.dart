@@ -58,121 +58,132 @@ class _ChangeEmailPhoneScreenState extends State<ChangeEmailPhoneScreen> {
             child: LayoutBuilder(
               builder: (context, constraints) {
                 return SingleChildScrollView(
-                  padding: EdgeInsets.only(
-                    left: 20,
-                    right: 20,
-                    top: 8,
-                    bottom: 24 + MediaQuery.viewInsetsOf(context).bottom,
-                  ),
                   child: ConstrainedBox(
                     constraints: BoxConstraints(
                       minHeight: constraints.maxHeight,
                     ),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         CustomAppBar(title: 'Change Email or Phone'),
-                        const SizedBox(height: 32),
-                        Text(
-                          'Keep your contact info up to date.',
-                          style: AppTextStyles.h3(context),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 32),
 
-                        CustomLabelTextField(
-                          label: 'Email',
-                          hintText: 'johndoe123@email.com',
-                          filled: false,
-                          controller: _emailController,
-                          keyboardType: TextInputType.emailAddress,
-                        ),
-
-                        const SizedBox(height: 28),
-                        Text(
-                          'Phone Number',
-                          style: AppTextStyles.bodySmall(
-                            context,
-                          ).copyWith(fontWeight: FontWeight.w600),
-                        ),
-                        const CustomSizedBox(height: 12),
-                        PhoneNumberField(
-                          initialValue: _phoneNumber,
-                          onChanged: (completePhoneNumber) {
-                            _phoneNumber = completePhoneNumber;
-                          },
-                        ),
-                        const CustomSizedBox(height: 32),
-
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
+                        Padding(
+                          padding: EdgeInsets.only(
+                            left: 20,
+                            right: 20,
+                            top: 8,
+                            bottom:
+                                24 + MediaQuery.viewInsetsOf(context).bottom,
                           ),
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(16),
-                            color: isDarkTheme(context)
-                                ? Colors.black26
-                                : ColorPalette.textGrey,
-                          ),
-                          child: ListTile(
-                            contentPadding: EdgeInsets.zero,
-                            leading: SvgPicture.asset(
-                              Assets.icons.info.path,
-                              width: 24,
-                              height: 24,
-                              color: isLightTheme(context)
-                                  ? ColorPalette.black
-                                  : ColorPalette.textSecondary,
-                            ),
-                            title: Text(
-                              'We’ll send a verification code to confirm your new phone number.',
-                              style: AppTextStyles.subHeading(context).copyWith(
-                                color: isLightTheme(context)
-                                    ? ColorPalette.black
-                                    : ColorPalette.textSecondary,
-                                fontSize: 13,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(height: 32),
+                              Text(
+                                'Keep your contact info up to date.',
+                                style: AppTextStyles.h3(context),
+                                textAlign: TextAlign.center,
                               ),
-                            ),
-                          ),
-                        ),
-                        const CustomSizedBox(height: 48),
-                        BlocBuilder<ProfileCubit, ProfileState>(
-                          bloc: _profileCubit,
-                          builder: (context, state) {
-                            return CustomElevatedButton(
-                              text: _profileCubit.isSubmitting
-                                  ? ''
-                                  : 'Send Verification Code',
-                              isLoading: _isSubmitting,
-                              icon: _profileCubit.isSubmitting
-                                  ? SizedBox(
-                                      height: 18,
-                                      width: 18,
-                                      child: Lottie.asset(
-                                        Assets.animations.loadingSpinner,
-                                        width: 18,
-                                        height: 18,
-                                      ),
-                                    )
-                                  : null,
-                              onTap: () async {
-                                final success = await _profileCubit
-                                    .changeEmailOrPhone(
-                                      email: _emailController.text,
-                                      phone: _phoneNumber,
-                                    );
-                                if (!mounted) return;
-                                setState(() => _isSubmitting = false);
-                                if (success) {
-                                  AutoRouter.of(context).push(
-                                    VerifyPhoneNumberRoute(isFromProfile: true),
+                              const SizedBox(height: 32),
+
+                              CustomLabelTextField(
+                                label: 'Email',
+                                hintText: 'johndoe123@email.com',
+                                filled: false,
+                                controller: _emailController,
+                                keyboardType: TextInputType.emailAddress,
+                              ),
+
+                              const SizedBox(height: 28),
+                              Text(
+                                'Phone Number',
+                                style: AppTextStyles.bodySmall(
+                                  context,
+                                ).copyWith(fontWeight: FontWeight.w600),
+                              ),
+                              const CustomSizedBox(height: 12),
+                              PhoneNumberField(
+                                initialValue: _phoneNumber,
+                                onChanged: (completePhoneNumber) {
+                                  _phoneNumber = completePhoneNumber;
+                                },
+                              ),
+                              const CustomSizedBox(height: 32),
+
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 12,
+                                ),
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(16),
+                                  color: isDarkTheme(context)
+                                      ? Colors.black26
+                                      : ColorPalette.textGrey,
+                                ),
+                                child: ListTile(
+                                  contentPadding: EdgeInsets.zero,
+                                  leading: SvgPicture.asset(
+                                    Assets.icons.info.path,
+                                    width: 24,
+                                    height: 24,
+                                    color: isLightTheme(context)
+                                        ? ColorPalette.black
+                                        : ColorPalette.textSecondary,
+                                  ),
+                                  title: Text(
+                                    'We’ll send a verification code to confirm your new phone number.',
+                                    style: AppTextStyles.subHeading(context)
+                                        .copyWith(
+                                          color: isLightTheme(context)
+                                              ? ColorPalette.black
+                                              : ColorPalette.textSecondary,
+                                          fontSize: 13,
+                                        ),
+                                  ),
+                                ),
+                              ),
+                              const CustomSizedBox(height: 48),
+                              BlocBuilder<ProfileCubit, ProfileState>(
+                                bloc: _profileCubit,
+                                builder: (context, state) {
+                                  return CustomElevatedButton(
+                                    text: _profileCubit.isSubmitting
+                                        ? ''
+                                        : 'Send Verification Code',
+                                    isLoading: _isSubmitting,
+                                    icon: _profileCubit.isSubmitting
+                                        ? SizedBox(
+                                            height: 18,
+                                            width: 18,
+                                            child: Lottie.asset(
+                                              Assets.animations.loadingSpinner,
+                                              width: 18,
+                                              height: 18,
+                                            ),
+                                          )
+                                        : null,
+                                    onTap: () async {
+                                      final success = await _profileCubit
+                                          .changeEmailOrPhone(
+                                            email: _emailController.text,
+                                            phone: _phoneNumber,
+                                          );
+                                      if (!mounted) return;
+                                      setState(() => _isSubmitting = false);
+                                      if (success) {
+                                        AutoRouter.of(context).push(
+                                          VerifyPhoneNumberRoute(
+                                            isFromProfile: true,
+                                          ),
+                                        );
+                                      }
+                                    },
                                   );
-                                }
-                              },
-                            );
-                          },
+                                },
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),

@@ -16,7 +16,7 @@ class AuthCubit extends Cubit<AuthState> {
   bool isEmail = true;
 
   // OTP states
-  int _remainingSeconds = 120; // 2 minutes
+  int _remainingSeconds = 10; // 1 minute
   Timer? _otpTimer;
   bool _canResendOtp = false;
   String? _otpErrorMessage;
@@ -127,14 +127,59 @@ class AuthCubit extends Cubit<AuthState> {
       return 'Phone number is required';
     }
 
-    final digitsOnly = value.replaceAll(RegExp(r'[^0-9]'), '');
+    final phoneDigits = value.replaceAll(RegExp(r'[^0-9]'), '');
+    if (phoneDigits.isEmpty) {
+      return 'Phone number is required';
+    }
 
-    if (digitsOnly.length < 10) {
-      return 'Phone number must be at least 10 digits';
+    final selectedPhoneCode =
+        selectedCountry?.phoneCode?.replaceAll(RegExp(r'[^0-9]'), '') ?? '';
+
+    var e164Digits = phoneDigits;
+    if (selectedPhoneCode.isNotEmpty &&
+        !phoneDigits.startsWith(selectedPhoneCode)) {
+      // Support local input in the field (without country code) by prepending
+      // selected country code before validating E.164.
+      e164Digits = '$selectedPhoneCode$phoneDigits';
     }
-    if (digitsOnly.length > 15) {
-      return 'Phone number is too long';
+
+    final e164 = '+$e164Digits';
+    final e164Regex = RegExp(r'^\+[1-9]\d{1,14}$');
+    if (!e164Regex.hasMatch(e164)) {
+      return 'Enter a valid phone number in E.164 format';
     }
+
+    final iso = selectedCountry?.iso;
+
+    // NANP (US/CA) => +1 followed by exactly 10 national digits.
+    if (iso == 'US' || iso == 'CA') {
+      if (!e164Digits.startsWith('1')) {
+        return 'US/Canada number must start with country code 1';
+      }
+
+      final national = e164Digits.substring(1);
+      if (national.length != 10) {
+        return 'US/Canada number must be 10 digits after country code';
+      }
+    }
+
+    // Pakistan mobile (as requested) => +92 followed by 10 digits, typically
+    // starting with 3 (e.g. +923001234567).
+    if (iso == 'PK') {
+      if (!e164Digits.startsWith('92')) {
+        return 'Pakistan number must start with country code 92';
+      }
+
+      var national = e164Digits.substring(2);
+      if (national.startsWith('0')) {
+        national = national.substring(1);
+      }
+
+      if (national.length != 10 || !national.startsWith('3')) {
+        return 'Enter a valid Pakistan mobile number (e.g. +923001234567)';
+      }
+    }
+
     return null;
   }
 
@@ -435,11 +480,11 @@ class AuthCubit extends Cubit<AuthState> {
 
   // ============ OTP Verification Methods ============
 
-  /// Start OTP timer (120 seconds / 2 minutes)
+  /// Start OTP timer (60 seconds / 1 minute)
   void startOtpTimer() {
     emit(AuthValidationLoading());
     _canResendOtp = false;
-    _remainingSeconds = 120;
+    _remainingSeconds = 60;
     _otpErrorMessage = null;
     _isOtpBlurred = false;
     _validationCounter++; // Increment to trigger initial emit

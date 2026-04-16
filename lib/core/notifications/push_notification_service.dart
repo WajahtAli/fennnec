@@ -1,8 +1,8 @@
 import 'dart:developer';
-import 'dart:io';
 
 import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/pages/auth/presentation/bloc/cubit/create_account_cubit.dart';
+import 'package:fennac_app/pages/homelanding/presentation/bloc/cubit/home_landing_cubit.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
@@ -17,9 +17,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     'Background message received: ${message.notification?.title}, ${message.notification?.body}',
   );
   if (message.data['type'] == 'call_incoming') {
-    if (Platform.isAndroid) {
-      await CallNotificationHandler.handleCallNotification(message);
-    }
+    await CallNotificationHandler.handleCallNotification(message);
   } else if (message.data['type'] == 'call_ended') {
     FlutterCallkitIncoming.endAllCalls();
   } else {
@@ -86,11 +84,20 @@ class PushNotificationService {
     );
 
     if (message.data['type'] == 'call_incoming') {
-      if (Platform.isAndroid) {
-        CallNotificationHandler.handleCallNotification(message);
-      }
+      CallNotificationHandler.handleCallNotification(message);
     } else if (message.data['type'] == 'call_ended') {
       FlutterCallkitIncoming.endAllCalls();
+    } else if (message.data['type'] == 'group_invitation') {
+      Di().sl<HomeLandingCubit>().fetchGroupInvitations();
+      if (message.notification != null) {
+        LocalNotificationService.showNotification(
+          title: message.notification!.title ?? '',
+          body: message.notification!.body ?? '',
+          channelKey:
+              message.data['channel_key'] ?? AppConstants.messagesChannelKey,
+          payload: message.data,
+        );
+      }
     } else if (message.notification != null) {
       LocalNotificationService.showNotification(
         title: message.notification!.title ?? '',

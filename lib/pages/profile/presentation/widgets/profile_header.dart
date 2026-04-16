@@ -211,7 +211,7 @@ class _ProfileHeaderState extends State<ProfileHeader> {
                 children: [
                   AppText(
                     text:
-                        '${_loginCubit.userData?.user?.firstName ?? ''} ${_loginCubit.userData?.user?.lastName ?? ''}, ${calculateAge(_loginCubit.userData?.user?.dob.toString() ?? "")}',
+                        '${_loginCubit.userData?.user?.firstName ?? ''} , ${calculateAge(_loginCubit.userData?.user?.dob.toString() ?? "")}',
                     style: AppTextStyles.h3(
                       context,
                     ).copyWith(fontWeight: FontWeight.w500),
@@ -289,21 +289,30 @@ class _ProfileHeaderState extends State<ProfileHeader> {
                           if (user.pronouns != null &&
                               user.pronouns!.isNotEmpty)
                             ProfileChip(label: user.pronouns!),
-                          if (user.v != null)
-                            ProfileChip(
-                              icon: Assets.icons.mapPin.path,
-                              label: '${user.v}',
+                          if (user.latitude != null)
+                            FutureBuilder<String>(
+                              future: _loginCubit.getLocationFromLatLng(
+                                _loginCubit.userData?.user?.latitude,
+                                _loginCubit.userData?.user?.longitude,
+                              ),
+                              builder: (context, snapshot) {
+                                final location = snapshot.data ?? '';
+                                return ProfileChip(
+                                  icon: Assets.icons.mapPin.path,
+                                  label: location,
+                                );
+                              },
                             ),
                           if (user.groupLocation?.address != null)
                             ProfileChip(
-                              icon: Assets.icons.navigation.path,
+                              icon: Assets.icons.groupLocation.path,
                               label: user.groupLocation?.address ?? '',
                             ),
                         ],
                       ),
 
                       if (hasEducation || hasJobTitle) ...[
-                        const CustomSizedBox(height: 16),
+                        const CustomSizedBox(height: 8),
                         Wrap(
                           spacing: 8,
                           runSpacing: 8,

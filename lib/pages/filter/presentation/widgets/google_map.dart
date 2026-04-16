@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:fennac_app/app/constants/media_query_constants.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -74,6 +76,14 @@ class GoogleMapWidgetState extends State<GoogleMapWidget> {
           mapType: MapType.normal,
           myLocationEnabled: true,
           myLocationButtonEnabled: true,
+          zoomControlsEnabled: true,
+          zoomGesturesEnabled: true,
+
+          gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
+            Factory<OneSequenceGestureRecognizer>(
+              () => EagerGestureRecognizer(),
+            ),
+          },
 
           initialCameraPosition: _getInitialCameraPosition(),
           onMapCreated: _onMapCreated,
@@ -113,7 +123,7 @@ class GoogleMapWidgetState extends State<GoogleMapWidget> {
   }
 
   void _onCameraMove(CameraPosition position) {
-    // _googleMapCubit.updateMarkers(position);
+    _googleMapCubit.updateMarkers(position);
   }
 
   Set<Circle> _buildDistanceCircle() {

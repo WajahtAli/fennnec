@@ -48,6 +48,8 @@ abstract class CreateAccountRepo {
 
   Future<dynamic> uploadMedia({required final String filePath});
 
+  Future<dynamic> uploadMediaMultiple({required final List<String> filePaths});
+
   Future<dynamic> customPrompt({
     required final String promptTitle,
     required final String type,

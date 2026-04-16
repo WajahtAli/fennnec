@@ -16,6 +16,7 @@ dependencies:
   flutter_bloc: ^8.1.6
   equatable: ^2.0.7
   dartz: ^0.10.1
+  http: ^1.5.0
 
   auto_route: ^11.0.0
 
@@ -36,7 +37,6 @@ dependencies:
   path_provider: ^2.1.4
   just_audio: ^0.10.5
   fast_contacts: ^5.0.1
-  wechat_assets_picker:
 
   freezed_annotation: ^3.0.0
   json_annotation: ^4.9.0
@@ -63,6 +63,7 @@ dependencies:
   rive: ^0.13.14
   shimmer: ^3.0.0
   cached_network_image: ^3.4.1
+  flutter_cache_manager: ^3.4.1
   firebase_messaging: ^16.1.1
   awesome_notifications: ^0.10.1
   google_maps_flutter: ^2.14.2
@@ -70,7 +71,8 @@ dependencies:
   mobile_scanner: ^7.2.0
   flutter_html: ^3.0.0
   in_app_purchase: ^3.2.3
-  app_links: ^6.4.1
+  wechat_assets_picker: ^10.1.1
+  app_links: ^7.0.0
   socket_io_client: ^3.1.4
   pip: ^0.0.3
 

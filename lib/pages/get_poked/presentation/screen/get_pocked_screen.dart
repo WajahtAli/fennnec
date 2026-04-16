@@ -30,13 +30,23 @@ class GetPockedScreen extends StatefulWidget {
 }
 
 class _GetPockedScreenState extends State<GetPockedScreen> {
+  late final PageController _pageController;
+  int _currentPage = 0;
+
   @override
   void initState() {
     super.initState();
+    _pageController = PageController();
     final id = widget.pokeId ?? widget.group?.id;
     if (id != null) {
       Di().sl<GetPokedDetailsCubit>().fetchPokeDetail(id);
     }
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 
   @override
@@ -89,6 +99,8 @@ class _GetPockedScreenState extends State<GetPockedScreen> {
           final detail = state.pokeDetail;
           final fromUser = detail.fromUser;
           final target = detail.pokedTargetDetail;
+          final pokes = detail.pokes.isNotEmpty ? detail.pokes : [detail.poke];
+          final isCircular = target.type == 'profile';
 
           return Scaffold(
             backgroundColor: ColorPalette.black,
@@ -101,36 +113,86 @@ class _GetPockedScreenState extends State<GetPockedScreen> {
                       const CustomSizedBox(height: 40),
                       const CustomBackButton(),
                       Expanded(
-                        child: SingleChildScrollView(
-                          child: Column(
-                            children: [
-                              PokeImageCard(
-                                imageUrl: _getImageForTarget(target, fromUser),
-                                isAsset: false,
+                        child: Column(
+                          children: [
+                            Expanded(
+                              child: PageView.builder(
+                                controller: _pageController,
+                                itemCount: pokes.length,
+                                onPageChanged: (index) {
+                                  setState(() => _currentPage = index);
+                                },
+                                itemBuilder: (context, index) {
+                                  final poke = pokes[index];
+                                  return SingleChildScrollView(
+                                    child: Column(
+                                      children: [
+                                        const CustomSizedBox(height: 20),
+                                        PokeImageCard(
+                                          imageUrl: _getImageForTarget(
+                                            target,
+                                            fromUser,
+                                          ),
+                                          isAsset: false,
+                                          isCircular: isCircular,
+                                        ),
+                                        const CustomSizedBox(height: 20),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 24,
+                                          ),
+                                          child: PokeMessageBubble(
+                                            message: poke.message,
+                                          ),
+                                        ),
+                                        const CustomSizedBox(height: 20),
+                                      ],
+                                    ),
+                                  );
+                                },
                               ),
-                              const CustomSizedBox(height: 20),
+                            ),
+                            if (pokes.length > 1)
                               Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 24,
-                                ),
-                                child: PokeMessageBubble(
-                                  message: detail.poke.message,
+                                padding: const EdgeInsets.only(bottom: 12),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: List.generate(
+                                    pokes.length,
+                                    (index) => AnimatedContainer(
+                                      duration: const Duration(
+                                        milliseconds: 300,
+                                      ),
+                                      margin: const EdgeInsets.symmetric(
+                                        horizontal: 4,
+                                      ),
+                                      width: _currentPage == index ? 20 : 8,
+                                      height: 8,
+                                      decoration: BoxDecoration(
+                                        color: _currentPage == index
+                                            ? ColorPalette.primary
+                                            : ColorPalette.white.withValues(
+                                                alpha: 0.4,
+                                              ),
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ),
-                              const CustomSizedBox(height: 40),
-                            ],
-                          ),
+                          ],
                         ),
                       ),
                       PokeNotificationCard(
                         fromUser: fromUser,
                         targetDetail: target,
+                        pokeCount: pokes.length,
+                        activeGroup: detail.activeGroup,
                         onIgnore: () => context.router.pop(),
                         onStartChat: () {
                           Di().sl<GetPokedDetailsCubit>().startChat(
-                            detail.poke.id,
+                            pokes[_currentPage].id,
                           );
-                          // VxToast.show(message: 'Chat feature coming soon!');
                         },
                       ),
                     ],

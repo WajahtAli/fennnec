@@ -5,6 +5,7 @@ abstract class LoginRepo {
     final String? emailOrPhone,
     final String? password,
   });
+  Future<LoginModel> getProfile({required String userId});
   Future<LoginModel> loginUserByGoogle({required String accessToken});
   Future<LoginModel> loginUserByApple({
     required String firebaseUserId,
@@ -27,6 +28,7 @@ abstract class LoginRepo {
     required String newPassword,
   });
   Future<dynamic> logout();
+  Future<dynamic> deleteAccount();
   Future<LoginModel> refreshToken({required String refreshToken});
   Future<dynamic> checkToken();
 }

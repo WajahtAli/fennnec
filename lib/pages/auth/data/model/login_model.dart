@@ -41,6 +41,10 @@ class LoginData {
   String? refreshToken;
   String? deviceFingerprint;
   DeviceInfo? deviceInfo;
+  int? peopleWhoLikedYouCount;
+  int? chatCount;
+  ChatCountStats? chatCounts;
+  ChatCountStats? chatUnreadCounts;
 
   LoginData({
     this.user,
@@ -49,6 +53,10 @@ class LoginData {
     this.refreshToken,
     this.deviceFingerprint,
     this.deviceInfo,
+    this.peopleWhoLikedYouCount,
+    this.chatCount,
+    this.chatCounts,
+    this.chatUnreadCounts,
   });
 
   LoginData copyWith({
@@ -58,6 +66,10 @@ class LoginData {
     String? refreshToken,
     String? deviceFingerprint,
     DeviceInfo? deviceInfo,
+    int? peopleWhoLikedYouCount,
+    int? chatCount,
+    ChatCountStats? chatCounts,
+    ChatCountStats? chatUnreadCounts,
   }) => LoginData(
     user: user ?? this.user,
     prompts: prompts ?? this.prompts,
@@ -65,6 +77,11 @@ class LoginData {
     refreshToken: refreshToken ?? this.refreshToken,
     deviceFingerprint: deviceFingerprint ?? this.deviceFingerprint,
     deviceInfo: deviceInfo ?? this.deviceInfo,
+    peopleWhoLikedYouCount:
+        peopleWhoLikedYouCount ?? this.peopleWhoLikedYouCount,
+    chatCount: chatCount ?? this.chatCount,
+    chatCounts: chatCounts ?? this.chatCounts,
+    chatUnreadCounts: chatUnreadCounts ?? this.chatUnreadCounts,
   );
 
   factory LoginData.fromJson(Map<String, dynamic> json) => LoginData(
@@ -78,6 +95,14 @@ class LoginData {
     deviceInfo: json["deviceInfo"] == null
         ? null
         : DeviceInfo.fromJson(json["deviceInfo"]),
+    peopleWhoLikedYouCount: validateInt(json["peopleWhoLikedYouCount"]),
+    chatCount: validateInt(json["chatCount"]),
+    chatCounts: json["chatCounts"] == null
+        ? null
+        : ChatCountStats.fromJson(json["chatCounts"]),
+    chatUnreadCounts: json["chatUnreadCounts"] == null
+        ? null
+        : ChatCountStats.fromJson(json["chatUnreadCounts"]),
   );
 
   Map<String, dynamic> toJson() => {
@@ -89,6 +114,10 @@ class LoginData {
     "refreshToken": refreshToken,
     "deviceFingerprint": deviceFingerprint,
     "deviceInfo": deviceInfo?.toJson(),
+    "peopleWhoLikedYouCount": peopleWhoLikedYouCount,
+    "chatCount": chatCount,
+    "chatCounts": chatCounts?.toJson(),
+    "chatUnreadCounts": chatUnreadCounts?.toJson(),
   };
 }
 
@@ -129,6 +158,37 @@ class DeviceInfo {
     "acceptLanguage": acceptLanguage,
     "acceptEncoding": acceptEncoding,
     "ip": ip,
+  };
+}
+
+class ChatCountStats {
+  int? chats;
+  int? pokes;
+  int? calls;
+  int? total;
+
+  ChatCountStats({this.chats, this.pokes, this.calls, this.total});
+
+  ChatCountStats copyWith({int? chats, int? pokes, int? calls, int? total}) =>
+      ChatCountStats(
+        chats: chats ?? this.chats,
+        pokes: pokes ?? this.pokes,
+        calls: calls ?? this.calls,
+        total: total ?? this.total,
+      );
+
+  factory ChatCountStats.fromJson(Map<String, dynamic> json) => ChatCountStats(
+    chats: validateInt(json["chats"]),
+    pokes: validateInt(json["pokes"]),
+    calls: validateInt(json["calls"]),
+    total: validateInt(json["total"]),
+  );
+
+  Map<String, dynamic> toJson() => {
+    "chats": chats,
+    "pokes": pokes,
+    "calls": calls,
+    "total": total,
   };
 }
 

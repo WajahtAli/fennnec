@@ -16,6 +16,10 @@ class LoginUsecase {
     );
   }
 
+  Future<LoginModel> getProfile({required String userId}) async {
+    return await _loginRepo.getProfile(userId: userId);
+  }
+
   Future<LoginModel> loginUserByGoogle({required String accessToken}) async {
     return await _loginRepo.loginUserByGoogle(accessToken: accessToken);
   }
@@ -67,6 +71,10 @@ class LoginUsecase {
 
   Future<dynamic> logout() async {
     return await _loginRepo.logout();
+  }
+
+  Future<dynamic> deleteAccount() async {
+    return await _loginRepo.deleteAccount();
   }
 
   Future<LoginModel> refreshToken({required String refreshToken}) async {

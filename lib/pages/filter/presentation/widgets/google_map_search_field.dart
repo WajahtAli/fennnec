@@ -1,5 +1,9 @@
 import 'dart:convert';
+import 'dart:async';
 
+import 'package:fennac_app/core/di_container.dart';
+import 'package:fennac_app/pages/filter/presentation/bloc/cubit/google_map_cubit.dart';
+import 'package:fennac_app/pages/filter/presentation/bloc/state/google_map_state.dart';
 import 'package:fennac_app/app/constants/app_constants.dart';
 import 'package:fennac_app/app/constants/media_query_constants.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
@@ -36,34 +40,55 @@ class GoogleMapSearchPlacesApi extends StatefulWidget {
 class _GoogleMapSearchPlacesApiState extends State<GoogleMapSearchPlacesApi> {
   final _controller = TextEditingController();
   final _uuid = const Uuid();
-  String _sessionToken = '1234567890';
+  String _sessionToken = '';
   List<dynamic> _placeList = [];
+  Timer? _debounce;
 
   @override
   void initState() {
     super.initState();
     _controller.text = widget.initialAddress ?? '';
-    _controller.addListener(_onChanged);
+    _listenToCameraMovements();
+  }
+
+  void _listenToCameraMovements() {
+    final googleMapCubit = Di().sl<GoogleMapCubit>();
+    // Subscribe to cubit state changes
+    googleMapCubit.stream.listen((state) {
+      if (state is GoogleMapStateMarkersUpdated) {
+        if (googleMapCubit.selectedAddress != null &&
+            googleMapCubit.selectedAddress!.isNotEmpty) {
+          if (mounted) {
+            _controller.text = googleMapCubit.selectedAddress!;
+          }
+        }
+      }
+    });
   }
 
   @override
   void dispose() {
-    _controller.removeListener(_onChanged);
+    _debounce?.cancel();
     _controller.dispose();
     super.dispose();
   }
 
-  void _onChanged() {
-    setState(() {
-      _sessionToken = _uuid.v4();
+  void _onChanged(String value) {
+    _debounce?.cancel();
+
+    _debounce = Timer(const Duration(milliseconds: 350), () {
+      if (!mounted) return;
+      getSuggestion(value);
     });
-    getSuggestion(_controller.text);
   }
 
   Future<void> getSuggestion(String input) async {
     if (input.trim().isEmpty) {
       setState(() => _placeList = []);
       return;
+    }
+    if (_sessionToken.isEmpty) {
+      _sessionToken = _uuid.v4();
     }
     try {
       const String baseURL =
@@ -164,7 +189,7 @@ class _GoogleMapSearchPlacesApiState extends State<GoogleMapSearchPlacesApi> {
         // ── Search field ──────────────────────────────────────────
         Container(
           height: 52,
-          margin: const EdgeInsets.symmetric(horizontal: 12),
+          margin: const EdgeInsets.symmetric(horizontal: 4),
           decoration: BoxDecoration(
             color: fieldBg,
             borderRadius: BorderRadius.circular(16),
@@ -172,8 +197,8 @@ class _GoogleMapSearchPlacesApiState extends State<GoogleMapSearchPlacesApi> {
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: isLight ? 0.08 : 0.3),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
+                blurRadius: 3,
+                offset: const Offset(0, 3),
               ),
             ],
           ),
@@ -193,6 +218,8 @@ class _GoogleMapSearchPlacesApiState extends State<GoogleMapSearchPlacesApi> {
               Expanded(
                 child: TextField(
                   controller: _controller,
+                  onChanged: _onChanged,
+
                   style: AppTextStyles.body(context).copyWith(color: textColor),
                   decoration: InputDecoration(
                     hintText: 'Search location...',
@@ -202,6 +229,8 @@ class _GoogleMapSearchPlacesApiState extends State<GoogleMapSearchPlacesApi> {
                     border: InputBorder.none,
                     enabledBorder: InputBorder.none,
                     focusedBorder: InputBorder.none,
+                    disabledBorder: InputBorder.none,
+
                     isDense: true,
                     contentPadding: EdgeInsets.zero,
                   ),
@@ -211,7 +240,11 @@ class _GoogleMapSearchPlacesApiState extends State<GoogleMapSearchPlacesApi> {
                 GestureDetector(
                   onTap: () {
                     _controller.clear();
-                    setState(() => _placeList = []);
+                    _debounce?.cancel();
+                    setState(() {
+                      _placeList = [];
+                      _sessionToken = '';
+                    });
                   },
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -241,8 +274,8 @@ class _GoogleMapSearchPlacesApiState extends State<GoogleMapSearchPlacesApi> {
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: isLight ? 0.08 : 0.35),
-                  blurRadius: 16,
-                  offset: const Offset(0, 6),
+                  blurRadius: 3,
+                  offset: const Offset(0, 3),
                 ),
               ],
             ),
@@ -278,7 +311,10 @@ class _GoogleMapSearchPlacesApiState extends State<GoogleMapSearchPlacesApi> {
                       }
                     }
 
-                    setState(() => _placeList = []);
+                    setState(() {
+                      _placeList = [];
+                      _sessionToken = '';
+                    });
                     FocusScope.of(context).unfocus();
                   },
                   child: Padding(

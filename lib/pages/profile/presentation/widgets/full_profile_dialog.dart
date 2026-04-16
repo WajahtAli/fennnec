@@ -17,7 +17,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
-import 'package:geocoding/geocoding.dart' as geocoding;
 import '../../../edit_profile/presentation/widgets/interleaved_media_section.dart';
 
 class FullProfileDialog extends StatefulWidget {
@@ -36,35 +35,6 @@ class FullProfileDialog extends StatefulWidget {
 
 class _FullProfileDialogState extends State<FullProfileDialog> {
   final LoginCubit _loginCubit = Di().sl<LoginCubit>();
-
-  Future<String> _getLocationFromLatLng(
-    String? latitude,
-    String? longitude,
-  ) async {
-    if (latitude == null || longitude == null) return '';
-    try {
-      final lat = double.tryParse(latitude);
-      final lng = double.tryParse(longitude);
-      if (lat == null || lng == null) return '';
-
-      final placemarks = await geocoding.placemarkFromCoordinates(lat, lng);
-      if (placemarks.isNotEmpty) {
-        final place = placemarks.first;
-        final city = place.locality ?? '';
-        final state = place.administrativeArea ?? '';
-        if (city.isNotEmpty && state.isNotEmpty) {
-          return '$city, $state';
-        } else if (city.isNotEmpty) {
-          return city;
-        } else if (state.isNotEmpty) {
-          return state;
-        }
-      }
-    } catch (e) {
-      debugPrint('Error getting location: $e');
-    }
-    return '';
-  }
 
   @override
   void initState() {
@@ -119,7 +89,7 @@ class _FullProfileDialogState extends State<FullProfileDialog> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            '${user?.firstName ?? ''} ${user?.lastName ?? ''}${user?.dob != null ? ', ${calculateAge(user?.dob.toString() ?? "")}' : ''}',
+                            '${user?.firstName ?? ''} ${user?.dob != null ? ', ${calculateAge(user?.dob.toString() ?? "")}' : ''}',
                             style: AppTextStyles.h3(
                               context,
                             ).copyWith(fontWeight: FontWeight.bold),
@@ -158,7 +128,7 @@ class _FullProfileDialogState extends State<FullProfileDialog> {
                           label: _loginCubit.userData?.user?.pronouns ?? '',
                         ),
                         FutureBuilder<String>(
-                          future: _getLocationFromLatLng(
+                          future: _loginCubit.getLocationFromLatLng(
                             _loginCubit.userData?.user?.latitude,
                             _loginCubit.userData?.user?.longitude,
                           ),
@@ -171,12 +141,13 @@ class _FullProfileDialogState extends State<FullProfileDialog> {
                           },
                         ),
                         ProfileChip(
-                          icon: Assets.icons.navigation.path,
-                          label: user?.address ?? '',
+                          icon: Assets.icons.groupLocation.path,
+                          label: user?.groupLocation?.address ?? '',
                         ),
                       ],
                     ),
-                    const CustomSizedBox(height: 16),
+                    CustomSizedBox(height: 12),
+
                     Wrap(
                       spacing: 8,
                       alignment: WrapAlignment.center,
@@ -189,13 +160,21 @@ class _FullProfileDialogState extends State<FullProfileDialog> {
                           icon: Assets.icons.cap.path,
                           label: _loginCubit.userData?.user?.jobTitle ?? '',
                         ),
-                        if (user?.groupLocation?.address != null)
-                          ProfileChip(
-                            icon: Assets.icons.navigation.path,
-                            label: user?.groupLocation?.address ?? '',
-                          ),
                       ],
                     ),
+                    if (user?.groupLocation?.address != null) ...[
+                      CustomSizedBox(height: 12),
+                      Wrap(
+                        alignment: WrapAlignment.center,
+
+                        children: [
+                          ProfileChip(
+                            icon: Assets.icons.home.path,
+                            label: user?.address ?? '',
+                          ),
+                        ],
+                      ),
+                    ],
                     const CustomSizedBox(height: 12),
 
                     Padding(

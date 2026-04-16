@@ -1,6 +1,5 @@
 import 'dart:ui';
-import 'package:fennac_app/pages/chats/presentation/bloc/cubit/chat_landing_cubit.dart';
-import 'package:fennac_app/pages/chats/presentation/bloc/state/chat_landing_state.dart';
+import 'package:fennac_app/pages/auth/presentation/bloc/cubit/login_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -8,6 +7,7 @@ import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
 
 import '../core/di_container.dart';
+import '../pages/auth/presentation/bloc/state/login_state.dart';
 
 class CustomBottomNavigationBar extends StatefulWidget {
   final List<BottomNavItem> items;
@@ -120,11 +120,10 @@ class CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
                                           top: -8,
                                           child:
                                               BlocBuilder<
-                                                ChatLandingCubit,
-                                                ChatLandingState
+                                                LoginCubit,
+                                                LoginState
                                               >(
-                                                bloc: Di()
-                                                    .sl<ChatLandingCubit>(),
+                                                bloc: Di().sl<LoginCubit>(),
                                                 builder: (context, state) {
                                                   return Container(
                                                     alignment: Alignment.center,

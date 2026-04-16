@@ -74,6 +74,7 @@ class _PhoneNumberFieldState extends State<PhoneNumberField> {
   late Future<List<Country>> _future;
   final TextEditingController _phoneController = TextEditingController();
   String? _errorMessage;
+  bool _didApplyFallbackCountry = false;
 
   @override
   void initState() {
@@ -103,9 +104,55 @@ class _PhoneNumberFieldState extends State<PhoneNumberField> {
         _selected = widget.initialCountry;
       }
 
+      if (_selected != null) {
+        Di().sl<AuthCubit>().selectedCountry = _selected;
+        // If user already typed before country resolved, propagate full number.
+        _notifyChange();
+      }
+
       return countries;
     });
     _phoneController.addListener(_notifyChange);
+  }
+
+  @override
+  void didUpdateWidget(covariant PhoneNumberField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (_selected == null && widget.initialCountry != null) {
+      _selected = widget.initialCountry;
+      Di().sl<AuthCubit>().selectedCountry = _selected;
+      _notifyChange();
+    }
+
+    final oldValue = oldWidget.initialValue?.trim() ?? '';
+    final newValue = widget.initialValue?.trim() ?? '';
+    if (oldValue == newValue || newValue.isEmpty) {
+      return;
+    }
+
+    final digitsOnly = newValue.replaceAll(RegExp(r'[^0-9]'), '');
+    if (digitsOnly.isEmpty) {
+      return;
+    }
+
+    final selectedCode =
+        _selected?.phoneCode?.replaceAll(RegExp(r'[^0-9]'), '') ?? '';
+    var nationalDigits = digitsOnly;
+    if (selectedCode.isNotEmpty && digitsOnly.startsWith(selectedCode)) {
+      nationalDigits = digitsOnly.substring(selectedCode.length);
+    }
+
+    final formatted = formatPhoneNumber(
+      input: nationalDigits,
+      countryIso: _selected?.iso ?? widget.initialCountry?.iso ?? 'US',
+    );
+    if (_phoneController.text != formatted) {
+      _phoneController.value = TextEditingValue(
+        text: formatted,
+        selection: TextSelection.collapsed(offset: formatted.length),
+      );
+    }
   }
 
   String formatPhoneNumber({
@@ -234,15 +281,20 @@ class _PhoneNumberFieldState extends State<PhoneNumberField> {
             // Set default country if not selected and initial country not provided
             if (_selected == null &&
                 widget.initialCountry == null &&
-                snap.hasData) {
+                snap.hasData &&
+                !_didApplyFallbackCountry) {
+              _didApplyFallbackCountry = true;
               WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (!mounted || snap.data == null || snap.data!.isEmpty) return;
                 final defaultCountry = snap.data!.firstWhere(
                   (c) => c.iso == 'US',
                   orElse: () => snap.data!.first,
                 );
                 setState(() {
                   _selected = defaultCountry;
+                  Di().sl<AuthCubit>().selectedCountry = defaultCountry;
                 });
+                _notifyChange();
               });
             }
 
@@ -388,13 +440,30 @@ class _PhoneNumberFieldState extends State<PhoneNumberField> {
   }
 
   void _showCountryBottomSheet(BuildContext context, List<Country> countries) {
+    final selectedForSheet =
+        _selected ??
+        countries.firstWhere(
+          (c) => c.iso == 'US',
+          orElse: () => countries.first,
+        );
+
+    if (_selected == null) {
+      setState(() {
+        _selected = selectedForSheet;
+        Di().sl<AuthCubit>().selectedCountry = selectedForSheet;
+      });
+      // Ensure parent receives complete number when default/fallback country
+      // is set and digits are already entered.
+      _notifyChange();
+    }
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
       builder: (context) => _CountryBottomSheetContent(
         countries: countries,
-        selectedCountry: _selected,
+        selectedCountry: selectedForSheet,
         onCountrySelected: (country) {
           setState(() {
             _selected = country;

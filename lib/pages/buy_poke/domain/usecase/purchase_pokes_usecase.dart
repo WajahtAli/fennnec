@@ -10,6 +10,16 @@ class PurchaseSubscriptionUseCase {
   }
 }
 
+class CancelSubscriptionUseCase {
+  final PokeRepository _pokeRepository;
+
+  CancelSubscriptionUseCase(this._pokeRepository);
+
+  Future<Map<String, dynamic>> call({required String userId}) {
+    return _pokeRepository.cancelSubscription(userId: userId);
+  }
+}
+
 class PurchasePokesUseCase {
   final PokeRepository _pokeRepository;
 

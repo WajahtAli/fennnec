@@ -124,20 +124,31 @@ class KycMatchScreen extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-            child: BlocBuilder<CreateAccountCubit, CreateAccountState>(
+            child: BlocConsumer<CreateAccountCubit, CreateAccountState>(
               bloc: _createAccountCubit,
-
+              listener: (context, state) {
+                if (state is CreateAccountLoaded) {
+                  VxToast.show(message: "Profile updated successfully");
+                } else if (state is CreateAccountError) {
+                  VxToast.show(message: state.message);
+                }
+              },
               builder: (context, state) {
                 return Row(
                   children: [
                     Expanded(
                       child: CustomOutlinedButton(
-                        onPressed: () {
-                          Di().sl<KycPromptCubit>().resetAllData();
+                        onPressed: () async {
+                          await _createAccountCubit.updateProfile();
+                          if (context.mounted &&
+                              _createAccountCubit.state
+                                  is! CreateAccountError) {
+                            Di().sl<KycPromptCubit>().resetAllData();
 
-                          AutoRouter.of(
-                            context,
-                          ).push(KycPromptRoute(showSkipButton: true));
+                            AutoRouter.of(
+                              context,
+                            ).push(KycPromptRoute(showSkipButton: true));
+                          }
                         },
                         text: 'Skip',
                         width: double.infinity,
@@ -155,9 +166,10 @@ class KycMatchScreen extends StatelessWidget {
                             return;
                           }
                           await _createAccountCubit.updateProfile();
-                          if (context.mounted && state is! CreateAccountError) {
+                          if (context.mounted &&
+                              _createAccountCubit.state
+                                  is! CreateAccountError) {
                             Di().sl<KycPromptCubit>().resetAllData();
-
                             AutoRouter.of(
                               context,
                             ).push(KycPromptRoute(showSkipButton: true));

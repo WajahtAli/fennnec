@@ -3,10 +3,11 @@ import 'package:fennac_app/app/constants/app_enums.dart';
 import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:fennac_app/pages/auth/presentation/bloc/cubit/create_account_cubit.dart';
-import 'package:fennac_app/pages/chats/presentation/bloc/cubit/chat_landing_cubit.dart';
+import 'package:fennac_app/pages/auth/presentation/bloc/cubit/login_cubit.dart';
 import 'package:fennac_app/pages/dashboard/presentation/bloc/cubit/dashboard_cubit.dart';
 import 'package:fennac_app/pages/home/presentation/screen/home_screen.dart';
 import 'package:fennac_app/pages/homelanding/presentation/bloc/cubit/home_landing_cubit.dart';
+import 'package:fennac_app/pages/homelanding/presentation/bloc/state/home_landing_state.dart';
 import 'package:fennac_app/pages/homelanding/presentation/screen/home_landing_screen.dart';
 import 'package:fennac_app/pages/my_group/presentation/bloc/cubit/my_group_cubit.dart';
 import 'package:fennac_app/skeletons/home/home_landing_skeleton.dart';
@@ -15,7 +16,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../utils/validators.dart';
-import '../../../liked_groups/presentation/bloc/cubit/liked_groups_cubit.dart';
 
 @RoutePage()
 class DashboardScreen extends StatefulWidget {
@@ -71,64 +71,74 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      body: BlocBuilder(
-        bloc: _dashboardCubit,
-        builder: (context, state) {
-          return Stack(
-            children: [
-              // Always render the full layout — swap only the content area
-              if (_isResolvingDashboardEntryFlow)
-                const Center(child: HomeLandingSkeleton())
-              else
-                IndexedStack(
-                  index: _dashboardCubit.selectedIndex,
-                  children: _dashboardCubit.screens,
-                ),
-
-              // Bottom bar is always present, no flash
-              Positioned(
-                left: 0,
-                right: 0,
-                bottom: 20,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 8,
-                  ),
-                  child: CustomBottomNavigationBar(
-                    items: [
-                      BottomNavItem(iconPath: Assets.icons.home.path),
-                      BottomNavItem(
-                        iconPath: Assets.icons.messageCircle.path,
-                        badgeCount: Di()
-                            .sl<ChatLandingCubit>()
-                            .state
-                            .chats
-                            .length,
-                      ),
-                      BottomNavItem(
-                        iconPath: Assets.icons.user.path,
-                        badgeCount: validateInt(
-                          Di()
-                                  .sl<LikedGroupsCubit>()
-                                  .groupsModel
-                                  ?.data
-                                  ?.groups
-                                  ?.length ??
-                              '0',
-                        ),
-                      ),
-                    ],
-                    currentIndex: _dashboardCubit.selectedIndex,
-                    onTap: _isResolvingDashboardEntryFlow
-                        ? (_) {}
-                        : _dashboardCubit.changeIndex,
-                  ),
-                ),
-              ),
-            ],
-          );
+      body: BlocListener<HomeLandingCubit, HomeLandingState>(
+        bloc: _homeLandingCubit,
+        listener: (context, state) {
+          if (state is HomeLandingLoaded) {
+            final hasInvitations = _homeLandingCubit.invitations.isNotEmpty;
+            if (hasInvitations) {
+              _dashboardCubit.changePage(0, const HomeLandingScreen());
+              _homeLandingCubit.invitationStatus = InvitationStatus.pending;
+            }
+          }
         },
+        child: BlocBuilder(
+          bloc: _dashboardCubit,
+          builder: (context, state) {
+            return Stack(
+              children: [
+                if (_isResolvingDashboardEntryFlow)
+                  const Center(child: HomeLandingSkeleton())
+                else
+                  IndexedStack(
+                    index: _dashboardCubit.selectedIndex,
+                    children: _dashboardCubit.screens,
+                  ),
+
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 20,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 8,
+                    ),
+                    child: CustomBottomNavigationBar(
+                      items: [
+                        BottomNavItem(iconPath: Assets.icons.home.path),
+                        BottomNavItem(
+                          iconPath: Assets.icons.messageCircle.path,
+                          badgeCount:
+                              Di()
+                                  .sl<LoginCubit>()
+                                  .userData
+                                  ?.chatCounts
+                                  ?.total ??
+                              0,
+                        ),
+                        BottomNavItem(
+                          iconPath: Assets.icons.user.path,
+                          badgeCount: validateInt(
+                            Di()
+                                    .sl<LoginCubit>()
+                                    .userData
+                                    ?.peopleWhoLikedYouCount ??
+                                0,
+                          ),
+                        ),
+                      ],
+                      currentIndex: _dashboardCubit.selectedIndex,
+                      onTap: _isResolvingDashboardEntryFlow
+                          ? (_) {}
+                          : _dashboardCubit.changeIndex,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }

@@ -14,6 +14,7 @@ import 'package:fennac_app/pages/kyc/presentation/widgets/continue_button.dart';
 import 'package:fennac_app/pages/kyc/presentation/widgets/date_picker_widget.dart';
 import 'package:fennac_app/reusable_widgets/dropdown_field_widget.dart';
 import 'package:fennac_app/reusable_widgets/gender_selection_widget.dart';
+import 'package:fennac_app/dialogs/gallery_permission_dialog.dart';
 import 'package:fennac_app/routes/routes_imports.gr.dart';
 import 'package:fennac_app/widgets/custom_back_button.dart';
 import 'package:fennac_app/widgets/custom_sized_box.dart';
@@ -26,6 +27,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../../../app/constants/media_query_constants.dart';
+import '../../../../utils/validators.dart';
 import '../../../auth/presentation/bloc/state/create_account_state.dart';
 import '../bloc/state/kyc_state.dart';
 
@@ -68,22 +70,37 @@ class _KycScreenState extends State<KycScreen> {
 
   Future<void> _setCurrentLocation() async {
     if (widget.isEditMode == true) return;
-    if (_kycCubit.latitudeController.text.isNotEmpty &&
-        _kycCubit.longitudeController.text.isNotEmpty) {
-      return;
-    }
 
     try {
       final serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) return;
+      if (!serviceEnabled) {
+        if (!mounted) return;
+        showAppConfirmDialog(
+          context: context,
+          title: 'Location Service Disabled',
+          description:
+              'Please enable location services in Settings to show your location to others.',
+          confirmLabel: 'Settings',
+          icon: Icons.location_off_outlined,
+          onConfirm: () => Geolocator.openLocationSettings(),
+        );
+        return;
+      }
 
       var permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
       }
 
-      if (permission == LocationPermission.denied ||
-          permission == LocationPermission.deniedForever) {
+      if (permission == LocationPermission.denied) {
+        if (!mounted) return;
+        showGalleryPermissionDialog(context);
+        return;
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        if (!mounted) return;
+        showGalleryPermissionDialog(context);
         return;
       }
 
@@ -98,6 +115,7 @@ class _KycScreenState extends State<KycScreen> {
 
     if (user != null) {
       log('KYC init for user: ${user.gender}');
+      log('KYC init for user: ${user.dob}');
       _kycCubit.setSelectedDate(user.dob);
       _kycCubit.selectGender(user.gender ?? '');
       _kycCubit.selectSexualOrientations(user.sexualOrientation ?? []);
@@ -131,202 +149,236 @@ class _KycScreenState extends State<KycScreen> {
                 child: BlocBuilder(
                   bloc: _kycCubit,
                   builder: (context, state) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (widget.isEditMode ?? false) CustomBackButton(),
-                          CustomSizedBox(height: 8),
-                          // Greeting
-                          if (widget.isEditMode == true)
-                            BlocBuilder(
-                              bloc: _createAccountCubit,
-                              builder: (context, state) {
-                                final user = _resolvedUser;
+                    return Column(
+                      children: [
+                        if (widget.isEditMode ?? false) CustomBackButton(),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24),
 
-                                return AppText(
-                                  text: 'Hi, ${user?.firstName ?? ''}!',
-                                  style: AppTextStyles.h1(
-                                    context,
-                                  ).copyWith(fontWeight: FontWeight.w500),
-                                );
-                              },
-                            )
-                          else
-                            BlocBuilder(
-                              bloc: _createAccountCubit,
-                              builder: (context, state) {
-                                final user = _resolvedUser;
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              CustomSizedBox(height: 8),
+                              // Greeting
+                              if (widget.isEditMode == true)
+                                BlocBuilder(
+                                  bloc: _createAccountCubit,
+                                  builder: (context, state) {
+                                    final user = _resolvedUser;
 
-                                return AppText(
-                                  text: 'Hi, ${user?.firstName ?? ''}!',
-                                  style: AppTextStyles.h2(
-                                    context,
-                                  ).copyWith(fontWeight: FontWeight.w500),
-                                );
-                              },
-                            ),
-
-                          CustomSizedBox(height: 16),
-                          AppText(
-                            text: "Let's start with the basics",
-                            style: AppTextStyles.h4(
-                              context,
-                            ).copyWith(fontWeight: FontWeight.w500),
-                          ),
-                          CustomSizedBox(height: 24),
-                          // Date of Birth
-                          AppText(
-                            text: 'Select Your Date of Birth',
-                            style: AppTextStyles.inputLabel(
-                              context,
-                            ).copyWith(fontWeight: FontWeight.bold),
-                          ),
-                          CustomSizedBox(height: 10),
-                          BlocBuilder<KycCubit, KycState>(
-                            bloc: _kycCubit,
-                            builder: (context, state) {
-                              return ValueListenableBuilder<bool>(
-                                valueListenable: _isInitialized,
-                                builder: (context, isInitialized, _) {
-                                  if (!isInitialized) {
-                                    return Shimmer.fromColors(
-                                      baseColor: Colors.grey[300]!,
-                                      highlightColor: Colors.grey[100]!,
-                                      child: Container(
-                                        height: 200,
-                                        width: double.infinity,
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius: BorderRadius.circular(
-                                            18,
-                                          ),
-                                        ),
-                                      ),
+                                    return AppText(
+                                      text: 'Hi, ${user?.firstName ?? ''}!',
+                                      style: AppTextStyles.h1(
+                                        context,
+                                      ).copyWith(fontWeight: FontWeight.w500),
                                     );
-                                  }
-                                  return DatePickerWidget(
-                                    initialDate: _kycCubit.selectedDate,
-                                    onDateSelected: (date) {
-                                      _kycCubit.selectedDate = date;
+                                  },
+                                )
+                              else
+                                BlocBuilder(
+                                  bloc: _createAccountCubit,
+                                  builder: (context, state) {
+                                    final user = _resolvedUser;
+
+                                    return AppText(
+                                      text: 'Hi, ${user?.firstName ?? ''}!',
+                                      style: AppTextStyles.h2(
+                                        context,
+                                      ).copyWith(fontWeight: FontWeight.w500),
+                                    );
+                                  },
+                                ),
+
+                              CustomSizedBox(height: 16),
+                              AppText(
+                                text: "Let's start with the basics",
+                                style: AppTextStyles.h4(
+                                  context,
+                                ).copyWith(fontWeight: FontWeight.w500),
+                              ),
+                              CustomSizedBox(height: 24),
+                              // Date of Birth
+                              AppText(
+                                text: 'Select Your Date of Birth',
+                                style: AppTextStyles.inputLabel(
+                                  context,
+                                ).copyWith(fontWeight: FontWeight.bold),
+                              ),
+                              CustomSizedBox(height: 4),
+                              AppText(
+                                text: 'You must be at least 18 years old.',
+                                style: AppTextStyles.bodyRegular(context)
+                                    .copyWith(
+                                      color: isLightTheme(context)
+                                          ? Colors.black.withValues(alpha: 0.65)
+                                          : Colors.white.withValues(alpha: 0.7),
+                                    ),
+                              ),
+                              CustomSizedBox(height: 10),
+                              BlocBuilder<KycCubit, KycState>(
+                                bloc: _kycCubit,
+                                builder: (context, state) {
+                                  return ValueListenableBuilder<bool>(
+                                    valueListenable: _isInitialized,
+                                    builder: (context, isInitialized, _) {
+                                      if (!isInitialized) {
+                                        return Shimmer.fromColors(
+                                          baseColor: Colors.grey[300]!,
+                                          highlightColor: Colors.grey[100]!,
+                                          child: Container(
+                                            height: 200,
+                                            width: double.infinity,
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(18),
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                      return DatePickerWidget(
+                                        initialDate: _kycCubit.selectedDate,
+                                        onDateSelected: (date) {
+                                          _kycCubit.selectedDate = date;
+                                        },
+                                      );
                                     },
                                   );
                                 },
-                              );
-                            },
-                          ),
-                          CustomSizedBox(height: 24),
+                              ),
+                              CustomSizedBox(height: 24),
 
-                          // Gender Selection
-                          AppText(
-                            text: 'Select Gender',
-                            style: AppTextStyles.inputLabel(
-                              context,
-                            ).copyWith(fontWeight: FontWeight.bold),
-                          ),
-                          CustomSizedBox(height: 10),
-                          GenderSelectionWidget(
-                            selectedGender: _kycCubit.selectedGender,
-                            onGenderSelected: (gender) {
-                              _kycCubit.selectGender(gender);
-                            },
-                          ),
-                          CustomSizedBox(height: 24),
+                              // Gender Selection
+                              AppText(
+                                text: 'Select Gender',
+                                style: AppTextStyles.inputLabel(
+                                  context,
+                                ).copyWith(fontWeight: FontWeight.bold),
+                              ),
+                              CustomSizedBox(height: 10),
+                              GenderSelectionWidget(
+                                selectedGender: _kycCubit.selectedGender,
+                                onGenderSelected: (gender) {
+                                  _kycCubit.selectGender(gender);
+                                },
+                              ),
+                              CustomSizedBox(height: 24),
 
-                          // Sexual Orientation
-                          DropdownFieldWidget(
-                            label: 'Select Sexual Orientation',
-                            subtitle: 'Choose all that describe you best.',
-                            selectedValues:
-                                _kycCubit.selectedSexualOrientations,
-                            options: DummyConstants.sexualOrientations,
-                            selectionType: SelectionType.multiple,
-                            onMultipleSelected: (values) {
-                              _kycCubit.selectSexualOrientations(values);
-                              log(
-                                'Selected selectedSexualOrientations: ${_kycCubit.selectedSexualOrientations}',
-                              );
-                            },
-                            blurNotifier: _isBlurNotifier,
+                              // Sexual Orientation
+                              DropdownFieldWidget(
+                                label: 'Select Sexual Orientation',
+                                subtitle:
+                                    'Choose the one that describes you best.',
+                                selectedValue:
+                                    _kycCubit.selectedSexualOrientations.isEmpty
+                                    ? null
+                                    : _kycCubit
+                                          .selectedSexualOrientations
+                                          .first,
+                                options: DummyConstants.sexualOrientations,
+                                selectionType: SelectionType.single,
+                                onSelected: (value) {
+                                  _kycCubit.selectSexualOrientations([value]);
+                                  log(
+                                    'Selected selectedSexualOrientations: ${_kycCubit.selectedSexualOrientations}',
+                                  );
+                                },
+                                blurNotifier: _isBlurNotifier,
+                              ),
+                              CustomSizedBox(height: 20),
+
+                              // Pronouns
+                              DropdownFieldWidget(
+                                label: 'Select Pronouns',
+                                subtitle: 'Select what feels right for you.',
+                                selectedValue:
+                                    (_kycCubit.selectedPronoun == null ||
+                                        (_kycCubit.selectedPronoun?.isEmpty ??
+                                            false))
+                                    ? 'Select'
+                                    : _kycCubit.selectedPronoun,
+                                options: DummyConstants.pronouns,
+                                selectionType: SelectionType.single,
+                                onSelected: (value) {
+                                  _kycCubit.selectPronouns(value);
+                                },
+                                blurNotifier: _isBlurNotifier,
+                              ),
+                              if (widget.isEditMode == true) ...[
+                                CustomSizedBox(height: 16),
+                                CustomLabelTextField(
+                                  label: 'Job Title / Occupation',
+                                  labelStyle: AppTextStyles.bodyLarge(context)
+                                      .copyWith(
+                                        color: isLightTheme(context)
+                                            ? Colors.black
+                                            : Colors.white,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                  controller: _kycCubit.jobTitleController,
+                                  hintText: 'What do you do?',
+                                  labelColor: isLightTheme(context)
+                                      ? Colors.black
+                                      : Colors.white,
+                                  filled: false,
+                                  onChanged: (_) {
+                                    capitalizeFirstLetter(
+                                      _kycCubit.jobTitleController,
+                                    );
+                                  },
+                                ),
+                                CustomSizedBox(height: 16),
+
+                                CustomLabelTextField(
+                                  label: 'Education / School',
+                                  labelStyle: AppTextStyles.bodyLarge(context)
+                                      .copyWith(
+                                        color: isLightTheme(context)
+                                            ? Colors.black
+                                            : Colors.white,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                  controller: _kycCubit.educationController,
+                                  hintText: 'Where do/did you go to school?',
+                                  labelColor: isLightTheme(context)
+                                      ? Colors.black
+                                      : Colors.white,
+                                  filled: false,
+                                  onChanged: (_) {
+                                    capitalizeFirstLetter(
+                                      _kycCubit.educationController,
+                                    );
+                                  },
+                                ),
+                                CustomSizedBox(height: 16),
+                                CustomLabelTextField(
+                                  label: 'Hometown',
+                                  labelStyle: AppTextStyles.bodyLarge(context)
+                                      .copyWith(
+                                        color: isLightTheme(context)
+                                            ? Colors.black
+                                            : Colors.white,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                  controller: _kycCubit.homeTownController,
+                                  hintText: 'Where are you from?',
+                                  labelColor: isLightTheme(context)
+                                      ? Colors.black
+                                      : Colors.white,
+                                  filled: false,
+                                  onChanged: (_) {
+                                    capitalizeFirstLetter(
+                                      _kycCubit.homeTownController,
+                                    );
+                                  },
+                                ),
+                              ],
+
+                              CustomSizedBox(height: 80),
+                            ],
                           ),
-                          CustomSizedBox(height: 20),
-
-                          // Pronouns
-                          DropdownFieldWidget(
-                            label: 'Select Pronouns',
-                            subtitle: 'Select what feels right for you.',
-                            selectedValue:
-                                (_kycCubit.selectedPronoun == null ||
-                                    (_kycCubit.selectedPronoun?.isEmpty ??
-                                        false))
-                                ? 'Select'
-                                : _kycCubit.selectedPronoun,
-                            options: DummyConstants.pronouns,
-                            selectionType: SelectionType.single,
-                            onSelected: (value) {
-                              _kycCubit.selectPronouns(value);
-                            },
-                            blurNotifier: _isBlurNotifier,
-                          ),
-                          if (widget.isEditMode == true) ...[
-                            CustomSizedBox(height: 16),
-                            CustomLabelTextField(
-                              label: 'Job Title / Occupation',
-                              labelStyle: AppTextStyles.bodyLarge(context)
-                                  .copyWith(
-                                    color: isLightTheme(context)
-                                        ? Colors.black
-                                        : Colors.white,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                              controller: _kycCubit.jobTitleController,
-                              hintText: 'What do you do?',
-                              labelColor: isLightTheme(context)
-                                  ? Colors.black
-                                  : Colors.white,
-                              filled: false,
-                            ),
-                            CustomSizedBox(height: 16),
-
-                            CustomLabelTextField(
-                              label: 'Education / School',
-                              labelStyle: AppTextStyles.bodyLarge(context)
-                                  .copyWith(
-                                    color: isLightTheme(context)
-                                        ? Colors.black
-                                        : Colors.white,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                              controller: _kycCubit.educationController,
-                              hintText: 'Where do/did you go to school?',
-                              labelColor: isLightTheme(context)
-                                  ? Colors.black
-                                  : Colors.white,
-                              filled: false,
-                            ),
-                            CustomSizedBox(height: 16),
-                            CustomLabelTextField(
-                              label: 'Hometown',
-                              labelStyle: AppTextStyles.bodyLarge(context)
-                                  .copyWith(
-                                    color: isLightTheme(context)
-                                        ? Colors.black
-                                        : Colors.white,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                              controller: _kycCubit.homeTownController,
-                              hintText: 'Where are you from?',
-                              labelColor: isLightTheme(context)
-                                  ? Colors.black
-                                  : Colors.white,
-                              filled: false,
-                            ),
-                          ],
-
-                          CustomSizedBox(height: 80),
-                        ],
-                      ),
+                        ),
+                      ],
                     );
                   },
                 ),

@@ -185,6 +185,7 @@ class KycPromptCubit extends Cubit<KycPromptState> {
   void resetAllData() {
     emit(KycPromptLoading());
     selectedPrompts.clear();
+
     resetRecording();
     emit(KycPromptLoaded());
   }

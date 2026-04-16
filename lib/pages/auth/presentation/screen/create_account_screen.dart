@@ -9,6 +9,7 @@ import 'package:fennac_app/pages/auth/presentation/bloc/cubit/auth_cubit.dart';
 import 'package:fennac_app/pages/auth/presentation/bloc/cubit/create_account_cubit.dart';
 import 'package:fennac_app/pages/auth/presentation/bloc/state/auth_state.dart';
 import 'package:fennac_app/pages/auth/presentation/bloc/state/create_account_state.dart';
+import 'package:fennac_app/routes/routes_imports.gr.dart';
 import 'package:fennac_app/widgets/custom_back_button.dart';
 import 'package:fennac_app/widgets/custom_country_field.dart';
 import 'package:fennac_app/widgets/custom_elevated_button.dart';
@@ -69,9 +70,15 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                             Row(
                               children: [
                                 // Left: back button
-                                const SizedBox(
+                                SizedBox(
                                   width: 48,
-                                  child: CustomBackButton(),
+                                  child: CustomBackButton(
+                                    onPressed: () {
+                                      AutoRouter.of(
+                                        context,
+                                      ).push(const LandingRoute());
+                                    },
+                                  ),
                                 ),
                                 Expanded(
                                   child: Center(
@@ -238,6 +245,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                                   label: 'Phone Number',
                                   hintText: 'Enter Your Number',
                                   initialCountry: _authCubit.selectedCountry,
+                                  initialValue: _authCubit.phoneController.text,
                                   onChanged: (completePhoneNumber) {
                                     if (mounted) {
                                       _authCubit.phoneController.text =

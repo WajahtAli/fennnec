@@ -16,6 +16,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:lottie/lottie.dart';
 
+import 'typing_indicator.dart';
+
 class MessageList extends StatefulWidget {
   final bool isGroup;
   final String groupId;
@@ -378,6 +380,7 @@ class _MessageListState extends State<MessageList> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         if (message.senderAvatar != null) ...[
+                          // if(index == 0 &&)
                           Container(
                             width: 24,
                             height: 24,
@@ -408,6 +411,8 @@ class _MessageListState extends State<MessageList> {
                     ),
                   ] else
                     _buildMessageWithLongPress(message, isMineSide),
+                  if (index == 0 && messageCubit.otherUserIsTyping)
+                    TypingIndicator(),
                 ],
               ),
             );

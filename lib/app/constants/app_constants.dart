@@ -9,11 +9,14 @@ class AppConstants {
   static const verifyCode = 'auth/verify-code';
   static const updateProfile = 'auth/update-profile';
   static const uploadSingle = 'upload/single';
+  static const uploadMultiple = 'upload/multiple';
   static const userPrompts = 'prompts';
   static const login = 'auth/login';
+  static const getProfile = 'auth/profile';
   static const loginGoogle = 'auth/auth-google';
   static const loginApple = 'auth/auth-apple';
   static const logout = 'auth/logout';
+  static const deleteAccount = 'auth/delete-account';
   static const reqPasswordReset = 'auth/request-password-reset';
   static const verifyResetCode = 'auth/verify-reset-code';
   static const resetPassword = 'auth/reset-password';
@@ -40,12 +43,14 @@ class AppConstants {
   static const fetchPokeProducts = 'pokes/products';
   static const legalContents = 'help-support/legal-contents';
   static const sendPoke = 'pokes/send';
+  static const cancelSubscription = 'subscription/cancel';
   static const getChatAndCalls = 'chat-and-calls';
   static const pokeDetail = 'pokes/';
   static const startPokeChat = '/start-chat';
   static const directChat = 'users';
   static const peopleWhoLikedYou = 'groups/people-who-liked-you';
   static const startCall = 'calls/start';
+  static const blockedWords = 'users/check-blocked-words';
 
   //!Agora Constants
   static const agoraAppId = "e02d6c955f5947f0a671b1b2dbb67514";

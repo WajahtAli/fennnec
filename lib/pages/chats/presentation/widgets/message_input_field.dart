@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:fennac_app/app/constants/media_query_constants.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
@@ -5,6 +7,7 @@ import 'package:fennac_app/bloc/cubit/imagepicker_cubit.dart';
 import 'package:fennac_app/bloc/state/imagepicker_state.dart';
 import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
+import 'package:fennac_app/helpers/gradient_toast.dart';
 import 'package:fennac_app/pages/chats/presentation/bloc/cubit/message_cubit.dart';
 import 'package:fennac_app/pages/chats/presentation/widgets/attachment_widget.dart';
 import 'package:fennac_app/pages/chats/presentation/widgets/recording_audio_widget.dart';
@@ -39,11 +42,26 @@ class _MessageInputFieldState extends State<MessageInputField> {
     super.initState();
   }
 
-  void _sendMessage() {
-    _messageCubit.sendTextMessage(
-      isGroupMessage: widget.isGroup,
-      otherGroupId: widget.otherGroupId,
-    );
+  Future<void> _sendMessage() async {
+    final text = _messageCubit.messageController.text.trim();
+    if (text.isEmpty) {
+      return;
+    }
+
+    try {
+      final blockedWords = await _messageCubit.sendTextMessage(
+        isGroupMessage: widget.isGroup,
+        otherGroupId: widget.otherGroupId,
+      );
+
+      if (blockedWords.isNotEmpty) {
+        final blockedWordsText = blockedWords.join(', ');
+        VxToast.show(message: 'These words are not allowed: $blockedWordsText');
+      }
+    } catch (e) {
+      log('Error validating message: ${e.toString()}');
+      VxToast.show(message: 'Unable to validate message right now.');
+    }
   }
 
   @override

@@ -79,7 +79,7 @@ class _CreateGroupGalleryScreenState extends State<CreateGroupGalleryScreen> {
     if (existing.isEmpty) return;
 
     final prefilled = existing
-        .take(ImagePickerCubit.maxMediaItems)
+        .take(ImagePickerCubit().maxMediaItems)
         .toList(growable: false)
         .asMap()
         .entries

@@ -32,8 +32,8 @@ class CustomBackButton extends StatelessWidget {
     return Align(
       alignment: alignment ?? Alignment.centerLeft,
       child: Container(
-        height: height ?? 48,
-        width: width ?? 48,
+        height: height ?? 44,
+        width: width ?? 44,
         decoration: BoxDecoration(
           color:
               backgroundColor ??

@@ -4,6 +4,7 @@ import 'package:fennac_app/app/constants/media_query_constants.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/pages/home/presentation/bloc/cubit/groups_cubit.dart';
+import 'package:fennac_app/pages/liked_groups/presentation/bloc/cubit/liked_groups_cubit.dart';
 import 'package:fennac_app/pages/my_group/presentation/bloc/cubit/my_group_cubit.dart';
 import 'package:fennac_app/pages/profile/presentation/screen/appearence_screen.dart';
 import 'package:fennac_app/pages/profile/presentation/widgets/poke_balance_tile.dart';
@@ -21,6 +22,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/di_container.dart';
+import '../../../../dialogs/delete_dialog.dart';
 import '../../../auth/presentation/bloc/cubit/login_cubit.dart';
 
 @RoutePage()
@@ -36,6 +38,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _fetchGroup() async {
     await Di().sl<MyGroupCubit>().fetchGroupById('');
+    await Di().sl<LikedGroupsCubit>().fetchPeopleWhoLikedMe();
   }
 
   @override
@@ -352,9 +355,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     showDivider: true,
                   ),
                   ProfileListTile(
-                    title: 'Logout',
+                    title: 'Delete Account',
                     onTap: () {
-                      Di().sl<LoginCubit>().logout(context);
+                      showDeleteDialog(
+                        context,
+                        onConfirm: () {
+                          Di().sl<LoginCubit>().deleteAccount(context: context);
+                        },
+                      );
+                    },
+                    showDivider: true,
+                  ),
+                  ProfileListTile(
+                    title: 'Logout',
+                    isLogoutTile: true,
+                    onTap: () async {
+                      await Di().sl<LoginCubit>().logout(context);
                     },
                     showDivider: false,
                   ),

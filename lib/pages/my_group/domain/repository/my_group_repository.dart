@@ -4,6 +4,7 @@ import 'package:fennac_app/pages/my_group/data/model/my_group_model.dart';
 abstract class MyGroupRepository {
   Future<dynamic> unMatchGroup(String groupId);
   Future<dynamic> setActiveGroup(String groupId);
+  Future<List<String>> checkBlockedWords(String text);
   Future<MyGroupModel> fetchGroupById(String groupId);
   Future<MyGroupModel> updateGroupById(
     String groupId,

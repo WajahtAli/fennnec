@@ -7,6 +7,7 @@ import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:fennac_app/helpers/gradient_toast.dart';
 import 'package:fennac_app/pages/chats/data/models/chat_and_calls_response.dart';
 import 'package:fennac_app/pages/chats/presentation/bloc/cubit/chat_landing_cubit.dart';
+import 'package:fennac_app/pages/chats/presentation/bloc/cubit/message_cubit.dart';
 import 'package:fennac_app/pages/chats/presentation/bloc/state/chat_landing_state.dart';
 import 'package:fennac_app/pages/chats/data/repository/chat_repository.dart';
 import 'package:fennac_app/pages/chats/presentation/widgets/call_history_item.dart';
@@ -140,10 +141,10 @@ class _SubscribedChatWidgetState extends State<SubscribedChatWidget> {
                     return GestureDetector(
                       onTap: () async {
                         Di().sl<ImagePickerCubit>().clearAllMedia();
+                        Di().sl<MessageCubit>().markMessageAsRead(chat.id);
 
                         if (chat.type == 'poke') {
                           final pokeId = _resolvePokeId(chat);
-
                           if ((pokeId == null || pokeId.isEmpty) &&
                               chat.meta.hasStartedChat &&
                               (chat.meta.directChat?.otherUserId?.isNotEmpty ??

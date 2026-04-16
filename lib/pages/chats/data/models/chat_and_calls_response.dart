@@ -424,12 +424,61 @@ abstract class PokeDetailResponse with _$PokeDetailResponse {
 abstract class PokeDetailData with _$PokeDetailData {
   const factory PokeDetailData({
     required PokeModel poke,
+    @Default([]) List<PokeModel> pokes,
     required PokerFromUser fromUser,
     required PokedTargetDetail pokedTargetDetail,
+    PokeActiveGroupModel? activeGroup,
   }) = _PokeDetailData;
 
   factory PokeDetailData.fromJson(Map<String, dynamic> json) =>
-      _$PokeDetailDataFromJson(json);
+      _$PokeDetailDataFromJson(_normalizePokeDetailData(json));
+}
+
+@freezed
+abstract class PokeActiveGroupModel with _$PokeActiveGroupModel {
+  const factory PokeActiveGroupModel({
+    required String id,
+    String? title,
+    String? bio,
+    String? fitsForGroup,
+    @Default([]) List<ChatGroupMemberUserModel> members,
+  }) = _PokeActiveGroupModel;
+
+  factory PokeActiveGroupModel.fromJson(Map<String, dynamic> json) =>
+      _$PokeActiveGroupModelFromJson({
+        ...json,
+        'id': json['id'] ?? json['_id'] ?? '',
+      });
+}
+
+Map<String, dynamic> _normalizePokeDetailData(Map<String, dynamic> json) {
+  final normalized = Map<String, dynamic>.from(json);
+
+  final rawPoke = normalized['poke'];
+  final rawPokes = normalized['pokes'];
+
+  if (rawPoke == null && rawPokes is List && rawPokes.isNotEmpty) {
+    final firstPoke = rawPokes.first;
+    if (firstPoke is Map<String, dynamic>) {
+      normalized['poke'] = firstPoke;
+    } else if (firstPoke is Map) {
+      normalized['poke'] = Map<String, dynamic>.from(firstPoke);
+    }
+  }
+
+  // Ensure 'pokes' is kept as a list for multi-poke carousel
+  if (rawPokes is List && rawPokes.isNotEmpty && normalized['poke'] == null) {
+    // poke already set above
+  }
+  // Normalize pokes list items
+  if (rawPokes is List) {
+    normalized['pokes'] = rawPokes
+        .whereType<Map>()
+        .map((e) => _normalizePokeModel(Map<String, dynamic>.from(e)))
+        .toList();
+  }
+
+  return normalized;
 }
 
 @freezed
@@ -449,7 +498,30 @@ abstract class PokeModel with _$PokeModel {
   }) = _PokeModel;
 
   factory PokeModel.fromJson(Map<String, dynamic> json) =>
-      _$PokeModelFromJson({...json, 'id': json['_id'] ?? json['id'] ?? ''});
+      _$PokeModelFromJson(_normalizePokeModel(json));
+}
+
+Map<String, dynamic> _normalizePokeModel(Map<String, dynamic> json) {
+  final normalized = Map<String, dynamic>.from(json);
+
+  final fromUser = normalized['fromUserId'];
+  if (fromUser is Map<String, dynamic>) {
+    normalized['fromUserId'] = fromUser['_id'] ?? fromUser['id'] ?? '';
+  } else if (fromUser is Map) {
+    final map = Map<String, dynamic>.from(fromUser);
+    normalized['fromUserId'] = map['_id'] ?? map['id'] ?? '';
+  }
+
+  final toUser = normalized['toUserId'];
+  if (toUser is Map<String, dynamic>) {
+    normalized['toUserId'] = toUser['_id'] ?? toUser['id'] ?? '';
+  } else if (toUser is Map) {
+    final map = Map<String, dynamic>.from(toUser);
+    normalized['toUserId'] = map['_id'] ?? map['id'] ?? '';
+  }
+
+  normalized['id'] = normalized['_id'] ?? normalized['id'] ?? '';
+  return normalized;
 }
 
 @freezed

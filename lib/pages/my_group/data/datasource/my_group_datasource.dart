@@ -5,6 +5,7 @@ import '../model/my_group_model.dart';
 abstract class MyGroupDatasource {
   Future<dynamic> unMatchGroup(String groupId);
   Future<dynamic> setActiveGroup(String groupId);
+  Future<List<String>> checkBlockedWords(String text);
   Future<MyGroupModel> fetchGroupById(String groupId);
   Future<MyGroupModel> updateGroupById(
     String groupId,
@@ -72,6 +73,49 @@ abstract class MyGroupDatasource {
 }
 
 class MyGroupDatasourceImpl extends MyGroupDatasource {
+  static const _blockedWordsApiKey = '7C3C40B6A611';
+
+  @override
+  Future<List<String>> checkBlockedWords(String text) async {
+    final normalizedText = text.trim();
+    if (normalizedText.isEmpty) {
+      return [];
+    }
+
+    try {
+      final response = await apiHelper.post(
+        '${AppConstants.blockedWords}?text=${Uri.encodeQueryComponent(normalizedText)}',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'x-api-key': _blockedWordsApiKey,
+        },
+        body: {'text': normalizedText},
+        requiresAuth: false,
+      );
+
+      final rawData = response['data'];
+      if (rawData is! Map) {
+        return [];
+      }
+
+      final data = Map<String, dynamic>.from(rawData);
+      final rawBlockedWords = data['matchedWords'];
+
+      if (rawBlockedWords is! List) {
+        return [];
+      }
+
+      return rawBlockedWords
+          .map((word) => word.toString().trim())
+          .where((word) => word.isNotEmpty)
+          .toSet()
+          .toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   @override
   Future<dynamic> unMatchGroup(String groupId) async {
     try {

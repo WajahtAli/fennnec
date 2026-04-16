@@ -76,6 +76,17 @@ class VerificationMethodBottomSheet extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          Container(
+            width: 56,
+            height: 6,
+            decoration: BoxDecoration(
+              color: isLight
+                  ? ColorPalette.black.withValues(alpha: 0.18)
+                  : Colors.white.withValues(alpha: 0.30),
+              borderRadius: BorderRadius.circular(999),
+            ),
+          ),
+          const SizedBox(height: 18),
           AppText(
             text: 'Choose Verification Method',
             style: AppTextStyles.h3(context).copyWith(

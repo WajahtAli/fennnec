@@ -3,6 +3,8 @@ import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
+import 'package:fennac_app/pages/auth/presentation/bloc/cubit/login_cubit.dart';
+import 'package:fennac_app/pages/auth/presentation/bloc/state/login_state.dart';
 import 'package:fennac_app/pages/liked_groups/presentation/bloc/cubit/liked_groups_cubit.dart';
 import 'package:fennac_app/pages/liked_groups/presentation/bloc/state/like_groups_state.dart';
 import 'package:fennac_app/pages/my_group/presentation/bloc/cubit/my_group_cubit.dart';
@@ -22,6 +24,7 @@ class ProfileListTile extends StatelessWidget {
   final bool? isGroupTile;
   final bool? isPeopleLikedYouTile;
   final bool? isSwitchGroupTile;
+  final bool? isLogoutTile;
 
   const ProfileListTile({
     super.key,
@@ -32,6 +35,7 @@ class ProfileListTile extends StatelessWidget {
     this.isGroupTile,
     this.isPeopleLikedYouTile,
     this.isSwitchGroupTile,
+    this.isLogoutTile,
   });
 
   @override
@@ -146,6 +150,25 @@ class ProfileListTile extends StatelessWidget {
                             .toList() ??
                         [],
                   );
+                },
+              ),
+              const SizedBox(width: 8),
+            ],
+            if (isLogoutTile == true) ...[
+              BlocBuilder<LoginCubit, LoginState>(
+                bloc: Di().sl<LoginCubit>(),
+                builder: (context, state) {
+                  if (state is LoginLoading) {
+                    return SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: Lottie.asset(
+                        Assets.animations.loadingSpinner,
+                        fit: BoxFit.cover,
+                      ),
+                    );
+                  }
+                  return const SizedBox.shrink();
                 },
               ),
               const SizedBox(width: 8),

@@ -98,7 +98,9 @@ class _VerifyPhoneNumberScreenState extends State<VerifyPhoneNumberScreen> {
                         alignment: Alignment.centerLeft,
                         child: CustomBackButton(
                           onPressed: () {
-                            Navigator.of(context).pop();
+                            AutoRouter.of(
+                              context,
+                            ).replace(const CreateAccountRoute());
                           },
                         ),
                       ),
@@ -165,8 +167,7 @@ class _VerifyPhoneNumberScreenState extends State<VerifyPhoneNumberScreen> {
                       BlocListener<CreateAccountCubit, CreateAccountState>(
                         bloc: _createAccountCubit,
                         listener: (context, state) {
-                          if (state is CreateAccountLoaded &&
-                              _createAccountCubit.isOtpVerify) {
+                          if (_createAccountCubit.isOtpVerify == true) {
                             if (!mounted) return;
 
                             CustomBottomSheet.show(
@@ -217,8 +218,7 @@ class _VerifyPhoneNumberScreenState extends State<VerifyPhoneNumberScreen> {
                               builder: (context, accountState) {
                                 final isLoading = widget.isFromProfile == true
                                     ? (profileState is ProfileLoading)
-                                    : (accountState is CreateAccountLoading &&
-                                          _createAccountCubit.isOtpVerify);
+                                    : (accountState is CreateAccountLoading);
 
                                 return CustomElevatedButton(
                                   icon: isLoading

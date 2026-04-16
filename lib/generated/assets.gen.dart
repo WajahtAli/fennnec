@@ -319,6 +319,10 @@ class $AssetsIconsGen {
   SvgGenImage get fennecLogoWithText =>
       const SvgGenImage('assets/icons/Fennec_logo_with_text.svg');
 
+  /// File path: assets/icons/Group Location.svg
+  SvgGenImage get groupLocation =>
+      const SvgGenImage('assets/icons/Group Location.svg');
+
   /// File path: assets/icons/Group Users Icon-2.svg
   SvgGenImage get groupUsersIcon2 =>
       const SvgGenImage('assets/icons/Group Users Icon-2.svg');
@@ -643,6 +647,7 @@ class $AssetsIconsGen {
   List<dynamic> get values => [
     fennecLogoText,
     fennecLogoWithText,
+    groupLocation,
     groupUsersIcon2,
     groupUsersIcon3,
     groupUsersIcon4,

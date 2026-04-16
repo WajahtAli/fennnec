@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'package:fennac_app/pages/filter/presentation/bloc/state/google_map_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -23,6 +24,7 @@ class GoogleMapCubit extends Cubit<GoogleMapState> {
   // Location related variables
   Position? currentLocation;
   LatLng? selectedMapCenter;
+  String? selectedAddress;
   geocoding.Placemark? address;
   StreamSubscription<Position>? positionStreamSubscription;
   LocationPermission? locationStatus;
@@ -84,6 +86,43 @@ class GoogleMapCubit extends Cubit<GoogleMapState> {
       Geolocator.openLocationSettings();
       throw Exception("Location permission permanently denied");
     }
+  }
+
+  Future<void> updateMarkers(CameraPosition position) async {
+    emit(GoogleMapStateUpdatingMarkers());
+    selectedMapCenter = position.target;
+
+    // Reverse geocode to get address
+    try {
+      final placemarks = await geocoding.placemarkFromCoordinates(
+        position.target.latitude,
+        position.target.longitude,
+      );
+      if (placemarks.isNotEmpty) {
+        log('Reverse geocoding result: ${placemarks[0]}');
+        final placemark = placemarks[0];
+        final parts = [
+          placemark.subLocality,
+          placemark.locality,
+          placemark.country,
+        ].where((p) => p != null && p.isNotEmpty).toList();
+
+        selectedAddress = parts.isNotEmpty
+            ? parts.join(', ')
+            : (placemark.name ?? '');
+      }
+    } catch (e) {
+      debugPrint('Reverse geocode error: $e');
+    }
+
+    final newMarker = Marker(
+      markerId: const MarkerId('selected_location'),
+      position: position.target,
+      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
+    );
+
+    markers = [newMarker];
+    emit(GoogleMapStateMarkersUpdated());
   }
 
   Future<void> _checkAndRequestService() async {

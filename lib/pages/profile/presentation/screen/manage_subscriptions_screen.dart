@@ -5,13 +5,21 @@ import 'package:fennac_app/app/theme/app_emojis.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:fennac_app/helpers/gradient_toast.dart';
+import 'package:fennac_app/pages/auth/presentation/bloc/cubit/login_cubit.dart';
+import 'package:fennac_app/pages/auth/presentation/bloc/state/login_state.dart';
+import 'package:fennac_app/pages/buy_poke/presentation/bloc/cubit/poke_cubit.dart';
+import 'package:fennac_app/pages/chats/presentation/widgets/premium_card.dart';
 import 'package:fennac_app/reusable_widgets/custom_app_bar.dart';
 import 'package:fennac_app/widgets/custom_outlined_button.dart';
 import 'package:fennac_app/widgets/custom_sized_box.dart';
 import 'package:fennac_app/widgets/movable_background.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 
 import 'package:flutter_svg/svg.dart';
+
+import '../../../../core/di_container.dart';
 
 @RoutePage()
 class ManageSubscriptionsScreen extends StatelessWidget {
@@ -19,6 +27,7 @@ class ManageSubscriptionsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loginCubit = Di().sl<LoginCubit>();
     return Scaffold(
       body: MovableBackground(
         backgroundType: MovableBackgroundType.dark,
@@ -27,13 +36,23 @@ class ManageSubscriptionsScreen extends StatelessWidget {
             children: [
               CustomAppBar(title: 'Manage Subscription', allowSpace: true),
               Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 16),
-                      _buildPremiumCard(context),
-                    ],
+                child: BlocBuilder<LoginCubit, LoginState>(
+                  bloc: loginCubit,
+                  builder: (context, state) => SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 20,
+                    ),
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 16),
+                        if (loginCubit.userData?.user?.subscriptionActive ==
+                            true)
+                          _buildPremiumCard(context)
+                        else
+                          PremiumCard(),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -45,6 +64,14 @@ class ManageSubscriptionsScreen extends StatelessWidget {
   }
 
   Widget _buildPremiumCard(BuildContext context) {
+    final user = Di().sl<LoginCubit>().userData?.user;
+    final premiumUserSince =
+        _formatIsoDate(user?.verifiedAt) ??
+        _formatDateTime(user?.createdAt) ??
+        'October 25, 2024';
+    final nextBillingDate =
+        _formatIsoDate(user?.subscriptionExpiresAt) ?? 'November 25, 2025';
+
     return CustomPaint(
       painter: _GradientBorderPainter(
         radius: 24,
@@ -177,16 +204,24 @@ class ManageSubscriptionsScreen extends StatelessWidget {
             const SizedBox(height: 16),
             _buildDetailRow('Plan Type', 'Premium Monthly', context),
             const SizedBox(height: 16),
-            _buildDetailRow('Premium User Since', 'October 25, 2024', context),
+            _buildDetailRow('Premium User Since', premiumUserSince, context),
             const SizedBox(height: 16),
-            _buildDetailRow('Next Billing Date', 'November 25, 2025', context),
+            _buildDetailRow('Next Billing Date', nextBillingDate, context),
             const SizedBox(height: 32),
 
             // Cancel Subscription button
             CustomOutlinedButton(
               text: 'Cancel Subscription',
-              onPressed: () {
-                VxToast.show(message: 'Coming Soon!');
+              onPressed: () async {
+                final userId = user?.id?.trim() ?? '';
+                if (userId.isEmpty) {
+                  VxToast.show(
+                    message: 'Unable to cancel subscription right now.',
+                  );
+                  return;
+                }
+
+                await Di().sl<PokeCubit>().cancelSubscription(userId: userId);
               },
               borderColor: isLightTheme(context)
                   ? ColorPalette.secondary
@@ -225,6 +260,20 @@ class ManageSubscriptionsScreen extends StatelessWidget {
         Text(value, style: AppTextStyles.inputLabel(context)),
       ],
     );
+  }
+
+  String? _formatIsoDate(String? rawDate) {
+    if (rawDate == null || rawDate.trim().isEmpty) return null;
+
+    final parsedDate = DateTime.tryParse(rawDate);
+    if (parsedDate == null) return null;
+
+    return DateFormat('MMMM d, y').format(parsedDate);
+  }
+
+  String? _formatDateTime(DateTime? dateTime) {
+    if (dateTime == null) return null;
+    return DateFormat('MMMM d, y').format(dateTime);
   }
 }
 

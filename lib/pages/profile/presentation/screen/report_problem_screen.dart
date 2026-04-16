@@ -44,6 +44,7 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
     _subjectController = TextEditingController();
     _descriptionController = TextEditingController();
     _isBlurNotifier = ValueNotifier<bool>(false);
+    _imagePickerCubit.maxMediaItems = 2;
     // Clear previous media when entering the screen
     _imagePickerCubit.clearAllMedia();
   }
@@ -51,6 +52,7 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
   @override
   void dispose() {
     _imagePickerCubit.clearAllMedia();
+    _imagePickerCubit.maxMediaItems = ImagePickerCubit.defaultMaxMediaItems;
     _subjectController.dispose();
     _descriptionController.dispose();
     _isBlurNotifier.dispose();
@@ -204,6 +206,8 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
                                               ),
                                             )
                                           : null,
+                                      isLoading:
+                                          _reportProblemCubit.isSubmitting,
                                       text: _reportProblemCubit.isSubmitting
                                           ? ''
                                           : 'Submit Report',

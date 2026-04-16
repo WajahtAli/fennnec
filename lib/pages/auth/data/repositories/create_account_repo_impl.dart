@@ -109,6 +109,15 @@ class CreateAccountRepoImpl extends CreateAccountRepo {
   }
 
   @override
+  Future<dynamic> uploadMediaMultiple({
+    required final List<String> filePaths,
+  }) async {
+    return await _createAccountDatasource.uploadMediaMultiple(
+      filePaths: filePaths,
+    );
+  }
+
+  @override
   Future<dynamic> customPrompt({
     required final String promptTitle,
     required final String type,

@@ -59,261 +59,283 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               MovableBackground(
                 child: SafeArea(
                   child: SingleChildScrollView(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
-                      child: BlocBuilder<AuthCubit, AuthState>(
-                        bloc: _authCubit,
-                        builder: (context, state) {
-                          return Form(
-                            key: _formKey,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                CustomAppBar(title: 'Change Password'),
+                    child: BlocBuilder<AuthCubit, AuthState>(
+                      bloc: _authCubit,
+                      builder: (context, state) {
+                        return Form(
+                          key: _formKey,
+                          child: Column(
+                            children: [
+                              CustomAppBar(title: 'Change Password'),
 
-                                CustomSizedBox(height: 40),
-                                CustomLabelTextField(
-                                  label: 'Current Password',
-                                  hintText: 'Enter your current password',
-                                  controller:
-                                      _authCubit.currentPasswordController,
-                                  validator: (value) {
-                                    final error = _authCubit
-                                        .getCurrentPasswordError();
-                                    return error;
-                                  },
-                                  obscureText:
-                                      _authCubit.obscureCurrentPassword,
-                                  onChanged: (value) {
-                                    _authCubit.onCurrentPasswordChanged(value);
-                                  },
-                                  suffixIcon: IconButton(
-                                    icon: Icon(
-                                      _authCubit.obscureCurrentPassword
-                                          ? Icons.visibility_outlined
-                                          : Icons.visibility_off_outlined,
-                                      color: isLightTheme(context)
-                                          ? Colors.black
-                                          : Colors.white,
-                                    ),
-                                    onPressed: () {
-                                      _authCubit
-                                          .toggleCurrentPasswordVisibility();
-                                    },
-                                  ),
-                                  labelColor:
-                                      _authCubit.getCurrentPasswordError() !=
-                                          null
-                                      ? ColorPalette.error
-                                      : isLightTheme(context)
-                                      ? Colors.black
-                                      : Colors.white,
-                                  filled: false,
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 24,
                                 ),
-                                const CustomSizedBox(height: 24),
-                                // New Password Field
-                                CustomLabelTextField(
-                                  label: 'New Password',
-                                  hintText: 'Enter your new password',
-                                  controller: _authCubit.newPasswordController,
-                                  validator: (value) {
-                                    final error = _authCubit
-                                        .getNewPasswordError();
-                                    return error;
-                                  },
-                                  obscureText: _authCubit.obscureNewPassword,
-                                  onChanged: (value) {
-                                    _authCubit.onNewPasswordChanged(value);
-                                  },
-                                  suffixIcon: IconButton(
-                                    icon: Icon(
-                                      _authCubit.obscureNewPassword
-                                          ? Icons.visibility_outlined
-                                          : Icons.visibility_off_outlined,
-                                      color: isLightTheme(context)
-                                          ? Colors.black
-                                          : Colors.white,
-                                    ),
-                                    onPressed: () {
-                                      _authCubit.toggleNewPasswordVisibility();
-                                    },
-                                  ),
-                                  labelColor:
-                                      _authCubit.getNewPasswordError() != null
-                                      ? ColorPalette.error
-                                      : isLightTheme(context)
-                                      ? Colors.black
-                                      : Colors.white,
-                                  filled: false,
-                                ),
-                                if (_authCubit.getNewPasswordError() != null)
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                      top: 8,
-                                      left: 4,
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Icon(
-                                          Icons.info_outline,
-                                          color: ColorPalette.error,
-                                          size: 16,
-                                        ),
-                                        const SizedBox(width: 4),
-                                        Expanded(
-                                          child: AppText(
-                                            text: _authCubit
-                                                .getNewPasswordError()!,
-                                            style:
-                                                AppTextStyles.bodyRegular(
-                                                  context,
-                                                ).copyWith(
-                                                  color: ColorPalette.error,
-                                                  fontSize: 12,
-                                                ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                CustomSizedBox(height: 24),
-                                // Confirm New Password Field
-                                CustomLabelTextField(
-                                  label: 'Confirm New Password',
-                                  hintText: 'Re-enter your new password',
-                                  controller:
-                                      _authCubit.confirmNewPasswordController,
-                                  validator: (value) {
-                                    final error = _authCubit
-                                        .getConfirmNewPasswordError();
-                                    return error;
-                                  },
-                                  obscureText:
-                                      _authCubit.obscureConfirmNewPassword,
-                                  onChanged: (value) {
-                                    _authCubit.onConfirmNewPasswordChanged(
-                                      value,
-                                    );
-                                  },
-                                  suffixIcon: IconButton(
-                                    icon: Icon(
-                                      _authCubit.obscureConfirmNewPassword
-                                          ? Icons.visibility_outlined
-                                          : Icons.visibility_off_outlined,
-                                      color: isLightTheme(context)
-                                          ? Colors.black
-                                          : Colors.white,
-                                    ),
-                                    onPressed: () {
-                                      _authCubit
-                                          .toggleConfirmNewPasswordVisibility();
-                                    },
-                                  ),
-                                  labelColor:
-                                      _authCubit.getConfirmNewPasswordError() !=
-                                          null
-                                      ? ColorPalette.error
-                                      : isLightTheme(context)
-                                      ? Colors.black
-                                      : Colors.white,
-                                  filled: false,
-                                ),
-                                if (_authCubit.getConfirmNewPasswordError() !=
-                                    null)
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                      top: 8,
-                                      left: 4,
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Icon(
-                                          Icons.info_outline,
-                                          color: ColorPalette.error,
-                                          size: 16,
-                                        ),
-                                        const SizedBox(width: 4),
-                                        Expanded(
-                                          child: AppText(
-                                            text: _authCubit
-                                                .getConfirmNewPasswordError()!,
-                                            style:
-                                                AppTextStyles.bodyRegular(
-                                                  context,
-                                                ).copyWith(
-                                                  color: ColorPalette.error,
-                                                  fontSize: 12,
-                                                ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                CustomSizedBox(height: 40),
-                                BlocBuilder<ProfileCubit, ProfileState>(
-                                  bloc: _profileCubit,
-                                  builder: (context, state) {
-                                    return CustomElevatedButton(
-                                      onTap: () async {
-                                        if (_profileCubit.isSubmitting) {
-                                          return;
-                                        }
-                                        if (_formKey.currentState?.validate() ??
-                                            false) {
-                                          final success = await _profileCubit
-                                              .changePassword(
-                                                currentPassword: _authCubit
-                                                    .currentPasswordController
-                                                    .text,
-                                                newPassword: _authCubit
-                                                    .newPasswordController
-                                                    .text,
-                                                context: context,
-                                              );
-                                          if (!mounted || !success) return;
 
-                                          _showBackdropFilter.value = true;
-                                          CustomBottomSheet.show(
-                                            context: context,
-                                            icon: AnimatedBackgroundContainer(
-                                              icon:
-                                                  Assets.icons.checkGreen.path,
-                                              isPng: true,
-                                            ),
-                                            title: 'Password Updated',
-                                            buttonText: 'Done',
-                                          ).then((_) {
-                                            _showBackdropFilter.value = false;
-                                          });
-                                        } else {
-                                          _authCubit.submitNewPassword();
-                                        }
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    CustomSizedBox(height: 40),
+                                    CustomLabelTextField(
+                                      label: 'Current Password',
+                                      hintText: 'Enter your current password',
+                                      controller:
+                                          _authCubit.currentPasswordController,
+                                      validator: (value) {
+                                        final error = _authCubit
+                                            .getCurrentPasswordError();
+                                        return error;
                                       },
-                                      text: _profileCubit.isSubmitting
-                                          ? ''
-                                          : 'Update Password',
-                                      icon: _profileCubit.isSubmitting
-                                          ? SizedBox(
-                                              width: 18,
-                                              height: 18,
-                                              child: Lottie.asset(
-                                                Assets
-                                                    .animations
-                                                    .loadingSpinner,
+                                      obscureText:
+                                          _authCubit.obscureCurrentPassword,
+                                      onChanged: (value) {
+                                        _authCubit.onCurrentPasswordChanged(
+                                          value,
+                                        );
+                                      },
+                                      suffixIcon: IconButton(
+                                        icon: Icon(
+                                          _authCubit.obscureCurrentPassword
+                                              ? Icons.visibility_outlined
+                                              : Icons.visibility_off_outlined,
+                                          color: isLightTheme(context)
+                                              ? Colors.black
+                                              : Colors.white,
+                                        ),
+                                        onPressed: () {
+                                          _authCubit
+                                              .toggleCurrentPasswordVisibility();
+                                        },
+                                      ),
+                                      labelColor:
+                                          _authCubit
+                                                  .getCurrentPasswordError() !=
+                                              null
+                                          ? ColorPalette.error
+                                          : isLightTheme(context)
+                                          ? Colors.black
+                                          : Colors.white,
+                                      filled: false,
+                                    ),
+                                    const CustomSizedBox(height: 24),
+                                    // New Password Field
+                                    CustomLabelTextField(
+                                      label: 'New Password',
+                                      hintText: 'Enter your new password',
+                                      controller:
+                                          _authCubit.newPasswordController,
+                                      validator: (value) {
+                                        final error = _authCubit
+                                            .getNewPasswordError();
+                                        return error;
+                                      },
+                                      obscureText:
+                                          _authCubit.obscureNewPassword,
+                                      onChanged: (value) {
+                                        _authCubit.onNewPasswordChanged(value);
+                                      },
+                                      suffixIcon: IconButton(
+                                        icon: Icon(
+                                          _authCubit.obscureNewPassword
+                                              ? Icons.visibility_outlined
+                                              : Icons.visibility_off_outlined,
+                                          color: isLightTheme(context)
+                                              ? Colors.black
+                                              : Colors.white,
+                                        ),
+                                        onPressed: () {
+                                          _authCubit
+                                              .toggleNewPasswordVisibility();
+                                        },
+                                      ),
+                                      labelColor:
+                                          _authCubit.getNewPasswordError() !=
+                                              null
+                                          ? ColorPalette.error
+                                          : isLightTheme(context)
+                                          ? Colors.black
+                                          : Colors.white,
+                                      filled: false,
+                                    ),
+                                    if (_authCubit.getNewPasswordError() !=
+                                        null)
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                          top: 8,
+                                          left: 4,
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              Icons.info_outline,
+                                              color: ColorPalette.error,
+                                              size: 16,
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Expanded(
+                                              child: AppText(
+                                                text: _authCubit
+                                                    .getNewPasswordError()!,
+                                                style:
+                                                    AppTextStyles.bodyRegular(
+                                                      context,
+                                                    ).copyWith(
+                                                      color: ColorPalette.error,
+                                                      fontSize: 12,
+                                                    ),
                                               ),
-                                            )
-                                          : null,
-                                      isLoading: _profileCubit.isSubmitting,
-                                      width: double.infinity,
-                                    );
-                                  },
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    CustomSizedBox(height: 24),
+                                    // Confirm New Password Field
+                                    CustomLabelTextField(
+                                      label: 'Confirm New Password',
+                                      hintText: 'Re-enter your new password',
+                                      controller: _authCubit
+                                          .confirmNewPasswordController,
+                                      validator: (value) {
+                                        final error = _authCubit
+                                            .getConfirmNewPasswordError();
+                                        return error;
+                                      },
+                                      obscureText:
+                                          _authCubit.obscureConfirmNewPassword,
+                                      onChanged: (value) {
+                                        _authCubit.onConfirmNewPasswordChanged(
+                                          value,
+                                        );
+                                      },
+                                      suffixIcon: IconButton(
+                                        icon: Icon(
+                                          _authCubit.obscureConfirmNewPassword
+                                              ? Icons.visibility_outlined
+                                              : Icons.visibility_off_outlined,
+                                          color: isLightTheme(context)
+                                              ? Colors.black
+                                              : Colors.white,
+                                        ),
+                                        onPressed: () {
+                                          _authCubit
+                                              .toggleConfirmNewPasswordVisibility();
+                                        },
+                                      ),
+                                      labelColor:
+                                          _authCubit
+                                                  .getConfirmNewPasswordError() !=
+                                              null
+                                          ? ColorPalette.error
+                                          : isLightTheme(context)
+                                          ? Colors.black
+                                          : Colors.white,
+                                      filled: false,
+                                    ),
+                                    if (_authCubit
+                                            .getConfirmNewPasswordError() !=
+                                        null)
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                          top: 8,
+                                          left: 4,
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              Icons.info_outline,
+                                              color: ColorPalette.error,
+                                              size: 16,
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Expanded(
+                                              child: AppText(
+                                                text: _authCubit
+                                                    .getConfirmNewPasswordError()!,
+                                                style:
+                                                    AppTextStyles.bodyRegular(
+                                                      context,
+                                                    ).copyWith(
+                                                      color: ColorPalette.error,
+                                                      fontSize: 12,
+                                                    ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    CustomSizedBox(height: 40),
+                                    BlocBuilder<ProfileCubit, ProfileState>(
+                                      bloc: _profileCubit,
+                                      builder: (context, state) {
+                                        return CustomElevatedButton(
+                                          onTap: () async {
+                                            if (_profileCubit.isSubmitting) {
+                                              return;
+                                            }
+                                            if (_formKey.currentState
+                                                    ?.validate() ??
+                                                false) {
+                                              final success = await _profileCubit
+                                                  .changePassword(
+                                                    currentPassword: _authCubit
+                                                        .currentPasswordController
+                                                        .text,
+                                                    newPassword: _authCubit
+                                                        .newPasswordController
+                                                        .text,
+                                                    context: context,
+                                                  );
+                                              if (!mounted || !success) return;
+
+                                              _showBackdropFilter.value = true;
+                                              CustomBottomSheet.show(
+                                                context: context,
+                                                icon:
+                                                    AnimatedBackgroundContainer(
+                                                      icon: Assets
+                                                          .icons
+                                                          .checkGreen
+                                                          .path,
+                                                      isPng: true,
+                                                    ),
+                                                title: 'Password Updated',
+                                                buttonText: 'Done',
+                                              ).then((_) {
+                                                _showBackdropFilter.value =
+                                                    false;
+                                              });
+                                            } else {
+                                              _authCubit.submitNewPassword();
+                                            }
+                                          },
+                                          text: _profileCubit.isSubmitting
+                                              ? ''
+                                              : 'Update Password',
+                                          icon: _profileCubit.isSubmitting
+                                              ? SizedBox(
+                                                  width: 18,
+                                                  height: 18,
+                                                  child: Lottie.asset(
+                                                    Assets
+                                                        .animations
+                                                        .loadingSpinner,
+                                                  ),
+                                                )
+                                              : null,
+                                          isLoading: _profileCubit.isSubmitting,
+                                          width: double.infinity,
+                                        );
+                                      },
+                                    ),
+                                    CustomSizedBox(height: 40),
+                                  ],
                                 ),
-                                CustomSizedBox(height: 40),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ),

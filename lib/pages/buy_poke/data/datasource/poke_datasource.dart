@@ -15,9 +15,23 @@ abstract class PokeDatasource {
   Future<Map<String, dynamic>> purchaseSubscription({
     required String productId,
   });
+  Future<Map<String, dynamic>> cancelSubscription({required String userId});
 }
 
 class PokeDatasourceImpl extends PokeDatasource {
+  @override
+  Future<Map<String, dynamic>> cancelSubscription({
+    required String userId,
+  }) async {
+    final body = <String, dynamic>{'userId': userId};
+    final response = await apiHelper.post(
+      AppConstants.cancelSubscription,
+      body: body,
+      requiresAuth: true,
+    );
+    return response;
+  }
+
   @override
   Future<Map<String, dynamic>> purchaseSubscription({
     required String productId,

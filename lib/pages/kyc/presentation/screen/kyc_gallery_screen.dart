@@ -129,7 +129,7 @@ class _KycGalleryScreenState extends State<KycGalleryScreen> {
     }
 
     final prefilled = existing
-        .take(ImagePickerCubit.maxMediaItems)
+        .take(ImagePickerCubit().maxMediaItems)
         .toList()
         .asMap()
         .entries

@@ -180,6 +180,15 @@ class MessageCubit extends Cubit<MessageState> {
             receiverGroupId == _groupId);
   }
 
+  Future<List<String>> checkBlockedWords(String text) async {
+    final normalizedText = text.trim();
+    if (normalizedText.isEmpty) {
+      return [];
+    }
+
+    return await _myGroupRepository.checkBlockedWords(normalizedText);
+  }
+
   Future<void> _reactToMessageRequest({
     required String messageId,
     required String emoji,
@@ -243,6 +252,9 @@ class MessageCubit extends Cubit<MessageState> {
     _isGroup = isGroup;
     _otherGroupId = isGroup ? otherGroupId : null;
     otherUserIsTyping = false;
+    log(
+      "📨 Initialized messages: _groupId=$_groupId, _isGroup=$_isGroup, _otherGroupId=$_otherGroupId",
+    );
     _page = 1;
     _hasMore = true;
     messages.clear();
@@ -319,67 +331,255 @@ class MessageCubit extends Cubit<MessageState> {
   }
 
   void _attachSocketListeners() {
+    log("🔌 Attaching socket listeners (isGroup=$_isGroup)");
     SocketService.on(SocketEvents.newGroupMessage, _handleIncomingMessage);
     SocketService.on(SocketEvents.newDirectMessage, _handleIncomingMessage);
+    SocketService.on(SocketEvents.messagesReaction, _handleReactionEvent);
+    SocketService.on(SocketEvents.groupMessagesReaction, _handleReactionEvent);
 
     if (_isGroup) {
+      log("🔌 Attaching group:typing listener");
       SocketService.on(SocketEvents.groupTyping, _handleTypingEvent);
       SocketService.off(SocketEvents.directTyping);
       return;
     }
 
+    log("🔌 Attaching direct:typing listener");
     SocketService.on(SocketEvents.directTyping, _handleTypingEvent);
     SocketService.off(SocketEvents.groupTyping);
   }
 
   void _detachSocketListeners() {
+    log("🔌 Detaching socket listeners");
     SocketService.off(SocketEvents.newGroupMessage);
     SocketService.off(SocketEvents.newDirectMessage);
+    SocketService.off(SocketEvents.messagesReaction);
+    SocketService.off(SocketEvents.groupMessagesReaction);
     SocketService.off(SocketEvents.groupTyping);
     SocketService.off(SocketEvents.directTyping);
   }
 
-  void _handleTypingEvent(dynamic data) {
+  void _handleReactionEvent(dynamic data) {
     try {
       if (data is! Map) return;
+      emit(MessageLoading());
 
       final payload = Map<String, dynamic>.from(data);
-      final typingChatId =
-          payload['chatId'] ?? payload['groupId'] ?? payload['directChatId'];
-      final senderId = payload['senderId'];
+
+      Map<String, dynamic>? messageJson;
+      final nested =
+          payload['message'] ?? payload['data'] ?? payload['payload'];
+      if (nested is Map) {
+        messageJson = Map<String, dynamic>.from(nested);
+      }
+
+      if (!_isReactionEventForCurrentChat(payload, messageJson: messageJson)) {
+        return;
+      }
+
+      if (messageJson != null) {
+        final message = _normalizeFetchedMessage(
+          MessageModel.fromJson(messageJson),
+        );
+        final index = messages.indexWhere((m) => m.id == message.id);
+        if (index == -1) {
+          return;
+        }
+
+        messages[index] = message;
+        emit(MessageSuccess());
+        return;
+      }
+
+      final messageId =
+          payload['messageId']?.toString() ??
+          payload['_id']?.toString() ??
+          payload['id']?.toString();
+      final emoji = payload['emoji']?.toString();
+      final action = payload['action']?.toString().toLowerCase();
+      final reactedByUserId =
+          payload['reactedByUserId']?.toString() ??
+          payload['userId']?.toString() ??
+          payload['senderId']?.toString();
+
+      if (messageId == null || messageId.isEmpty) return;
+      if (emoji == null || emoji.isEmpty) return;
+      if (reactedByUserId == null || reactedByUserId.isEmpty) return;
+
+      final index = messages.indexWhere((m) => m.id == messageId);
+      if (index == -1) return;
+
+      final message = messages[index];
+      final updated = List<ReactionModel>.from(message.reactions);
+
+      if (action == 'removed') {
+        updated.removeWhere(
+          (reaction) =>
+              reaction.userId == reactedByUserId && reaction.emoji == emoji,
+        );
+      } else {
+        updated.removeWhere((reaction) => reaction.userId == reactedByUserId);
+        updated.add(
+          ReactionModel(
+            userId: reactedByUserId,
+            userName:
+                payload['senderName']?.toString() ??
+                payload['userName']?.toString() ??
+                '',
+            emoji: emoji,
+            reactedAt:
+                DateTime.tryParse(payload['at']?.toString() ?? '') ??
+                DateTime.now(),
+          ),
+        );
+      }
+
+      messages[index] = message.copyWith(
+        reactions: _normalizeReactions(updated),
+      );
+      emit(MessageSuccess());
+    } catch (e) {
+      log('Error handling reaction event: $e');
+    }
+  }
+
+  bool _isReactionEventForCurrentChat(
+    Map<String, dynamic> payload, {
+    Map<String, dynamic>? messageJson,
+  }) {
+    final activeChatId = _groupId;
+    if (activeChatId == null || activeChatId.isEmpty) return false;
+
+    if (messageJson != null) {
+      if (_isSocketMessageForCurrentChat(messageJson)) {
+        return true;
+      }
+    }
+
+    if (_isGroup) {
+      final groupId = payload['groupId']?.toString();
+      final receiverGroupId = payload['receiverGroupId']?.toString();
+      return groupId == activeChatId || receiverGroupId == activeChatId;
+    }
+
+    final senderId =
+        payload['reactedByUserId']?.toString() ??
+        payload['userId']?.toString() ??
+        payload['senderId']?.toString();
+
+    return senderId == activeChatId;
+  }
+
+  void _handleTypingEvent(dynamic data) {
+    try {
+      log("🔔 Received typing event: $data");
+      if (data is! Map) {
+        log("❌ Typing: data is not a Map");
+        return;
+      }
+      emit(MessageLoading());
+
+      final payload = Map<String, dynamic>.from(data);
+      final typingGroupId = payload['groupId'];
+      final typingReceiverGroupId = payload['receiverGroupId'];
+      final typingChatId = payload['chatId'] ?? payload['directChatId'];
+      final senderId = payload['userId'] ?? payload['senderId'];
       final isTyping = payload['isTyping'] == true;
 
-      if (typingChatId == null || senderId == null) return;
+      log(
+        "🔔 Typing payload: groupId=$typingGroupId, receiverGroupId=$typingReceiverGroupId, chatId=$typingChatId, senderId=$senderId, isTyping=$isTyping, activeChatId=$_groupId, isGroup=$_isGroup",
+      );
 
-      final sameChat = typingChatId.toString() == _groupId;
+      if (senderId == null) {
+        log("❌ Typing: senderId is null");
+        return;
+      }
+
+      final activeChatId = _groupId;
+      if (activeChatId == null || activeChatId.isEmpty) {
+        log("❌ Typing: no active chat id");
+        return;
+      }
+
+      final bool sameChat;
+      if (_isGroup) {
+        // For group chats, match by groupId or receiverGroupId
+        sameChat =
+            typingGroupId?.toString() == activeChatId ||
+            typingReceiverGroupId?.toString() == activeChatId;
+        log(
+          "🔔 Typing: isGroup=true, sameChat=$sameChat (groupId match: ${typingGroupId?.toString() == activeChatId}, receiverGroupId match: ${typingReceiverGroupId?.toString() == activeChatId})",
+        );
+      } else {
+        // For direct chats, the senderId (userId from backend) IS the chat identifier
+        // OR match by explicit chatId field if present
+        sameChat =
+            senderId.toString() == activeChatId ||
+            typingChatId?.toString() == activeChatId;
+        log(
+          "🔔 Typing: isGroup=false, sameChat=$sameChat (senderId match: ${senderId.toString() == activeChatId}, chatId match: ${typingChatId?.toString() == activeChatId})",
+        );
+      }
+
       final isOtherUser = senderId.toString() != currentUserId;
+      log(
+        "🔔 Typing: isOtherUser=$isOtherUser (senderId=$senderId, currentUserId=$currentUserId)",
+      );
 
-      if (!sameChat || !isOtherUser) return;
+      if (!sameChat || !isOtherUser) {
+        log(
+          "❌ Typing: rejected (sameChat=$sameChat, isOtherUser=$isOtherUser)",
+        );
+        return;
+      }
 
       if (otherUserIsTyping != isTyping) {
+        log(
+          "✅ Typing: updating otherUserIsTyping from $otherUserIsTyping to $isTyping",
+        );
         otherUserIsTyping = isTyping;
-        emit(MessageSuccess());
+      } else {
+        log("⏭️ Typing: no change needed (already $isTyping)");
       }
+      // Always emit to trigger UI rebuild on any valid typing event
+      emit(MessageSuccess());
     } catch (e) {
-      log('Error handling typing event: $e');
+      log('❌ Error handling typing event: $e');
     }
   }
 
   void sendTypingStatus(bool isTyping) {
-    if (_groupId == null || _groupId!.isEmpty) return;
-
-    final payload = <String, dynamic>{
-      'chatId': _groupId,
-      'senderId': currentUserId,
-      'isTyping': isTyping,
-    };
+    log(
+      "📤 Emitting typing status: isTyping=$isTyping for groupId=$_groupId, isGroup=$_isGroup",
+    );
+    final activeChatId = _groupId;
+    if (activeChatId == null || activeChatId.isEmpty) {
+      log("❌ Send typing: no active chat id");
+      return;
+    }
 
     if (_isGroup) {
-      payload['groupId'] = _groupId;
+      final payload = <String, dynamic>{
+        'groupId': activeChatId,
+        'isTyping': isTyping,
+      };
+
+      final receiverGroupId = _resolveEffectiveOtherGroupId(_otherGroupId);
+      if (receiverGroupId != null && receiverGroupId.isNotEmpty) {
+        payload['receiverGroupId'] = receiverGroupId;
+      }
+
+      log("📤 Emitting group:typing: $payload");
       SocketService.emit(SocketEvents.groupTyping, payload);
       return;
     }
 
+    final payload = <String, dynamic>{
+      'receiverId': activeChatId,
+      'isTyping': isTyping,
+    };
+
+    log("📤 Emitting direct:typing: $payload");
     SocketService.emit(SocketEvents.directTyping, payload);
   }
 
@@ -575,12 +775,19 @@ class MessageCubit extends Cubit<MessageState> {
   }
 
   /// Send a text message
-  Future<void> sendTextMessage({
+  Future<List<String>> sendTextMessage({
     bool? isGroupMessage,
     String? otherGroupId,
   }) async {
     final content = messageController.text;
-    if (content.trim().isEmpty) return;
+    if (content.trim().isEmpty) return [];
+
+    final blockedWords = await checkBlockedWords(content);
+    if (blockedWords.isNotEmpty) {
+      emit(MessageSuccess());
+      return blockedWords;
+    }
+
     emit(MessageLoading());
 
     final effectiveOtherGroupId = (isGroupMessage ?? false)
@@ -590,7 +797,7 @@ class MessageCubit extends Cubit<MessageState> {
     if ((isGroupMessage ?? false) &&
         _isInvalidGroupReceiverId(effectiveOtherGroupId)) {
       emit(MessageError('Invalid receiver group id for group message'));
-      return;
+      return [];
     }
 
     final message = MessageModel(
@@ -634,6 +841,8 @@ class MessageCubit extends Cubit<MessageState> {
 
       log('sendTextMessage completed for ${message.id}');
     }
+
+    return [];
   }
 
   /// Send a media message (image, video, audio, file)
@@ -694,7 +903,7 @@ class MessageCubit extends Cubit<MessageState> {
         }
 
         final String effectiveContent = (caption == null || caption.isEmpty)
-            ? (type == MessageType.audio ? 'Audio message' : ' ')
+            ? _defaultMediaPreview(type)
             : caption;
 
         await _sendMessageRequest(
@@ -722,6 +931,21 @@ class MessageCubit extends Cubit<MessageState> {
         });
         emit(MessageSuccess());
       }
+    }
+  }
+
+  String _defaultMediaPreview(MessageType type) {
+    switch (type) {
+      case MessageType.image:
+        return 'Photo';
+      case MessageType.video:
+        return 'Video';
+      case MessageType.audio:
+        return 'Audio message';
+      case MessageType.file:
+        return 'File';
+      case MessageType.text:
+        return '';
     }
   }
 
@@ -800,6 +1024,7 @@ class MessageCubit extends Cubit<MessageState> {
 
   /// Mark message as read
   Future<void> markMessageAsRead(String messageId) async {
+    log("Marking message $messageId as read");
     final messageIndex = messages.indexWhere((m) => m.id == messageId);
     if (messageIndex == -1) return;
 

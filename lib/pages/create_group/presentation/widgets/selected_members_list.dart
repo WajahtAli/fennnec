@@ -177,6 +177,9 @@ class _MembersWrap extends StatelessWidget {
         allSlots.add(
           _MemberSlot(
             selectedMember: member,
+            imagePath: member.profileImageUrl?.isNotEmpty == true
+                ? member.profileImageUrl
+                : null,
             label: member.displayName.isNotEmpty
                 ? member.displayName
                 : 'Member',

@@ -2,6 +2,8 @@ class SocketEvents {
   // 🔹 Messages
   static const newDirectMessage = 'direct:message:new';
   static const newGroupMessage = 'group:message:new';
+  static const messagesReaction = 'direct:message:reaction';
+  static const groupMessagesReaction = 'group:message:reaction';
 
   // 🔹 Typing
   static const directTyping = 'direct:typing';
@@ -13,6 +15,7 @@ class SocketEvents {
   static const chatUpdated3 = 'chat-updates';
   static const unifiedChatsUpdated = 'unified:chats:updated';
   static const unifiedChatsList = 'unified:chats:list';
+  static const unifiedChatsCount = 'unified:chats:count';
 
   // 🔹 Calls
   static const callUpdated1 = 'call-updated';
@@ -20,17 +23,20 @@ class SocketEvents {
 
   // 🔹 Groups & Pokes
   static const groupsAllNew = 'groups:all:new';
+  static const groupsSettingsUpdated = 'groups:settings:updated';
   static const pokeStartedChatIndividual = 'pokes:started-chat:individual';
 
   // 🔹 Likes
   static const peopleWhoLikedYouCount = 'groups:people-who-liked-you:count';
   static const peopleWhoLikedYouList = 'groups:people-who-liked-you:list';
 
-  // 🔹 Ride (if needed)
-  static const riderLocation = 'riderLocation';
-  static const rideRequest = 'rideRequest';
-
   // 🔹 Emit Events (optional naming clarity)
   static const sendDirectMessage = 'direct:message:send';
   static const sendGroupMessage = 'group:message:send';
+
+  // deactivate
+  static const deactivateAccount = 'user:account:deactivated';
+
+  // 🔹 Auth
+  static const pendingGroupInvitations = 'auth:pending-group-invitations';
 }

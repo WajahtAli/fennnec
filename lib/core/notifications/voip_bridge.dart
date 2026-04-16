@@ -15,21 +15,5 @@ class VoipBridge {
         onDecline(args);
       }
     });
-
-    // Check for any pending action that happened before init
-    _channel.invokeMethod('checkPendingAction').then((result) {
-      if (result != null) {
-        final data = Map<String, dynamic>.from(result);
-        onAccept(data);
-      }
-    });
-  }
-
-  static Future<void> endCall() async {
-    try {
-      await _channel.invokeMethod('endCall');
-    } catch (e) {
-      // Ignore if not implemented or fails
-    }
   }
 }

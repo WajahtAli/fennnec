@@ -62,15 +62,10 @@ class CreateAccountCubit extends Cubit<CreateAccountState> {
       // createdUser = user;
       isLoading = false;
 
-      showBottomSheet(
+      await VerificationMethodBottomSheet.show(
         context: context,
-        builder: (sheetContext) {
-          return VerificationMethodBottomSheet(
-            parentContext: context,
-            phone: phone,
-            email: email,
-          );
-        },
+        phone: phone,
+        email: email,
       );
 
       // AutoRouter.of(context).replace(VerifyPhoneNumberRoute());
@@ -103,7 +98,6 @@ class CreateAccountCubit extends Cubit<CreateAccountState> {
     String phone,
     Function() onSuccess,
   ) async {
-    isOtpVerify = true;
     emit(CreateAccountLoading());
 
     try {
@@ -116,6 +110,7 @@ class CreateAccountCubit extends Cubit<CreateAccountState> {
         emit(CreateAccountError("Invalid verification response"));
         return;
       }
+      isOtpVerify = true;
 
       final token = response.data?.accessToken ?? '';
       await sharedPreferencesHelper.saveUserData(response);
@@ -172,6 +167,47 @@ class CreateAccountCubit extends Cubit<CreateAccountState> {
     }
   }
 
+  Future<List<String>> uploadMediaMultiple({
+    required List<String> filePaths,
+  }) async {
+    try {
+      final response = await _createAccountUsecase.uploadMediaMultiple(
+        filePaths: filePaths,
+      );
+
+      debugPrint('📤 Multiple upload response type: ${response.runtimeType}');
+      debugPrint('📤 Multiple upload response: $response');
+
+      if (response == null) {
+        debugPrint('❌ Multiple upload response is null');
+        emit(CreateAccountError("Upload failed: No response from server"));
+        return [];
+      }
+
+      if (response is Map<String, dynamic>) {
+        final urls = _extractUploadUrls(response);
+
+        if (urls.isNotEmpty) {
+          mediaLinks.addAll(urls);
+          debugPrint('✅ Media added: $urls');
+          emit(CreateAccountLoaded());
+        } else {
+          debugPrint('❌ No valid URLs found in response: $response');
+          emit(CreateAccountError("Invalid URL in upload response"));
+        }
+        return urls;
+      } else {
+        debugPrint('❌ Response is not a Map: ${response.runtimeType}');
+        emit(CreateAccountError("Invalid response format from upload"));
+        return [];
+      }
+    } catch (e) {
+      debugPrint('❌ Multiple upload error: $e');
+      emit(CreateAccountError("Failed to upload media: $e"));
+      return [];
+    }
+  }
+
   String? _extractUploadUrl(Map<String, dynamic> response) {
     final directUrl =
         response['url'] ??
@@ -198,6 +234,54 @@ class CreateAccountCubit extends Cubit<CreateAccountState> {
     }
 
     return null;
+  }
+
+  List<String> _extractUploadUrls(Map<String, dynamic> response) {
+    List<String> parseUrls(dynamic value) {
+      if (value is String && value.isNotEmpty) {
+        return [value];
+      }
+
+      if (value is List) {
+        return value
+            .whereType<String>()
+            .where((url) => url.isNotEmpty)
+            .toList();
+      }
+
+      return [];
+    }
+
+    final directUrls = parseUrls(
+      response['urls'] ?? response['files'] ?? response['links'],
+    );
+    if (directUrls.isNotEmpty) {
+      return directUrls;
+    }
+
+    final singleUrl = _extractUploadUrl(response);
+    if (singleUrl != null && singleUrl.isNotEmpty) {
+      return [singleUrl];
+    }
+
+    for (final key in ['data', 'result', 'payload']) {
+      final nested = response[key];
+      if (nested is Map<String, dynamic>) {
+        final nestedUrls = parseUrls(
+          nested['urls'] ?? nested['files'] ?? nested['links'],
+        );
+        if (nestedUrls.isNotEmpty) {
+          return nestedUrls;
+        }
+
+        final nestedSingleUrl = _extractUploadUrl(nested);
+        if (nestedSingleUrl != null && nestedSingleUrl.isNotEmpty) {
+          return [nestedSingleUrl];
+        }
+      }
+    }
+
+    return [];
   }
 
   Future<void> sendVerificationCode({

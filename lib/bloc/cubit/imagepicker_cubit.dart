@@ -1,10 +1,10 @@
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
-import 'package:photo_manager/photo_manager.dart';
 import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
 import 'package:fennac_app/app/app.dart';
+import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/bloc/state/imagepicker_state.dart';
 
 import 'package:flutter/material.dart';
@@ -13,6 +13,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:giphy_get/giphy_get.dart';
 import 'package:permission_handler/permission_handler.dart';
+
+import '../../dialogs/gallery_permission_dialog.dart';
 
 class MediaItem {
   final String path;
@@ -25,9 +27,12 @@ class MediaItem {
 enum MediaType { image, video }
 
 class ImagePickerCubit extends Cubit<ImagePickerState> {
-  static const int maxMediaItems = 6;
+  static const int defaultMaxMediaItems = 6;
 
-  ImagePickerCubit() : super(ImagePickerInitial());
+  ImagePickerCubit({this.maxMediaItems = defaultMaxMediaItems})
+    : super(ImagePickerInitial());
+
+  int maxMediaItems;
 
   final ImagePicker _imagePicker = ImagePicker();
   List<MediaItem> mediaList = [];
@@ -74,11 +79,14 @@ class ImagePickerCubit extends Cubit<ImagePickerState> {
     try {
       List<MediaItem> pickedItems = [];
 
-      // Pre-request permission so AssetPicker receives an already-resolved
-      // state — avoids the first-grant exception on iOS/Android.
       final permissionState = await PhotoManager.requestPermissionExtend();
       if (!permissionState.hasAccess) {
         _emitLoaded();
+        scheduleMicrotask(() {
+          if (navigatorKey.currentContext != null) {
+            showGalleryPermissionDialog(navigatorKey.currentContext!);
+          }
+        });
         return;
       }
 
@@ -87,6 +95,7 @@ class ImagePickerCubit extends Cubit<ImagePickerState> {
         pickerConfig: AssetPickerConfig(
           requestType: RequestType.image,
           maxAssets: containerIndex == null ? remainingSlots : 1,
+          themeColor: ColorPalette.secondary,
         ),
       );
 
@@ -142,7 +151,6 @@ class ImagePickerCubit extends Cubit<ImagePickerState> {
       _emitLoaded();
     } catch (e) {
       debugPrint('Error picking images: $e');
-      _emitError('Error picking images');
     }
   }
 
@@ -331,6 +339,20 @@ class ImagePickerCubit extends Cubit<ImagePickerState> {
       }
 
       _emitLoaded(mediaItems);
+    } on PlatformException catch (e) {
+      debugPrint('Camera error: ${e.code} - ${e.message}');
+
+      _emitLoaded();
+
+      if (e.code == 'photo_access_denied' ||
+          e.code == 'media_access_denied' ||
+          e.code == 'permission_denied') {
+        scheduleMicrotask(() {
+          if (navigatorKey.currentContext != null) {
+            showGalleryPermissionDialog(navigatorKey.currentContext!);
+          }
+        });
+      }
     } catch (e) {
       _emitError('Error picking image from gallery: $e');
       debugPrint('Error picking image from gallery: $e');

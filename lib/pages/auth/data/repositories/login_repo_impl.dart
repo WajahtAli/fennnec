@@ -19,6 +19,11 @@ class LoginRepoImpl extends LoginRepo {
   }
 
   @override
+  Future<LoginModel> getProfile({required String userId}) async {
+    return await _loginDatasource.getProfile(userId: userId);
+  }
+
+  @override
   Future<LoginModel> loginUserByGoogle({required String accessToken}) async {
     return await _loginDatasource.loginUserByGoogle(accessToken: accessToken);
   }
@@ -78,6 +83,11 @@ class LoginRepoImpl extends LoginRepo {
   @override
   Future<dynamic> logout() async {
     return await _loginDatasource.logout();
+  }
+
+  @override
+  Future<dynamic> deleteAccount() async {
+    return await _loginDatasource.deleteAccount();
   }
 
   @override

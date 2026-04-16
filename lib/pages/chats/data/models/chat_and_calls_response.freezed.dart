@@ -6296,7 +6296,7 @@ $PokeDetailDataCopyWith<$Res> get data {
 /// @nodoc
 mixin _$PokeDetailData {
 
- PokeModel get poke; PokerFromUser get fromUser; PokedTargetDetail get pokedTargetDetail;
+ PokeModel get poke; List<PokeModel> get pokes; PokerFromUser get fromUser; PokedTargetDetail get pokedTargetDetail; PokeActiveGroupModel? get activeGroup;
 /// Create a copy of PokeDetailData
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -6309,16 +6309,16 @@ $PokeDetailDataCopyWith<PokeDetailData> get copyWith => _$PokeDetailDataCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PokeDetailData&&(identical(other.poke, poke) || other.poke == poke)&&(identical(other.fromUser, fromUser) || other.fromUser == fromUser)&&(identical(other.pokedTargetDetail, pokedTargetDetail) || other.pokedTargetDetail == pokedTargetDetail));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PokeDetailData&&(identical(other.poke, poke) || other.poke == poke)&&const DeepCollectionEquality().equals(other.pokes, pokes)&&(identical(other.fromUser, fromUser) || other.fromUser == fromUser)&&(identical(other.pokedTargetDetail, pokedTargetDetail) || other.pokedTargetDetail == pokedTargetDetail)&&(identical(other.activeGroup, activeGroup) || other.activeGroup == activeGroup));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,poke,fromUser,pokedTargetDetail);
+int get hashCode => Object.hash(runtimeType,poke,const DeepCollectionEquality().hash(pokes),fromUser,pokedTargetDetail,activeGroup);
 
 @override
 String toString() {
-  return 'PokeDetailData(poke: $poke, fromUser: $fromUser, pokedTargetDetail: $pokedTargetDetail)';
+  return 'PokeDetailData(poke: $poke, pokes: $pokes, fromUser: $fromUser, pokedTargetDetail: $pokedTargetDetail, activeGroup: $activeGroup)';
 }
 
 
@@ -6329,11 +6329,11 @@ abstract mixin class $PokeDetailDataCopyWith<$Res>  {
   factory $PokeDetailDataCopyWith(PokeDetailData value, $Res Function(PokeDetailData) _then) = _$PokeDetailDataCopyWithImpl;
 @useResult
 $Res call({
- PokeModel poke, PokerFromUser fromUser, PokedTargetDetail pokedTargetDetail
+ PokeModel poke, List<PokeModel> pokes, PokerFromUser fromUser, PokedTargetDetail pokedTargetDetail, PokeActiveGroupModel? activeGroup
 });
 
 
-$PokeModelCopyWith<$Res> get poke;$PokerFromUserCopyWith<$Res> get fromUser;$PokedTargetDetailCopyWith<$Res> get pokedTargetDetail;
+$PokeModelCopyWith<$Res> get poke;$PokerFromUserCopyWith<$Res> get fromUser;$PokedTargetDetailCopyWith<$Res> get pokedTargetDetail;$PokeActiveGroupModelCopyWith<$Res>? get activeGroup;
 
 }
 /// @nodoc
@@ -6346,12 +6346,14 @@ class _$PokeDetailDataCopyWithImpl<$Res>
 
 /// Create a copy of PokeDetailData
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? poke = null,Object? fromUser = null,Object? pokedTargetDetail = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? poke = null,Object? pokes = null,Object? fromUser = null,Object? pokedTargetDetail = null,Object? activeGroup = freezed,}) {
   return _then(_self.copyWith(
 poke: null == poke ? _self.poke : poke // ignore: cast_nullable_to_non_nullable
-as PokeModel,fromUser: null == fromUser ? _self.fromUser : fromUser // ignore: cast_nullable_to_non_nullable
+as PokeModel,pokes: null == pokes ? _self.pokes : pokes // ignore: cast_nullable_to_non_nullable
+as List<PokeModel>,fromUser: null == fromUser ? _self.fromUser : fromUser // ignore: cast_nullable_to_non_nullable
 as PokerFromUser,pokedTargetDetail: null == pokedTargetDetail ? _self.pokedTargetDetail : pokedTargetDetail // ignore: cast_nullable_to_non_nullable
-as PokedTargetDetail,
+as PokedTargetDetail,activeGroup: freezed == activeGroup ? _self.activeGroup : activeGroup // ignore: cast_nullable_to_non_nullable
+as PokeActiveGroupModel?,
   ));
 }
 /// Create a copy of PokeDetailData
@@ -6380,6 +6382,18 @@ $PokedTargetDetailCopyWith<$Res> get pokedTargetDetail {
   
   return $PokedTargetDetailCopyWith<$Res>(_self.pokedTargetDetail, (value) {
     return _then(_self.copyWith(pokedTargetDetail: value));
+  });
+}/// Create a copy of PokeDetailData
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$PokeActiveGroupModelCopyWith<$Res>? get activeGroup {
+    if (_self.activeGroup == null) {
+    return null;
+  }
+
+  return $PokeActiveGroupModelCopyWith<$Res>(_self.activeGroup!, (value) {
+    return _then(_self.copyWith(activeGroup: value));
   });
 }
 }
@@ -6463,10 +6477,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( PokeModel poke,  PokerFromUser fromUser,  PokedTargetDetail pokedTargetDetail)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( PokeModel poke,  List<PokeModel> pokes,  PokerFromUser fromUser,  PokedTargetDetail pokedTargetDetail,  PokeActiveGroupModel? activeGroup)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PokeDetailData() when $default != null:
-return $default(_that.poke,_that.fromUser,_that.pokedTargetDetail);case _:
+return $default(_that.poke,_that.pokes,_that.fromUser,_that.pokedTargetDetail,_that.activeGroup);case _:
   return orElse();
 
 }
@@ -6484,10 +6498,10 @@ return $default(_that.poke,_that.fromUser,_that.pokedTargetDetail);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( PokeModel poke,  PokerFromUser fromUser,  PokedTargetDetail pokedTargetDetail)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( PokeModel poke,  List<PokeModel> pokes,  PokerFromUser fromUser,  PokedTargetDetail pokedTargetDetail,  PokeActiveGroupModel? activeGroup)  $default,) {final _that = this;
 switch (_that) {
 case _PokeDetailData():
-return $default(_that.poke,_that.fromUser,_that.pokedTargetDetail);case _:
+return $default(_that.poke,_that.pokes,_that.fromUser,_that.pokedTargetDetail,_that.activeGroup);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -6504,10 +6518,10 @@ return $default(_that.poke,_that.fromUser,_that.pokedTargetDetail);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( PokeModel poke,  PokerFromUser fromUser,  PokedTargetDetail pokedTargetDetail)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( PokeModel poke,  List<PokeModel> pokes,  PokerFromUser fromUser,  PokedTargetDetail pokedTargetDetail,  PokeActiveGroupModel? activeGroup)?  $default,) {final _that = this;
 switch (_that) {
 case _PokeDetailData() when $default != null:
-return $default(_that.poke,_that.fromUser,_that.pokedTargetDetail);case _:
+return $default(_that.poke,_that.pokes,_that.fromUser,_that.pokedTargetDetail,_that.activeGroup);case _:
   return null;
 
 }
@@ -6519,12 +6533,20 @@ return $default(_that.poke,_that.fromUser,_that.pokedTargetDetail);case _:
 @JsonSerializable()
 
 class _PokeDetailData implements PokeDetailData {
-  const _PokeDetailData({required this.poke, required this.fromUser, required this.pokedTargetDetail});
+  const _PokeDetailData({required this.poke, final  List<PokeModel> pokes = const [], required this.fromUser, required this.pokedTargetDetail, this.activeGroup}): _pokes = pokes;
   factory _PokeDetailData.fromJson(Map<String, dynamic> json) => _$PokeDetailDataFromJson(json);
 
 @override final  PokeModel poke;
+ final  List<PokeModel> _pokes;
+@override@JsonKey() List<PokeModel> get pokes {
+  if (_pokes is EqualUnmodifiableListView) return _pokes;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_pokes);
+}
+
 @override final  PokerFromUser fromUser;
 @override final  PokedTargetDetail pokedTargetDetail;
+@override final  PokeActiveGroupModel? activeGroup;
 
 /// Create a copy of PokeDetailData
 /// with the given fields replaced by the non-null parameter values.
@@ -6539,16 +6561,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PokeDetailData&&(identical(other.poke, poke) || other.poke == poke)&&(identical(other.fromUser, fromUser) || other.fromUser == fromUser)&&(identical(other.pokedTargetDetail, pokedTargetDetail) || other.pokedTargetDetail == pokedTargetDetail));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PokeDetailData&&(identical(other.poke, poke) || other.poke == poke)&&const DeepCollectionEquality().equals(other._pokes, _pokes)&&(identical(other.fromUser, fromUser) || other.fromUser == fromUser)&&(identical(other.pokedTargetDetail, pokedTargetDetail) || other.pokedTargetDetail == pokedTargetDetail)&&(identical(other.activeGroup, activeGroup) || other.activeGroup == activeGroup));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,poke,fromUser,pokedTargetDetail);
+int get hashCode => Object.hash(runtimeType,poke,const DeepCollectionEquality().hash(_pokes),fromUser,pokedTargetDetail,activeGroup);
 
 @override
 String toString() {
-  return 'PokeDetailData(poke: $poke, fromUser: $fromUser, pokedTargetDetail: $pokedTargetDetail)';
+  return 'PokeDetailData(poke: $poke, pokes: $pokes, fromUser: $fromUser, pokedTargetDetail: $pokedTargetDetail, activeGroup: $activeGroup)';
 }
 
 
@@ -6559,11 +6581,11 @@ abstract mixin class _$PokeDetailDataCopyWith<$Res> implements $PokeDetailDataCo
   factory _$PokeDetailDataCopyWith(_PokeDetailData value, $Res Function(_PokeDetailData) _then) = __$PokeDetailDataCopyWithImpl;
 @override @useResult
 $Res call({
- PokeModel poke, PokerFromUser fromUser, PokedTargetDetail pokedTargetDetail
+ PokeModel poke, List<PokeModel> pokes, PokerFromUser fromUser, PokedTargetDetail pokedTargetDetail, PokeActiveGroupModel? activeGroup
 });
 
 
-@override $PokeModelCopyWith<$Res> get poke;@override $PokerFromUserCopyWith<$Res> get fromUser;@override $PokedTargetDetailCopyWith<$Res> get pokedTargetDetail;
+@override $PokeModelCopyWith<$Res> get poke;@override $PokerFromUserCopyWith<$Res> get fromUser;@override $PokedTargetDetailCopyWith<$Res> get pokedTargetDetail;@override $PokeActiveGroupModelCopyWith<$Res>? get activeGroup;
 
 }
 /// @nodoc
@@ -6576,12 +6598,14 @@ class __$PokeDetailDataCopyWithImpl<$Res>
 
 /// Create a copy of PokeDetailData
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? poke = null,Object? fromUser = null,Object? pokedTargetDetail = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? poke = null,Object? pokes = null,Object? fromUser = null,Object? pokedTargetDetail = null,Object? activeGroup = freezed,}) {
   return _then(_PokeDetailData(
 poke: null == poke ? _self.poke : poke // ignore: cast_nullable_to_non_nullable
-as PokeModel,fromUser: null == fromUser ? _self.fromUser : fromUser // ignore: cast_nullable_to_non_nullable
+as PokeModel,pokes: null == pokes ? _self._pokes : pokes // ignore: cast_nullable_to_non_nullable
+as List<PokeModel>,fromUser: null == fromUser ? _self.fromUser : fromUser // ignore: cast_nullable_to_non_nullable
 as PokerFromUser,pokedTargetDetail: null == pokedTargetDetail ? _self.pokedTargetDetail : pokedTargetDetail // ignore: cast_nullable_to_non_nullable
-as PokedTargetDetail,
+as PokedTargetDetail,activeGroup: freezed == activeGroup ? _self.activeGroup : activeGroup // ignore: cast_nullable_to_non_nullable
+as PokeActiveGroupModel?,
   ));
 }
 
@@ -6612,7 +6636,300 @@ $PokedTargetDetailCopyWith<$Res> get pokedTargetDetail {
   return $PokedTargetDetailCopyWith<$Res>(_self.pokedTargetDetail, (value) {
     return _then(_self.copyWith(pokedTargetDetail: value));
   });
+}/// Create a copy of PokeDetailData
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$PokeActiveGroupModelCopyWith<$Res>? get activeGroup {
+    if (_self.activeGroup == null) {
+    return null;
+  }
+
+  return $PokeActiveGroupModelCopyWith<$Res>(_self.activeGroup!, (value) {
+    return _then(_self.copyWith(activeGroup: value));
+  });
 }
+}
+
+
+/// @nodoc
+mixin _$PokeActiveGroupModel {
+
+ String get id; String? get title; String? get bio; String? get fitsForGroup; List<ChatGroupMemberUserModel> get members;
+/// Create a copy of PokeActiveGroupModel
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$PokeActiveGroupModelCopyWith<PokeActiveGroupModel> get copyWith => _$PokeActiveGroupModelCopyWithImpl<PokeActiveGroupModel>(this as PokeActiveGroupModel, _$identity);
+
+  /// Serializes this PokeActiveGroupModel to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PokeActiveGroupModel&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.bio, bio) || other.bio == bio)&&(identical(other.fitsForGroup, fitsForGroup) || other.fitsForGroup == fitsForGroup)&&const DeepCollectionEquality().equals(other.members, members));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,title,bio,fitsForGroup,const DeepCollectionEquality().hash(members));
+
+@override
+String toString() {
+  return 'PokeActiveGroupModel(id: $id, title: $title, bio: $bio, fitsForGroup: $fitsForGroup, members: $members)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $PokeActiveGroupModelCopyWith<$Res>  {
+  factory $PokeActiveGroupModelCopyWith(PokeActiveGroupModel value, $Res Function(PokeActiveGroupModel) _then) = _$PokeActiveGroupModelCopyWithImpl;
+@useResult
+$Res call({
+ String id, String? title, String? bio, String? fitsForGroup, List<ChatGroupMemberUserModel> members
+});
+
+
+
+
+}
+/// @nodoc
+class _$PokeActiveGroupModelCopyWithImpl<$Res>
+    implements $PokeActiveGroupModelCopyWith<$Res> {
+  _$PokeActiveGroupModelCopyWithImpl(this._self, this._then);
+
+  final PokeActiveGroupModel _self;
+  final $Res Function(PokeActiveGroupModel) _then;
+
+/// Create a copy of PokeActiveGroupModel
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? title = freezed,Object? bio = freezed,Object? fitsForGroup = freezed,Object? members = null,}) {
+  return _then(_self.copyWith(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,title: freezed == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String?,bio: freezed == bio ? _self.bio : bio // ignore: cast_nullable_to_non_nullable
+as String?,fitsForGroup: freezed == fitsForGroup ? _self.fitsForGroup : fitsForGroup // ignore: cast_nullable_to_non_nullable
+as String?,members: null == members ? _self.members : members // ignore: cast_nullable_to_non_nullable
+as List<ChatGroupMemberUserModel>,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [PokeActiveGroupModel].
+extension PokeActiveGroupModelPatterns on PokeActiveGroupModel {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _PokeActiveGroupModel value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _PokeActiveGroupModel() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _PokeActiveGroupModel value)  $default,){
+final _that = this;
+switch (_that) {
+case _PokeActiveGroupModel():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _PokeActiveGroupModel value)?  $default,){
+final _that = this;
+switch (_that) {
+case _PokeActiveGroupModel() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String? title,  String? bio,  String? fitsForGroup,  List<ChatGroupMemberUserModel> members)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _PokeActiveGroupModel() when $default != null:
+return $default(_that.id,_that.title,_that.bio,_that.fitsForGroup,_that.members);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String? title,  String? bio,  String? fitsForGroup,  List<ChatGroupMemberUserModel> members)  $default,) {final _that = this;
+switch (_that) {
+case _PokeActiveGroupModel():
+return $default(_that.id,_that.title,_that.bio,_that.fitsForGroup,_that.members);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String? title,  String? bio,  String? fitsForGroup,  List<ChatGroupMemberUserModel> members)?  $default,) {final _that = this;
+switch (_that) {
+case _PokeActiveGroupModel() when $default != null:
+return $default(_that.id,_that.title,_that.bio,_that.fitsForGroup,_that.members);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _PokeActiveGroupModel implements PokeActiveGroupModel {
+  const _PokeActiveGroupModel({required this.id, this.title, this.bio, this.fitsForGroup, final  List<ChatGroupMemberUserModel> members = const []}): _members = members;
+  factory _PokeActiveGroupModel.fromJson(Map<String, dynamic> json) => _$PokeActiveGroupModelFromJson(json);
+
+@override final  String id;
+@override final  String? title;
+@override final  String? bio;
+@override final  String? fitsForGroup;
+ final  List<ChatGroupMemberUserModel> _members;
+@override@JsonKey() List<ChatGroupMemberUserModel> get members {
+  if (_members is EqualUnmodifiableListView) return _members;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_members);
+}
+
+
+/// Create a copy of PokeActiveGroupModel
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$PokeActiveGroupModelCopyWith<_PokeActiveGroupModel> get copyWith => __$PokeActiveGroupModelCopyWithImpl<_PokeActiveGroupModel>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$PokeActiveGroupModelToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PokeActiveGroupModel&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.bio, bio) || other.bio == bio)&&(identical(other.fitsForGroup, fitsForGroup) || other.fitsForGroup == fitsForGroup)&&const DeepCollectionEquality().equals(other._members, _members));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,title,bio,fitsForGroup,const DeepCollectionEquality().hash(_members));
+
+@override
+String toString() {
+  return 'PokeActiveGroupModel(id: $id, title: $title, bio: $bio, fitsForGroup: $fitsForGroup, members: $members)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$PokeActiveGroupModelCopyWith<$Res> implements $PokeActiveGroupModelCopyWith<$Res> {
+  factory _$PokeActiveGroupModelCopyWith(_PokeActiveGroupModel value, $Res Function(_PokeActiveGroupModel) _then) = __$PokeActiveGroupModelCopyWithImpl;
+@override @useResult
+$Res call({
+ String id, String? title, String? bio, String? fitsForGroup, List<ChatGroupMemberUserModel> members
+});
+
+
+
+
+}
+/// @nodoc
+class __$PokeActiveGroupModelCopyWithImpl<$Res>
+    implements _$PokeActiveGroupModelCopyWith<$Res> {
+  __$PokeActiveGroupModelCopyWithImpl(this._self, this._then);
+
+  final _PokeActiveGroupModel _self;
+  final $Res Function(_PokeActiveGroupModel) _then;
+
+/// Create a copy of PokeActiveGroupModel
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? title = freezed,Object? bio = freezed,Object? fitsForGroup = freezed,Object? members = null,}) {
+  return _then(_PokeActiveGroupModel(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,title: freezed == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String?,bio: freezed == bio ? _self.bio : bio // ignore: cast_nullable_to_non_nullable
+as String?,fitsForGroup: freezed == fitsForGroup ? _self.fitsForGroup : fitsForGroup // ignore: cast_nullable_to_non_nullable
+as String?,members: null == members ? _self._members : members // ignore: cast_nullable_to_non_nullable
+as List<ChatGroupMemberUserModel>,
+  ));
+}
+
+
 }
 
 

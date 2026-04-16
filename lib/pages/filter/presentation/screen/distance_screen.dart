@@ -1,6 +1,8 @@
 import 'dart:developer';
 
 import 'package:auto_route/auto_route.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fennac_app/app/constants/media_query_constants.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
@@ -8,6 +10,7 @@ import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/pages/create_group/presentation/bloc/cubit/create_group_cubit.dart';
 import 'package:fennac_app/pages/filter/presentation/bloc/cubit/filter_cubit.dart';
 import 'package:fennac_app/pages/filter/presentation/bloc/cubit/google_map_cubit.dart';
+import 'package:fennac_app/pages/filter/presentation/bloc/state/google_map_state.dart';
 import 'package:fennac_app/pages/filter/presentation/widgets/google_map_search_field.dart';
 import 'package:fennac_app/pages/filter/presentation/widgets/map_widget.dart';
 import 'package:fennac_app/pages/my_group/presentation/bloc/cubit/my_group_cubit.dart';
@@ -16,7 +19,6 @@ import 'package:fennac_app/widgets/custom_elevated_button.dart';
 import 'package:fennac_app/widgets/custom_sized_box.dart';
 import 'package:fennac_app/widgets/custom_text.dart';
 import 'package:fennac_app/widgets/movable_background.dart';
-import 'package:flutter/material.dart';
 
 import '../../../../routes/routes_imports.gr.dart';
 import '../../../my_group/data/model/my_group_model.dart';
@@ -190,38 +192,53 @@ class _DistanceContentState extends State<_DistanceContent> {
             },
           ),
         ),
-        if (widget.needPickLocation == false)
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              AppText(
-                text: _current.toString(),
-                style: AppTextStyles.h1Large(
-                  context,
-                ).copyWith(fontWeight: FontWeight.w700, fontSize: 48),
-              ),
-              const CustomSizedBox(width: 8),
-              AppText(
-                text: 'miles',
-                style: AppTextStyles.bodyLarge(
-                  context,
-                ).copyWith(fontWeight: FontWeight.w600, fontSize: 20),
-              ),
-            ],
-          ),
+        BlocListener<GoogleMapCubit, GoogleMapState>(
+          bloc: _googleMapCubit,
+          listenWhen: (previous, current) =>
+              current is GoogleMapStateMarkersUpdated,
+          listener: (context, state) {
+            if (_googleMapCubit.selectedMapCenter != null) {
+              setState(() {
+                _selectedLatitude = _googleMapCubit.selectedMapCenter!.latitude;
+                _selectedLongitude =
+                    _googleMapCubit.selectedMapCenter!.longitude;
+              });
+            }
+          },
+          child: const SizedBox.shrink(),
+        ),
+        // if (widget.needPickLocation == false)
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            AppText(
+              text: _current.toString(),
+              style: AppTextStyles.h1Large(
+                context,
+              ).copyWith(fontWeight: FontWeight.w700, fontSize: 48),
+            ),
+            const CustomSizedBox(width: 8),
+            AppText(
+              text: 'miles',
+              style: AppTextStyles.bodyLarge(
+                context,
+              ).copyWith(fontWeight: FontWeight.w600, fontSize: 20),
+            ),
+          ],
+        ),
         const CustomSizedBox(height: 24),
-        if (widget.needPickLocation == false)
-          _HorizontalPillSlider(
-            min: _min,
-            max: _max,
-            value: _current,
-            onChanged: (v) => setState(() => _current = v),
-          ),
+        // if (widget.needPickLocation == false)
+        _HorizontalPillSlider(
+          min: _min,
+          max: _max,
+          value: _current,
+          onChanged: (v) => setState(() => _current = v),
+        ),
         const Spacer(),
         CustomElevatedButton(
           text: 'Done',
           onTap: () {
-            if (widget.needPickLocation == true) {
+            if (widget.needPickLocation == true && widget.isEditMode == false) {
               _createGroupCubit.addLocation(
                 GroupLocation(
                   latitude: _selectedLatitude,
@@ -248,6 +265,7 @@ class _DistanceContentState extends State<_DistanceContent> {
                   state: _selectedState ?? '',
                 ),
               );
+              Navigator.of(context).pop();
             } else {
               _filterCubit.updateDistance('Max $_current miles');
               _filterCubit.updateSelectedLocation(

@@ -1,3 +1,4 @@
+import 'package:fennac_app/app/constants/media_query_constants.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/helpers/cached_network_image_helper.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
@@ -21,7 +22,7 @@ class ProfileAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fallbackAvatar = _buildFallbackAvatar();
+    final fallbackAvatar = _buildFallbackAvatar(context);
     final hasImage = imageUrl?.trim().isNotEmpty == true;
 
     return SizedBox(
@@ -37,7 +38,12 @@ class ProfileAvatar extends StatelessWidget {
             alignment: Alignment.center,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(120),
-              border: Border.all(color: ColorPalette.black, width: 2.5),
+              border: Border.all(
+                color: isLightTheme(context)
+                    ? ColorPalette.black
+                    : Colors.white,
+                width: 2.5,
+              ),
             ),
             child: hasImage
                 ? ClipRRect(
@@ -92,12 +98,15 @@ class ProfileAvatar extends StatelessWidget {
     );
   }
 
-  Widget _buildFallbackAvatar() {
+  Widget _buildFallbackAvatar(BuildContext context) {
     return Center(
       child: SvgPicture.asset(
         Assets.icons.user.path,
         fit: BoxFit.cover,
-        colorFilter: ColorFilter.mode(ColorPalette.primary, BlendMode.srcIn),
+        colorFilter: ColorFilter.mode(
+          isLightTheme(context) ? ColorPalette.primary : Colors.white,
+          BlendMode.srcIn,
+        ),
         width: size * 0.5,
         height: size * 0.5,
       ),

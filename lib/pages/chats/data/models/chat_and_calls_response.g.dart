@@ -546,20 +546,58 @@ Map<String, dynamic> _$PokeDetailResponseToJson(_PokeDetailResponse instance) =>
 _PokeDetailData _$PokeDetailDataFromJson(Map<String, dynamic> json) =>
     _PokeDetailData(
       poke: PokeModel.fromJson(json['poke'] as Map<String, dynamic>),
+      pokes:
+          (json['pokes'] as List<dynamic>?)
+              ?.map((e) => PokeModel.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
       fromUser: PokerFromUser.fromJson(
         json['fromUser'] as Map<String, dynamic>,
       ),
       pokedTargetDetail: PokedTargetDetail.fromJson(
         json['pokedTargetDetail'] as Map<String, dynamic>,
       ),
+      activeGroup: json['activeGroup'] == null
+          ? null
+          : PokeActiveGroupModel.fromJson(
+              json['activeGroup'] as Map<String, dynamic>,
+            ),
     );
 
 Map<String, dynamic> _$PokeDetailDataToJson(_PokeDetailData instance) =>
     <String, dynamic>{
       'poke': instance.poke,
+      'pokes': instance.pokes,
       'fromUser': instance.fromUser,
       'pokedTargetDetail': instance.pokedTargetDetail,
+      'activeGroup': instance.activeGroup,
     };
+
+_PokeActiveGroupModel _$PokeActiveGroupModelFromJson(
+  Map<String, dynamic> json,
+) => _PokeActiveGroupModel(
+  id: json['id'] as String,
+  title: json['title'] as String?,
+  bio: json['bio'] as String?,
+  fitsForGroup: json['fitsForGroup'] as String?,
+  members:
+      (json['members'] as List<dynamic>?)
+          ?.map(
+            (e) => ChatGroupMemberUserModel.fromJson(e as Map<String, dynamic>),
+          )
+          .toList() ??
+      const [],
+);
+
+Map<String, dynamic> _$PokeActiveGroupModelToJson(
+  _PokeActiveGroupModel instance,
+) => <String, dynamic>{
+  'id': instance.id,
+  'title': instance.title,
+  'bio': instance.bio,
+  'fitsForGroup': instance.fitsForGroup,
+  'members': instance.members,
+};
 
 _PokeModel _$PokeModelFromJson(Map<String, dynamic> json) => _PokeModel(
   id: json['id'] as String,

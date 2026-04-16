@@ -17,7 +17,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lottie/lottie.dart';
 
-import '../../../../core/extensions/string_extension.dart';
 import '../../../../generated/assets.gen.dart';
 import '../../../auth/presentation/bloc/cubit/create_account_cubit.dart';
 import '../bloc/state/kyc_prompt_state.dart';
@@ -145,19 +144,27 @@ class _CreatePromptBottomSheetState extends State<CreatePromptBottomSheet> {
             );
 
         log("test ${widget.isEditMode} :: ${widget.isEditingPrompt}");
-        if ((audioPromptData?.promptAnswer?.isAudio ?? false) &&
-            (audioPromptData?.promptAnswer?.isUrl == false)) {
+
+        // Upload audio if in audio mode and have a local recording
+        if (_kycPromptCubit.isAudioMode &&
+            _kycPromptCubit.recordingPath != null &&
+            _kycPromptCubit.recordingPath!.isNotEmpty &&
+            !(_kycPromptCubit.recordingPath?.startsWith('http') ?? false)) {
           String url = await _createAccountCubit.uploadMedia(
-            filePath: audioPromptData?.promptAnswer ?? "",
+            filePath: _kycPromptCubit.recordingPath ?? "",
           );
           if (url.isNotEmpty) {
             audioPromptData = audioPromptData?.copyWith(promptAnswer: url);
             debugPrint("Audio URL: $url");
           } else {
             VxToast.show(message: "Failed to upload audio");
+            setState(() {
+              isLoading = false;
+            });
             return;
           }
         }
+
         _kycPromptCubit.updatePrompt(audioPromptData!);
 
         if (widget.isEditingPrompt == true) {
@@ -172,9 +179,7 @@ class _CreatePromptBottomSheetState extends State<CreatePromptBottomSheet> {
             promptTitle: audioPromptData.promptText ?? "",
             promptAnswer: audioPromptData.promptAnswer ?? "",
             context: context,
-            type: (audioPromptData.promptAnswer?.isAudio ?? false)
-                ? "audio"
-                : "text",
+            type: _kycPromptCubit.isAudioMode ? "audio" : "text",
           );
         }
         log("promptId: ${_createAccountCubit.promptId}");
@@ -331,13 +336,7 @@ class _CreatePromptBottomSheetState extends State<CreatePromptBottomSheet> {
                       ),
                       CustomSizedBox(height: 40),
                       Expanded(
-                        child:
-                            _kycPromptCubit
-                                        .promptToEdit
-                                        ?.promptAnswer
-                                        ?.isAudio ==
-                                    true ||
-                                _kycPromptCubit.isAudioMode
+                        child: _kycPromptCubit.isAudioMode
                             ? AudioModeWidget(
                                 existingAudioData: _kycPromptCubit.promptToEdit,
                               )

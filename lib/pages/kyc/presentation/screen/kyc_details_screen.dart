@@ -18,6 +18,8 @@ import 'package:fennac_app/widgets/movable_background.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../utils/validators.dart';
+
 @RoutePage()
 class KycDetailsScreen extends StatelessWidget {
   const KycDetailsScreen({super.key});
@@ -103,6 +105,9 @@ class KycDetailsScreen extends StatelessWidget {
                             ? Colors.black
                             : Colors.white,
                         filled: false,
+                        onChanged: (_) {
+                          capitalizeFirstLetter(_kycCubit.jobTitleController);
+                        },
                       ),
                       CustomSizedBox(height: 16),
 
@@ -120,6 +125,9 @@ class KycDetailsScreen extends StatelessWidget {
                             ? Colors.black
                             : Colors.white,
                         filled: false,
+                        onChanged: (_) {
+                          capitalizeFirstLetter(_kycCubit.educationController);
+                        },
                       ),
                       CustomSizedBox(height: 16),
                       CustomLabelTextField(
@@ -136,6 +144,9 @@ class KycDetailsScreen extends StatelessWidget {
                             ? Colors.black
                             : Colors.white,
                         filled: false,
+                        onChanged: (_) {
+                          capitalizeFirstLetter(_kycCubit.homeTownController);
+                        },
                       ),
                       CustomSizedBox(height: 80),
                     ],

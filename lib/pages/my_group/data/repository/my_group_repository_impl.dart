@@ -5,6 +5,11 @@ import '../model/my_group_model.dart';
 
 class MyGroupRepositoryImpl extends MyGroupRepository {
   @override
+  Future<List<String>> checkBlockedWords(String text) async {
+    return await _datasource.checkBlockedWords(text);
+  }
+
+  @override
   Future<dynamic> unMatchGroup(String groupId) async {
     return await _datasource.unMatchGroup(groupId);
   }

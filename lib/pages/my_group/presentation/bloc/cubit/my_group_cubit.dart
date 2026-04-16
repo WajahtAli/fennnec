@@ -32,14 +32,15 @@ class MyGroupCubit extends Cubit<MyGroupState> {
 
   // ========== FETCH GROUP BY ID ==========
   Future<void> fetchGroupById(String groupId) async {
-    if (groupId.isEmpty &&
-        myGroupList != null &&
-        myGroupList!.groupList != null &&
-        myGroupList!.groupList!.isNotEmpty) {
-      log('Using cached group list: ${myGroupList!.groupList?.length}');
-      emit(MyGroupLoaded());
-      return;
-    }
+    //todo to show realtime data
+    // if (groupId.isEmpty &&
+    //     myGroupList != null &&
+    //     myGroupList!.groupList != null &&
+    //     myGroupList!.groupList!.isNotEmpty) {
+    //   log('Using cached group list: ${myGroupList!.groupList?.length}');
+    //   emit(MyGroupLoaded());
+    //   return;
+    // }
 
     emit(MyGroupLoading());
     try {

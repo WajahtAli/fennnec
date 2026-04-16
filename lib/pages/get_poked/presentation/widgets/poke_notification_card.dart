@@ -17,12 +17,19 @@ class PokeNotificationCard extends StatelessWidget {
   final VoidCallback onIgnore;
   final VoidCallback onStartChat;
 
+  final int pokeCount;
+  final PokeActiveGroupModel? activeGroup;
+  final VoidCallback? onViewGroupProfile;
+
   const PokeNotificationCard({
     super.key,
     required this.fromUser,
     required this.targetDetail,
     required this.onIgnore,
     required this.onStartChat,
+    this.pokeCount = 1,
+    this.activeGroup,
+    this.onViewGroupProfile,
   });
 
   @override
@@ -82,7 +89,7 @@ class PokeNotificationCard extends StatelessWidget {
               ),
               const CustomSizedBox(height: 24),
               AppText(
-                text: 'You Got a Poke!',
+                text: pokeCount > 1 ? 'You Got $pokeCount Pokes!' : 'You Got a Poke!',
                 style: AppTextStyles.h2(
                   context,
                 ).copyWith(fontWeight: FontWeight.bold),
@@ -113,6 +120,76 @@ class PokeNotificationCard extends StatelessWidget {
               // Profile/Target Info Area
               if (targetDetail.type == 'profile' &&
                   targetDetail.profile != null)
+                              // Active Group members row
+                              if (activeGroup != null && activeGroup!.members.isNotEmpty)
+                                GestureDetector(
+                                  onTap: onViewGroupProfile,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                    decoration: BoxDecoration(
+                                      color: isLightTheme(context)
+                                          ? ColorPalette.textGrey
+                                          : ColorPalette.primary.withValues(alpha: 0.5),
+                                      borderRadius: BorderRadius.circular(24),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        SizedBox(
+                                          height: 44,
+                                          width: (activeGroup!.members.take(4).length * 28.0 + 16),
+                                          child: Stack(
+                                            children: List.generate(
+                                              activeGroup!.members.take(4).length,
+                                              (index) {
+                                                final member = activeGroup!.members[index];
+                                                final imageUrl = member.image ?? '';
+                                                return Positioned(
+                                                  left: index * 24.0,
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                      shape: BoxShape.circle,
+                                                      border: Border.all(
+                                                        color: ColorPalette.secondary,
+                                                        width: 2,
+                                                      ),
+                                                    ),
+                                                    child: CircleAvatar(
+                                                      radius: 20,
+                                                      backgroundImage: imageUrl.isNotEmpty
+                                                          ? NetworkImage(imageUrl)
+                                                          : null,
+                                                      backgroundColor: ColorPalette.primary.withValues(alpha: 0.3),
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                        ),
+                                        const Spacer(),
+                                        AppText(
+                                          text: 'View Group Profile',
+                                          style: AppTextStyles.bodySmall(
+                                            context,
+                                          ).copyWith(fontWeight: FontWeight.w600),
+                                        ),
+                                        const CustomSizedBox(width: 4),
+                                        Icon(
+                                          Icons.arrow_outward_rounded,
+                                          color: isLightTheme(context)
+                                              ? ColorPalette.black
+                                              : ColorPalette.white,
+                                          size: 16,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              if (activeGroup != null && activeGroup!.members.isNotEmpty)
+                                const CustomSizedBox(height: 16),
+                              // Profile/Target Info Area
+                              if (activeGroup == null && targetDetail.type == 'profile' &&
+                                  targetDetail.profile != null)
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -131,8 +208,7 @@ class PokeNotificationCard extends StatelessWidget {
                         width: 130,
                         child: Stack(
                           children: List.generate(
-                            (targetDetail.profile!.bestShorts.take(4).length ??
-                                0),
+                            targetDetail.profile!.bestShorts.take(4).length,
                             (index) {
                               return Positioned(
                                 left: index * 24.0,

@@ -2,10 +2,8 @@ import 'dart:developer';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:fennac_app/app/constants/app_constants.dart';
-import 'package:fennac_app/app/constants/media_query_constants.dart';
-import 'package:fennac_app/app/theme/app_colors.dart';
-import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/core/di_container.dart';
+import 'package:fennac_app/core/notifications/push_notification_service.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:fennac_app/helpers/gradient_toast.dart';
 import 'package:fennac_app/pages/auth/domain/usecases/login_usecase.dart';
@@ -29,6 +27,7 @@ import 'package:lottie/lottie.dart';
 import '../../../../../helpers/shared_pref_helper.dart';
 import '../../../../../reusable_widgets/session_dialog.dart';
 import '../../../../home/presentation/screen/home_screen.dart';
+import 'package:geocoding/geocoding.dart' as geocoding;
 
 class LoginCubit extends Cubit<LoginState> {
   final LoginUsecase _loginUsecase;
@@ -43,7 +42,9 @@ class LoginCubit extends Cubit<LoginState> {
   int validationCounter = 0;
   bool obscurePassword = true;
   LoginModel? loginModel;
+  LoginModel? individualProfileModel;
   LoginData? userData;
+  LoginData? individualProfileData;
   bool isLoading = false;
   final SharedPreferencesHelper sharedPreferencesHelper = Di()
       .sl<SharedPreferencesHelper>();
@@ -54,6 +55,20 @@ class LoginCubit extends Cubit<LoginState> {
     userData = loginModel?.data;
     log('userData ${userData?.user}');
     emit(LoginLoaded());
+  }
+
+  Future<LoginModel> getProfile({required String userId}) async {
+    emit(LoginLoading());
+    try {
+      final data = await _loginUsecase.getProfile(userId: userId);
+      individualProfileModel = data;
+      individualProfileData = data.data;
+      emit(LoginLoaded());
+      return data;
+    } catch (e) {
+      emit(LoginError(e.toString()));
+      rethrow;
+    }
   }
 
   bool _signingIn = false;
@@ -137,6 +152,9 @@ class LoginCubit extends Cubit<LoginState> {
       await sharedPreferencesHelper.saveRefreshToken(
         userData?.refreshToken ?? '',
       );
+
+      // update token
+      await PushNotificationService.init();
 
       VxToast.show(
         message: data.message ?? 'Login successful',
@@ -346,6 +364,15 @@ class LoginCubit extends Cubit<LoginState> {
         message: data.message ?? 'Google sign-in successful',
         icon: Assets.icons.checkGreen.path,
       );
+    } on GoogleSignInException catch (e, st) {
+      if (e.code == GoogleSignInExceptionCode.canceled) {
+        emit(LoginError('Cancelled by user'));
+        VxToast.show(message: 'Cancelled by user');
+      } else {
+        debugPrint('❌ Google sign-in error [${e.code}]: ${e.description}\n$st');
+        emit(LoginError(e.description ?? e.code.name));
+        VxToast.show(message: e.description ?? 'Google sign-in failed');
+      }
     } catch (e, st) {
       debugPrint('❌ Google sign-in error: $e\n$st');
       emit(LoginError(e.toString()));
@@ -436,11 +463,18 @@ class LoginCubit extends Cubit<LoginState> {
         icon: Assets.icons.checkGreen.path,
       );
     } on FirebaseAuthException catch (e, st) {
-      debugPrint(
-        '❌ Apple sign-in Firebase error [${e.code}]: ${e.message}\n$st',
-      );
-      emit(LoginError('Apple sign-in failed: ${e.code}'));
-      VxToast.show(message: 'Apple sign-in failed');
+      if (e.code == 'sign_in_canceled') {
+        const message = 'Cancelled by user';
+        debugPrint('Apple sign-in cancelled by user');
+        emit(LoginError(message));
+        VxToast.show(message: message);
+      } else {
+        debugPrint(
+          '❌ Apple sign-in Firebase error [${e.code}]: ${e.message}\n$st',
+        );
+        emit(LoginError('Apple sign-in failed: ${e.code}'));
+        VxToast.show(message: 'Apple sign-in failed');
+      }
     } catch (e, st) {
       debugPrint('❌ Apple sign-in error: $e\n$st');
       emit(LoginError(e.toString()));
@@ -507,6 +541,36 @@ class LoginCubit extends Cubit<LoginState> {
     }
   }
 
+  Future<void> deleteAccount({required BuildContext context}) async {
+    emit(LoginLoading());
+    try {
+      final response = await _loginUsecase.deleteAccount();
+
+      await sharedPreferencesHelper.clearUserData();
+      await sharedPreferencesHelper.clearAuthToken();
+      loginModel = null;
+      userData = null;
+      email.clear();
+      phone.clear();
+      password.clear();
+
+      VxToast.show(
+        message: response['message'] ?? 'Account deleted successfully',
+        icon: Assets.icons.checkGreen.path,
+      );
+      Di().sl<GroupsCubit>().clearGroupData();
+      Di().sl<MyGroupCubit>().clearGroupData();
+      emit(LoginLoaded());
+
+      if (context.mounted) {
+        AutoRouter.of(context).replaceAll([const OnBoardingRoute()]);
+      }
+    } catch (e) {
+      emit(LoginError(e.toString()));
+      VxToast.show(message: e.toString());
+    }
+  }
+
   /// Check if token is valid and not expired
   Future<void> checkToken(BuildContext context) async {
     emit(LoginLoading());
@@ -536,7 +600,12 @@ class LoginCubit extends Cubit<LoginState> {
       }
 
       if (shouldOpenDashboard && context.mounted) {
-        AutoRouter.of(context).replaceAll([const DashboardRoute()]);
+        if (userData?.user?.sexualOrientation?.isEmpty ?? false) {
+          Di().sl<CreateAccountCubit>().createdUser = userData?.user;
+          AutoRouter.of(context).replaceAll([KycRoute()]);
+        } else {
+          AutoRouter.of(context).replaceAll([DashboardRoute()]);
+        }
       }
 
       emit(LoginLoaded());
@@ -548,6 +617,35 @@ class LoginCubit extends Cubit<LoginState> {
         logout(context);
       }
     }
+  }
+
+  Future<String> getLocationFromLatLng(
+    String? latitude,
+    String? longitude,
+  ) async {
+    if (latitude == null || longitude == null) return '';
+    try {
+      final lat = double.tryParse(latitude);
+      final lng = double.tryParse(longitude);
+      if (lat == null || lng == null) return '';
+
+      final placemarks = await geocoding.placemarkFromCoordinates(lat, lng);
+      if (placemarks.isNotEmpty) {
+        final place = placemarks.first;
+        final city = place.locality ?? '';
+        final state = place.administrativeArea ?? '';
+        if (city.isNotEmpty && state.isNotEmpty) {
+          return '$city, $state';
+        } else if (city.isNotEmpty) {
+          return city;
+        } else if (state.isNotEmpty) {
+          return state;
+        }
+      }
+    } catch (e) {
+      debugPrint('Error getting location: $e');
+    }
+    return '';
   }
 
   @override

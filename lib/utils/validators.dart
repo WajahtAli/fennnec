@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 int validateInt(var data) {
@@ -172,4 +173,17 @@ String getTimeAgo(DateTime dateTime) {
   } else {
     return 'Just now';
   }
+}
+
+void capitalizeFirstLetter(TextEditingController controller) {
+  String text = controller.text;
+
+  if (text.isEmpty) return;
+
+  String updatedText = text[0].toUpperCase() + text.substring(1).toLowerCase();
+
+  controller.value = controller.value.copyWith(
+    text: updatedText,
+    selection: TextSelection.collapsed(offset: updatedText.length),
+  );
 }

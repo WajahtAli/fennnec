@@ -6,7 +6,9 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 
 import 'package:fennac_app/app/app.dart';
+import 'package:fennac_app/app/constants/socket_constants.dart';
 import 'package:fennac_app/core/di_container.dart';
+import 'package:fennac_app/core/sockets/sockets_service.dart';
 import 'package:fennac_app/helpers/shared_pref_helper.dart';
 import 'package:fennac_app/reusable_widgets/session_dialog.dart';
 import '../../app/constants/app_constants.dart';
@@ -15,10 +17,22 @@ class ApiHelper {
   final SharedPreferencesHelper sharedPreferencesHelper = Di()
       .sl<SharedPreferencesHelper>();
   static bool _isDeactivatedDialogVisible = false;
+  static bool _isDeactivateSocketListenerAttached = false;
 
   final Duration timeout = const Duration(seconds: 15);
 
-  ApiHelper();
+  ApiHelper() {
+    _ensureDeactivateSocketListener();
+  }
+
+  void _ensureDeactivateSocketListener() {
+    if (_isDeactivateSocketListenerAttached) return;
+
+    SocketService.on(SocketEvents.deactivateAccount, (_) {
+      _showDeactivatedDialog();
+    });
+    _isDeactivateSocketListenerAttached = true;
+  }
 
   // ========================= GET =========================
   Future<dynamic> get(
@@ -218,6 +232,76 @@ class ApiHelper {
     }
   }
 
+  Future<dynamic> uploadFiles(
+    String endpoint, {
+    Map<String, String>? headers,
+    required String fileFieldName,
+    required List<String> filePaths,
+    Map<String, String>? additionalFields,
+    bool requiresAuth = true,
+    Duration? uploadTimeout,
+  }) async {
+    final String? token = sharedPreferencesHelper.getAuthToken();
+    final String url = "${AppConstants.baseUrl}$endpoint";
+
+    if (filePaths.isEmpty) {
+      throw ApiException("No files selected for upload", 0);
+    }
+
+    headers ??= {"Accept": "application/json"};
+
+    if (requiresAuth && token != null) {
+      headers["Authorization"] = "Bearer $token";
+    }
+
+    _printRequestLog(
+      method: "MULTIPART",
+      url: url,
+      headers: headers,
+      body: "Files: ${filePaths.join(', ')}",
+    );
+
+    try {
+      final request = http.MultipartRequest('POST', Uri.parse(url));
+
+      request.headers.addAll(headers);
+
+      for (final filePath in filePaths) {
+        request.files.add(
+          await http.MultipartFile.fromPath(
+            fileFieldName,
+            filePath,
+            filename: filePath.split('/').last,
+          ),
+        );
+      }
+
+      if (additionalFields != null) {
+        request.fields.addAll(additionalFields);
+      }
+
+      final fileUploadTimeout = uploadTimeout ?? const Duration(seconds: 120);
+      final response = await request.send().timeout(fileUploadTimeout);
+      final responseBody = await response.stream.bytesToString();
+      final httpResponse = http.Response(
+        responseBody,
+        response.statusCode,
+        request: response.request,
+        headers: response.headers,
+      );
+
+      _printResponseLog(url, httpResponse);
+      return _handleResponse(httpResponse);
+    } catch (e) {
+      log('🔥 API ERROR: $e');
+      if (e is ApiException) {
+        rethrow;
+      }
+      final errorMessage = _handleException(e);
+      throw ApiException(errorMessage, 0);
+    }
+  }
+
   // ========================= DELETE =========================
   Future<dynamic> delete(
     String endpoint, {
@@ -326,6 +410,10 @@ class ApiHelper {
         : (message?.toString().toLowerCase() ?? '');
 
     if (!normalizedMessage.contains('deactivated')) return;
+    _showDeactivatedDialog();
+  }
+
+  void _showDeactivatedDialog() {
     if (_isDeactivatedDialogVisible) return;
 
     final context = navigatorKey.currentContext;
@@ -347,7 +435,17 @@ class ApiHelper {
     } else if (e is TimeoutException) {
       return "Request timed out. Please check your internet connection and try again.";
     } else if (e is SocketException) {
-      return "No internet connection";
+      final details = e.message.trim();
+      if (details.isEmpty) {
+        return "Network error. Please try again.";
+      }
+      return "Network error: $details";
+    } else if (e is http.ClientException) {
+      final clientMessage = e.message.trim();
+      if (clientMessage.isEmpty) {
+        return "Network request failed";
+      }
+      return "Network request failed: $clientMessage";
     } else if (e is HttpException) {
       return "Server not reachable";
     } else if (e is FormatException) {

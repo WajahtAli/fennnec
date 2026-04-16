@@ -102,6 +102,12 @@ class CreateAccountUsecase {
     return await _createAccountRepo.uploadMedia(filePath: filePath);
   }
 
+  Future<dynamic> uploadMediaMultiple({
+    required final List<String> filePaths,
+  }) async {
+    return await _createAccountRepo.uploadMediaMultiple(filePaths: filePaths);
+  }
+
   Future<dynamic> customPrompt({
     required final String promptTitle,
     required final String type,

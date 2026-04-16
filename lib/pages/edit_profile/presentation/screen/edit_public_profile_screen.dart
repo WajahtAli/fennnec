@@ -87,7 +87,7 @@ class _EditPublicProfileScreenState extends State<EditPublicProfileScreen> {
                     ),
                     const CustomSizedBox(height: 24),
                     InterleavedMediaSection(
-                      bestShorts: user?.bestShorts?.skip(1).toList() ?? [],
+                      bestShorts: user?.bestShorts ?? [],
                       prompts: _loginCubit.userData?.prompts ?? [],
                       onImageEditTap: () =>
                           _handleEditTap(context, EditableCardType.image),

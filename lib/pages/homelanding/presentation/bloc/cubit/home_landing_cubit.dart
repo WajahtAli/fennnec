@@ -1,4 +1,6 @@
 import 'package:fennac_app/app/constants/app_enums.dart';
+import 'package:fennac_app/app/constants/socket_constants.dart';
+import 'package:fennac_app/core/sockets/sockets_service.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:fennac_app/helpers/gradient_toast.dart';
 import 'package:fennac_app/pages/homelanding/data/models/group_invitation_model.dart';
@@ -29,14 +31,17 @@ class HomeLandingCubit extends Cubit<HomeLandingState> {
 
   bool isLoading = false;
   String? activeInvitationAction;
+  bool _isPendingInvitationsSocketRegistered = false;
 
   Future<void> fetchGroupInvitations() async {
+    _registerPendingInvitationsSocket();
     emit(HomeLandingLoading());
     try {
       final response = await fetchGroupInvitationsUseCase();
       if (response.success == true && response.data != null) {
         invitations = response.data!.invitations ?? [];
         defaultData = response.data!.defaultScreen;
+
         emit(HomeLandingLoaded());
       } else {
         emit(HomeLandingError());
@@ -44,6 +49,16 @@ class HomeLandingCubit extends Cubit<HomeLandingState> {
     } catch (e) {
       emit(HomeLandingError());
     }
+  }
+
+  void _registerPendingInvitationsSocket() {
+    emit(HomeLandingLoading());
+    if (_isPendingInvitationsSocketRegistered) return;
+
+    SocketService.on(SocketEvents.pendingGroupInvitations, (_) {
+      fetchGroupInvitations();
+    });
+    _isPendingInvitationsSocketRegistered = true;
   }
 
   Future<void> acceptDeclineGroupInvitation({
@@ -101,5 +116,13 @@ class HomeLandingCubit extends Cubit<HomeLandingState> {
     emit(HomeLandingLoading());
     invitationStatus = value;
     emit(HomeLandingLoaded());
+  }
+
+  @override
+  Future<void> close() {
+    if (_isPendingInvitationsSocketRegistered) {
+      SocketService.off(SocketEvents.pendingGroupInvitations);
+    }
+    return super.close();
   }
 }

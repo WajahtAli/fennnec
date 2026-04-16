@@ -214,7 +214,10 @@ class _ChatLandingScreenState extends State<ChatLandingScreen> {
             ...pokeItems.map((poke) {
               return AppInkWell(
                 onTap: () async {
-                  await _openPokeDetailIfAllowed(context, poke.pokes.first.id);
+                  await _openPokeDetailIfAllowed(
+                    context,
+                    poke.pokes.first.fromUser?.id ?? poke.pokes.first.id,
+                  );
                 },
                 child: CallHistoryItem(
                   name: _getPokeSenderName(poke),

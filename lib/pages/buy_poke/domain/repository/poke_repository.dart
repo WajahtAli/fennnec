@@ -14,4 +14,6 @@ abstract class PokeRepository {
   Future<Map<String, dynamic>> purchaseSubscription({
     required String productId,
   });
+
+  Future<Map<String, dynamic>> cancelSubscription({required String userId});
 }

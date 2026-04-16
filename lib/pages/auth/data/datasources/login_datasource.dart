@@ -9,6 +9,7 @@ abstract class LoginDatasource {
     final String? emailOrPhone,
     final String? password,
   });
+  Future<LoginModel> getProfile({required String userId});
   Future<LoginModel> loginUserByGoogle({required String accessToken});
   Future<LoginModel> loginUserByApple({
     required String firebaseUserId,
@@ -31,6 +32,7 @@ abstract class LoginDatasource {
     required String newPassword,
   });
   Future<dynamic> logout();
+  Future<dynamic> deleteAccount();
   Future<LoginModel> refreshToken({required String refreshToken});
   Future<dynamic> checkToken();
 }
@@ -70,6 +72,22 @@ class LoginDatasourceImpl extends LoginDatasource {
     }
 
     return LoginModel.fromJson(data);
+  }
+
+  @override
+  Future<LoginModel> getProfile({required String userId}) async {
+    final response = await apiHelper.get(
+      AppConstants.getProfile,
+      queryParameters: {'userId': userId},
+      requiresAuth: true,
+    );
+
+    dev.log(
+      '📥 Raw Get Profile Response: ${jsonEncode(response)}',
+      name: 'LoginDatasource',
+    );
+
+    return LoginModel.fromJson(Map<String, dynamic>.from(response));
   }
 
   @override
@@ -193,6 +211,15 @@ class LoginDatasourceImpl extends LoginDatasource {
       AppConstants.logout,
       requiresAuth: true,
       isRefreshToken: true,
+    );
+    return response;
+  }
+
+  @override
+  Future<dynamic> deleteAccount() async {
+    final response = await apiHelper.delete(
+      AppConstants.deleteAccount,
+      requiresAuth: true,
     );
     return response;
   }
