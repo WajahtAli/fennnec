@@ -205,24 +205,27 @@ class _CreateGroupGalleryScreenState extends State<CreateGroupGalleryScreen> {
   }
 
   Future<void> uploadAllMedia() async {
-    if (imagePickerCubit.mediaList.isEmpty) {
-      return;
-    }
+    final mediaList = imagePickerCubit.mediaList;
+    if (mediaList.isEmpty) return;
 
-    for (var item in imagePickerCubit.mediaList) {
-      if (!item.path.startsWith('http://') &&
-          !item.path.startsWith('https://')) {
-        await _uploadMedia(item.path);
-      }
+    final uploadTasks = mediaList
+        .where((item) =>
+            !item.path.startsWith('http://') &&
+            !item.path.startsWith('https://'))
+        .map((item) => _uploadMedia(item.path))
+        .toList();
+
+    if (uploadTasks.isNotEmpty) {
+      await Future.wait(uploadTasks);
     }
   }
 
   Future<void> _uploadMedia(String filePath) async {
     try {
-      await _createAccountCubit.uploadMedia(filePath: filePath);
+      final uploadedUrl = await _createAccountCubit.uploadMedia(filePath: filePath);
+      
+      if (uploadedUrl.isEmpty) return;
 
-      // After successful upload, update the media item path to the uploaded URL
-      final uploadedUrl = _createAccountCubit.mediaLinks.last;
       final currentList = imagePickerCubit.mediaList;
       final index = currentList.indexWhere((item) => item.path == filePath);
 

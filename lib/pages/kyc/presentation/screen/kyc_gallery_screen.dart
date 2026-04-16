@@ -68,12 +68,16 @@ class _KycGalleryScreenState extends State<KycGalleryScreen> {
   }
 
   Future<void> uploadAllMedia() async {
-    if (_imagePickerCubit.mediaList.isEmpty) return;
+    final mediaList = _imagePickerCubit.mediaList;
+    if (mediaList.isEmpty) return;
 
-    for (var item in _imagePickerCubit.mediaList) {
-      if (!item.path.startsWith('http')) {
-        await _uploadMedia(item.path);
-      }
+    final uploadTasks = mediaList
+        .where((item) => !item.path.startsWith('http'))
+        .map((item) => _uploadMedia(item.path))
+        .toList();
+
+    if (uploadTasks.isNotEmpty) {
+      await Future.wait(uploadTasks);
     }
     _syncMediaLinksWithMediaList();
   }
@@ -92,9 +96,10 @@ class _KycGalleryScreenState extends State<KycGalleryScreen> {
 
   Future<void> _uploadMedia(String filePath) async {
     try {
-      await _createAccountCubit.uploadMedia(filePath: filePath);
-      final uploadedUrl = _createAccountCubit.mediaLinks.last;
-      _updateMediaItemPath(filePath, uploadedUrl);
+      final uploadedUrl = await _createAccountCubit.uploadMedia(filePath: filePath);
+      if (uploadedUrl.isNotEmpty) {
+        _updateMediaItemPath(filePath, uploadedUrl);
+      }
     } catch (e) {
       if (mounted) {
         Fluttertoast.showToast(

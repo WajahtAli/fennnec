@@ -245,9 +245,10 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
 
   Future<void> _submitReport() async {
     if (_imagePickerCubit.mediaList.isNotEmpty) {
-      await Di().sl<CreateAccountCubit>().uploadMedia(
-        filePath: _imagePickerCubit.mediaList.first.path,
+      final uploadTasks = _imagePickerCubit.mediaList.map(
+        (item) => Di().sl<CreateAccountCubit>().uploadMedia(filePath: item.path),
       );
+      await Future.wait(uploadTasks);
     }
 
     await _reportProblemCubit.submitReport(

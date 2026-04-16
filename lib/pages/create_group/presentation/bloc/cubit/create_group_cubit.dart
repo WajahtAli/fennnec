@@ -206,22 +206,17 @@ class CreateGroupCubit extends Cubit<CreateGroupState> {
       List<String> meadiaLinks = [];
       createAccountCubit.mediaLinks.clear();
 
-      for (var i in photosVideos) {
-        try {
-          log("📤 Uploading media: $i");
-          await createAccountCubit.uploadMedia(filePath: i);
-
-          if (createAccountCubit.mediaLinks.isNotEmpty) {
-            log(
-              "✅ Media uploaded successfully: ${createAccountCubit.mediaLinks.last}",
-            );
-          } else {
-            log("⚠️ Media upload returned but no link was recorded for: $i");
+      log("📤 Uploading ${photosVideos.length} media items in parallel");
+      await Future.wait(
+        photosVideos.map((i) async {
+          try {
+            log("📤 Uploading media: $i");
+            await createAccountCubit.uploadMedia(filePath: i);
+          } catch (uploadError) {
+            log("❌ Error uploading media: $uploadError");
           }
-        } catch (uploadError) {
-          log("❌ Error uploading media: $uploadError");
-        }
-      }
+        }),
+      );
 
       meadiaLinks.addAll(createAccountCubit.mediaLinks);
 
