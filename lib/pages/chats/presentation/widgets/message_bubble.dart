@@ -204,11 +204,16 @@ class ImageMessageBubble extends StatelessWidget {
                   children: [
                     GestureDetector(
                       onTap: () {
+                        final cubit = context.read<MessageCubit>();
+                        final globalIndex = cubit.getGlobalMediaIndex(
+                          message.id,
+                          index,
+                        );
                         context.router.navigate(
                           MediaPreviewRoute(
-                            messages: context.read<MessageCubit>().messages,
-                            initialIndex: index,
-                            messageCubit: context.read<MessageCubit>(),
+                            messages: cubit.messages,
+                            initialIndex: globalIndex,
+                            messageCubit: cubit,
                           ),
                         );
                       },
@@ -345,11 +350,13 @@ class _VideoMessageBubbleState extends State<VideoMessageBubble> {
 
     return GestureDetector(
       onTap: () {
+        final cubit = context.read<MessageCubit>();
+        final globalIndex = cubit.getGlobalMediaIndex(widget.message.id, 0);
         context.router.navigate(
           MediaPreviewRoute(
-            messages: context.read<MessageCubit>().messages,
-            initialIndex: 0,
-            messageCubit: context.read<MessageCubit>(),
+            messages: cubit.messages,
+            initialIndex: globalIndex,
+            messageCubit: cubit,
           ),
         );
       },

@@ -285,101 +285,105 @@ class _MessageListState extends State<MessageList> {
         if (_messageCubit.isLoading) {
           return Center(child: Lottie.asset(Assets.animations.loadingSpinner));
         }
-        final messages = state.messages;
 
-        if (_messageCubit.hasError && messages.isEmpty) {
-          return Padding(
-            padding: const EdgeInsets.all(24),
-            child: Center(
-              child: EmptyWidget(
-                height: 326,
-                title: 'No messages yet',
-                description:
-                    'Your groups are matched, but no one has started the conversation. Be the first to break the ice.',
-                imagePath: Assets.icons.chatGroup.path,
-              ),
-            ),
-          );
-        }
+        final messages = state.messages;
+        final isTyping = state.isOtherUserTyping;
+
+        Widget mainContent;
 
         if (messages.isEmpty) {
-          return Padding(
-            padding: const EdgeInsets.all(24),
-            child: Center(
-              child: EmptyWidget(
-                height: 326,
-                title: 'No messages yet',
-                description:
-                    'Your groups are matched, but no one has started the conversation. Be the first to break the ice.',
-                imagePath: Assets.icons.chatGroup.path,
-              ),
+          mainContent = Center(
+            child: EmptyWidget(
+              height: 326,
+              title: 'No messages yet',
+              description: state.isOtherUserTyping
+                  ? 'Someone is typing...'
+                  : 'Your groups are matched, but no one has started the conversation. Be the first to break the ice.',
+              imagePath: Assets.icons.chatGroup.path,
             ),
           );
-        }
-        return ListView.builder(
-          controller: _scrollController,
-          reverse: true,
-          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-          padding: const EdgeInsets.only(
-            left: 16,
-            right: 16,
-            top: 140,
-            bottom: 0,
-          ),
-          itemCount: messages.length,
-          itemBuilder: (context, index) {
-            final message = messages[index];
-            final isMineSide = message.isMe;
+        } else {
+          mainContent = ListView.builder(
+            controller: _scrollController,
+            reverse: true,
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            padding: const EdgeInsets.only(
+              left: 16,
+              right: 16,
+              top: 140,
+              bottom: 0,
+            ),
+            itemCount: messages.length,
+            itemBuilder: (context, index) {
+              final message = messages[index];
+              final isMineSide = message.isMe;
 
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 16),
-              child: Column(
-                crossAxisAlignment: isMineSide
-                    ? CrossAxisAlignment.end
-                    : CrossAxisAlignment.start,
-                children: [
-                  if (!isMineSide && widget.isGroup) ...[
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (message.senderAvatar != null) ...[
-                          // if(index == 0 &&)
-                          Container(
-                            width: 24,
-                            height: 24,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              image: DecorationImage(
-                                image: AssetImage(message.senderAvatar!),
-                                fit: BoxFit.cover,
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: Column(
+                  crossAxisAlignment: isMineSide
+                      ? CrossAxisAlignment.end
+                      : CrossAxisAlignment.start,
+                  children: [
+                    if (!isMineSide && widget.isGroup) ...[
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (message.senderAvatar != null) ...[
+                            Container(
+                              width: 24,
+                              height: 24,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                image: DecorationImage(
+                                  image: AssetImage(message.senderAvatar!),
+                                  fit: BoxFit.cover,
+                                ),
                               ),
                             ),
+                            const CustomSizedBox(width: 8),
+                          ],
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  message.senderName,
+                                  style: AppTextStyles.bodySmall(context),
+                                ),
+                                const CustomSizedBox(height: 4),
+                                _buildMessageWithLongPress(message, isMineSide),
+                              ],
+                            ),
                           ),
-                          const CustomSizedBox(width: 8),
                         ],
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                message.senderName,
-                                style: AppTextStyles.bodySmall(context),
-                              ),
-                              const CustomSizedBox(height: 4),
-                              _buildMessageWithLongPress(message, isMineSide),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ] else
-                    _buildMessageWithLongPress(message, isMineSide),
-                  if (index == 0 && _messageCubit.otherUserIsTyping)
-                    TypingIndicator(),
-                ],
+                      ),
+                    ] else
+                      _buildMessageWithLongPress(message, isMineSide),
+                    // Only show typing indicator for the very first message which is index 0 in reverse mode
+                    if (index == 0 && isTyping)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: TypingIndicator(),
+                      ),
+                  ],
+                ),
+              );
+            },
+          );
+        }
+
+        // Wrap everything in a stack to show typing indicator even if empty
+        return Stack(
+          children: [
+            Positioned.fill(child: mainContent),
+            if (isTyping && messages.isEmpty)
+              Positioned(
+                bottom: 16,
+                left: 16,
+                child: TypingIndicator(),
               ),
-            );
-          },
+          ],
         );
       },
     );
