@@ -122,6 +122,7 @@ class InterleavedMediaSection extends StatelessWidget {
                 prompt: item,
                 onEditTap: () => onPromptEditTap(item, true),
                 isNeedEdit: isNeedEdit,
+                userId: userId,
               ),
             );
           }
@@ -224,7 +225,6 @@ class _ImageItem extends StatelessWidget {
                 ),
               ),
             ),
-
           Positioned(
             top: 16,
             right: 16,
@@ -271,11 +271,13 @@ class _PromptCard extends StatelessWidget {
   final Prompt prompt;
   final VoidCallback onEditTap;
   final bool isNeedEdit;
+  final String? userId;
 
   const _PromptCard({
     required this.prompt,
     required this.onEditTap,
     required this.isNeedEdit,
+    this.userId,
   });
 
   @override
@@ -320,6 +322,7 @@ class _PromptCard extends StatelessWidget {
                 ),
             ],
           ),
+
           if (isNeedEdit)
             Positioned(
               top: 0,
@@ -340,6 +343,53 @@ class _PromptCard extends StatelessWidget {
                       Colors.white,
                       BlendMode.srcIn,
                     ),
+                  ),
+                ),
+              ),
+            ),
+          if (userId != null)
+            Positioned(
+              top: 0,
+              right: 0,
+              child: GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onTap: () async {
+                  log(
+                    "Tapped poke on prompt ${prompt.id} with answer $promptAnswer",
+                  );
+                  final user = Di()
+                      .sl<LoginCubit>()
+                      .individualProfileData
+                      ?.user;
+                  Di().sl<HomeCubit>().selectedProfile = Member(
+                    id: user?.id,
+                    name: user?.firstName,
+                    age: validateInt(calculateAge(user?.dob.toString() ?? "")),
+                  );
+
+                  await HomeBlurController.showWithBlur(
+                    context: context,
+                    builder: (context) => SendPokeBottomSheet(
+                      pokeType: promptAnswer.isAudio
+                          ? PokeType.audio
+                          : PokeType.text,
+                      targetId: prompt.id,
+                      promptTitle: prompt.promptTitle,
+                      promptAnswer: prompt.promptAnswer,
+                    ),
+                  );
+                },
+                child: Container(
+                  height: 32,
+                  width: 32,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: ColorPalette.primary,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Text(
+                    AppEmojis.pointingRight,
+                    style: AppTextStyles.h4(context),
                   ),
                 ),
               ),

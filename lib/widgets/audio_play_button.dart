@@ -34,7 +34,7 @@ class PlayPauseButton extends StatelessWidget {
                 ? SvgPicture.asset(
                     Assets.icons.play.path,
                     colorFilter: ColorFilter.mode(
-                      !isLightTheme(context) ? Colors.white : Colors.black,
+                      Colors.white,
                       BlendMode.srcIn,
                     ),
                     width: 24,

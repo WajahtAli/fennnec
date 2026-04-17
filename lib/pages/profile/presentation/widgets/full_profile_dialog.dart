@@ -158,7 +158,7 @@ class _FullProfileDialogState extends State<FullProfileDialog> {
                       radius: 60,
                       child: ProfileAvatar(
                         imageUrl: (user.user?.bestShorts?.isNotEmpty ?? false)
-                            ? user!.user!.bestShorts!.first
+                            ? user.user!.bestShorts!.first
                             : '',
                         size: 120,
                       ),
@@ -226,7 +226,6 @@ class _FullProfileDialogState extends State<FullProfileDialog> {
                       ],
                     ),
                     CustomSizedBox(height: 12),
-
                     Wrap(
                       spacing: 8,
                       alignment: WrapAlignment.center,

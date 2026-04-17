@@ -217,10 +217,20 @@ class MessageCubit extends Cubit<MessageState> {
 
   Future<void> _markMessageAsReadRequest(String messageId) async {
     final chatId = _groupId;
+    log(
+      'before mark as read: chatId=$chatId, messageId=$messageId, isGroup=$_isGroup, otherGroupId=$_otherGroupId',
+    );
     if (chatId == null || chatId.isEmpty) return;
 
     if (_isGroup) {
-      await _myGroupRepository.markGroupMessageAsRead(chatId, messageId);
+      log(
+        "Marking group message as read: chatId=$chatId, messageId=$messageId, otherGroupId=$_otherGroupId",
+      );
+      final receiverGroupId = _resolveEffectiveOtherGroupId(_otherGroupId);
+      await _myGroupRepository.markGroupMessageAsRead(
+        receiverGroupId ?? '',
+        messageId,
+      );
       return;
     }
 
@@ -652,8 +662,9 @@ class MessageCubit extends Cubit<MessageState> {
         json['directChatId'] ??
         json['roomId'];
     if (_isGroup) {
-      if (rawChatId == null) return false;
-      return rawChatId.toString() == activeChatId;
+      if (rawChatId == null && json['receiverGroupId'] == null) return false;
+      return rawChatId.toString() == activeChatId ||
+          (json['receiverGroupId']?.toString() == activeChatId);
     }
 
     if (rawChatId != null && rawChatId.toString() == activeChatId) return true;

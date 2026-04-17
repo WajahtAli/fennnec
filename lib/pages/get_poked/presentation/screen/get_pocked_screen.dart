@@ -2,6 +2,8 @@ import 'dart:ui';
 import 'package:auto_route/auto_route.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/pages/chats/data/models/chat_and_calls_response.dart';
+import 'package:fennac_app/pages/chats/presentation/bloc/cubit/chat_landing_cubit.dart';
+import 'package:fennac_app/pages/dashboard/presentation/bloc/cubit/dashboard_cubit.dart';
 import 'package:fennac_app/pages/get_poked/presentation/bloc/cubit/get_poked_details_cubit.dart';
 import 'package:fennac_app/pages/get_poked/presentation/bloc/state/get_poked_details_state.dart';
 import 'package:fennac_app/pages/get_poked/presentation/widgets/poke_image_card.dart';
@@ -55,12 +57,16 @@ class _GetPockedScreenState extends State<GetPockedScreen> {
       bloc: Di().sl<GetPokedDetailsCubit>(),
       listener: (context, state) {
         if (state is GetPokedDetailsChatStarted) {
-          context.router.replace(
-            GroupChatRoute(
-              isGroup: false,
-              groupId: state.startChatData.chatWithUserId,
-            ),
-          );
+          Di().sl<ChatLandingCubit>().fetchChatsAndCalls();
+
+          Di().sl<DashboardCubit>().changeIndex(1);
+          context.router.popUntilRoot();
+          // context.router.replace(
+          //   GroupChatRoute(
+          //     isGroup: false,
+          //     groupId: state.startChatData.chatWithUserId,
+          //   ),
+          // );
         }
       },
       builder: (context, state) {

@@ -331,7 +331,6 @@ class GroupGalleryWidget extends StatelessWidget {
                           child: _editIcon(),
                         ),
                       ),
-
                     Positioned(
                       top: 16,
                       right: 16,
@@ -523,10 +522,7 @@ class _GroupAudioCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title ?? 'If our group had a theme song...',
-            style: AppTextStyles.bodyLarge(context),
-          ),
+          Text(title ?? '', style: AppTextStyles.bodyLarge(context)),
           const SizedBox(height: 14),
 
           if (hasAudio)
@@ -601,10 +597,7 @@ class _GroupPromptCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          AppText(
-            text: prompt ?? "Our group's guilty pleasure...",
-            style: AppTextStyles.subHeading(context),
-          ),
+          AppText(text: prompt ?? "", style: AppTextStyles.subHeading(context)),
           const SizedBox(height: 14),
 
           if (isAudioPrompt ?? false)

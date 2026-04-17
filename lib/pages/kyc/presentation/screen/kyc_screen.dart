@@ -151,7 +151,13 @@ class _KycScreenState extends State<KycScreen> {
                   builder: (context, state) {
                     return Column(
                       children: [
-                        if (widget.isEditMode ?? false) CustomBackButton(),
+                        if (widget.isEditMode ?? false)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8.0,
+                            ),
+                            child: CustomBackButton(),
+                          ),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 24),
 

@@ -6,6 +6,7 @@ import '../di_container.dart';
 import '../../pages/buy_poke/data/datasource/iap_service.dart';
 import '../notifications/local_notification_service.dart';
 import '../notifications/push_notification_service.dart';
+import '../sockets/sockets_service.dart';
 
 class AppInitalizer {
   static Future init() async {
@@ -15,6 +16,7 @@ class AppInitalizer {
       options: DefaultFirebaseOptions.currentPlatform,
     );
 
+    SocketService.connect();
     // Notifications Pipeline
     await LocalNotificationService.init();
     await PushNotificationService.init();
