@@ -487,10 +487,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                   Di()
                                                       .sl<DashboardCubit>()
                                                       .changeIndex(0);
-                                                  await _groupsCubit
-                                                      .fetchAllGroups(
-                                                        isLikedGroups: false,
-                                                      );
                                                 }
                                               : () {
                                                   _groupsCubit.fetchAllGroups(
