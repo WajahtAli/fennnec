@@ -6296,7 +6296,8 @@ $PokeDetailDataCopyWith<$Res> get data {
 /// @nodoc
 mixin _$PokeDetailData {
 
- PokeModel get poke; List<PokeModel> get pokes; PokerFromUser get fromUser; PokedTargetDetail get pokedTargetDetail; PokeActiveGroupModel? get activeGroup;
+ PokeModel? get poke;// Made nullable as it might be missing in favor of 'pokes'
+ List<PokeModel> get pokes; PokerFromUser get fromUser; PokedTargetDetail get pokedTargetDetail; PokeActiveGroupModel? get activeGroup;
 /// Create a copy of PokeDetailData
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -6329,11 +6330,11 @@ abstract mixin class $PokeDetailDataCopyWith<$Res>  {
   factory $PokeDetailDataCopyWith(PokeDetailData value, $Res Function(PokeDetailData) _then) = _$PokeDetailDataCopyWithImpl;
 @useResult
 $Res call({
- PokeModel poke, List<PokeModel> pokes, PokerFromUser fromUser, PokedTargetDetail pokedTargetDetail, PokeActiveGroupModel? activeGroup
+ PokeModel? poke, List<PokeModel> pokes, PokerFromUser fromUser, PokedTargetDetail pokedTargetDetail, PokeActiveGroupModel? activeGroup
 });
 
 
-$PokeModelCopyWith<$Res> get poke;$PokerFromUserCopyWith<$Res> get fromUser;$PokedTargetDetailCopyWith<$Res> get pokedTargetDetail;$PokeActiveGroupModelCopyWith<$Res>? get activeGroup;
+$PokeModelCopyWith<$Res>? get poke;$PokerFromUserCopyWith<$Res> get fromUser;$PokedTargetDetailCopyWith<$Res> get pokedTargetDetail;$PokeActiveGroupModelCopyWith<$Res>? get activeGroup;
 
 }
 /// @nodoc
@@ -6346,10 +6347,10 @@ class _$PokeDetailDataCopyWithImpl<$Res>
 
 /// Create a copy of PokeDetailData
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? poke = null,Object? pokes = null,Object? fromUser = null,Object? pokedTargetDetail = null,Object? activeGroup = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? poke = freezed,Object? pokes = null,Object? fromUser = null,Object? pokedTargetDetail = null,Object? activeGroup = freezed,}) {
   return _then(_self.copyWith(
-poke: null == poke ? _self.poke : poke // ignore: cast_nullable_to_non_nullable
-as PokeModel,pokes: null == pokes ? _self.pokes : pokes // ignore: cast_nullable_to_non_nullable
+poke: freezed == poke ? _self.poke : poke // ignore: cast_nullable_to_non_nullable
+as PokeModel?,pokes: null == pokes ? _self.pokes : pokes // ignore: cast_nullable_to_non_nullable
 as List<PokeModel>,fromUser: null == fromUser ? _self.fromUser : fromUser // ignore: cast_nullable_to_non_nullable
 as PokerFromUser,pokedTargetDetail: null == pokedTargetDetail ? _self.pokedTargetDetail : pokedTargetDetail // ignore: cast_nullable_to_non_nullable
 as PokedTargetDetail,activeGroup: freezed == activeGroup ? _self.activeGroup : activeGroup // ignore: cast_nullable_to_non_nullable
@@ -6360,9 +6361,12 @@ as PokeActiveGroupModel?,
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$PokeModelCopyWith<$Res> get poke {
-  
-  return $PokeModelCopyWith<$Res>(_self.poke, (value) {
+$PokeModelCopyWith<$Res>? get poke {
+    if (_self.poke == null) {
+    return null;
+  }
+
+  return $PokeModelCopyWith<$Res>(_self.poke!, (value) {
     return _then(_self.copyWith(poke: value));
   });
 }/// Create a copy of PokeDetailData
@@ -6477,7 +6481,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( PokeModel poke,  List<PokeModel> pokes,  PokerFromUser fromUser,  PokedTargetDetail pokedTargetDetail,  PokeActiveGroupModel? activeGroup)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( PokeModel? poke,  List<PokeModel> pokes,  PokerFromUser fromUser,  PokedTargetDetail pokedTargetDetail,  PokeActiveGroupModel? activeGroup)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PokeDetailData() when $default != null:
 return $default(_that.poke,_that.pokes,_that.fromUser,_that.pokedTargetDetail,_that.activeGroup);case _:
@@ -6498,7 +6502,7 @@ return $default(_that.poke,_that.pokes,_that.fromUser,_that.pokedTargetDetail,_t
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( PokeModel poke,  List<PokeModel> pokes,  PokerFromUser fromUser,  PokedTargetDetail pokedTargetDetail,  PokeActiveGroupModel? activeGroup)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( PokeModel? poke,  List<PokeModel> pokes,  PokerFromUser fromUser,  PokedTargetDetail pokedTargetDetail,  PokeActiveGroupModel? activeGroup)  $default,) {final _that = this;
 switch (_that) {
 case _PokeDetailData():
 return $default(_that.poke,_that.pokes,_that.fromUser,_that.pokedTargetDetail,_that.activeGroup);case _:
@@ -6518,7 +6522,7 @@ return $default(_that.poke,_that.pokes,_that.fromUser,_that.pokedTargetDetail,_t
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( PokeModel poke,  List<PokeModel> pokes,  PokerFromUser fromUser,  PokedTargetDetail pokedTargetDetail,  PokeActiveGroupModel? activeGroup)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( PokeModel? poke,  List<PokeModel> pokes,  PokerFromUser fromUser,  PokedTargetDetail pokedTargetDetail,  PokeActiveGroupModel? activeGroup)?  $default,) {final _that = this;
 switch (_that) {
 case _PokeDetailData() when $default != null:
 return $default(_that.poke,_that.pokes,_that.fromUser,_that.pokedTargetDetail,_that.activeGroup);case _:
@@ -6533,11 +6537,13 @@ return $default(_that.poke,_that.pokes,_that.fromUser,_that.pokedTargetDetail,_t
 @JsonSerializable()
 
 class _PokeDetailData implements PokeDetailData {
-  const _PokeDetailData({required this.poke, final  List<PokeModel> pokes = const [], required this.fromUser, required this.pokedTargetDetail, this.activeGroup}): _pokes = pokes;
+  const _PokeDetailData({this.poke, final  List<PokeModel> pokes = const [], required this.fromUser, required this.pokedTargetDetail, this.activeGroup}): _pokes = pokes;
   factory _PokeDetailData.fromJson(Map<String, dynamic> json) => _$PokeDetailDataFromJson(json);
 
-@override final  PokeModel poke;
+@override final  PokeModel? poke;
+// Made nullable as it might be missing in favor of 'pokes'
  final  List<PokeModel> _pokes;
+// Made nullable as it might be missing in favor of 'pokes'
 @override@JsonKey() List<PokeModel> get pokes {
   if (_pokes is EqualUnmodifiableListView) return _pokes;
   // ignore: implicit_dynamic_type
@@ -6581,11 +6587,11 @@ abstract mixin class _$PokeDetailDataCopyWith<$Res> implements $PokeDetailDataCo
   factory _$PokeDetailDataCopyWith(_PokeDetailData value, $Res Function(_PokeDetailData) _then) = __$PokeDetailDataCopyWithImpl;
 @override @useResult
 $Res call({
- PokeModel poke, List<PokeModel> pokes, PokerFromUser fromUser, PokedTargetDetail pokedTargetDetail, PokeActiveGroupModel? activeGroup
+ PokeModel? poke, List<PokeModel> pokes, PokerFromUser fromUser, PokedTargetDetail pokedTargetDetail, PokeActiveGroupModel? activeGroup
 });
 
 
-@override $PokeModelCopyWith<$Res> get poke;@override $PokerFromUserCopyWith<$Res> get fromUser;@override $PokedTargetDetailCopyWith<$Res> get pokedTargetDetail;@override $PokeActiveGroupModelCopyWith<$Res>? get activeGroup;
+@override $PokeModelCopyWith<$Res>? get poke;@override $PokerFromUserCopyWith<$Res> get fromUser;@override $PokedTargetDetailCopyWith<$Res> get pokedTargetDetail;@override $PokeActiveGroupModelCopyWith<$Res>? get activeGroup;
 
 }
 /// @nodoc
@@ -6598,10 +6604,10 @@ class __$PokeDetailDataCopyWithImpl<$Res>
 
 /// Create a copy of PokeDetailData
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? poke = null,Object? pokes = null,Object? fromUser = null,Object? pokedTargetDetail = null,Object? activeGroup = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? poke = freezed,Object? pokes = null,Object? fromUser = null,Object? pokedTargetDetail = null,Object? activeGroup = freezed,}) {
   return _then(_PokeDetailData(
-poke: null == poke ? _self.poke : poke // ignore: cast_nullable_to_non_nullable
-as PokeModel,pokes: null == pokes ? _self._pokes : pokes // ignore: cast_nullable_to_non_nullable
+poke: freezed == poke ? _self.poke : poke // ignore: cast_nullable_to_non_nullable
+as PokeModel?,pokes: null == pokes ? _self._pokes : pokes // ignore: cast_nullable_to_non_nullable
 as List<PokeModel>,fromUser: null == fromUser ? _self.fromUser : fromUser // ignore: cast_nullable_to_non_nullable
 as PokerFromUser,pokedTargetDetail: null == pokedTargetDetail ? _self.pokedTargetDetail : pokedTargetDetail // ignore: cast_nullable_to_non_nullable
 as PokedTargetDetail,activeGroup: freezed == activeGroup ? _self.activeGroup : activeGroup // ignore: cast_nullable_to_non_nullable
@@ -6613,9 +6619,12 @@ as PokeActiveGroupModel?,
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$PokeModelCopyWith<$Res> get poke {
-  
-  return $PokeModelCopyWith<$Res>(_self.poke, (value) {
+$PokeModelCopyWith<$Res>? get poke {
+    if (_self.poke == null) {
+    return null;
+  }
+
+  return $PokeModelCopyWith<$Res>(_self.poke!, (value) {
     return _then(_self.copyWith(poke: value));
   });
 }/// Create a copy of PokeDetailData
@@ -6936,7 +6945,7 @@ as List<ChatGroupMemberUserModel>,
 /// @nodoc
 mixin _$PokeModel {
 
- String get id; String get fromUserId; String get toUserId; String get targetType; String? get targetId; String get message; String get status;@JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson) DateTime get createdAt;@JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson) DateTime get updatedAt;
+ String get id; String get fromUserId; ChatPokeUserModel? get fromUser; String get toUserId; String get targetType; String? get targetId; String get message; String get status; List<String> get readBy; PokePhotoDetail? get targetPhoto; ChatPokePromptModel? get targetPrompt;@JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson) DateTime get createdAt;@JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson) DateTime get updatedAt;
 /// Create a copy of PokeModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -6949,16 +6958,16 @@ $PokeModelCopyWith<PokeModel> get copyWith => _$PokeModelCopyWithImpl<PokeModel>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PokeModel&&(identical(other.id, id) || other.id == id)&&(identical(other.fromUserId, fromUserId) || other.fromUserId == fromUserId)&&(identical(other.toUserId, toUserId) || other.toUserId == toUserId)&&(identical(other.targetType, targetType) || other.targetType == targetType)&&(identical(other.targetId, targetId) || other.targetId == targetId)&&(identical(other.message, message) || other.message == message)&&(identical(other.status, status) || other.status == status)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PokeModel&&(identical(other.id, id) || other.id == id)&&(identical(other.fromUserId, fromUserId) || other.fromUserId == fromUserId)&&(identical(other.fromUser, fromUser) || other.fromUser == fromUser)&&(identical(other.toUserId, toUserId) || other.toUserId == toUserId)&&(identical(other.targetType, targetType) || other.targetType == targetType)&&(identical(other.targetId, targetId) || other.targetId == targetId)&&(identical(other.message, message) || other.message == message)&&(identical(other.status, status) || other.status == status)&&const DeepCollectionEquality().equals(other.readBy, readBy)&&(identical(other.targetPhoto, targetPhoto) || other.targetPhoto == targetPhoto)&&(identical(other.targetPrompt, targetPrompt) || other.targetPrompt == targetPrompt)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,fromUserId,toUserId,targetType,targetId,message,status,createdAt,updatedAt);
+int get hashCode => Object.hash(runtimeType,id,fromUserId,fromUser,toUserId,targetType,targetId,message,status,const DeepCollectionEquality().hash(readBy),targetPhoto,targetPrompt,createdAt,updatedAt);
 
 @override
 String toString() {
-  return 'PokeModel(id: $id, fromUserId: $fromUserId, toUserId: $toUserId, targetType: $targetType, targetId: $targetId, message: $message, status: $status, createdAt: $createdAt, updatedAt: $updatedAt)';
+  return 'PokeModel(id: $id, fromUserId: $fromUserId, fromUser: $fromUser, toUserId: $toUserId, targetType: $targetType, targetId: $targetId, message: $message, status: $status, readBy: $readBy, targetPhoto: $targetPhoto, targetPrompt: $targetPrompt, createdAt: $createdAt, updatedAt: $updatedAt)';
 }
 
 
@@ -6969,11 +6978,11 @@ abstract mixin class $PokeModelCopyWith<$Res>  {
   factory $PokeModelCopyWith(PokeModel value, $Res Function(PokeModel) _then) = _$PokeModelCopyWithImpl;
 @useResult
 $Res call({
- String id, String fromUserId, String toUserId, String targetType, String? targetId, String message, String status,@JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson) DateTime createdAt,@JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson) DateTime updatedAt
+ String id, String fromUserId, ChatPokeUserModel? fromUser, String toUserId, String targetType, String? targetId, String message, String status, List<String> readBy, PokePhotoDetail? targetPhoto, ChatPokePromptModel? targetPrompt,@JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson) DateTime createdAt,@JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson) DateTime updatedAt
 });
 
 
-
+$ChatPokeUserModelCopyWith<$Res>? get fromUser;$PokePhotoDetailCopyWith<$Res>? get targetPhoto;$ChatPokePromptModelCopyWith<$Res>? get targetPrompt;
 
 }
 /// @nodoc
@@ -6986,21 +6995,61 @@ class _$PokeModelCopyWithImpl<$Res>
 
 /// Create a copy of PokeModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? fromUserId = null,Object? toUserId = null,Object? targetType = null,Object? targetId = freezed,Object? message = null,Object? status = null,Object? createdAt = null,Object? updatedAt = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? fromUserId = null,Object? fromUser = freezed,Object? toUserId = null,Object? targetType = null,Object? targetId = freezed,Object? message = null,Object? status = null,Object? readBy = null,Object? targetPhoto = freezed,Object? targetPrompt = freezed,Object? createdAt = null,Object? updatedAt = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,fromUserId: null == fromUserId ? _self.fromUserId : fromUserId // ignore: cast_nullable_to_non_nullable
-as String,toUserId: null == toUserId ? _self.toUserId : toUserId // ignore: cast_nullable_to_non_nullable
+as String,fromUser: freezed == fromUser ? _self.fromUser : fromUser // ignore: cast_nullable_to_non_nullable
+as ChatPokeUserModel?,toUserId: null == toUserId ? _self.toUserId : toUserId // ignore: cast_nullable_to_non_nullable
 as String,targetType: null == targetType ? _self.targetType : targetType // ignore: cast_nullable_to_non_nullable
 as String,targetId: freezed == targetId ? _self.targetId : targetId // ignore: cast_nullable_to_non_nullable
 as String?,message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
 as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as String,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as String,readBy: null == readBy ? _self.readBy : readBy // ignore: cast_nullable_to_non_nullable
+as List<String>,targetPhoto: freezed == targetPhoto ? _self.targetPhoto : targetPhoto // ignore: cast_nullable_to_non_nullable
+as PokePhotoDetail?,targetPrompt: freezed == targetPrompt ? _self.targetPrompt : targetPrompt // ignore: cast_nullable_to_non_nullable
+as ChatPokePromptModel?,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
 as DateTime,
   ));
 }
+/// Create a copy of PokeModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ChatPokeUserModelCopyWith<$Res>? get fromUser {
+    if (_self.fromUser == null) {
+    return null;
+  }
 
+  return $ChatPokeUserModelCopyWith<$Res>(_self.fromUser!, (value) {
+    return _then(_self.copyWith(fromUser: value));
+  });
+}/// Create a copy of PokeModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$PokePhotoDetailCopyWith<$Res>? get targetPhoto {
+    if (_self.targetPhoto == null) {
+    return null;
+  }
+
+  return $PokePhotoDetailCopyWith<$Res>(_self.targetPhoto!, (value) {
+    return _then(_self.copyWith(targetPhoto: value));
+  });
+}/// Create a copy of PokeModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ChatPokePromptModelCopyWith<$Res>? get targetPrompt {
+    if (_self.targetPrompt == null) {
+    return null;
+  }
+
+  return $ChatPokePromptModelCopyWith<$Res>(_self.targetPrompt!, (value) {
+    return _then(_self.copyWith(targetPrompt: value));
+  });
+}
 }
 
 
@@ -7082,10 +7131,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String fromUserId,  String toUserId,  String targetType,  String? targetId,  String message,  String status, @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson)  DateTime createdAt, @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson)  DateTime updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String fromUserId,  ChatPokeUserModel? fromUser,  String toUserId,  String targetType,  String? targetId,  String message,  String status,  List<String> readBy,  PokePhotoDetail? targetPhoto,  ChatPokePromptModel? targetPrompt, @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson)  DateTime createdAt, @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson)  DateTime updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PokeModel() when $default != null:
-return $default(_that.id,_that.fromUserId,_that.toUserId,_that.targetType,_that.targetId,_that.message,_that.status,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.id,_that.fromUserId,_that.fromUser,_that.toUserId,_that.targetType,_that.targetId,_that.message,_that.status,_that.readBy,_that.targetPhoto,_that.targetPrompt,_that.createdAt,_that.updatedAt);case _:
   return orElse();
 
 }
@@ -7103,10 +7152,10 @@ return $default(_that.id,_that.fromUserId,_that.toUserId,_that.targetType,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String fromUserId,  String toUserId,  String targetType,  String? targetId,  String message,  String status, @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson)  DateTime createdAt, @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson)  DateTime updatedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String fromUserId,  ChatPokeUserModel? fromUser,  String toUserId,  String targetType,  String? targetId,  String message,  String status,  List<String> readBy,  PokePhotoDetail? targetPhoto,  ChatPokePromptModel? targetPrompt, @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson)  DateTime createdAt, @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson)  DateTime updatedAt)  $default,) {final _that = this;
 switch (_that) {
 case _PokeModel():
-return $default(_that.id,_that.fromUserId,_that.toUserId,_that.targetType,_that.targetId,_that.message,_that.status,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.id,_that.fromUserId,_that.fromUser,_that.toUserId,_that.targetType,_that.targetId,_that.message,_that.status,_that.readBy,_that.targetPhoto,_that.targetPrompt,_that.createdAt,_that.updatedAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -7123,10 +7172,10 @@ return $default(_that.id,_that.fromUserId,_that.toUserId,_that.targetType,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String fromUserId,  String toUserId,  String targetType,  String? targetId,  String message,  String status, @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson)  DateTime createdAt, @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson)  DateTime updatedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String fromUserId,  ChatPokeUserModel? fromUser,  String toUserId,  String targetType,  String? targetId,  String message,  String status,  List<String> readBy,  PokePhotoDetail? targetPhoto,  ChatPokePromptModel? targetPrompt, @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson)  DateTime createdAt, @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson)  DateTime updatedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _PokeModel() when $default != null:
-return $default(_that.id,_that.fromUserId,_that.toUserId,_that.targetType,_that.targetId,_that.message,_that.status,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.id,_that.fromUserId,_that.fromUser,_that.toUserId,_that.targetType,_that.targetId,_that.message,_that.status,_that.readBy,_that.targetPhoto,_that.targetPrompt,_that.createdAt,_that.updatedAt);case _:
   return null;
 
 }
@@ -7138,16 +7187,26 @@ return $default(_that.id,_that.fromUserId,_that.toUserId,_that.targetType,_that.
 @JsonSerializable()
 
 class _PokeModel implements PokeModel {
-  const _PokeModel({required this.id, required this.fromUserId, required this.toUserId, required this.targetType, this.targetId, required this.message, required this.status, @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson) required this.createdAt, @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson) required this.updatedAt});
+  const _PokeModel({required this.id, required this.fromUserId, this.fromUser, required this.toUserId, required this.targetType, this.targetId, required this.message, required this.status, final  List<String> readBy = const [], this.targetPhoto, this.targetPrompt, @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson) required this.createdAt, @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson) required this.updatedAt}): _readBy = readBy;
   factory _PokeModel.fromJson(Map<String, dynamic> json) => _$PokeModelFromJson(json);
 
 @override final  String id;
 @override final  String fromUserId;
+@override final  ChatPokeUserModel? fromUser;
 @override final  String toUserId;
 @override final  String targetType;
 @override final  String? targetId;
 @override final  String message;
 @override final  String status;
+ final  List<String> _readBy;
+@override@JsonKey() List<String> get readBy {
+  if (_readBy is EqualUnmodifiableListView) return _readBy;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_readBy);
+}
+
+@override final  PokePhotoDetail? targetPhoto;
+@override final  ChatPokePromptModel? targetPrompt;
 @override@JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson) final  DateTime createdAt;
 @override@JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson) final  DateTime updatedAt;
 
@@ -7164,16 +7223,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PokeModel&&(identical(other.id, id) || other.id == id)&&(identical(other.fromUserId, fromUserId) || other.fromUserId == fromUserId)&&(identical(other.toUserId, toUserId) || other.toUserId == toUserId)&&(identical(other.targetType, targetType) || other.targetType == targetType)&&(identical(other.targetId, targetId) || other.targetId == targetId)&&(identical(other.message, message) || other.message == message)&&(identical(other.status, status) || other.status == status)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PokeModel&&(identical(other.id, id) || other.id == id)&&(identical(other.fromUserId, fromUserId) || other.fromUserId == fromUserId)&&(identical(other.fromUser, fromUser) || other.fromUser == fromUser)&&(identical(other.toUserId, toUserId) || other.toUserId == toUserId)&&(identical(other.targetType, targetType) || other.targetType == targetType)&&(identical(other.targetId, targetId) || other.targetId == targetId)&&(identical(other.message, message) || other.message == message)&&(identical(other.status, status) || other.status == status)&&const DeepCollectionEquality().equals(other._readBy, _readBy)&&(identical(other.targetPhoto, targetPhoto) || other.targetPhoto == targetPhoto)&&(identical(other.targetPrompt, targetPrompt) || other.targetPrompt == targetPrompt)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,fromUserId,toUserId,targetType,targetId,message,status,createdAt,updatedAt);
+int get hashCode => Object.hash(runtimeType,id,fromUserId,fromUser,toUserId,targetType,targetId,message,status,const DeepCollectionEquality().hash(_readBy),targetPhoto,targetPrompt,createdAt,updatedAt);
 
 @override
 String toString() {
-  return 'PokeModel(id: $id, fromUserId: $fromUserId, toUserId: $toUserId, targetType: $targetType, targetId: $targetId, message: $message, status: $status, createdAt: $createdAt, updatedAt: $updatedAt)';
+  return 'PokeModel(id: $id, fromUserId: $fromUserId, fromUser: $fromUser, toUserId: $toUserId, targetType: $targetType, targetId: $targetId, message: $message, status: $status, readBy: $readBy, targetPhoto: $targetPhoto, targetPrompt: $targetPrompt, createdAt: $createdAt, updatedAt: $updatedAt)';
 }
 
 
@@ -7184,11 +7243,11 @@ abstract mixin class _$PokeModelCopyWith<$Res> implements $PokeModelCopyWith<$Re
   factory _$PokeModelCopyWith(_PokeModel value, $Res Function(_PokeModel) _then) = __$PokeModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String fromUserId, String toUserId, String targetType, String? targetId, String message, String status,@JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson) DateTime createdAt,@JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson) DateTime updatedAt
+ String id, String fromUserId, ChatPokeUserModel? fromUser, String toUserId, String targetType, String? targetId, String message, String status, List<String> readBy, PokePhotoDetail? targetPhoto, ChatPokePromptModel? targetPrompt,@JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson) DateTime createdAt,@JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson) DateTime updatedAt
 });
 
 
-
+@override $ChatPokeUserModelCopyWith<$Res>? get fromUser;@override $PokePhotoDetailCopyWith<$Res>? get targetPhoto;@override $ChatPokePromptModelCopyWith<$Res>? get targetPrompt;
 
 }
 /// @nodoc
@@ -7201,29 +7260,69 @@ class __$PokeModelCopyWithImpl<$Res>
 
 /// Create a copy of PokeModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? fromUserId = null,Object? toUserId = null,Object? targetType = null,Object? targetId = freezed,Object? message = null,Object? status = null,Object? createdAt = null,Object? updatedAt = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? fromUserId = null,Object? fromUser = freezed,Object? toUserId = null,Object? targetType = null,Object? targetId = freezed,Object? message = null,Object? status = null,Object? readBy = null,Object? targetPhoto = freezed,Object? targetPrompt = freezed,Object? createdAt = null,Object? updatedAt = null,}) {
   return _then(_PokeModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,fromUserId: null == fromUserId ? _self.fromUserId : fromUserId // ignore: cast_nullable_to_non_nullable
-as String,toUserId: null == toUserId ? _self.toUserId : toUserId // ignore: cast_nullable_to_non_nullable
+as String,fromUser: freezed == fromUser ? _self.fromUser : fromUser // ignore: cast_nullable_to_non_nullable
+as ChatPokeUserModel?,toUserId: null == toUserId ? _self.toUserId : toUserId // ignore: cast_nullable_to_non_nullable
 as String,targetType: null == targetType ? _self.targetType : targetType // ignore: cast_nullable_to_non_nullable
 as String,targetId: freezed == targetId ? _self.targetId : targetId // ignore: cast_nullable_to_non_nullable
 as String?,message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
 as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as String,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as String,readBy: null == readBy ? _self._readBy : readBy // ignore: cast_nullable_to_non_nullable
+as List<String>,targetPhoto: freezed == targetPhoto ? _self.targetPhoto : targetPhoto // ignore: cast_nullable_to_non_nullable
+as PokePhotoDetail?,targetPrompt: freezed == targetPrompt ? _self.targetPrompt : targetPrompt // ignore: cast_nullable_to_non_nullable
+as ChatPokePromptModel?,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
 as DateTime,
   ));
 }
 
+/// Create a copy of PokeModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ChatPokeUserModelCopyWith<$Res>? get fromUser {
+    if (_self.fromUser == null) {
+    return null;
+  }
 
+  return $ChatPokeUserModelCopyWith<$Res>(_self.fromUser!, (value) {
+    return _then(_self.copyWith(fromUser: value));
+  });
+}/// Create a copy of PokeModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$PokePhotoDetailCopyWith<$Res>? get targetPhoto {
+    if (_self.targetPhoto == null) {
+    return null;
+  }
+
+  return $PokePhotoDetailCopyWith<$Res>(_self.targetPhoto!, (value) {
+    return _then(_self.copyWith(targetPhoto: value));
+  });
+}/// Create a copy of PokeModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ChatPokePromptModelCopyWith<$Res>? get targetPrompt {
+    if (_self.targetPrompt == null) {
+    return null;
+  }
+
+  return $ChatPokePromptModelCopyWith<$Res>(_self.targetPrompt!, (value) {
+    return _then(_self.copyWith(targetPrompt: value));
+  });
+}
 }
 
 
 /// @nodoc
 mixin _$PokerFromUser {
 
- String get id; String get firstName; String? get lastName; List<String> get bestShorts;
+ String get id; String get firstName; String? get lastName; List<String> get bestShorts; String? get activeGroupId;
 /// Create a copy of PokerFromUser
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -7236,16 +7335,16 @@ $PokerFromUserCopyWith<PokerFromUser> get copyWith => _$PokerFromUserCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PokerFromUser&&(identical(other.id, id) || other.id == id)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&const DeepCollectionEquality().equals(other.bestShorts, bestShorts));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PokerFromUser&&(identical(other.id, id) || other.id == id)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&const DeepCollectionEquality().equals(other.bestShorts, bestShorts)&&(identical(other.activeGroupId, activeGroupId) || other.activeGroupId == activeGroupId));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,firstName,lastName,const DeepCollectionEquality().hash(bestShorts));
+int get hashCode => Object.hash(runtimeType,id,firstName,lastName,const DeepCollectionEquality().hash(bestShorts),activeGroupId);
 
 @override
 String toString() {
-  return 'PokerFromUser(id: $id, firstName: $firstName, lastName: $lastName, bestShorts: $bestShorts)';
+  return 'PokerFromUser(id: $id, firstName: $firstName, lastName: $lastName, bestShorts: $bestShorts, activeGroupId: $activeGroupId)';
 }
 
 
@@ -7256,7 +7355,7 @@ abstract mixin class $PokerFromUserCopyWith<$Res>  {
   factory $PokerFromUserCopyWith(PokerFromUser value, $Res Function(PokerFromUser) _then) = _$PokerFromUserCopyWithImpl;
 @useResult
 $Res call({
- String id, String firstName, String? lastName, List<String> bestShorts
+ String id, String firstName, String? lastName, List<String> bestShorts, String? activeGroupId
 });
 
 
@@ -7273,13 +7372,14 @@ class _$PokerFromUserCopyWithImpl<$Res>
 
 /// Create a copy of PokerFromUser
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? firstName = null,Object? lastName = freezed,Object? bestShorts = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? firstName = null,Object? lastName = freezed,Object? bestShorts = null,Object? activeGroupId = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,firstName: null == firstName ? _self.firstName : firstName // ignore: cast_nullable_to_non_nullable
 as String,lastName: freezed == lastName ? _self.lastName : lastName // ignore: cast_nullable_to_non_nullable
 as String?,bestShorts: null == bestShorts ? _self.bestShorts : bestShorts // ignore: cast_nullable_to_non_nullable
-as List<String>,
+as List<String>,activeGroupId: freezed == activeGroupId ? _self.activeGroupId : activeGroupId // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -7364,10 +7464,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String firstName,  String? lastName,  List<String> bestShorts)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String firstName,  String? lastName,  List<String> bestShorts,  String? activeGroupId)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PokerFromUser() when $default != null:
-return $default(_that.id,_that.firstName,_that.lastName,_that.bestShorts);case _:
+return $default(_that.id,_that.firstName,_that.lastName,_that.bestShorts,_that.activeGroupId);case _:
   return orElse();
 
 }
@@ -7385,10 +7485,10 @@ return $default(_that.id,_that.firstName,_that.lastName,_that.bestShorts);case _
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String firstName,  String? lastName,  List<String> bestShorts)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String firstName,  String? lastName,  List<String> bestShorts,  String? activeGroupId)  $default,) {final _that = this;
 switch (_that) {
 case _PokerFromUser():
-return $default(_that.id,_that.firstName,_that.lastName,_that.bestShorts);case _:
+return $default(_that.id,_that.firstName,_that.lastName,_that.bestShorts,_that.activeGroupId);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -7405,10 +7505,10 @@ return $default(_that.id,_that.firstName,_that.lastName,_that.bestShorts);case _
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String firstName,  String? lastName,  List<String> bestShorts)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String firstName,  String? lastName,  List<String> bestShorts,  String? activeGroupId)?  $default,) {final _that = this;
 switch (_that) {
 case _PokerFromUser() when $default != null:
-return $default(_that.id,_that.firstName,_that.lastName,_that.bestShorts);case _:
+return $default(_that.id,_that.firstName,_that.lastName,_that.bestShorts,_that.activeGroupId);case _:
   return null;
 
 }
@@ -7420,7 +7520,7 @@ return $default(_that.id,_that.firstName,_that.lastName,_that.bestShorts);case _
 @JsonSerializable()
 
 class _PokerFromUser implements PokerFromUser {
-  const _PokerFromUser({required this.id, required this.firstName, this.lastName, required final  List<String> bestShorts}): _bestShorts = bestShorts;
+  const _PokerFromUser({required this.id, required this.firstName, this.lastName, required final  List<String> bestShorts, this.activeGroupId}): _bestShorts = bestShorts;
   factory _PokerFromUser.fromJson(Map<String, dynamic> json) => _$PokerFromUserFromJson(json);
 
 @override final  String id;
@@ -7433,6 +7533,7 @@ class _PokerFromUser implements PokerFromUser {
   return EqualUnmodifiableListView(_bestShorts);
 }
 
+@override final  String? activeGroupId;
 
 /// Create a copy of PokerFromUser
 /// with the given fields replaced by the non-null parameter values.
@@ -7447,16 +7548,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PokerFromUser&&(identical(other.id, id) || other.id == id)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&const DeepCollectionEquality().equals(other._bestShorts, _bestShorts));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PokerFromUser&&(identical(other.id, id) || other.id == id)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&const DeepCollectionEquality().equals(other._bestShorts, _bestShorts)&&(identical(other.activeGroupId, activeGroupId) || other.activeGroupId == activeGroupId));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,firstName,lastName,const DeepCollectionEquality().hash(_bestShorts));
+int get hashCode => Object.hash(runtimeType,id,firstName,lastName,const DeepCollectionEquality().hash(_bestShorts),activeGroupId);
 
 @override
 String toString() {
-  return 'PokerFromUser(id: $id, firstName: $firstName, lastName: $lastName, bestShorts: $bestShorts)';
+  return 'PokerFromUser(id: $id, firstName: $firstName, lastName: $lastName, bestShorts: $bestShorts, activeGroupId: $activeGroupId)';
 }
 
 
@@ -7467,7 +7568,7 @@ abstract mixin class _$PokerFromUserCopyWith<$Res> implements $PokerFromUserCopy
   factory _$PokerFromUserCopyWith(_PokerFromUser value, $Res Function(_PokerFromUser) _then) = __$PokerFromUserCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String firstName, String? lastName, List<String> bestShorts
+ String id, String firstName, String? lastName, List<String> bestShorts, String? activeGroupId
 });
 
 
@@ -7484,13 +7585,14 @@ class __$PokerFromUserCopyWithImpl<$Res>
 
 /// Create a copy of PokerFromUser
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? firstName = null,Object? lastName = freezed,Object? bestShorts = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? firstName = null,Object? lastName = freezed,Object? bestShorts = null,Object? activeGroupId = freezed,}) {
   return _then(_PokerFromUser(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,firstName: null == firstName ? _self.firstName : firstName // ignore: cast_nullable_to_non_nullable
 as String,lastName: freezed == lastName ? _self.lastName : lastName // ignore: cast_nullable_to_non_nullable
 as String?,bestShorts: null == bestShorts ? _self._bestShorts : bestShorts // ignore: cast_nullable_to_non_nullable
-as List<String>,
+as List<String>,activeGroupId: freezed == activeGroupId ? _self.activeGroupId : activeGroupId // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -7501,7 +7603,7 @@ as List<String>,
 /// @nodoc
 mixin _$PokedTargetDetail {
 
- String get type; PokePhotoDetail? get photo; PokeAudioDetail? get audio; PokedProfileDetail? get profile; String? get text;
+ String get type; PokePhotoDetail? get photo; PokeAudioDetail? get audio; PokedProfileDetail? get profile; ChatPokePromptModel? get prompt; String? get text;
 /// Create a copy of PokedTargetDetail
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -7514,16 +7616,16 @@ $PokedTargetDetailCopyWith<PokedTargetDetail> get copyWith => _$PokedTargetDetai
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PokedTargetDetail&&(identical(other.type, type) || other.type == type)&&(identical(other.photo, photo) || other.photo == photo)&&(identical(other.audio, audio) || other.audio == audio)&&(identical(other.profile, profile) || other.profile == profile)&&(identical(other.text, text) || other.text == text));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PokedTargetDetail&&(identical(other.type, type) || other.type == type)&&(identical(other.photo, photo) || other.photo == photo)&&(identical(other.audio, audio) || other.audio == audio)&&(identical(other.profile, profile) || other.profile == profile)&&(identical(other.prompt, prompt) || other.prompt == prompt)&&(identical(other.text, text) || other.text == text));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,type,photo,audio,profile,text);
+int get hashCode => Object.hash(runtimeType,type,photo,audio,profile,prompt,text);
 
 @override
 String toString() {
-  return 'PokedTargetDetail(type: $type, photo: $photo, audio: $audio, profile: $profile, text: $text)';
+  return 'PokedTargetDetail(type: $type, photo: $photo, audio: $audio, profile: $profile, prompt: $prompt, text: $text)';
 }
 
 
@@ -7534,11 +7636,11 @@ abstract mixin class $PokedTargetDetailCopyWith<$Res>  {
   factory $PokedTargetDetailCopyWith(PokedTargetDetail value, $Res Function(PokedTargetDetail) _then) = _$PokedTargetDetailCopyWithImpl;
 @useResult
 $Res call({
- String type, PokePhotoDetail? photo, PokeAudioDetail? audio, PokedProfileDetail? profile, String? text
+ String type, PokePhotoDetail? photo, PokeAudioDetail? audio, PokedProfileDetail? profile, ChatPokePromptModel? prompt, String? text
 });
 
 
-$PokePhotoDetailCopyWith<$Res>? get photo;$PokeAudioDetailCopyWith<$Res>? get audio;$PokedProfileDetailCopyWith<$Res>? get profile;
+$PokePhotoDetailCopyWith<$Res>? get photo;$PokeAudioDetailCopyWith<$Res>? get audio;$PokedProfileDetailCopyWith<$Res>? get profile;$ChatPokePromptModelCopyWith<$Res>? get prompt;
 
 }
 /// @nodoc
@@ -7551,13 +7653,14 @@ class _$PokedTargetDetailCopyWithImpl<$Res>
 
 /// Create a copy of PokedTargetDetail
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? type = null,Object? photo = freezed,Object? audio = freezed,Object? profile = freezed,Object? text = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? type = null,Object? photo = freezed,Object? audio = freezed,Object? profile = freezed,Object? prompt = freezed,Object? text = freezed,}) {
   return _then(_self.copyWith(
 type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
 as String,photo: freezed == photo ? _self.photo : photo // ignore: cast_nullable_to_non_nullable
 as PokePhotoDetail?,audio: freezed == audio ? _self.audio : audio // ignore: cast_nullable_to_non_nullable
 as PokeAudioDetail?,profile: freezed == profile ? _self.profile : profile // ignore: cast_nullable_to_non_nullable
-as PokedProfileDetail?,text: freezed == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
+as PokedProfileDetail?,prompt: freezed == prompt ? _self.prompt : prompt // ignore: cast_nullable_to_non_nullable
+as ChatPokePromptModel?,text: freezed == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -7596,6 +7699,18 @@ $PokedProfileDetailCopyWith<$Res>? get profile {
 
   return $PokedProfileDetailCopyWith<$Res>(_self.profile!, (value) {
     return _then(_self.copyWith(profile: value));
+  });
+}/// Create a copy of PokedTargetDetail
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ChatPokePromptModelCopyWith<$Res>? get prompt {
+    if (_self.prompt == null) {
+    return null;
+  }
+
+  return $ChatPokePromptModelCopyWith<$Res>(_self.prompt!, (value) {
+    return _then(_self.copyWith(prompt: value));
   });
 }
 }
@@ -7679,10 +7794,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String type,  PokePhotoDetail? photo,  PokeAudioDetail? audio,  PokedProfileDetail? profile,  String? text)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String type,  PokePhotoDetail? photo,  PokeAudioDetail? audio,  PokedProfileDetail? profile,  ChatPokePromptModel? prompt,  String? text)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PokedTargetDetail() when $default != null:
-return $default(_that.type,_that.photo,_that.audio,_that.profile,_that.text);case _:
+return $default(_that.type,_that.photo,_that.audio,_that.profile,_that.prompt,_that.text);case _:
   return orElse();
 
 }
@@ -7700,10 +7815,10 @@ return $default(_that.type,_that.photo,_that.audio,_that.profile,_that.text);cas
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String type,  PokePhotoDetail? photo,  PokeAudioDetail? audio,  PokedProfileDetail? profile,  String? text)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String type,  PokePhotoDetail? photo,  PokeAudioDetail? audio,  PokedProfileDetail? profile,  ChatPokePromptModel? prompt,  String? text)  $default,) {final _that = this;
 switch (_that) {
 case _PokedTargetDetail():
-return $default(_that.type,_that.photo,_that.audio,_that.profile,_that.text);case _:
+return $default(_that.type,_that.photo,_that.audio,_that.profile,_that.prompt,_that.text);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -7720,10 +7835,10 @@ return $default(_that.type,_that.photo,_that.audio,_that.profile,_that.text);cas
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String type,  PokePhotoDetail? photo,  PokeAudioDetail? audio,  PokedProfileDetail? profile,  String? text)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String type,  PokePhotoDetail? photo,  PokeAudioDetail? audio,  PokedProfileDetail? profile,  ChatPokePromptModel? prompt,  String? text)?  $default,) {final _that = this;
 switch (_that) {
 case _PokedTargetDetail() when $default != null:
-return $default(_that.type,_that.photo,_that.audio,_that.profile,_that.text);case _:
+return $default(_that.type,_that.photo,_that.audio,_that.profile,_that.prompt,_that.text);case _:
   return null;
 
 }
@@ -7735,13 +7850,14 @@ return $default(_that.type,_that.photo,_that.audio,_that.profile,_that.text);cas
 @JsonSerializable()
 
 class _PokedTargetDetail implements PokedTargetDetail {
-  const _PokedTargetDetail({required this.type, this.photo, this.audio, this.profile, this.text});
+  const _PokedTargetDetail({required this.type, this.photo, this.audio, this.profile, this.prompt, this.text});
   factory _PokedTargetDetail.fromJson(Map<String, dynamic> json) => _$PokedTargetDetailFromJson(json);
 
 @override final  String type;
 @override final  PokePhotoDetail? photo;
 @override final  PokeAudioDetail? audio;
 @override final  PokedProfileDetail? profile;
+@override final  ChatPokePromptModel? prompt;
 @override final  String? text;
 
 /// Create a copy of PokedTargetDetail
@@ -7757,16 +7873,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PokedTargetDetail&&(identical(other.type, type) || other.type == type)&&(identical(other.photo, photo) || other.photo == photo)&&(identical(other.audio, audio) || other.audio == audio)&&(identical(other.profile, profile) || other.profile == profile)&&(identical(other.text, text) || other.text == text));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PokedTargetDetail&&(identical(other.type, type) || other.type == type)&&(identical(other.photo, photo) || other.photo == photo)&&(identical(other.audio, audio) || other.audio == audio)&&(identical(other.profile, profile) || other.profile == profile)&&(identical(other.prompt, prompt) || other.prompt == prompt)&&(identical(other.text, text) || other.text == text));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,type,photo,audio,profile,text);
+int get hashCode => Object.hash(runtimeType,type,photo,audio,profile,prompt,text);
 
 @override
 String toString() {
-  return 'PokedTargetDetail(type: $type, photo: $photo, audio: $audio, profile: $profile, text: $text)';
+  return 'PokedTargetDetail(type: $type, photo: $photo, audio: $audio, profile: $profile, prompt: $prompt, text: $text)';
 }
 
 
@@ -7777,11 +7893,11 @@ abstract mixin class _$PokedTargetDetailCopyWith<$Res> implements $PokedTargetDe
   factory _$PokedTargetDetailCopyWith(_PokedTargetDetail value, $Res Function(_PokedTargetDetail) _then) = __$PokedTargetDetailCopyWithImpl;
 @override @useResult
 $Res call({
- String type, PokePhotoDetail? photo, PokeAudioDetail? audio, PokedProfileDetail? profile, String? text
+ String type, PokePhotoDetail? photo, PokeAudioDetail? audio, PokedProfileDetail? profile, ChatPokePromptModel? prompt, String? text
 });
 
 
-@override $PokePhotoDetailCopyWith<$Res>? get photo;@override $PokeAudioDetailCopyWith<$Res>? get audio;@override $PokedProfileDetailCopyWith<$Res>? get profile;
+@override $PokePhotoDetailCopyWith<$Res>? get photo;@override $PokeAudioDetailCopyWith<$Res>? get audio;@override $PokedProfileDetailCopyWith<$Res>? get profile;@override $ChatPokePromptModelCopyWith<$Res>? get prompt;
 
 }
 /// @nodoc
@@ -7794,13 +7910,14 @@ class __$PokedTargetDetailCopyWithImpl<$Res>
 
 /// Create a copy of PokedTargetDetail
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? type = null,Object? photo = freezed,Object? audio = freezed,Object? profile = freezed,Object? text = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? type = null,Object? photo = freezed,Object? audio = freezed,Object? profile = freezed,Object? prompt = freezed,Object? text = freezed,}) {
   return _then(_PokedTargetDetail(
 type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
 as String,photo: freezed == photo ? _self.photo : photo // ignore: cast_nullable_to_non_nullable
 as PokePhotoDetail?,audio: freezed == audio ? _self.audio : audio // ignore: cast_nullable_to_non_nullable
 as PokeAudioDetail?,profile: freezed == profile ? _self.profile : profile // ignore: cast_nullable_to_non_nullable
-as PokedProfileDetail?,text: freezed == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
+as PokedProfileDetail?,prompt: freezed == prompt ? _self.prompt : prompt // ignore: cast_nullable_to_non_nullable
+as ChatPokePromptModel?,text: freezed == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -7840,6 +7957,18 @@ $PokedProfileDetailCopyWith<$Res>? get profile {
 
   return $PokedProfileDetailCopyWith<$Res>(_self.profile!, (value) {
     return _then(_self.copyWith(profile: value));
+  });
+}/// Create a copy of PokedTargetDetail
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ChatPokePromptModelCopyWith<$Res>? get prompt {
+    if (_self.prompt == null) {
+    return null;
+  }
+
+  return $ChatPokePromptModelCopyWith<$Res>(_self.prompt!, (value) {
+    return _then(_self.copyWith(prompt: value));
   });
 }
 }

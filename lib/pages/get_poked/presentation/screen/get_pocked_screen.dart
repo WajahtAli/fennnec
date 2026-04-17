@@ -130,7 +130,7 @@ class _GetPockedScreenState extends State<GetPockedScreen> {
                                         const CustomSizedBox(height: 20),
                                         PokeImageCard(
                                           imageUrl: _getImageForTarget(
-                                            target,
+                                            poke,
                                             fromUser,
                                           ),
                                           isAsset: false,
@@ -142,7 +142,7 @@ class _GetPockedScreenState extends State<GetPockedScreen> {
                                             horizontal: 24,
                                           ),
                                           child: PokeMessageBubble(
-                                            message: poke.message,
+                                            message: poke?.message ?? "",
                                           ),
                                         ),
                                         const CustomSizedBox(height: 20),
@@ -191,7 +191,7 @@ class _GetPockedScreenState extends State<GetPockedScreen> {
                         onIgnore: () => context.router.pop(),
                         onStartChat: () {
                           Di().sl<GetPokedDetailsCubit>().startChat(
-                            pokes[_currentPage].id,
+                            pokes[_currentPage]?.id ?? "",
                           );
                         },
                       ),
@@ -209,13 +209,11 @@ class _GetPockedScreenState extends State<GetPockedScreen> {
     );
   }
 
-  String _getImageForTarget(PokedTargetDetail target, PokerFromUser fromUser) {
-    if (target.type == 'profile' && target.profile != null) {
-      return target.profile!.bestShorts.isNotEmpty
-          ? target.profile!.bestShorts.first
-          : '';
-    } else if (target.type == 'photo' && target.photo != null) {
-      return target.photo!.url;
+  String _getImageForTarget(PokeModel? target, PokerFromUser fromUser) {
+    if (target?.targetType == 'prompt' && target?.targetPrompt != null) {
+      return fromUser.bestShorts.isNotEmpty ? fromUser.bestShorts.first : '';
+    } else if (target?.targetType == 'photo' && target?.targetPhoto != null) {
+      return target?.targetPhoto?.url ?? "";
     }
     return fromUser.bestShorts.isNotEmpty ? fromUser.bestShorts.first : '';
   }

@@ -36,6 +36,8 @@ class CreateGroupCubit extends Cubit<CreateGroupState> {
   bool canUpdatePrompts = true;
   String? createdGroupId;
 
+  void startLoading() => emit(CreateGroupLoading());
+
   CreatedBy? _resolveGroupAdmin() {
     final myGroupCubit = Di().sl<MyGroupCubit>();
     return myGroupCubit.myGroupModel?.data?.createdBy ??

@@ -423,7 +423,7 @@ abstract class PokeDetailResponse with _$PokeDetailResponse {
 @freezed
 abstract class PokeDetailData with _$PokeDetailData {
   const factory PokeDetailData({
-    required PokeModel poke,
+    PokeModel? poke,
     @Default([]) List<PokeModel> pokes,
     required PokerFromUser fromUser,
     required PokedTargetDetail pokedTargetDetail,
@@ -486,11 +486,15 @@ abstract class PokeModel with _$PokeModel {
   const factory PokeModel({
     required String id,
     required String fromUserId,
+    ChatPokeUserModel? fromUser,
     required String toUserId,
     required String targetType,
     String? targetId,
     required String message,
     required String status,
+    @Default([]) List<String> readBy,
+    PokePhotoDetail? targetPhoto,
+    ChatPokePromptModel? targetPrompt,
     @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson)
     required DateTime createdAt,
     @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson)
@@ -506,9 +510,11 @@ Map<String, dynamic> _normalizePokeModel(Map<String, dynamic> json) {
 
   final fromUser = normalized['fromUserId'];
   if (fromUser is Map<String, dynamic>) {
+    normalized['fromUser'] = fromUser;
     normalized['fromUserId'] = fromUser['_id'] ?? fromUser['id'] ?? '';
   } else if (fromUser is Map) {
     final map = Map<String, dynamic>.from(fromUser);
+    normalized['fromUser'] = map;
     normalized['fromUserId'] = map['_id'] ?? map['id'] ?? '';
   }
 
@@ -521,6 +527,12 @@ Map<String, dynamic> _normalizePokeModel(Map<String, dynamic> json) {
   }
 
   normalized['id'] = normalized['_id'] ?? normalized['id'] ?? '';
+
+  // Handle readBy normalization
+  if (normalized['readBy'] == null) {
+    normalized['readBy'] = [];
+  }
+
   return normalized;
 }
 
@@ -531,6 +543,7 @@ abstract class PokerFromUser with _$PokerFromUser {
     required String firstName,
     String? lastName,
     required List<String> bestShorts,
+    String? activeGroupId,
   }) = _PokerFromUser;
 
   factory PokerFromUser.fromJson(Map<String, dynamic> json) =>
@@ -544,6 +557,7 @@ abstract class PokedTargetDetail with _$PokedTargetDetail {
     PokePhotoDetail? photo,
     PokeAudioDetail? audio,
     PokedProfileDetail? profile,
+    ChatPokePromptModel? prompt,
     String? text,
   }) = _PokedTargetDetail;
 

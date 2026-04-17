@@ -181,14 +181,12 @@ class _CreateGroupGalleryScreenState extends State<CreateGroupGalleryScreen> {
                   : (widget.isEditMode ? 'Update' : 'Create Prompts'),
               onTap: () async {
                 if (widget.isEditMode) {
+                  createGroupCubit.startLoading();
                   await uploadAllMedia();
                   await createGroupCubit.updateGroupWithChangedFields(
                     groupId: _myGroupCubit.myGroupModel?.data?.id ?? '',
                   );
-                  // // Clear media after successful update
-                  // if (mounted) {
-                  //   imagePickerCubit.updateMediaList([]);
-                  // }
+                  if (mounted) AutoRouter.of(context).pop();
                 } else {
                   await createGroupCubit.createGroup(context: context);
                   // Clear media after successful creation

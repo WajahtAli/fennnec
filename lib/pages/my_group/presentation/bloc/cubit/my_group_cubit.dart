@@ -78,6 +78,17 @@ class MyGroupCubit extends Cubit<MyGroupState> {
     emit(MyGroupLoading());
     try {
       final result = await _myGroupUsecase.updateGroupById(groupId, body);
+
+      // Merge existing groupPrompts if they are missing or empty in the response
+      if (result.data != null &&
+          (result.data?.groupPrompts?.isEmpty ?? true) &&
+          (myGroupModel?.data?.groupPrompts?.isNotEmpty ?? false)) {
+        log('Merging existing prompts into update response');
+        result.data = result.data?.copyWith(
+          groupPrompts: myGroupModel!.data!.groupPrompts,
+        );
+      }
+
       myGroupModel = result;
       final updatedData = result.data;
       if (updatedData != null && myGroupList?.groupList != null) {

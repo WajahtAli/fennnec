@@ -545,7 +545,9 @@ Map<String, dynamic> _$PokeDetailResponseToJson(_PokeDetailResponse instance) =>
 
 _PokeDetailData _$PokeDetailDataFromJson(Map<String, dynamic> json) =>
     _PokeDetailData(
-      poke: PokeModel.fromJson(json['poke'] as Map<String, dynamic>),
+      poke: json['poke'] == null
+          ? null
+          : PokeModel.fromJson(json['poke'] as Map<String, dynamic>),
       pokes:
           (json['pokes'] as List<dynamic>?)
               ?.map((e) => PokeModel.fromJson(e as Map<String, dynamic>))
@@ -602,11 +604,25 @@ Map<String, dynamic> _$PokeActiveGroupModelToJson(
 _PokeModel _$PokeModelFromJson(Map<String, dynamic> json) => _PokeModel(
   id: json['id'] as String,
   fromUserId: json['fromUserId'] as String,
+  fromUser: json['fromUser'] == null
+      ? null
+      : ChatPokeUserModel.fromJson(json['fromUser'] as Map<String, dynamic>),
   toUserId: json['toUserId'] as String,
   targetType: json['targetType'] as String,
   targetId: json['targetId'] as String?,
   message: json['message'] as String,
   status: json['status'] as String,
+  readBy:
+      (json['readBy'] as List<dynamic>?)?.map((e) => e as String).toList() ??
+      const [],
+  targetPhoto: json['targetPhoto'] == null
+      ? null
+      : PokePhotoDetail.fromJson(json['targetPhoto'] as Map<String, dynamic>),
+  targetPrompt: json['targetPrompt'] == null
+      ? null
+      : ChatPokePromptModel.fromJson(
+          json['targetPrompt'] as Map<String, dynamic>,
+        ),
   createdAt: _dateTimeFromJson(json['createdAt']),
   updatedAt: _dateTimeFromJson(json['updatedAt']),
 );
@@ -615,11 +631,15 @@ Map<String, dynamic> _$PokeModelToJson(_PokeModel instance) =>
     <String, dynamic>{
       'id': instance.id,
       'fromUserId': instance.fromUserId,
+      'fromUser': instance.fromUser,
       'toUserId': instance.toUserId,
       'targetType': instance.targetType,
       'targetId': instance.targetId,
       'message': instance.message,
       'status': instance.status,
+      'readBy': instance.readBy,
+      'targetPhoto': instance.targetPhoto,
+      'targetPrompt': instance.targetPrompt,
       'createdAt': _dateTimeToJson(instance.createdAt),
       'updatedAt': _dateTimeToJson(instance.updatedAt),
     };
@@ -632,6 +652,7 @@ _PokerFromUser _$PokerFromUserFromJson(Map<String, dynamic> json) =>
       bestShorts: (json['bestShorts'] as List<dynamic>)
           .map((e) => e as String)
           .toList(),
+      activeGroupId: json['activeGroupId'] as String?,
     );
 
 Map<String, dynamic> _$PokerFromUserToJson(_PokerFromUser instance) =>
@@ -640,24 +661,27 @@ Map<String, dynamic> _$PokerFromUserToJson(_PokerFromUser instance) =>
       'firstName': instance.firstName,
       'lastName': instance.lastName,
       'bestShorts': instance.bestShorts,
+      'activeGroupId': instance.activeGroupId,
     };
 
-_PokedTargetDetail _$PokedTargetDetailFromJson(Map<String, dynamic> json) =>
-    _PokedTargetDetail(
-      type: json['type'] as String,
-      photo: json['photo'] == null
-          ? null
-          : PokePhotoDetail.fromJson(json['photo'] as Map<String, dynamic>),
-      audio: json['audio'] == null
-          ? null
-          : PokeAudioDetail.fromJson(json['audio'] as Map<String, dynamic>),
-      profile: json['profile'] == null
-          ? null
-          : PokedProfileDetail.fromJson(
-              json['profile'] as Map<String, dynamic>,
-            ),
-      text: json['text'] as String?,
-    );
+_PokedTargetDetail _$PokedTargetDetailFromJson(
+  Map<String, dynamic> json,
+) => _PokedTargetDetail(
+  type: json['type'] as String,
+  photo: json['photo'] == null
+      ? null
+      : PokePhotoDetail.fromJson(json['photo'] as Map<String, dynamic>),
+  audio: json['audio'] == null
+      ? null
+      : PokeAudioDetail.fromJson(json['audio'] as Map<String, dynamic>),
+  profile: json['profile'] == null
+      ? null
+      : PokedProfileDetail.fromJson(json['profile'] as Map<String, dynamic>),
+  prompt: json['prompt'] == null
+      ? null
+      : ChatPokePromptModel.fromJson(json['prompt'] as Map<String, dynamic>),
+  text: json['text'] as String?,
+);
 
 Map<String, dynamic> _$PokedTargetDetailToJson(_PokedTargetDetail instance) =>
     <String, dynamic>{
@@ -665,6 +689,7 @@ Map<String, dynamic> _$PokedTargetDetailToJson(_PokedTargetDetail instance) =>
       'photo': instance.photo,
       'audio': instance.audio,
       'profile': instance.profile,
+      'prompt': instance.prompt,
       'text': instance.text,
     };
 
