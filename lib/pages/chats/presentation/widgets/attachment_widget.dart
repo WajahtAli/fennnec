@@ -2,6 +2,7 @@ import 'package:fennac_app/app/constants/media_query_constants.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:fennac_app/pages/chats/presentation/bloc/cubit/message_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fennac_app/widgets/app_inkwell.dart';
 
@@ -88,7 +89,7 @@ class _AttachmentPanelBelow extends StatelessWidget {
           return AppInkWell(
             onTap: () {
               final picker = Di().sl<ImagePickerCubit>();
-              Di().sl<MessageCubit>().toggleAttachmentPanel(close: true);
+              context.read<MessageCubit>().toggleAttachmentPanel(close: true);
               if (option.label == 'Photos') {
                 picker.pickImageFromGallery();
               } else if (option.type == 'video') {

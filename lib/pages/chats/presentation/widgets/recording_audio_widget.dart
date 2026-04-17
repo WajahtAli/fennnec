@@ -30,7 +30,7 @@ class RecordingAudioWidget extends StatelessWidget {
               // Text message button to switch to text mode
               GestureDetector(
                 onTap: () {
-                  Di().sl<MessageCubit>().toggleRecordingAudio(stop: true);
+                  context.read<MessageCubit>().toggleRecordingAudio(stop: true);
                   recordingCubit.deleteAudio();
                 },
                 child: Container(
@@ -55,7 +55,9 @@ class RecordingAudioWidget extends StatelessWidget {
               if (recordingCubit.isRecorded) ...[
                 GestureDetector(
                   onTap: () {
-                    Di().sl<MessageCubit>().toggleRecordingAudio(stop: true);
+                    context.read<MessageCubit>().toggleRecordingAudio(
+                      stop: true,
+                    );
 
                     recordingCubit.deleteAudio();
                   },
@@ -142,8 +144,10 @@ class RecordingAudioWidget extends StatelessWidget {
               GestureDetector(
                 onTap: () {
                   if (recordingCubit.isRecorded) {
-                    Di().sl<MessageCubit>().toggleRecordingAudio(stop: true);
-                    Di().sl<MessageCubit>().sendMediaMessage(
+                    context.read<MessageCubit>().toggleRecordingAudio(
+                      stop: true,
+                    );
+                    context.read<MessageCubit>().sendMediaMessage(
                       mediaPath: [recordingCubit.recordingPath!],
                       type: MessageType.audio,
                       waveformData: recordingCubit.recordedWaveformData,

@@ -31,9 +31,9 @@ class MessageCubit extends Cubit<MessageState> {
   Timer? _pollingTimer;
 
   void _emitLoadingSuccess(void Function() action) {
-    emit(MessageLoading());
+    emit(MessageLoading(messages: messages));
     action();
-    emit(MessageSuccess());
+    emit(MessageSuccess(messages: messages));
   }
 
   void toggleAttachmentPanel({bool? close}) {
@@ -267,7 +267,7 @@ class MessageCubit extends Cubit<MessageState> {
     );
     _page = 1;
     _hasMore = true;
-    messages.clear();
+    messages = const [];
     isLoading = true;
     emit(MessageLoading());
 
@@ -277,7 +277,7 @@ class MessageCubit extends Cubit<MessageState> {
 
       isLoading = false;
       hasError = false;
-      emit(MessageSuccess());
+      emit(MessageSuccess(messages: messages));
 
       _attachSocketListeners();
     } catch (e) {
@@ -285,7 +285,7 @@ class MessageCubit extends Cubit<MessageState> {
       hasError = true;
       errorMessage = e.toString();
       log("error while getting messages ${e.toString()}");
-      emit(MessageError(e.toString()));
+      emit(MessageError(e.toString(), messages: messages));
     }
   }
 
@@ -324,9 +324,9 @@ class MessageCubit extends Cubit<MessageState> {
       final normalizedMessages = newMessages
           .map(_normalizeFetchedMessage)
           .toList();
-      messages = _mergeAndSortMessages(messages, normalizedMessages);
+      messages = List.unmodifiable(_mergeAndSortMessages(messages, normalizedMessages));
       isFetchingMore = false;
-      emit(MessageSuccess());
+      emit(MessageSuccess(messages: messages));
     } catch (e) {
       isFetchingMore = false;
       rethrow;
@@ -396,8 +396,10 @@ class MessageCubit extends Cubit<MessageState> {
           return;
         }
 
-        messages[index] = message;
-        emit(MessageSuccess());
+        final updatedList = List<MessageModel>.from(messages);
+        updatedList[index] = message;
+        messages = List.unmodifiable(updatedList);
+        emit(MessageSuccess(messages: messages));
         return;
       }
 
@@ -444,10 +446,12 @@ class MessageCubit extends Cubit<MessageState> {
         );
       }
 
-      messages[index] = message.copyWith(
+      final updatedList = List<MessageModel>.from(messages);
+      updatedList[index] = message.copyWith(
         reactions: _normalizeReactions(updated),
       );
-      emit(MessageSuccess());
+      messages = List.unmodifiable(updatedList);
+      emit(MessageSuccess(messages: messages));
     } catch (e) {
       log('Error handling reaction event: $e');
     }
@@ -483,12 +487,6 @@ class MessageCubit extends Cubit<MessageState> {
   void _handleTypingEvent(dynamic data) {
     try {
       log("🔔 Received typing event: $data");
-      if (data is! Map) {
-        log("❌ Typing: data is not a Map");
-        return;
-      }
-      emit(MessageLoading());
-
       final payload = Map<String, dynamic>.from(data);
       final typingGroupId = payload['groupId'];
       final typingReceiverGroupId = payload['receiverGroupId'];
@@ -552,7 +550,7 @@ class MessageCubit extends Cubit<MessageState> {
         log("⏭️ Typing: no change needed (already $isTyping)");
       }
       // Always emit to trigger UI rebuild on any valid typing event
-      emit(MessageSuccess());
+      emit(MessageSuccess(messages: messages));
     } catch (e) {
       log('❌ Error handling typing event: $e');
     }
@@ -631,22 +629,29 @@ class MessageCubit extends Cubit<MessageState> {
           (m) =>
               sendingMessageIds.contains(m.id) &&
               m.senderId == normalized.senderId &&
-              m.content.trim() == normalized.content.trim() &&
-              m.type == normalized.type,
+              m.type == normalized.type &&
+              (m.content.trim() == normalized.content.trim() ||
+                  (m.mediaUrl != null && m.mediaUrl == normalized.mediaUrl) ||
+                  (m.imageUrls.isNotEmpty &&
+                      normalized.imageUrls.isNotEmpty &&
+                      m.imageUrls.first == normalized.imageUrls.first)),
         );
         if (optimisticIndex != -1) {
           final optimisticId = messages[optimisticIndex].id;
-          messages[optimisticIndex] = normalized;
+          final updatedList = List<MessageModel>.from(messages);
+          updatedList[optimisticIndex] = normalized;
+          messages = List.unmodifiable(updatedList);
           sendingMessageIds.remove(optimisticId);
-          emit(MessageSuccess());
+          log('✅ Deduplicated message: replaced optimistic $optimisticId with server ${normalized.id}');
+          emit(MessageSuccess(messages: messages));
           return;
         }
       }
 
-      messages.insert(0, normalized);
+      messages = List.unmodifiable([normalized, ...messages]);
       hasError = false;
       isLoading = false;
-      emit(MessageSuccess());
+      emit(MessageSuccess(messages: messages));
     } catch (e) {
       log('Error handling incoming socket message: $e');
     }
@@ -712,7 +717,7 @@ class MessageCubit extends Cubit<MessageState> {
     }
 
     root['_id'] ??= root['id'] ?? root['messageId'];
-    emit(MessageSuccess());
+    emit(MessageSuccess(messages: messages));
     return root;
   }
 
@@ -795,7 +800,7 @@ class MessageCubit extends Cubit<MessageState> {
 
     final blockedWords = await checkBlockedWords(content);
     if (blockedWords.isNotEmpty) {
-      emit(MessageSuccess());
+      emit(MessageSuccess(messages: messages));
       return blockedWords;
     }
 
@@ -829,6 +834,7 @@ class MessageCubit extends Cubit<MessageState> {
 
     _addMessage(message);
     sendingMessageIds.add(message.id);
+    _startOptimisticCleanup(message.id);
 
     messageController.clear();
     sendTypingStatus(false);
@@ -843,11 +849,13 @@ class MessageCubit extends Cubit<MessageState> {
         );
         // Keep optimistic message in sending state until socket confirmation
         // arrives, so it can be replaced instead of duplicated.
-        emit(MessageSuccess());
+        emit(MessageSuccess(messages: messages));
       } catch (e) {
-        messages[index] = message.copyWith(isSending: false, hasFailed: true);
+        final updatedList = List<MessageModel>.from(messages);
+        updatedList[index] = message.copyWith(isSending: false, hasFailed: true);
+        messages = List.unmodifiable(updatedList);
         sendingMessageIds.remove(message.id);
-        emit(MessageError(e.toString()));
+        emit(MessageError(e.toString(), messages: messages));
       }
 
       log('sendTextMessage completed for ${message.id}');
@@ -893,6 +901,7 @@ class MessageCubit extends Cubit<MessageState> {
 
     _addMessage(message);
     sendingMessageIds.add(message.id);
+    _startOptimisticCleanup(message.id);
 
     final index = messages.indexWhere((m) => m.id == message.id);
     if (index != -1) {
@@ -917,6 +926,20 @@ class MessageCubit extends Cubit<MessageState> {
             ? _defaultMediaPreview(type)
             : caption;
 
+        // PRE-EMPTIVE UPDATE: Update local list with web URLs BEFORE request
+        // This prevents a race condition where the socket confirmation arrives
+        // before the local list is updated.
+        final syncList = List<MessageModel>.from(messages);
+        final syncIndex = syncList.indexWhere((m) => m.id == message.id);
+        if (syncIndex != -1) {
+          syncList[syncIndex] = message.copyWith(
+            imageUrls: uploadedUrls,
+            mediaUrl: uploadedUrls.length == 1 ? uploadedUrls.first : null,
+          );
+          messages = List.unmodifiable(syncList);
+          emit(MessageSuccess(messages: messages));
+        }
+
         await _sendMessageRequest(
           content: effectiveContent,
           type: type.name,
@@ -925,22 +948,25 @@ class MessageCubit extends Cubit<MessageState> {
           wave: type == MessageType.audio ? null : waveformData,
           duration: type == MessageType.audio ? null : duration,
         );
-        messages[index] = message.copyWith(
-          isSending: false,
-          imageUrls: uploadedUrls,
-          mediaUrl: uploadedUrls.length == 1 ? uploadedUrls.first : null,
-        );
-        emit(MessageSuccess());
+
+        // Final transition to non-sending state
+        final finalIndex = messages.indexWhere((m) => m.id == message.id);
+        if (finalIndex != -1) {
+          final updatedList = List<MessageModel>.from(messages);
+          updatedList[finalIndex] = messages[finalIndex].copyWith(isSending: false);
+          messages = List.unmodifiable(updatedList);
+          emit(MessageSuccess(messages: messages));
+        }
       } catch (e) {
-        messages[index] = message.copyWith(isSending: false, hasFailed: true);
-        emit(MessageError(e.toString()));
-      } finally {
-        emit(MessageSuccess());
-        Future.delayed(const Duration(seconds: 1), () {
-          messages.removeWhere((m) => m.id == message.id);
-          sendingMessageIds.remove(message.id);
-        });
-        emit(MessageSuccess());
+        log('❌ Error sending message: $e');
+        final index = messages.indexWhere((m) => m.id == message.id);
+        if (index != -1) {
+          final updatedList = List<MessageModel>.from(messages);
+          updatedList[index] = message.copyWith(isSending: false, hasFailed: true);
+          messages = List.unmodifiable(updatedList);
+          emit(MessageError(e.toString(), messages: messages));
+        }
+        sendingMessageIds.remove(message.id);
       }
     }
   }
@@ -995,8 +1021,10 @@ class MessageCubit extends Cubit<MessageState> {
       );
     }
 
-    messages[messageIndex] = message.copyWith(reactions: reactions);
-    emit(MessageSuccess());
+    final updatedList = List<MessageModel>.from(messages);
+    updatedList[messageIndex] = message.copyWith(reactions: reactions);
+    messages = List.unmodifiable(updatedList);
+    emit(MessageSuccess(messages: messages));
 
     try {
       await _reactToMessageRequest(
@@ -1005,7 +1033,7 @@ class MessageCubit extends Cubit<MessageState> {
         isRemove: isRemove,
       );
     } catch (e) {
-      emit(MessageError(e.toString()));
+      emit(MessageError(e.toString(), messages: messages));
     }
   }
 
@@ -1019,8 +1047,10 @@ class MessageCubit extends Cubit<MessageState> {
 
     reactions.removeWhere((r) => r.userId == currentUserId && r.emoji == emoji);
 
-    messages[messageIndex] = message.copyWith(reactions: reactions);
-    emit(MessageSuccess());
+    final updatedList = List<MessageModel>.from(messages);
+    updatedList[messageIndex] = message.copyWith(reactions: reactions);
+    messages = List.unmodifiable(updatedList);
+    emit(MessageSuccess(messages: messages));
 
     try {
       await _reactToMessageRequest(
@@ -1029,7 +1059,7 @@ class MessageCubit extends Cubit<MessageState> {
         isRemove: true,
       );
     } catch (e) {
-      emit(MessageError(e.toString()));
+      emit(MessageError(e.toString(), messages: messages));
     }
   }
 
@@ -1041,17 +1071,21 @@ class MessageCubit extends Cubit<MessageState> {
 
     final message = messages[messageIndex];
     if (!message.isRead && !message.isMe) {
-      messages[messageIndex] = message.copyWith(
+      final updatedList = List<MessageModel>.from(messages);
+      updatedList[messageIndex] = message.copyWith(
         isRead: true,
         readAt: DateTime.now(),
       );
-      emit(MessageSuccess());
+      messages = List.unmodifiable(updatedList);
+      emit(MessageSuccess(messages: messages));
 
       try {
         await _markMessageAsReadRequest(messageId);
       } catch (e) {
-        messages[messageIndex] = message.copyWith(isRead: false, readAt: null);
-        emit(MessageError(e.toString()));
+        final revertList = List<MessageModel>.from(messages);
+        revertList[messageIndex] = message.copyWith(isRead: false, readAt: null);
+        messages = List.unmodifiable(revertList);
+        emit(MessageError(e.toString(), messages: messages));
       }
     }
   }
@@ -1062,20 +1096,24 @@ class MessageCubit extends Cubit<MessageState> {
     if (messageIndex == -1) return;
 
     final message = messages[messageIndex];
-    messages[messageIndex] = message.copyWith(
+    final updatedList1 = List<MessageModel>.from(messages);
+    updatedList1[messageIndex] = message.copyWith(
       isSending: true,
       hasFailed: false,
     );
-    emit(MessageSuccess());
+    messages = List.unmodifiable(updatedList1);
+    emit(MessageSuccess(messages: messages));
 
     // Simulate sending
     await Future.delayed(const Duration(milliseconds: 500));
 
-    messages[messageIndex] = message.copyWith(
+    final updatedList2 = List<MessageModel>.from(messages);
+    updatedList2[messageIndex] = message.copyWith(
       isSending: false,
       hasFailed: false,
     );
-    emit(MessageSuccess());
+    messages = List.unmodifiable(updatedList2);
+    emit(MessageSuccess(messages: messages));
   }
 
   /// Delete a message
@@ -1086,16 +1124,20 @@ class MessageCubit extends Cubit<MessageState> {
     if (_groupId == null || _groupId!.isEmpty) return false;
 
     // Optimistically update UI
-    final deletedMessage = messages.removeAt(messageIndex);
-    emit(MessageSuccess());
+    final updatedList = List<MessageModel>.from(messages);
+    final deletedMessage = updatedList.removeAt(messageIndex);
+    messages = List.unmodifiable(updatedList);
+    emit(MessageSuccess(messages: messages));
 
     try {
       await _deleteMessageRequest(messageId);
       return true;
     } catch (e) {
       // Revert if API call fails
-      messages.insert(messageIndex, deletedMessage);
-      emit(MessageError(e.toString()));
+      final revertList = List<MessageModel>.from(messages);
+      revertList.insert(messageIndex, deletedMessage);
+      messages = List.unmodifiable(revertList);
+      emit(MessageError(e.toString(), messages: messages));
       return false;
     }
   }
@@ -1128,9 +1170,8 @@ class MessageCubit extends Cubit<MessageState> {
 
   /// Private helper to add message and emit state
   void _addMessage(MessageModel message) {
-    _emitLoadingSuccess(() {
-      messages.insert(0, message);
-    });
+    messages = List.unmodifiable([message, ...messages]);
+    emit(MessageSuccess(messages: messages));
   }
 
   /// Get grouped reactions for display
@@ -1151,7 +1192,16 @@ class MessageCubit extends Cubit<MessageState> {
 
   /// Clear all messages
   void clearMessages() {
-    messages.clear();
-    emit(MessageSuccess());
+    messages = const [];
+    emit(MessageSuccess(messages: messages));
+  }
+
+  void _startOptimisticCleanup(String messageId) {
+    Future.delayed(const Duration(seconds: 30), () {
+      if (!isClosed && sendingMessageIds.contains(messageId)) {
+        log('⚠️ Safety cleanup: removing stuck message ID $messageId after timeout');
+        sendingMessageIds.remove(messageId);
+      }
+    });
   }
 }

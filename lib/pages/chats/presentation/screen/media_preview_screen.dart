@@ -8,18 +8,19 @@ import 'package:fennac_app/reusable_widgets/custom_app_bar.dart';
 import 'package:fennac_app/widgets/movable_background.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../core/di_container.dart';
 import '../bloc/cubit/message_cubit.dart';
 
 @RoutePage()
 class MediaPreviewScreen extends StatefulWidget {
   final List<MessageModel> messages;
   final int initialIndex;
+  final MessageCubit messageCubit;
 
   const MediaPreviewScreen({
     super.key,
     required this.messages,
     required this.initialIndex,
+    required this.messageCubit,
   });
 
   @override
@@ -39,7 +40,7 @@ class _MediaPreviewScreenState extends State<MediaPreviewScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final media = Di().sl<MessageCubit>().getMedias();
+    final media = widget.messageCubit.getMedias();
     // Safety check
     if (widget.messages.isEmpty) {
       return Scaffold(
@@ -90,6 +91,7 @@ class _MediaPreviewScreenState extends State<MediaPreviewScreen> {
                       child: ThumbnailStrip(
                         messages: widget.messages,
                         selectedIndex: _currentIndex,
+                        messageCubit: widget.messageCubit,
                         onMessageSelected: (index) {
                           setState(() {
                             _currentIndex = index;

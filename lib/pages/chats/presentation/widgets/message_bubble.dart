@@ -11,6 +11,7 @@ import 'package:fennac_app/pages/chats/data/models/message_model.dart';
 import 'package:fennac_app/pages/chats/data/models/message_type_enum.dart';
 import 'package:fennac_app/pages/chats/presentation/bloc/cubit/message_cubit.dart';
 import 'package:fennac_app/widgets/prompt_audio_row.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -126,8 +127,14 @@ class TextMessageBubble extends StatelessWidget {
 class ChatImage extends StatelessWidget {
   final String path;
   final double height;
+  final double? width;
 
-  const ChatImage({super.key, required this.path, required this.height});
+  const ChatImage({
+    super.key,
+    required this.path,
+    required this.height,
+    this.width,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -139,6 +146,7 @@ class ChatImage extends StatelessWidget {
         imageUrl: path,
         fit: BoxFit.cover,
         height: height,
+        width: width,
         radius: 16,
       );
     }
@@ -146,13 +154,18 @@ class ChatImage extends StatelessWidget {
     if (isFile) {
       return ClipRRect(
         borderRadius: BorderRadius.circular(16),
-        child: Image.file(File(path), fit: BoxFit.cover, height: height),
+        child: Image.file(
+          File(path),
+          fit: BoxFit.cover,
+          height: height,
+          width: width,
+        ),
       );
     }
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
-      child: Image.asset(path, fit: BoxFit.cover, height: height),
+      child: Image.asset(path, fit: BoxFit.cover, height: height, width: width),
     );
   }
 }
@@ -165,46 +178,64 @@ class ImageMessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final images = message.imageUrls;
+    if (images.isEmpty) return const SizedBox.shrink();
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: GridView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: images.length > 1 ? 2 : 1,
-          crossAxisSpacing: 4,
-          mainAxisSpacing: 4,
+    return Container(
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(context).size.width * 0.75,
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            const spacing = 4.0;
+            final isMulti = images.length > 1;
+            final size = isMulti
+                ? (constraints.maxWidth - spacing) / 2
+                : constraints.maxWidth;
+
+            return Wrap(
+              spacing: spacing,
+              runSpacing: spacing,
+              children: List.generate(images.length > 4 ? 4 : images.length, (
+                index,
+              ) {
+                return Stack(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        context.router.navigate(
+                          MediaPreviewRoute(
+                            messages: context.read<MessageCubit>().messages,
+                            initialIndex: index,
+                            messageCubit: context.read<MessageCubit>(),
+                          ),
+                        );
+                      },
+                      child: ChatImage(
+                        path: images[index],
+                        height: images.length == 1 ? 250 : size,
+                        width: size,
+                      ),
+                    ),
+                    if (index == 3 && images.length > 4)
+                      Positioned.fill(
+                        child: Container(
+                          color: Colors.black.withOpacity(0.6),
+                          child: Center(
+                            child: Text(
+                              '+${images.length - 4}',
+                              style: AppTextStyles.h3(context),
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                );
+              }),
+            );
+          },
         ),
-        itemCount: images.length > 4 ? 4 : images.length,
-        itemBuilder: (_, index) {
-          return Stack(
-            fit: StackFit.expand,
-            children: [
-              GestureDetector(
-                onTap: () {
-                  context.router.navigate(
-                    MediaPreviewRoute(
-                      messages: Di().sl<MessageCubit>().messages,
-                      initialIndex: index,
-                    ),
-                  );
-                },
-                child: ChatImage(path: images[index], height: 120),
-              ),
-              if (index == 3 && images.length > 4)
-                Container(
-                  color: Colors.black.withOpacity(0.6),
-                  child: Center(
-                    child: Text(
-                      '+${images.length - 4}',
-                      style: AppTextStyles.h3(context),
-                    ),
-                  ),
-                ),
-            ],
-          );
-        },
       ),
     );
   }
@@ -316,13 +347,17 @@ class _VideoMessageBubbleState extends State<VideoMessageBubble> {
       onTap: () {
         context.router.navigate(
           MediaPreviewRoute(
-            messages: Di().sl<MessageCubit>().messages,
-            initialIndex: 2,
+            messages: context.read<MessageCubit>().messages,
+            initialIndex: 0,
+            messageCubit: context.read<MessageCubit>(),
           ),
         );
       },
-      child: SizedBox(
-        height: 400,
+      child: Container(
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.sizeOf(context).width * 0.75,
+          maxHeight: 400,
+        ),
         child: Stack(
           alignment: Alignment.center,
           children: [

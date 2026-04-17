@@ -22,6 +22,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:lottie/lottie.dart';
 
+import '../bloc/cubit/message_cubit.dart';
+
 class ChatAppBar extends StatelessWidget {
   final bool isGroup;
   final String? contactName;
@@ -92,6 +94,7 @@ class ChatAppBar extends StatelessWidget {
                     isGroup: true,
                     contactName: currentChat?.name ?? contactName,
                     contactAvatar: currentChat?.image ?? contactAvatar,
+                    messageCubit: context.read<MessageCubit>(),
                   ),
                 );
               },

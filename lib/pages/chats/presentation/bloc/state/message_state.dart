@@ -1,21 +1,31 @@
 part of '../cubit/message_cubit.dart';
 
 class MessageState extends Equatable {
+  final List<MessageModel> messages;
+
+  const MessageState({this.messages = const []});
+
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [messages];
 }
 
-final class MessageInitial extends MessageState {}
+final class MessageInitial extends MessageState {
+  const MessageInitial() : super(messages: const []);
+}
 
-final class MessageLoading extends MessageState {}
+final class MessageLoading extends MessageState {
+  const MessageLoading({super.messages});
+}
 
-final class MessageSuccess extends MessageState {}
+final class MessageSuccess extends MessageState {
+  const MessageSuccess({super.messages});
+}
 
 final class MessageError extends MessageState {
   final String message;
 
-  MessageError(this.message);
+  const MessageError(this.message, {super.messages});
 
   @override
-  List<Object?> get props => [message];
+  List<Object?> get props => [message, messages];
 }

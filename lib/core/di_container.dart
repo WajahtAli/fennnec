@@ -299,7 +299,7 @@ class Di {
     sl.registerLazySingleton<WaveformCubit>(
       () => WaveformCubit(sl<WaveformExtractionController>()),
     );
-    sl.registerLazySingleton<MessageCubit>(() => MessageCubit(sl()));
+    sl.registerFactory<MessageCubit>(() => MessageCubit(sl()));
     sl.registerLazySingleton<CallCubit>(() => CallCubit(sl()));
     sl.registerLazySingleton<ProfileCubit>(() => ProfileCubit(sl()));
     sl.registerLazySingleton<PrivacyPermissionCubit>(

@@ -35,6 +35,7 @@ class MessageList extends StatefulWidget {
 }
 
 class _MessageListState extends State<MessageList> {
+  late final MessageCubit _messageCubit;
   final ScrollController _scrollController = ScrollController();
   final Map<String, GlobalKey> _messageKeys = {};
   OverlayEntry? _reactionOverlay;
@@ -43,7 +44,8 @@ class _MessageListState extends State<MessageList> {
   @override
   void initState() {
     super.initState();
-    messageCubit.initializeMessages(
+    _messageCubit = context.read<MessageCubit>();
+    _messageCubit.initializeMessages(
       widget.groupId,
       isGroup: widget.isGroup,
       otherGroupId: widget.otherGroupId,
@@ -54,15 +56,15 @@ class _MessageListState extends State<MessageList> {
   void _onScroll() {
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent - 200) {
-      if (!messageCubit.isLoading && !messageCubit.isFetchingMore) {
-        messageCubit.loadMoreMessages();
+      if (!_messageCubit.isLoading && !_messageCubit.isFetchingMore) {
+        _messageCubit.loadMoreMessages();
       }
     }
   }
 
   @override
   void dispose() {
-    messageCubit.stopPolling();
+    _messageCubit.stopPolling();
 
     _scrollController.dispose();
 
@@ -161,7 +163,7 @@ class _MessageListState extends State<MessageList> {
               children: _availableReactions.map((emoji) {
                 return GestureDetector(
                   onTap: () {
-                    messageCubit.addReaction(message.id, emoji);
+                    _messageCubit.addReaction(message.id, emoji);
                     _removeReactionOverlay(message.id, emoji);
                   },
                   child: Padding(
@@ -249,7 +251,7 @@ class _MessageListState extends State<MessageList> {
 
     if (!mounted) return;
     _removeReactionOverlay(message.id, '');
-    final isDeleted = await messageCubit.deleteMessage(message.id);
+    final isDeleted = await _messageCubit.deleteMessage(message.id);
     if (!mounted) return;
 
     if (isDeleted) {
@@ -270,61 +272,22 @@ class _MessageListState extends State<MessageList> {
       message: message,
       isMineSide: isMineSide,
       onLongPress: () {},
-      messageKey: GlobalKey(),
+      messageKey: GlobalKey(), // Single-use key for overlay is fine as it's a separate subtree
     );
-    // return Column(
-    //   mainAxisSize: MainAxisSize.min,
-    //   crossAxisAlignment: isMineSide
-    //       ? CrossAxisAlignment.end
-    //       : CrossAxisAlignment.start,
-    //   children: [
-    //     if (!isMineSide)
-    //       Text(
-    //         message.senderName,
-    //         style: AppTextStyles.body(
-    //           context,
-    //         ).copyWith(color: ColorPalette.white),
-    //       ),
-    //     Container(
-    //       constraints: BoxConstraints(
-    //         maxWidth: MediaQuery.of(context).size.width * 0.75,
-    //       ),
-    //       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-    //       decoration: BoxDecoration(
-    //         color: isMineSide
-    //             ? ColorPalette.primary
-    //             : ColorPalette.secondary.withValues(alpha: 0.5),
-    //         borderRadius: BorderRadius.circular(20),
-    //       ),
-    //       child: Text(
-    //         message.content,
-    //         style: AppTextStyles.body(
-    //           context,
-    //         ).copyWith(color: ColorPalette.white, fontSize: 15),
-    //       ),
-    //     ),
-    //     if (isMineSide)
-    //       Text(
-    //         DateFormat('hh:mm a').format(message.sentAt),
-    //         style: AppTextStyles.body(
-    //           context,
-    //         ).copyWith(color: ColorPalette.white),
-    //       ),
-    //   ],
-    // );
   }
+
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<MessageCubit, MessageState>(
-      bloc: messageCubit,
+      bloc: _messageCubit,
       builder: (context, state) {
-        if (messageCubit.isLoading) {
+        if (_messageCubit.isLoading) {
           return Center(child: Lottie.asset(Assets.animations.loadingSpinner));
         }
-        final messages = messageCubit.messages;
+        final messages = state.messages;
 
-        if (messageCubit.hasError && messages.isEmpty) {
+        if (_messageCubit.hasError && messages.isEmpty) {
           return Padding(
             padding: const EdgeInsets.all(24),
             child: Center(
@@ -411,7 +374,7 @@ class _MessageListState extends State<MessageList> {
                     ),
                   ] else
                     _buildMessageWithLongPress(message, isMineSide),
-                  if (index == 0 && messageCubit.otherUserIsTyping)
+                  if (index == 0 && _messageCubit.otherUserIsTyping)
                     TypingIndicator(),
                 ],
               ),
@@ -426,6 +389,7 @@ class _MessageListState extends State<MessageList> {
     final key = _messageKeys.putIfAbsent(message.id, () => GlobalKey());
 
     return GestureDetector(
+      key: ValueKey(message.id),
       onLongPress: () => _showReactionOverlay(message, isMineSide),
       child: MessageBubble(
         message: message,
@@ -437,4 +401,4 @@ class _MessageListState extends State<MessageList> {
   }
 }
 
-final MessageCubit messageCubit = Di().sl<MessageCubit>();
+// Removed global MessageCubit reference to support isolated chat instances.

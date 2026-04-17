@@ -10,7 +10,7 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:auto_route/auto_route.dart' as _i52;
-import 'package:collection/collection.dart' as _i57;
+import 'package:collection/collection.dart' as _i58;
 import 'package:fennac_app/app/constants/app_enums.dart' as _i54;
 import 'package:fennac_app/pages/auth/presentation/screen/create_account_screen.dart'
     as _i10;
@@ -34,7 +34,9 @@ import 'package:fennac_app/pages/call/presentation/screen/group_audio_call_scree
     as _i22;
 import 'package:fennac_app/pages/call/presentation/screen/video_call_screen.dart'
     as _i50;
-import 'package:fennac_app/pages/chats/data/models/message_model.dart' as _i56;
+import 'package:fennac_app/pages/chats/data/models/message_model.dart' as _i57;
+import 'package:fennac_app/pages/chats/presentation/bloc/cubit/message_cubit.dart'
+    as _i56;
 import 'package:fennac_app/pages/chats/presentation/screen/chat_landing_screen.dart'
     as _i8;
 import 'package:fennac_app/pages/chats/presentation/screen/group_chat_screen.dart'
@@ -889,6 +891,7 @@ class GroupDetailRoute extends _i52.PageRouteInfo<GroupDetailRouteArgs> {
     String? contactName,
     String? contactAvatar,
     bool isOnline = false,
+    required _i56.MessageCubit messageCubit,
     List<_i52.PageRouteInfo>? children,
   }) : super(
          GroupDetailRoute.name,
@@ -898,6 +901,7 @@ class GroupDetailRoute extends _i52.PageRouteInfo<GroupDetailRouteArgs> {
            contactName: contactName,
            contactAvatar: contactAvatar,
            isOnline: isOnline,
+           messageCubit: messageCubit,
          ),
          initialChildren: children,
        );
@@ -907,15 +911,14 @@ class GroupDetailRoute extends _i52.PageRouteInfo<GroupDetailRouteArgs> {
   static _i52.PageInfo page = _i52.PageInfo(
     name,
     builder: (data) {
-      final args = data.argsAs<GroupDetailRouteArgs>(
-        orElse: () => const GroupDetailRouteArgs(),
-      );
+      final args = data.argsAs<GroupDetailRouteArgs>();
       return _i24.GroupDetailScreen(
         key: args.key,
         isGroup: args.isGroup,
         contactName: args.contactName,
         contactAvatar: args.contactAvatar,
         isOnline: args.isOnline,
+        messageCubit: args.messageCubit,
       );
     },
   );
@@ -928,6 +931,7 @@ class GroupDetailRouteArgs {
     this.contactName,
     this.contactAvatar,
     this.isOnline = false,
+    required this.messageCubit,
   });
 
   final _i53.Key? key;
@@ -940,9 +944,11 @@ class GroupDetailRouteArgs {
 
   final bool isOnline;
 
+  final _i56.MessageCubit messageCubit;
+
   @override
   String toString() {
-    return 'GroupDetailRouteArgs{key: $key, isGroup: $isGroup, contactName: $contactName, contactAvatar: $contactAvatar, isOnline: $isOnline}';
+    return 'GroupDetailRouteArgs{key: $key, isGroup: $isGroup, contactName: $contactName, contactAvatar: $contactAvatar, isOnline: $isOnline, messageCubit: $messageCubit}';
   }
 
   @override
@@ -953,7 +959,8 @@ class GroupDetailRouteArgs {
         isGroup == other.isGroup &&
         contactName == other.contactName &&
         contactAvatar == other.contactAvatar &&
-        isOnline == other.isOnline;
+        isOnline == other.isOnline &&
+        messageCubit == other.messageCubit;
   }
 
   @override
@@ -962,7 +969,8 @@ class GroupDetailRouteArgs {
       isGroup.hashCode ^
       contactName.hashCode ^
       contactAvatar.hashCode ^
-      isOnline.hashCode;
+      isOnline.hashCode ^
+      messageCubit.hashCode;
 }
 
 /// generated route for
@@ -1346,8 +1354,9 @@ class ManageSubscriptionsRoute extends _i52.PageRouteInfo<void> {
 class MediaPreviewRoute extends _i52.PageRouteInfo<MediaPreviewRouteArgs> {
   MediaPreviewRoute({
     _i53.Key? key,
-    required List<_i56.MessageModel> messages,
+    required List<_i57.MessageModel> messages,
     required int initialIndex,
+    required _i56.MessageCubit messageCubit,
     List<_i52.PageRouteInfo>? children,
   }) : super(
          MediaPreviewRoute.name,
@@ -1355,6 +1364,7 @@ class MediaPreviewRoute extends _i52.PageRouteInfo<MediaPreviewRouteArgs> {
            key: key,
            messages: messages,
            initialIndex: initialIndex,
+           messageCubit: messageCubit,
          ),
          initialChildren: children,
        );
@@ -1369,6 +1379,7 @@ class MediaPreviewRoute extends _i52.PageRouteInfo<MediaPreviewRouteArgs> {
         key: args.key,
         messages: args.messages,
         initialIndex: args.initialIndex,
+        messageCubit: args.messageCubit,
       );
     },
   );
@@ -1379,17 +1390,20 @@ class MediaPreviewRouteArgs {
     this.key,
     required this.messages,
     required this.initialIndex,
+    required this.messageCubit,
   });
 
   final _i53.Key? key;
 
-  final List<_i56.MessageModel> messages;
+  final List<_i57.MessageModel> messages;
 
   final int initialIndex;
 
+  final _i56.MessageCubit messageCubit;
+
   @override
   String toString() {
-    return 'MediaPreviewRouteArgs{key: $key, messages: $messages, initialIndex: $initialIndex}';
+    return 'MediaPreviewRouteArgs{key: $key, messages: $messages, initialIndex: $initialIndex, messageCubit: $messageCubit}';
   }
 
   @override
@@ -1397,18 +1411,20 @@ class MediaPreviewRouteArgs {
     if (identical(this, other)) return true;
     if (other is! MediaPreviewRouteArgs) return false;
     return key == other.key &&
-        const _i57.ListEquality<_i56.MessageModel>().equals(
+        const _i58.ListEquality<_i57.MessageModel>().equals(
           messages,
           other.messages,
         ) &&
-        initialIndex == other.initialIndex;
+        initialIndex == other.initialIndex &&
+        messageCubit == other.messageCubit;
   }
 
   @override
   int get hashCode =>
       key.hashCode ^
-      const _i57.ListEquality<_i56.MessageModel>().hash(messages) ^
-      initialIndex.hashCode;
+      const _i58.ListEquality<_i57.MessageModel>().hash(messages) ^
+      initialIndex.hashCode ^
+      messageCubit.hashCode;
 }
 
 /// generated route for

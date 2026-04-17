@@ -6296,8 +6296,7 @@ $PokeDetailDataCopyWith<$Res> get data {
 /// @nodoc
 mixin _$PokeDetailData {
 
- PokeModel? get poke;// Made nullable as it might be missing in favor of 'pokes'
- List<PokeModel> get pokes; PokerFromUser get fromUser; PokedTargetDetail get pokedTargetDetail; PokeActiveGroupModel? get activeGroup;
+ PokeModel? get poke; List<PokeModel> get pokes; PokerFromUser get fromUser; PokedTargetDetail get pokedTargetDetail; PokeActiveGroupModel? get activeGroup;
 /// Create a copy of PokeDetailData
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -6541,9 +6540,7 @@ class _PokeDetailData implements PokeDetailData {
   factory _PokeDetailData.fromJson(Map<String, dynamic> json) => _$PokeDetailDataFromJson(json);
 
 @override final  PokeModel? poke;
-// Made nullable as it might be missing in favor of 'pokes'
  final  List<PokeModel> _pokes;
-// Made nullable as it might be missing in favor of 'pokes'
 @override@JsonKey() List<PokeModel> get pokes {
   if (_pokes is EqualUnmodifiableListView) return _pokes;
   // ignore: implicit_dynamic_type

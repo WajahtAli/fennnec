@@ -106,7 +106,7 @@ class MediaSelectionWidget extends StatelessWidget {
                                 ? MessageType.image
                                 : MessageType.video;
 
-                            Di().sl<MessageCubit>().sendMediaMessage(
+                            context.read<MessageCubit>().sendMediaMessage(
                               mediaPath: mediaList.map((e) => e.path).toList(),
                               type: mediaType,
                             );

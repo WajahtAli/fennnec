@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:ui';
 
 import 'package:auto_route/auto_route.dart';
@@ -8,7 +7,6 @@ import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:fennac_app/helpers/cached_network_image_helper.dart';
-import 'package:fennac_app/pages/auth/presentation/bloc/cubit/login_cubit.dart';
 import 'package:fennac_app/pages/chats/data/models/chat_and_calls_response.dart';
 import 'package:fennac_app/pages/chats/data/models/message_model.dart';
 import 'package:fennac_app/pages/chats/data/models/message_type_enum.dart';
@@ -41,6 +39,7 @@ class GroupDetailScreen extends StatefulWidget {
   final String? contactName;
   final String? contactAvatar;
   final bool isOnline;
+  final MessageCubit messageCubit;
 
   const GroupDetailScreen({
     super.key,
@@ -48,6 +47,7 @@ class GroupDetailScreen extends StatefulWidget {
     this.contactName,
     this.contactAvatar,
     this.isOnline = false,
+    required this.messageCubit,
   });
 
   @override
@@ -272,11 +272,9 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                       currentChat: currentChat,
                     )
                   : BlocBuilder<MessageCubit, MessageState>(
-                      bloc: Di().sl<MessageCubit>(),
+                      bloc: widget.messageCubit,
                       builder: (context, _) {
-                        final previewMessages = Di()
-                            .sl<MessageCubit>()
-                            .messages;
+                        final previewMessages = widget.messageCubit.messages;
                         final mediaUrls = _resolveMessageAttachmentMediaUrls(
                           previewMessages,
                         );
@@ -416,7 +414,11 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
         return GestureDetector(
           onTap: () {
             AutoRouter.of(context).push(
-              MediaPreviewRoute(messages: previewMessages, initialIndex: index),
+              MediaPreviewRoute(
+                messages: previewMessages,
+                initialIndex: index,
+                messageCubit: widget.messageCubit,
+              ),
             );
           },
           child: _buildMediaItem(mediaUrls[index]),

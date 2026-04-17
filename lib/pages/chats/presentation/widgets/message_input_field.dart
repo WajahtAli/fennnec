@@ -29,11 +29,12 @@ class MessageInputField extends StatefulWidget {
 }
 
 class _MessageInputFieldState extends State<MessageInputField> {
-  final MessageCubit _messageCubit = Di().sl<MessageCubit>();
+  late final MessageCubit _messageCubit;
   final ImagePickerCubit _imagePickerCubit = Di().sl<ImagePickerCubit>();
 
   @override
   void initState() {
+    _messageCubit = context.read<MessageCubit>();
     _messageCubit.messageController.addListener(() {
       _messageCubit.updateFieldHaveText(
         _messageCubit.messageController.text.trim().isNotEmpty,
