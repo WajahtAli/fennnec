@@ -108,6 +108,18 @@ class HomeCubit extends Cubit<HomeState> {
     emit(HomeLoaded());
   }
 
+  // reset groups
+  void resetGroups() {
+    emit(HomeLoading());
+    groups.clear();
+    currentIndex = 0;
+    selectedGroupIndex = 0;
+    selectedProfileIndex = null;
+    selectedProfile = null;
+    isEnd = false;
+    emit(HomeLoaded());
+  }
+
   void removeGroupById(String groupId) {
     emit(HomeLoading());
     groups.removeWhere((group) => group.id == groupId);

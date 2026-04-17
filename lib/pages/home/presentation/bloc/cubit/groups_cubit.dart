@@ -63,7 +63,7 @@ class GroupsCubit extends Cubit<GroupsState> {
     emit(GroupsLoading());
     backupGroupsModel = groupsModel;
     groupsModel = null;
-    Di().sl<HomeCubit>().updateGroups([]);
+    Di().sl<HomeCubit>().resetGroups();
     emit(GroupsSuccess());
   }
 
