@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/pages/chats/presentation/screen/chat_landing_screen.dart';
 import 'package:fennac_app/pages/dashboard/presentation/bloc/state/dashboard_state.dart';
@@ -28,6 +30,7 @@ class DashboardCubit extends Cubit<DashboardState> {
   }
 
   void changeIndex(int index, {bool scrollToServices = false}) {
+    log("changeIndex $index");
     emit(DashboardLoading());
     selectedIndex = index;
     shouldScrollToServices = scrollToServices;

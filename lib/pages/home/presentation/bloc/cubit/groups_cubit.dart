@@ -14,6 +14,7 @@ class GroupsCubit extends Cubit<GroupsState> {
   GroupsCubit(this._groupsUsecase) : super(GroupsInitial());
 
   GroupsModel? groupsModel;
+  GroupsModel? backupGroupsModel;
   Map<String, dynamic>? acceptGroupReqResponse;
 
   Future<void> fetchAllGroups({
@@ -35,8 +36,10 @@ class GroupsCubit extends Cubit<GroupsState> {
           limit: limit,
           queryParameters: queryParameters,
         );
+        backupGroupsModel = result;
         groupsModel = result;
         final groups = groupsModel?.data?.groups ?? [];
+        log("home groups  ${groups.length}");
         Di().sl<HomeCubit>().updateGroups(groups);
       }
       log('Fetched Groups: ${groupsModel?.data?.groups?.first.groupTag}');
@@ -48,7 +51,20 @@ class GroupsCubit extends Cubit<GroupsState> {
 
   // reset groups
   void resetGroups() {
+    log("resetGroups ${groupsModel?.data?.groups?.length}");
+    emit(GroupsLoading());
+    groupsModel = backupGroupsModel;
     Di().sl<HomeCubit>().updateGroups(groupsModel?.data?.groups ?? []);
+    emit(GroupsSuccess());
+  }
+
+  // backup groups
+  void backupGroups() {
+    emit(GroupsLoading());
+    backupGroupsModel = groupsModel;
+    groupsModel = null;
+    Di().sl<HomeCubit>().updateGroups([]);
+    emit(GroupsSuccess());
   }
 
   Future<void> likeDislikeGroup({

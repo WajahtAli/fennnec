@@ -117,9 +117,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   showDivider: false,
                                   title: 'People Who Liked You',
                                   onTap: () async {
-                                    await Di().sl<GroupsCubit>().fetchAllGroups(
-                                      isLikedGroups: true,
-                                    );
+                                    Di().sl<GroupsCubit>().backupGroups();
                                     AutoRouter.of(
                                       context,
                                     ).push(HomeRoute(isLikedGroups: true));
