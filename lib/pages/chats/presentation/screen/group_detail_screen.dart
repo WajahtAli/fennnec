@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:ui';
 
 import 'package:auto_route/auto_route.dart';
@@ -7,6 +8,7 @@ import 'package:fennac_app/app/theme/text_styles.dart';
 import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:fennac_app/helpers/cached_network_image_helper.dart';
+import 'package:fennac_app/pages/auth/presentation/bloc/cubit/login_cubit.dart';
 import 'package:fennac_app/pages/chats/data/models/chat_and_calls_response.dart';
 import 'package:fennac_app/pages/chats/data/models/message_model.dart';
 import 'package:fennac_app/pages/chats/data/models/message_type_enum.dart';
@@ -20,6 +22,7 @@ import 'package:fennac_app/pages/my_group/data/model/my_group_model.dart';
 import 'package:fennac_app/pages/my_group/presentation/bloc/state/my_group_state.dart';
 import 'package:fennac_app/pages/dashboard/presentation/bloc/cubit/dashboard_cubit.dart';
 import 'package:fennac_app/pages/my_group/presentation/bloc/cubit/my_group_cubit.dart';
+import 'package:fennac_app/pages/profile/presentation/widgets/full_profile_dialog.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fennac_app/reusable_widgets/animated_background_container.dart';
 import 'package:fennac_app/reusable_widgets/custom_app_bar.dart';
@@ -169,13 +172,29 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
               }
 
               if (userGroupMembers.isEmpty && matchedGroupMembers.isEmpty) {
-                return GroupDetailMembersAvatar(members: fallbackMembers);
+                return GroupDetailMembersAvatar(
+                  members: fallbackMembers,
+                  onTap: (member) {
+                    FullProfileDialog().showProfile(
+                      memberId: member.id,
+                      context: context,
+                    );
+                  },
+                );
               }
 
               return Column(
                 children: [
                   if (userGroupMembers.isNotEmpty)
-                    GroupDetailMembersAvatar(members: userGroupMembers),
+                    GroupDetailMembersAvatar(
+                      members: userGroupMembers,
+                      onTap: (member) {
+                        FullProfileDialog().showProfile(
+                          memberId: member.id,
+                          context: context,
+                        );
+                      },
+                    ),
                   Container(
                     width: 408,
                     height: 2,
@@ -201,7 +220,15 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                       child: Divider(height: 8, color: Color(0x40FFFFFF)),
                     ),
                   if (matchedGroupMembers.isNotEmpty)
-                    GroupDetailMembersAvatar(members: matchedGroupMembers),
+                    GroupDetailMembersAvatar(
+                      members: matchedGroupMembers,
+                      onTap: (member) async {
+                        FullProfileDialog().showProfile(
+                          memberId: member.id,
+                          context: context,
+                        );
+                      },
+                    ),
                 ],
               );
             },

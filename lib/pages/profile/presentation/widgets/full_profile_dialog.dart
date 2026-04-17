@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:fennac_app/app/constants/media_query_constants.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 import 'package:fennac_app/app/theme/app_emojis.dart';
@@ -10,6 +12,7 @@ import 'package:fennac_app/pages/home/presentation/widgets/group_gallery_widget.
 import 'package:fennac_app/pages/home/presentation/widgets/hero_section.dart';
 import 'package:fennac_app/pages/profile/presentation/widgets/profile_avatar.dart';
 import 'package:fennac_app/pages/profile/presentation/widgets/profile_chip.dart';
+import 'package:fennac_app/skeletons/home/home_landing_skeleton.dart';
 import 'package:fennac_app/utils/validators.dart';
 import 'package:fennac_app/widgets/custom_sized_box.dart';
 import 'package:fennac_app/widgets/prompt_audio_row.dart';
@@ -17,20 +20,86 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
+import '../../../auth/presentation/bloc/state/login_state.dart';
 import '../../../edit_profile/presentation/widgets/interleaved_media_section.dart';
 
 class FullProfileDialog extends StatefulWidget {
   final bool isEditProfile;
   final ScrollController? scrollController;
-
+  final String? userId;
   const FullProfileDialog({
     super.key,
     this.isEditProfile = false,
     this.scrollController,
+    this.userId,
   });
 
   @override
   State<FullProfileDialog> createState() => _FullProfileDialogState();
+
+  void showProfile({String? memberId, required BuildContext context}) {
+    const double minSheetExtent = 0.5;
+    const double maxSheetExtent = 1.0;
+    const double initialSheetExtent = 0.8;
+
+    final blurNotifier = ValueNotifier<double>(
+      lerpDouble(
+            4,
+            20,
+            ((initialSheetExtent - minSheetExtent) /
+                    (maxSheetExtent - minSheetExtent))
+                .clamp(0.0, 1.0),
+          ) ??
+          8,
+    );
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => ValueListenableBuilder<double>(
+        valueListenable: blurNotifier,
+        builder: (context, blur, __) => Stack(
+          children: [
+            Positioned.fill(
+              child: IgnorePointer(
+                child: ClipRect(
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
+                    child: Container(color: Colors.transparent),
+                  ),
+                ),
+              ),
+            ),
+            DraggableScrollableSheet(
+              initialChildSize: initialSheetExtent,
+              minChildSize: minSheetExtent,
+              maxChildSize: maxSheetExtent,
+              expand: false,
+              builder: (context, scrollController) =>
+                  NotificationListener<DraggableScrollableNotification>(
+                    onNotification: (notification) {
+                      final progress =
+                          ((notification.extent - minSheetExtent) /
+                                  (maxSheetExtent - minSheetExtent))
+                              .clamp(0.0, 1.0);
+                      final nextBlur = lerpDouble(4, 20, progress);
+                      if (nextBlur != null) {
+                        blurNotifier.value = nextBlur;
+                      }
+                      return false;
+                    },
+                    child: FullProfileDialog(
+                      isEditProfile: true,
+                      userId: memberId ?? '',
+                      scrollController: scrollController,
+                    ),
+                  ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class _FullProfileDialogState extends State<FullProfileDialog> {
@@ -39,7 +108,13 @@ class _FullProfileDialogState extends State<FullProfileDialog> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() => _loginCubit.getSelfInfo());
+    if (widget.userId != null) {
+      Future.microtask(
+        () => _loginCubit.getProfile(userId: widget.userId ?? ""),
+      );
+    } else {
+      Future.microtask(() => _loginCubit.getSelfInfo());
+    }
   }
 
   @override
@@ -47,7 +122,13 @@ class _FullProfileDialogState extends State<FullProfileDialog> {
     return BlocBuilder<LoginCubit, dynamic>(
       bloc: _loginCubit,
       builder: (context, state) {
-        final user = _loginCubit.userData?.user;
+        final user = widget.userId != null
+            ? _loginCubit.individualProfileData
+            : _loginCubit.userData;
+
+        if (state is LoginLoading || user == null) {
+          return HomeLandingSkeleton(verticalSpacing: 24);
+        }
         return ClipRRect(
           borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(32),
@@ -71,13 +152,13 @@ class _FullProfileDialogState extends State<FullProfileDialog> {
                 padding: EdgeInsets.zero,
                 children: [
                   CustomSizedBox(height: 16),
-                  if (widget.isEditProfile && user != null ||
-                      (user?.bestShorts?.isNotEmpty ?? false)) ...[
+                  if (widget.isEditProfile ||
+                      (user.user?.bestShorts?.isNotEmpty ?? false)) ...[
                     CircleAvatar(
                       radius: 60,
                       child: ProfileAvatar(
-                        imageUrl: (user?.bestShorts?.isNotEmpty ?? false)
-                            ? user!.bestShorts!.first
+                        imageUrl: (user.user?.bestShorts?.isNotEmpty ?? false)
+                            ? user!.user!.bestShorts!.first
                             : '',
                         size: 120,
                       ),
@@ -89,7 +170,7 @@ class _FullProfileDialogState extends State<FullProfileDialog> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            '${user?.firstName ?? ''} ${user?.dob != null ? ', ${calculateAge(user?.dob.toString() ?? "")}' : ''}',
+                            '${user.user?.firstName ?? ''} ${user.user?.dob != null ? ', ${calculateAge(user.user?.dob.toString() ?? "")}' : ''}',
                             style: AppTextStyles.h3(
                               context,
                             ).copyWith(fontWeight: FontWeight.bold),
@@ -124,13 +205,11 @@ class _FullProfileDialogState extends State<FullProfileDialog> {
                                     .first
                               : '',
                         ),
-                        ProfileChip(
-                          label: _loginCubit.userData?.user?.pronouns ?? '',
-                        ),
+                        ProfileChip(label: user.user?.pronouns ?? ''),
                         FutureBuilder<String>(
                           future: _loginCubit.getLocationFromLatLng(
-                            _loginCubit.userData?.user?.latitude,
-                            _loginCubit.userData?.user?.longitude,
+                            user.user?.latitude,
+                            user.user?.longitude,
                           ),
                           builder: (context, snapshot) {
                             final location = snapshot.data ?? '';
@@ -142,7 +221,7 @@ class _FullProfileDialogState extends State<FullProfileDialog> {
                         ),
                         ProfileChip(
                           icon: Assets.icons.groupLocation.path,
-                          label: user?.groupLocation?.address ?? '',
+                          label: user.user?.groupLocation?.address ?? '',
                         ),
                       ],
                     ),
@@ -154,15 +233,15 @@ class _FullProfileDialogState extends State<FullProfileDialog> {
                       children: [
                         ProfileChip(
                           icon: Assets.icons.bag.path,
-                          label: _loginCubit.userData?.user?.education ?? '',
+                          label: user.user?.education ?? '',
                         ),
                         ProfileChip(
                           icon: Assets.icons.cap.path,
-                          label: _loginCubit.userData?.user?.jobTitle ?? '',
+                          label: user.user?.jobTitle ?? '',
                         ),
                       ],
                     ),
-                    if (user?.groupLocation?.address != null) ...[
+                    if (user.user?.groupLocation?.address != null) ...[
                       CustomSizedBox(height: 12),
                       Wrap(
                         alignment: WrapAlignment.center,
@@ -170,7 +249,7 @@ class _FullProfileDialogState extends State<FullProfileDialog> {
                         children: [
                           ProfileChip(
                             icon: Assets.icons.home.path,
-                            label: user?.address ?? '',
+                            label: user.user?.address ?? '',
                           ),
                         ],
                       ),
@@ -180,7 +259,7 @@ class _FullProfileDialogState extends State<FullProfileDialog> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       child: Text(
-                        user?.shortBio ?? '',
+                        user.user?.shortBio ?? '',
                         textAlign: TextAlign.center,
                         style: AppTextStyles.body(context).copyWith(
                           color: isLightTheme(context)
@@ -189,29 +268,30 @@ class _FullProfileDialogState extends State<FullProfileDialog> {
                         ),
                       ),
                     ),
-                    if (_loginCubit.userData?.prompts?.isNotEmpty ??
-                        false || (user?.bestShorts?.isNotEmpty ?? false))
+                    if (user.prompts?.isNotEmpty ??
+                        false || (user.user?.bestShorts?.isNotEmpty ?? false))
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                         child: InterleavedMediaSection(
-                          bestShorts: user?.bestShorts ?? [],
-                          prompts: _loginCubit.userData?.prompts ?? [],
+                          bestShorts: user.user?.bestShorts ?? [],
+                          prompts: user.prompts ?? [],
                           onImageEditTap: () {},
                           onPromptEditTap: (prompt, isEdit) {},
                           isNeedEdit: false,
+                          userId: user.user?.id,
                         ),
                       ),
                   ] else ...[
-                    if (user?.bestShorts?.isNotEmpty ?? false)
+                    if (user.user?.bestShorts?.isNotEmpty ?? false)
                       HeroSection(
-                        imagePath: user?.bestShorts?.first ?? "",
-                        avatarPaths: user?.bestShorts ?? [],
+                        imagePath: user.user?.bestShorts?.first ?? "",
+                        avatarPaths: user.user?.bestShorts ?? [],
                       ),
                     CustomSizedBox(height: 24),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       child: Text(
-                        user?.firstName ?? "",
+                        user.user?.firstName ?? "",
                         textAlign: TextAlign.center,
                         style: AppTextStyles.h1Large(context).copyWith(
                           color: isLightTheme(context)
@@ -226,7 +306,7 @@ class _FullProfileDialogState extends State<FullProfileDialog> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8),
                       child: Text(
-                        'Just a bunch of friends who love spontaneous road trips, rooftop sunsets, concerts, and pretending we\'re outdoorsy (until it rains).',
+                        user.user?.shortBio ?? '',
                         textAlign: TextAlign.center,
                         style: AppTextStyles.bodyRegular(context).copyWith(
                           fontSize: 16,

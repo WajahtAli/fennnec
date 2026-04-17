@@ -11,6 +11,7 @@ import 'package:fennac_app/pages/chats/presentation/bloc/cubit/message_cubit.dar
 import 'package:fennac_app/pages/chats/presentation/bloc/state/chat_landing_state.dart';
 import 'package:fennac_app/pages/chats/data/repository/chat_repository.dart';
 import 'package:fennac_app/pages/chats/presentation/widgets/call_history_item.dart';
+import 'package:fennac_app/pages/profile/presentation/widgets/full_profile_dialog.dart';
 import 'package:fennac_app/reusable_widgets/horizontal_avatar_list.dart';
 import 'package:fennac_app/routes/routes_imports.gr.dart';
 import 'package:fennac_app/widgets/custom_search_field.dart';
@@ -84,24 +85,29 @@ class _SubscribedChatWidgetState extends State<SubscribedChatWidget> {
 
                     final isOnline = chat.status.toLowerCase() == 'online';
 
-                    context.router.push(
-                      GroupChatRoute(
-                        isGroup: chat.type == 'group' ? true : false,
-                        groupId: _resolveChatRouteId(chat),
-                        contactAvatar: member.image,
-                        contactName: member.name,
-                        isOnline: isOnline,
-                        otherGroupId: chat.type == 'group'
-                            ? (chat.meta.receiverGroupId ??
-                                  chat
-                                      .meta
-                                      .groupsDetails
-                                      ?.matchedGroupMembers
-                                      .firstOrNull
-                                      ?.groupId)
-                            : null,
-                      ),
+                    FullProfileDialog().showProfile(
+                      context: context,
+                      memberId: member.id,
                     );
+
+                    // context.router.push(
+                    //   GroupChatRoute(
+                    //     isGroup: chat.type == 'group' ? true : false,
+                    //     groupId: _resolveChatRouteId(chat),
+                    //     contactAvatar: member.image,
+                    //     contactName: member.name,
+                    //     isOnline: isOnline,
+                    //     otherGroupId: chat.type == 'group'
+                    //         ? (chat.meta.receiverGroupId ??
+                    //               chat
+                    //                   .meta
+                    //                   .groupsDetails
+                    //                   ?.matchedGroupMembers
+                    //                   .firstOrNull
+                    //                   ?.groupId)
+                    //         : null,
+                    //   ),
+                    // );
                   },
                 ),
               Padding(

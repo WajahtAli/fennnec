@@ -1,21 +1,36 @@
+import 'dart:developer';
+
 import 'package:fennac_app/app/constants/media_query_constants.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
+import 'package:fennac_app/app/theme/app_emojis.dart';
 import 'package:fennac_app/app/theme/text_styles.dart';
+import 'package:fennac_app/core/di_container.dart';
 import 'package:fennac_app/core/extensions/string_extension.dart';
 import 'package:fennac_app/generated/assets.gen.dart';
 import 'package:fennac_app/pages/auth/data/model/prompt_model.dart';
+import 'package:fennac_app/pages/auth/presentation/bloc/cubit/login_cubit.dart';
 import 'package:fennac_app/pages/edit_profile/presentation/widgets/profile_section_wrapper.dart';
+import 'package:fennac_app/pages/home/data/models/groups_model.dart';
+import 'package:fennac_app/pages/home/presentation/bloc/cubit/home_cubit.dart';
 import 'package:fennac_app/reusable_widgets/custom_video_player.dart';
 import 'package:fennac_app/widgets/prompt_audio_row.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:fennac_app/reusable_widgets/dynamic_ratio_image_widget.dart';
 
+import '../../../../app/constants/app_enums.dart';
+import '../../../../utils/validators.dart';
+import '../../../../widgets/app_inkwell.dart';
+import '../../../home/presentation/blur_controller.dart';
+import '../../../home/presentation/widgets/group_gallery_widget.dart';
+import '../../../home/presentation/widgets/send_poke_bottomsheet.dart';
+
 class InterleavedMediaSection extends StatelessWidget {
   final List<String> bestShorts;
   final List<Prompt> prompts;
   final VoidCallback onImageEditTap;
   final bool isNeedEdit;
+  final String? userId;
   final Function(Prompt, bool) onPromptEditTap;
 
   const InterleavedMediaSection({
@@ -23,6 +38,7 @@ class InterleavedMediaSection extends StatelessWidget {
     required this.bestShorts,
     required this.prompts,
     this.isNeedEdit = true,
+    this.userId,
     required this.onImageEditTap,
     required this.onPromptEditTap,
   });
@@ -83,12 +99,21 @@ class InterleavedMediaSection extends StatelessWidget {
         padding: EdgeInsets.zero,
         itemBuilder: (context, index) {
           final item = interleavedItems[index];
+          log("item $item prompts ${prompts.length}");
 
           if (item is String) {
             return _ImageItem(
               imagePath: item,
+              targetId: item,
+              onPokeTap: (type) {},
               onEditTap: onImageEditTap,
               isNeedEdit: isNeedEdit,
+              userId: userId,
+            );
+          } else if (prompts.length == 0) {
+            return Text(
+              'Add more media or prompts to your gallery',
+              style: AppTextStyles.h4(context),
             );
           } else if (item is Prompt) {
             return Padding(
@@ -110,12 +135,18 @@ class InterleavedMediaSection extends StatelessWidget {
 class _ImageItem extends StatelessWidget {
   final String imagePath;
   final VoidCallback onEditTap;
+  final void Function(EditableCardType type)? onPokeTap;
+  final String? targetId;
   final bool isNeedEdit;
+  final String? userId;
 
   const _ImageItem({
     required this.imagePath,
     required this.onEditTap,
+    this.targetId,
+    this.onPokeTap,
     required this.isNeedEdit,
+    this.userId,
   });
 
   @override
@@ -174,6 +205,62 @@ class _ImageItem extends StatelessWidget {
                 ),
               ),
             ),
+          if (userId != null)
+            Positioned(
+              top: 16,
+              right: 16,
+              child: AppInkWell(
+                onTap: () => onPokeTap?.call(EditableCardType.image),
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: ColorPalette.primary,
+                  ),
+                  child: SvgPicture.asset(
+                    Assets.icons.edit.path,
+                    color: ColorPalette.white,
+                  ),
+                ),
+              ),
+            ),
+
+          Positioned(
+            top: 16,
+            right: 16,
+            child: GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: () async {
+                final user = Di().sl<LoginCubit>().individualProfileData?.user;
+                Di().sl<HomeCubit>().selectedProfile = Member(
+                  name: user?.firstName,
+                  age: validateInt(calculateAge(user?.dob.toString() ?? "")),
+                );
+                await HomeBlurController.showWithBlur(
+                  context: context,
+                  builder: (context) => SendPokeBottomSheet(
+                    pokeType: PokeType.image,
+                    image: imagePath,
+
+                    // targetId: targetId,
+                  ),
+                );
+              },
+              child: Container(
+                height: 32,
+                width: 32,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: ColorPalette.primary,
+                  shape: BoxShape.circle,
+                ),
+                child: Text(
+                  AppEmojis.pointingRight,
+                  style: AppTextStyles.h4(context),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );

@@ -3,7 +3,8 @@ import 'package:shimmer/shimmer.dart';
 import 'package:fennac_app/app/theme/app_colors.dart';
 
 class HomeLandingSkeleton extends StatelessWidget {
-  const HomeLandingSkeleton({super.key});
+  final double? verticalSpacing;
+  const HomeLandingSkeleton({super.key, this.verticalSpacing});
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +16,10 @@ class HomeLandingSkeleton extends StatelessWidget {
     return Container(
       color: isDark ? ColorPalette.cardBlack : Colors.white,
       child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: verticalSpacing ?? 0,
+        ),
         child: Column(
           spacing: 32,
           children: [
